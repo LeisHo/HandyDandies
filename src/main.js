@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=70'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=71'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -31,7 +31,65 @@ function safeRefreshMultiSelectOptions(key) {
   try { refreshMultiSelectOptions(key) } catch (err) { console.error(`safeRefreshMultiSelectOptions('${key}') failed`, err) }
 }
 
-const MODEL_URL = '../data/processed/HAND3D/HandipantsOL_Clip.glb' // Draco-compressed, carries the 'Clipping Block' mesh (2026-10-11)
+const MODEL_URL = '../data/processed/HAND3D/HandipantsOL_Clip.glb' // Draco-compressed, carries the 'Clipping Block' mesh (2026-10-11) - no longer loaded directly, see resolveHandModelUrl()
+// ---- Hand model (2026-10-14, direct request: use HandipantsFixedBone.glb; Hand group > item selector with Use / Delete / Import) ----
+// The model is chosen BEFORE it loads, so the choice lives in localStorage (readable the instant the page starts, like the startup background); it is also saved with the settings (handModelId) so other devices follow it.
+// Models are the repo ones below plus any the user imports: an imported .glb is kept in this browser's IndexedDB (it cannot go into the repo from here), so it exists on this device only. Use reloads the page: everything that
+// is measured from the model (alignQuat, bounds, bone rest poses, the crop block) is taken once at load.
+const HAND_MODEL_DEFAULT_ID = 'repo:HandipantsFixedBone'
+const HAND_MODEL_BUILTINS = [
+  { id: 'repo:HandipantsFixedBone', name: 'Handipants Fixed Bone', url: '../data/processed/HAND3D/HandipantsFixedBone.glb', source: 'repo' },
+  { id: 'repo:HandipantsOL_Clip', name: 'Handipants OL (Crop Block, Draco)', url: '../data/processed/HAND3D/HandipantsOL_Clip.glb', source: 'repo' }
+]
+const HAND_MODEL_LS_KEY = 'handyDandies.handModelId'
+const HAND_MODEL_PENDING_KEY = 'handyDandies.handModelPending' // set by Use, cleared by the next load once the choice is on the server
+const HAND_MODEL_BONES = ['rHand', 'rMid3', 'rForearmBend', 'rMid1'] // the rig names the measurements and poses rely on
+let activeHandModelId = HAND_MODEL_DEFAULT_ID
+const localHandModelPresent = {} // id -> true when this browser holds the imported file
+function handModelIdb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('handyDandiesHandModels', 1)
+    req.onupgradeneeded = () => req.result.createObjectStore('models')
+    req.onsuccess = () => resolve(req.result)
+    req.onerror = () => reject(req.error)
+  })
+}
+function handModelIdbRun(mode, fn) {
+  return handModelIdb().then((db) => new Promise((resolve, reject) => {
+    const tx = db.transaction('models', mode)
+    const out = fn(tx.objectStore('models'))
+    tx.oncomplete = () => { db.close(); resolve(out && out.result) }
+    tx.onerror = () => { db.close(); reject(tx.error) }
+  }))
+}
+const handModelIdbGet = (id) => handModelIdbRun('readonly', (st) => st.get(id))
+const handModelIdbPut = (id, rec) => handModelIdbRun('readwrite', (st) => st.put(rec, id))
+const handModelIdbDelete = (id) => handModelIdbRun('readwrite', (st) => st.delete(id))
+const handModelIdbKeys = () => handModelIdbRun('readonly', (st) => st.getAllKeys())
+async function resolveHandModelUrl() {
+  let id = null
+  try { id = localStorage.getItem(HAND_MODEL_LS_KEY) } catch (e) { /* storage blocked */ }
+  id = id || HAND_MODEL_DEFAULT_ID
+  const builtin = HAND_MODEL_BUILTINS.find((m) => m.id === id)
+  if (builtin) { activeHandModelId = id; return builtin.url }
+  if (id.startsWith('local:')) {
+    try {
+      const rec = await handModelIdbGet(id)
+      if (rec && rec.blob) { activeHandModelId = id; return URL.createObjectURL(rec.blob) }
+    } catch (e) { /* fall through to the default */ }
+  }
+  activeHandModelId = HAND_MODEL_DEFAULT_ID // the chosen model is not available here (imported on another device, or removed)
+  try { localStorage.removeItem(HAND_MODEL_LS_KEY) } catch (e) { /* ignore */ }
+  return HAND_MODEL_BUILTINS[0].url
+}
+// A load that cannot work (bad file, missing rig bones): go back to the default model once instead of leaving a dead page.
+function revertHandModelAndReload(reason) {
+  if (activeHandModelId === HAND_MODEL_DEFAULT_ID) return false
+  console.error('Hand model "' + activeHandModelId + '" unusable: ' + reason + ' - going back to the default model')
+  try { localStorage.removeItem(HAND_MODEL_LS_KEY) } catch (e) { /* ignore */ }
+  location.reload()
+  return true
+}
 // Measured once after the first load -- the rig's own bind-pose "pointing"
 // axis (wrist -> middle fingertip), not assumed to be +Y/-Z.
 let alignQuat = new THREE.Quaternion()
@@ -869,7 +927,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -1840,6 +1898,26 @@ const DEV_GROUPS = [
       // Extra Fallback levels beyond Fallback 2, added with the Add Fallback button.
       { key: 'renderOrderExtraFallbacks', label: 'Render Order: Extra Fallbacks', type: 'text', placeAfter: 'renderOrderFallback2Except', def: '[]' },
       { key: 'renderOrderFlipLock', label: 'Render Order: Flip Once Per Sequence', type: 'checkbox', def: true },
+      // Hand Model (2026-10-14): which hand model is loaded, and the list to choose from. Moved into the group titled Hands (any capitalisation) after the restore, see placeHandModelRows().
+      { key: 'handModelId', label: 'Hand Model (Internal, Auto-Managed)', type: 'text', def: HAND_MODEL_DEFAULT_ID },
+      {
+        key: 'handModels',
+        label: 'Hand Models',
+        type: 'list-picker',
+        def: [],
+        hostManaged: true,
+        buttons: ['use', 'delete', 'import'],
+        itemLabel: 'Hand Model',
+        itemBadge: (item) => (item.id === activeHandModelId ? '  (in use)' : (item.source === 'local' && localHandModelPresent[item.id] === false ? '  (not on this device)' : '')),
+        onUse: (item) => useHandModel(item),
+        onBeforeDelete: (item, btn) => {
+          if (item.source !== 'local') { flashModelButton(btn, 'Built-in'); return false }
+          if (item.id === activeHandModelId) { flashModelButton(btn, 'In use'); return false }
+          return true
+        },
+        onDeleted: (item) => { if (item.source === 'local') handModelIdbDelete(item.id).catch(() => {}) },
+        onImportClick: (btn) => importHandModelFile(btn)
+      },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -2408,7 +2486,7 @@ const DEV_GROUPS = [
           isOn: (item) => !!cfg[`${item.fnId}Enabled`],
           setOn: (item, on) => setCustomFunctionEnabled(item.fnId, on)
         },
-        onDuplicate: (item) => { duplicateCustomClickFunction(item.fnId) }
+        onDuplicate: (item, opts) => { duplicateCustomClickFunction(item.fnId, opts) }
       },
       // MOVED to the top of this group 2026-09-28 (direct request) -- both
       // were previously elsewhere (Hold Confirm Delay lower in this same
@@ -3347,6 +3425,8 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
+    prof('placeHandModelRows', placeHandModelRows)
+    prof('syncHandModelWithSettings', syncHandModelWithSettings)
     startupSettingsReady = true
     prof('refreshStartupPreviewAfterRestore', refreshStartupPreviewAfterRestore)
     prof('writeStartupCache', writeStartupCache)
@@ -14556,7 +14636,12 @@ function refreshCustomFunctionSelector() {
     used.add(e.id)
     out.push({ name: customFunctionDisplayName(e), fnId: e.id, ...(it.group ? { group: it.group } : {}) })
   })
-  customClickFunctionIds.forEach((e) => { if (!used.has(e.id)) out.push({ name: customFunctionDisplayName(e), fnId: e.id }) })
+  customClickFunctionIds.forEach((e) => {
+    if (used.has(e.id)) return
+    const grp = customFunctionPendingGroup[e.id]
+    delete customFunctionPendingGroup[e.id]
+    out.push({ name: customFunctionDisplayName(e), fnId: e.id, ...(grp ? { group: grp } : {}) })
+  })
   if (JSON.stringify(out) === JSON.stringify(saved)) return
   cfg.customFunctionSelector = out
   syncValue('customFunctionSelector', out)
@@ -14577,11 +14662,14 @@ function watchCustomFunctionTitles() {
   customFunctionSelectorObserver.observe(anchor, { subtree: true, characterData: true, childList: true })
 }
 // Duplicate (selector button): a new function of the same kind / family with every setting of the source copied - all three devices' values, Show-in-Mobile / Landscape and Independent flags, and the Multi Trigger list with each trigger's own settings.
-async function duplicateCustomClickFunction(srcId) {
+// opts.group: the selector group path the copy goes into (duplicating a whole group) - read by refreshCustomFunctionSelector() when it first lists the new function.
+const customFunctionPendingGroup = {}
+async function duplicateCustomClickFunction(srcId, opts) {
   const src = customClickFunctionIds.find((e) => e.id === srcId)
   if (!src) return
   const id = `custom${nextCustomFunctionN}`
   nextCustomFunctionN++
+  if (opts && opts.group) customFunctionPendingGroup[id] = opts.group
   const base = customFunctionDisplayName(src).replace(/ Copy( \d+)?$/, '')
   const names = new Set(customClickFunctionIds.map((e) => customFunctionDisplayName(e)))
   let title = base + ' Copy'
@@ -15699,6 +15787,114 @@ async function restoreCustomClickFunctions() {
 // (their layout already holds an empty one, key "New Group", shown as LOADING PREVIEW LIGHTING); one is created inside the Loading Preview group when none exists. A row that is no longer sitting directly in the Loading Preview group
 // (the default spot for a control the saved layout does not know) was put somewhere on purpose and is left alone.
 const LOADING_PREVIEW_LIGHT_ROW_KEYS = ['loadingPreviewKeyAzimuth', 'loadingPreviewKeyElevation', 'loadingPreviewKeyTargetHeight', 'loadingPreviewKeyIntensity', 'loadingPreviewKeyColor', 'loadingPreviewAmbientIntensity', 'loadingPreviewAmbientSkyColor', 'loadingPreviewAmbientGroundColor']
+function flashModelButton(btn, msg) { if (!btn) return; const orig = btn.dataset.origText || btn.textContent; btn.dataset.origText = orig; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1600) }
+// The list always holds the repo models (first) plus whatever was imported; imported ones keep their place.
+function refreshHandModelList() {
+  let saved = cfg.handModels
+  if (typeof saved === 'string') { try { saved = JSON.parse(saved) } catch (e) { saved = [] } }
+  if (!Array.isArray(saved)) saved = []
+  const locals = saved.filter((it) => it && it.source === 'local' && it.id)
+  const items = HAND_MODEL_BUILTINS.map((m) => ({ name: m.name, id: m.id, source: 'repo' })).concat(locals)
+  if (JSON.stringify(items) === JSON.stringify(saved)) return
+  cfg.handModels = items
+  syncValue('handModels', items)
+}
+function useHandModel(item) {
+  if (!item || item.id === activeHandModelId) return
+  if (item.source === 'local' && localHandModelPresent[item.id] === false) { alert('"' + item.name + '" was imported on another device - import the file here to use it.'); return }
+  try { localStorage.setItem(HAND_MODEL_LS_KEY, item.id) } catch (e) { alert('This browser blocks local storage, so the model choice cannot be kept.'); return }
+  try { localStorage.setItem(HAND_MODEL_PENDING_KEY, item.id) } catch (e) { /* ignore */ } // the choice is not on the server yet; the next load must not undo it
+  cfg.handModelId = item.id
+  syncValue('handModelId', item.id)
+  // Reload (the model is measured once at load) only after the save has landed, or after 8 s whichever is first - a reload during the save would cancel it.
+  let saved
+  try { saved = Promise.resolve(saveCurrentSettings()) } catch (e) { saved = Promise.resolve() }
+  Promise.race([saved.catch(() => {}), new Promise((r) => setTimeout(r, 8000))]).then(() => setTimeout(() => location.reload(), 300))
+}
+function importHandModelFile(btn) {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.glb,.gltf,model/gltf-binary'
+  input.addEventListener('change', async () => {
+    const file = input.files && input.files[0]
+    if (!file) return
+    try {
+      const buf = await file.arrayBuffer()
+      // Check it before keeping it: it has to be a skinned mesh with the hand rig this app's poses are built on.
+      const gltf = await new Promise((resolve, reject) => gltfLoader.parse(buf, '', resolve, reject))
+      const skinned = findSkinnedMesh(gltf.scene)
+      if (!skinned) { flashModelButton(btn, 'No skinned mesh'); alert('"' + file.name + '" has no skinned mesh, so it cannot be posed.'); return }
+      const missing = HAND_MODEL_BONES.filter((n) => !skinned.skeleton.getBoneByName(n))
+      if (missing.length) { flashModelButton(btn, 'Rig mismatch'); alert('"' + file.name + '" does not have the hand rig this app uses (missing bones: ' + missing.join(', ') + ').'); return }
+      const id = 'local:' + Date.now().toString(36)
+      await handModelIdbPut(id, { name: file.name, title: file.name.replace(/\.(glb|gltf)$/i, ''), blob: new Blob([buf], { type: 'model/gltf-binary' }) })
+      localHandModelPresent[id] = true
+      const items = (Array.isArray(cfg.handModels) ? cfg.handModels : []).concat([{ name: file.name.replace(/\.(glb|gltf)$/i, ''), id, source: 'local' }])
+      cfg.handModels = items
+      syncValue('handModels', items)
+      flashModelButton(btn, 'Imported')
+    } catch (e) {
+      console.error('Hand model import failed', e)
+      flashModelButton(btn, 'Failed')
+      alert('Could not read "' + file.name + '" as a 3D model.')
+    }
+  })
+  input.click()
+}
+// After the settings restore: which imported models this browser actually holds, and follow the saved choice if another device changed it (once per session, so it cannot loop).
+async function syncHandModelWithSettings() {
+  try {
+    const keys = await handModelIdbKeys()
+    ;(Array.isArray(cfg.handModels) ? cfg.handModels : []).forEach((it) => { if (it.source === 'local') localHandModelPresent[it.id] = !!(keys && keys.includes(it.id)) })
+  } catch (e) { /* no IndexedDB: imported models cannot be listed as present */ }
+  // Heal the list from this browser's own stored files: an imported model whose list entry never reached the server (a save that did not land) is added back.
+  try {
+    const keys = (await handModelIdbKeys()) || []
+    const have = new Set((Array.isArray(cfg.handModels) ? cfg.handModels : []).map((it) => it.id))
+    for (const id of keys) {
+      if (have.has(id)) continue
+      const rec = await handModelIdbGet(id)
+      cfg.handModels = (Array.isArray(cfg.handModels) ? cfg.handModels : []).concat([{ name: (rec && (rec.title || rec.name)) || id, id, source: 'local' }])
+      localHandModelPresent[id] = true
+    }
+  } catch (e) { /* ignore */ }
+  refreshHandModelList()
+  syncValue('handModels', cfg.handModels) // the list above may have been healed directly in cfg; make the panel show it
+  refreshListPickerTogglesByKey('handModels')
+  let pending = null
+  try { pending = localStorage.getItem(HAND_MODEL_PENDING_KEY) } catch (e) { /* ignore */ }
+  if (pending) {
+    try { localStorage.removeItem(HAND_MODEL_PENDING_KEY) } catch (e) { /* ignore */ }
+    if (pending === activeHandModelId) { // this device just chose it: keep it, and put it on the server again in case the save before the reload did not land
+      cfg.handModelId = activeHandModelId
+      syncValue('handModelId', activeHandModelId)
+      try { saveCurrentSettings() } catch (e) { /* ignore */ }
+      return
+    }
+  }
+  const wanted = cfg.handModelId
+  if (!wanted || wanted === activeHandModelId) return
+  const ok = HAND_MODEL_BUILTINS.some((m) => m.id === wanted) || localHandModelPresent[wanted]
+  let tried = null
+  try { tried = sessionStorage.getItem('handyDandies.handModelSync') } catch (e) { /* ignore */ }
+  if (!ok || tried === wanted) return
+  try { sessionStorage.setItem('handyDandies.handModelSync', wanted); localStorage.setItem(HAND_MODEL_LS_KEY, wanted) } catch (e) { return }
+  location.reload()
+}
+// Hand Models rows -> the group the user calls Hands (any capitalisation, singular or plural), when they are still in their default place (Field Layout).
+function placeHandModelRows() {
+  const listRow = document.querySelector('.dp-row[data-key="handModels"]')
+  const idRow = document.querySelector('.dp-row[data-key="handModelId"]')
+  if (idRow) idRow.style.display = 'none' // internal bookkeeping, never edited by hand
+  if (!listRow) return
+  const titleOf = (g) => { const t = g.querySelector(':scope > .dp-group-header .dp-group-title-text'); return t ? t.textContent.trim() : '' }
+  const groups = Array.from(document.querySelectorAll('.dp-group'))
+  const target = groups.find((g) => /^hands?$/i.test(titleOf(g)))
+  const home = listRow.parentElement && listRow.parentElement.closest('.dp-group')
+  if (!target || !home || home === target || titleOf(home) !== 'Field Layout') return
+  const body = target.querySelector(':scope > .dp-group-body')
+  if (body) body.insertBefore(listRow, body.firstChild)
+}
 function placeLoadingPreviewLightingRows() {
   const rows = LOADING_PREVIEW_LIGHT_ROW_KEYS.map((k) => document.querySelector('.dp-row[data-key="' + k + '"]')).filter(Boolean)
   if (!rows.length) return
@@ -17684,15 +17880,18 @@ const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('https://unpkg.com/three@0.169.0/examples/jsm/libs/draco/gltf/')
 const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
-gltfLoader.load(
-  MODEL_URL,
+resolveHandModelUrl().then((handModelUrl) => gltfLoader.load(
+  handModelUrl,
   (gltf) => {
     const root = gltf.scene
     const skinned = findSkinnedMesh(root)
     if (!skinned) {
+      if (revertHandModelAndReload('no skinned mesh')) return
       loadingEl.textContent = 'No skinned mesh found in model.'
       return
     }
+    const missingBones = HAND_MODEL_BONES.filter((n) => !skinned.skeleton.getBoneByName(n))
+    if (missingBones.length && revertHandModelAndReload('missing rig bones ' + missingBones.join(', '))) return
     root.traverse((obj) => { if (obj.isMesh && obj !== skinned) obj.visible = false })
     root.updateMatrixWorld(true)
 
@@ -17795,9 +17994,10 @@ gltfLoader.load(
   undefined,
   (err) => {
     console.error('Failed to load hand model', err)
+    if (revertHandModelAndReload('load failed')) return
     loadingEl.textContent = 'Failed to load hand model — see console.'
   }
-)
+))
 
 // -----------------------------------------------------------------------
 // Render loop

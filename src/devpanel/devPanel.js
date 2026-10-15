@@ -484,7 +484,7 @@ function renderListPickerItemRow(entry, item) {
     tcb.addEventListener('change', () => { entry.ctrl.itemToggle.setOn(item, tcb.checked); refreshListPickerToggles(entry) })
     row.appendChild(tcb)
   }
-  row.appendChild(el('span', 'dp-lp-row-label', { textContent: item.name }))
+  row.appendChild(el('span', 'dp-lp-row-label', { textContent: item.name + (entry.ctrl.itemBadge ? (entry.ctrl.itemBadge(item) || '') : '') })) // ctrl.itemBadge(item): optional suffix such as "  (in use)"
   row.__item = item
   // Direct user report, 2026-09-11: on mobile, tapping a name and hitting
   // "Use" applied a DIFFERENT (adjacent) saved item's data, even though
@@ -541,6 +541,7 @@ function renderListPickerItemRow(entry, item) {
       entry.selectedItem = item
       entry.selectAnchor = item
       entry.multiSelected = new Set([item])
+      if (entry.selectedGroups && entry.selectedGroups.size) { entry.selectedGroups = new Set(); entry.listEl.querySelectorAll('.dp-lp-group-selected').forEach((g) => g.classList.remove('dp-lp-group-selected')) }
     }
     entry.listEl.querySelectorAll('.dp-list-picker-row').forEach((r) => {
       r.classList.toggle('dp-list-picker-row-selected', r.__item === entry.selectedItem)
@@ -612,8 +613,15 @@ function buildGroupHeader(entry, path) {
     renderListPickerRows(entry)
   })
   header.appendChild(removeBtn)
-  header.addEventListener('click', () => {
+  header.addEventListener('click', (e) => {
     const g = header.closest('.dp-lp-group')
+    if ((e.ctrlKey || e.metaKey) && entry.ctrl.onDuplicate) {
+      // Ctrl / Cmd-click a group header (2026-10-14): pick the whole group for Duplicate instead of collapsing it
+      if (entry.selectedGroups.has(path)) entry.selectedGroups.delete(path)
+      else entry.selectedGroups.add(path)
+      g.classList.toggle('dp-lp-group-selected', entry.selectedGroups.has(path))
+      return
+    }
     g.classList.toggle('collapsed')
     if (g.classList.contains('collapsed')) entry.collapsedGroups.add(path)
     else entry.collapsedGroups.delete(path)
@@ -833,7 +841,7 @@ function updateUsingLabel(select) {
 // initDevPanel() hasn't finished setting up saveSettingsRef yet, or if
 // DEV_MODE is off (no panel, no save button, nothing to trigger).
 export function saveCurrentSettings() {
-  if (saveSettingsRef) saveSettingsRef()
+  if (saveSettingsRef) return saveSettingsRef()
 }
 // Call after the underlying option list changes (e.g. a 'list-picker'
 // control's own onChange, once a Save/Delete alters what should be
@@ -1325,7 +1333,13 @@ function buildListPickerRow(ctrl, row) {
   // ctrl.hostManaged (2026-10-14, Custom Click Function Selector): the items are things the HOST already owns (custom click functions), so there is nothing to Save / Overwrite / Use / Rename / Delete here - just organizing them
   // (+ Group, drag to order / nest) and, when the host supplies ctrl.onDuplicate, a Duplicate button. See also ctrl.itemToggle (a checkbox per item + group).
   const duplicateBtn = el('button', null, { type: 'button', textContent: 'Duplicate' })
-  if (ctrl.hostManaged) { if (ctrl.onDuplicate) btnRow.append(duplicateBtn); btnRow.append(addGroupBtn) }
+  // ctrl.buttons (optional, with hostManaged): exactly these buttons, in this order - 'use', 'delete', 'import' (ctrl.onImportClick(button)), 'duplicate', 'group'.
+  const hostImportBtn = el('button', null, { type: 'button', textContent: 'Import' })
+  if (ctrl.hostManaged && Array.isArray(ctrl.buttons)) {
+    const byName = { use: useBtn, delete: deleteBtn, import: hostImportBtn, duplicate: duplicateBtn, group: addGroupBtn }
+    ctrl.buttons.forEach((n) => { if (byName[n]) btnRow.append(byName[n]) })
+  }
+  else if (ctrl.hostManaged) { if (ctrl.onDuplicate) btnRow.append(duplicateBtn); btnRow.append(addGroupBtn) }
   else if (ctrl.hideUseButton) btnRow.append(saveBtn, overwriteBtn, renameBtn, deleteBtn, addGroupBtn)
   else btnRow.append(saveBtn, overwriteBtn, useBtn, renameBtn, deleteBtn, addGroupBtn)
   // Cross-project pose export/import (direct user request): export ships
@@ -1380,7 +1394,8 @@ function buildListPickerRow(ctrl, row) {
     // stale creation-order priority on top of it would silently undo
     // their own drag on the next re-render.
     groupOrder: [],
-    collapsedGroups: new Set(), pendingGroups: [], exportChecked: new Set()
+    collapsedGroups: new Set(), pendingGroups: [], exportChecked: new Set(),
+    selectedGroups: new Set() // group paths picked with Ctrl / Cmd-click on a header (for Duplicate)
   }
   numEls[ctrl.key] = entry
 
@@ -1440,6 +1455,8 @@ function buildListPickerRow(ctrl, row) {
   })
   deleteBtn.addEventListener('click', () => {
     if (!entry.selectedItem) return
+    const removing = entry.selectedItem
+    if (ctrl.onBeforeDelete && ctrl.onBeforeDelete(removing, deleteBtn) === false) return // host veto (e.g. the item in use)
     entry.items = entry.items.filter((it) => it !== entry.selectedItem)
     entry.selectedItem = null
     // Multi-select cleared too (added 2026-09-15) -- a stale reference to
@@ -1452,6 +1469,7 @@ function buildListPickerRow(ctrl, row) {
     entry.selectAnchor = null
     commit(ctrl, entry.items)
     renderListPickerRows(entry)
+    if (ctrl.onDeleted) ctrl.onDeleted(removing)
   })
   // Direct user request: let a picker's own items be organized into groups.
   // Adds an empty group header to drag items into -- see
@@ -1473,11 +1491,31 @@ function buildListPickerRow(ctrl, row) {
   // (an earlier version of this fix) wasn't enough once an empty AND an
   // auto-assigned group could both be in play at once.
   const flashBtn = (btn, msg) => { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1400) }
+  hostImportBtn.addEventListener('click', () => { if (ctrl.onImportClick) ctrl.onImportClick(hostImportBtn) })
   duplicateBtn.addEventListener('click', () => {
-    const picked = entry.items.filter((x) => entry.multiSelected.has(x))
-    if (!picked.length && entry.selectedItem) picked.push(entry.selectedItem)
-    if (!picked.length) { flashBtn(duplicateBtn, 'Select one'); return }
-    if (ctrl.onDuplicate) picked.forEach((it) => ctrl.onDuplicate(it)) // every selected item, in list order
+    // Selected groups (Ctrl / Cmd-click a header) are duplicated whole: a new group "<name> Copy" holding a copy of every item in it, subgroups included; items inside a selected group are not duplicated twice.
+    const groups = Array.from(entry.selectedGroups)
+    const inSelectedGroup = (it) => groups.some((p) => it.group && (it.group === p || it.group.startsWith(p + LP_GROUP_PATH_SEP)))
+    const picked = entry.items.filter((x) => entry.multiSelected.has(x) && !inSelectedGroup(x))
+    if (!picked.length && !groups.length && entry.selectedItem) picked.push(entry.selectedItem)
+    if (!picked.length && !groups.length) { flashBtn(duplicateBtn, 'Select one'); return }
+    if (!ctrl.onDuplicate) return
+    picked.forEach((it) => ctrl.onDuplicate(it)) // every selected item, in list order
+    const taken = new Set([...entry.items.map((it) => it.group).filter(Boolean), ...entry.pendingGroups])
+    groups.forEach((path) => {
+      const parts = path.split(LP_GROUP_PATH_SEP)
+      const leaf = parts.pop()
+      const parent = parts.join(LP_GROUP_PATH_SEP)
+      const make = (nm) => (parent ? parent + LP_GROUP_PATH_SEP + nm : nm)
+      let nm = leaf + ' Copy'
+      for (let n = 2; taken.has(make(nm)); n++) nm = leaf + ' Copy ' + n
+      const newPath = make(nm)
+      taken.add(newPath)
+      entry.items.filter((it) => it.group && (it.group === path || it.group.startsWith(path + LP_GROUP_PATH_SEP)))
+        .forEach((it) => ctrl.onDuplicate(it, { group: newPath + it.group.slice(path.length) }))
+    })
+    entry.selectedGroups = new Set()
+    entry.listEl.querySelectorAll('.dp-lp-group-selected').forEach((g) => g.classList.remove('dp-lp-group-selected'))
   })
   addGroupBtn.addEventListener('click', () => {
     const existingNames = new Set([...entry.items.map((it) => it.group).filter(Boolean), ...entry.pendingGroups])
@@ -3490,10 +3528,11 @@ export function initDevPanel(groups, opts = {}) {
     try { localStorage.setItem(currentGeomKey(), JSON.stringify(geomNow)) } catch (err) { /* ignore */ }
     snapshot.panelGeometry = { [realDeviceClass()]: geomNow }
     if (opts.remoteSave) {
-      remoteSaveSnapshot(opts.remoteSave, snapshot).then((result) => {
+      // returns the promise so a host that must not reload before the save lands (the hand model Use) can wait for it
+      return remoteSaveSnapshot(opts.remoteSave, snapshot).then((result) => {
         flash(result.ok ? 'Saved!' : ('Save failed: ' + result.error))
+        return result
       })
-      return
     }
     try {
       localStorage.setItem(settingsKey(), JSON.stringify(snapshot))
