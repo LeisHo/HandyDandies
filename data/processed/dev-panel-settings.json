@@ -147,7 +147,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 3300,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -389,16 +389,17 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
+      "loadingPreviewLayout": "{\"loadingPreviewCanvas\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewCanvas\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}},\"loadingPreviewText\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewText\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\",\"gap\":\"15\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}}}",
       "loadingPreviewScalePct": 100,
-      "loadingPreviewScaleRefPx": 1080,
+      "loadingPreviewScaleRefPx": 1360,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713558,
+      "loadingPreviewRotationY": -109.10457274713552,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
-      "loadingPreviewOffsetY": 0,
-      "loadingPreviewOffsetZ": 0,
+      "loadingPreviewOffsetX": -1.1325151052008238,
+      "loadingPreviewOffsetY": -0.06726533502820686,
+      "loadingPreviewOffsetZ": 0.6781114689622285,
       "loadingPreviewCameraFov": 15,
       "loadingPreviewCameraZoom": 1394.7784318421322,
       "loadingPreviewTextEnabled": true,
@@ -8419,15 +8420,15 @@
           ]
         }
       ],
-      "cameraX": 1.5544272264775387,
-      "cameraY": 1.770208476559055e-13,
-      "cameraZ": 197.98779599525182,
+      "cameraX": 1.5544272264775383,
+      "cameraY": 1.9520685262324363e-13,
+      "cameraZ": 197.98779599525176,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 99,
+      "cameraZoom": 98.99999999999999,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -11772,16 +11773,16 @@
       "custom52Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "rvEnabled": true,
       "rvHoldOnly": false,
-      "rvVelocityRange": "{\"min\":400,\"max\":1000}",
+      "rvVelocityRange": "{\"min\":0,\"max\":4111}",
       "rvVelocitySmoothing": 0.31,
-      "rvTriggerDistanceRange": "{\"min\":10,\"max\":30}",
+      "rvTriggerDistanceRange": "{\"min\":10,\"max\":145}",
       "rvTriggerDistanceCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3572238009602319,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3288804677939753,\"y\":-0.008645884195963571}}]",
       "rvStartTimeEnabled": true,
       "rvStartTimeRange": "{\"min\":0,\"max\":500}",
       "rvStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3174898914645726,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3223635039520899,\"y\":0}}]",
       "rvSpeedEnabled": true,
-      "rvSpeedRange": "{\"min\":1500,\"max\":3000}",
-      "rvSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2515702070184387,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.24036571904091975,\"y\":0}}]",
+      "rvSpeedRange": "{\"min\":500,\"max\":1000}",
+      "rvSpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2515702070184387,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.24036571904091975,\"y\":0}}]",
       "rvRetransitionEnabled": true,
       "rvRetransitionSpeedMs": 3000,
       "rvRetransitionSpeedCurveEnabled": true,
@@ -11796,7 +11797,7 @@
       "rvEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.9185415903727213}},{\"x\":0.596011699711758,\"y\":1,\"h2\":{\"x\":-0.2777915537566246,\"y\":0},\"h1\":{\"x\":0.16826240944716064,\"y\":0}},{\"x\":1,\"y\":0.29854164123535154,\"h2\":{\"x\":-0.21032795125519754,\"y\":0.02666651407877607}}]",
       "rvSet1Enabled": true,
       "rvSet1Angle": 0,
-      "rvSet1DisplacementRange": "{\"min\":1,\"max\":20}",
+      "rvSet1DisplacementRange": "{\"min\":28.6,\"max\":49.8}",
       "rvSet1DisplacementCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3467930399273888,\"y\":-0.031666692097981786}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3277939971005652,\"y\":0}}]",
       "rvSet1DisplacementDistCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3674290323637406,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.6005208333333333}}]",
       "rvSet1TriggerAngleRange": "{\"min\":90,\"max\":270}",
@@ -12211,16 +12212,17 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
+      "loadingPreviewLayout": "{\"loadingPreviewCanvas\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewCanvas\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}},\"loadingPreviewText\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewText\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\",\"gap\":\"15\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}}}",
       "loadingPreviewScalePct": 100,
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713558,
+      "loadingPreviewRotationY": -109.10457274713552,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
-      "loadingPreviewOffsetY": 0,
-      "loadingPreviewOffsetZ": 0,
+      "loadingPreviewOffsetX": -1.1325151052008238,
+      "loadingPreviewOffsetY": -0.06726533502820686,
+      "loadingPreviewOffsetZ": 0.6781114689622285,
       "loadingPreviewCameraFov": 15,
       "loadingPreviewCameraZoom": 1394.7784318421322,
       "loadingPreviewTextEnabled": true,
@@ -23791,7 +23793,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 3300,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -24033,16 +24035,17 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
+      "loadingPreviewLayout": "{\"loadingPreviewCanvas\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewCanvas\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}},\"loadingPreviewText\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewText\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\",\"gap\":\"15\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}}}",
       "loadingPreviewScalePct": 100,
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713558,
+      "loadingPreviewRotationY": -109.10457274713552,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
-      "loadingPreviewOffsetY": 0,
-      "loadingPreviewOffsetZ": 0,
+      "loadingPreviewOffsetX": -1.1325151052008238,
+      "loadingPreviewOffsetY": -0.06726533502820686,
+      "loadingPreviewOffsetZ": 0.6781114689622285,
       "loadingPreviewCameraFov": 15,
       "loadingPreviewCameraZoom": 1394.7784318421322,
       "loadingPreviewTextEnabled": true,
@@ -36381,6 +36384,20 @@
               {
                 "type": "row",
                 "key": "loadingPreviewPosY"
+              },
+              {
+                "type": "row",
+                "key": "loadingPreviewLayout"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Loading Preview > Layout",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
               }
             ],
             "settings": [
@@ -36391,7 +36408,8 @@
               "loadingPreviewScalePct",
               "loadingPreviewScaleRefPx",
               "loadingPreviewPosX",
-              "loadingPreviewPosY"
+              "loadingPreviewPosY",
+              "loadingPreviewLayout"
             ]
           }
         }
@@ -37536,7 +37554,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -37657,7 +37675,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Angle to Velocity 1",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -37873,7 +37891,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -42525,8 +42543,8 @@
     "desktop": {
       "left": 844.8250122070312,
       "top": 48.79999923706055,
-      "width": 566.375,
-      "height": 526
+      "width": 569.5750122070312,
+      "height": 527.6000366210938
     },
     "mobile": {
       "left": 20,
