@@ -3820,6 +3820,7 @@ export function initDevPanel(groups, opts = {}) {
   const savedStatesGroup = createGroupElement('Saved Dev Settings')
   const savedStatesBody = savedStatesGroup.querySelector(':scope > .dp-group-body')
   // An item selector (2026-10-15, direct request) instead of a dropdown: one row per saved state, click to select, the default one carries a star badge.
+  const savedStatesStatus = el('div', 'dp-ss-status') // always says which item is the default (or that none is), and which one is in use
   const savedStatesList = el('div', 'dp-ss-list')
   let selectedStateName = ''
   let activeStateName = '' // the item the panel currently shows (last Used / Set Default / Save New / Overwrite, or the default after the main Save); session-only: after a refresh the panel loads the live settings, which are the default item as of the last Save
@@ -3832,7 +3833,7 @@ export function initDevPanel(groups, opts = {}) {
   const setDefaultStateBtn = el('button', null, { type: 'button', textContent: 'Set Default' })
   const exportStateBtn = el('button', null, { type: 'button', textContent: 'Export' })
   savedStatesBtnRow.append(saveStateBtn, overwriteStateBtn, useStateBtn, deleteStateBtn, setDefaultStateBtn, exportStateBtn)
-  savedStatesBody.append(savedStatesList, savedStatesBtnRow)
+  savedStatesBody.append(savedStatesStatus, savedStatesList, savedStatesBtnRow)
   groupsEl.insertBefore(savedStatesGroup, groupsEl.firstChild)
 
   function getSavedStates() {
@@ -3883,6 +3884,13 @@ export function initDevPanel(groups, opts = {}) {
     if (def && !states[def]) { setDefaultStateName(''); def = '' } // the default item was deleted
     if (!states[selectedStateName]) selectedStateName = ''
     if (!states[activeStateName]) activeStateName = ''
+    // The status lines (2026-10-15, direct report: "i still dont see which dev setting save is the default"): nothing is marked until a default has been chosen, which looked like the marker missing.
+    savedStatesStatus.innerHTML = ''
+    const defLine = el('div', 'dp-ss-status-line')
+    if (def) { defLine.appendChild(document.createTextNode('\u2605 Default: ')); defLine.appendChild(el('b', null, { textContent: def })); defLine.appendChild(document.createTextNode(' \u2014 the main Save button overwrites it')) }
+    else { defLine.textContent = 'No default set. Select an item and press Set Default; until then the main Save only writes the live settings.'; defLine.classList.add('dp-ss-status-none') }
+    savedStatesStatus.appendChild(defLine)
+    if (activeStateName) { const useLine = el('div', 'dp-ss-status-line'); useLine.appendChild(document.createTextNode('\u25CF In use: ')); useLine.appendChild(el('b', null, { textContent: activeStateName })); savedStatesStatus.appendChild(useLine) }
     savedStatesList.innerHTML = ''
     if (!names.length) savedStatesList.appendChild(el('div', 'dp-ss-empty', { textContent: 'No saved settings yet' }))
     names.forEach((name) => {
