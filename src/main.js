@@ -53,7 +53,17 @@ const MODEL_URL = '../data/processed/HAND3D/HandipantsOL_Clip.glb' // Draco-comp
 const HAND_MODEL_DEFAULT_ID = 'repo:HandipantsFixedBone'
 const HAND_MODEL_BUILTINS = [
   { id: 'repo:HandipantsFixedBone', name: 'Handipants Fixed Bone', url: '../data/processed/HAND3D/HandipantsFixedBone.glb', source: 'repo' },
-  { id: 'repo:HandipantsOL_Clip', name: 'Handipants OL (Crop Block, Draco)', url: '../data/processed/HAND3D/HandipantsOL_Clip.glb', source: 'repo' }
+  { id: 'repo:HandipantsOL_Clip', name: 'Handipants OL (Crop Block, Draco)', url: '../data/processed/HAND3D/HandipantsOL_Clip.glb', source: 'repo' },
+  // 2026-10-15: the lower-resolution exports from HANDO (HAND-021), same 23-bone rig / bind matrices as HandipantsOL_Clip. Triangle counts are measured from the files (the Hand mesh); HD-2k and HD-4k were re-exported on 2026-10-15 after the first copy (2k was a duplicate of 4k).
+  { id: 'repo:HD-300', name: 'HD 300 (366 tris)', url: '../data/processed/HAND3D/HD-300.glb', source: 'repo' },
+  { id: 'repo:HD-500', name: 'HD 500 (488 tris)', url: '../data/processed/HAND3D/HD-500.glb', source: 'repo' },
+  { id: 'repo:HD-1K', name: 'HD 1K (1,018 tris)', url: '../data/processed/HAND3D/HD-1K.glb', source: 'repo' },
+  { id: 'repo:HD-2k', name: 'HD 2k (2,036 tris)', url: '../data/processed/HAND3D/HD-2k.glb', source: 'repo' },
+  { id: 'repo:HD-3K', name: 'HD 3K (3,052 tris)', url: '../data/processed/HAND3D/HD-3K.glb', source: 'repo' },
+  { id: 'repo:HD-4k', name: 'HD 4k (4,074 tris)', url: '../data/processed/HAND3D/HD-4k.glb', source: 'repo' },
+  { id: 'repo:HD-5K', name: 'HD 5K (5,000 tris)', url: '../data/processed/HAND3D/HD-5K.glb', source: 'repo' },
+  { id: 'repo:HD-6k', name: 'HD 6k (6,014 tris)', url: '../data/processed/HAND3D/HD-6k.glb', source: 'repo' },
+  { id: 'repo:HD-8k', name: 'HD 8k (8,144 tris)', url: '../data/processed/HAND3D/HD-8k.glb', source: 'repo' }
 ]
 const HAND_MODEL_LS_KEY = 'handyDandies.handModelId'
 const HAND_MODEL_PENDING_KEY = 'handyDandies.handModelPending' // set by Use, cleared by the next load once the choice is on the server
@@ -663,6 +673,11 @@ let modelLoaded = false
 // first synchronous call, throwing "Cannot access before initialization"
 // (confirmed live, 2026-09-16, before moving it here).
 let idleReposeFrameCounter = 0
+// Small Scale Models (2026-10-15): id -> { state: 'loading' | 'ready' | 'failed', fill, outline } geometries loaded from the model files; the parsed, z-sorted level list; and how many hands currently use a small model.
+const smallScaleGeomCache = new Map()
+let smallScaleLevelsStr = null
+let smallScaleLevels = []
+let smallScaleActiveCount = 0
 // ROOT CAUSE of a real, severe startup-lag regression, 2026-09-16 (direct
 // user report: "way way way worse than ever before... its mainly laggy
 // on startup... the hands are getting into position and setting their
@@ -1068,7 +1083,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -2061,6 +2076,9 @@ const DEV_GROUPS = [
         onDeleted: (item) => { if (item.source === 'local') handModelIdbDelete(item.id).catch(() => {}) },
         onImportClick: (btn) => importHandModelFile(btn)
       },
+      // Small Scale Models (2026-10-15): swap a hand's mesh for a lower-resolution model of the same rig once its world Z reaches a level's Z. The levels are a JSON list edited by the widget (buildSmallScaleModelWidget()).
+      { key: 'smallScaleModelsEnabled', label: 'Small Scale Models', type: 'checkbox', def: false, perDevice: true, onChange: () => updateSmallScaleModelsGroupVisibility() },
+      { key: 'smallScaleModelLevels', label: 'Small Scale Model Levels', type: 'text', def: '[]' },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -3583,6 +3601,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
     prof('placeHandModelRows', placeHandModelRows)
+    prof('placeSmallScaleModelRows', placeSmallScaleModelRows)
     prof('syncHandModelWithSettings', syncHandModelWithSettings)
     startupSettingsReady = true
     prof('refreshStartupPreviewAfterRestore', refreshStartupPreviewAfterRestore)
@@ -16232,6 +16251,187 @@ function placeHandModelRows() {
   const body = target.querySelector(':scope > .dp-group-body')
   if (body) body.insertBefore(listRow, body.firstChild)
 }
+// ---- Small Scale Models (2026-10-15, direct request) ----
+// Hands whose world Z is at or below a level's Z use that level's lower-resolution model. Every model shares the active model's rig (bone order and bind matrices verified for the 9 HD files), so a swap is just
+// "point the hand's existing skinned mesh at another geometry": the hand's skeleton, material, clip planes and pose are untouched. A hand takes the DEEPEST level it has reached (the lowest Z that is still >= its Z).
+// A hand keeps its current level until its Z leaves it by SMALL_SCALE_HYSTERESIS world units (an unmeasured judgment call, to stop a hand on a threshold from flickering between two silhouettes). Levels whose model has not
+// loaded yet (or cannot be used) are skipped, so a hand never shows a missing mesh.
+const SMALL_SCALE_HYSTERESIS = 0.5
+function smallScaleModelOptions() {
+  const out = HAND_MODEL_BUILTINS.map((m) => ({ id: m.id, name: m.name }))
+  const saved = Array.isArray(cfg.handModels) ? cfg.handModels : []
+  saved.forEach((it) => { if (it && it.source === 'local' && it.id && localHandModelPresent[it.id] !== false) out.push({ id: it.id, name: it.name }) })
+  return out
+}
+function loadSmallScaleModel(id) {
+  let e = smallScaleGeomCache.get(id)
+  if (e) return e
+  e = { state: 'loading', fill: null, outline: null }
+  smallScaleGeomCache.set(id, e)
+  const builtin = HAND_MODEL_BUILTINS.find((m) => m.id === id)
+  const urlPromise = builtin
+    ? Promise.resolve(builtin.url)
+    : (id.startsWith('local:') ? handModelIdbGet(id).then((rec) => { if (!rec || !rec.blob) throw new Error('not on this device'); return URL.createObjectURL(rec.blob) }) : Promise.reject(new Error('unknown model')))
+  urlPromise.then((url) => new Promise((resolve, reject) => gltfLoader.load(url, resolve, undefined, reject))).then((gltf) => {
+    let fill = null, outline = null
+    gltf.scene.traverse((o) => {
+      if (!o.isSkinnedMesh) return
+      const n = o.material && o.material.name
+      if (n === 'OUTLINE') outline = o
+      else if (!fill || n === 'Hand') fill = o
+    })
+    const ref = modelRoot ? findSkinnedMesh(modelRoot) : null
+    if (!fill || !fill.geometry.attributes.skinIndex || !ref) throw new Error('no skinned Hand mesh')
+    const a = fill.skeleton.bones.map((b) => b.name), r = ref.skeleton.bones.map((b) => b.name)
+    if (a.length !== r.length || a.some((nm, i) => nm !== r[i])) throw new Error('bone order differs from the active hand model')
+    e.fill = fill.geometry
+    e.outline = outline ? outline.geometry : null
+    e.state = 'ready'
+    sceneNeedsRedraw = true
+  }).catch((err) => { e.state = 'failed'; console.error('Small Scale Models: "' + id + '" unusable: ' + ((err && err.message) || err)) })
+  return e
+}
+function parseSmallScaleLevels() {
+  const str = cfg.smallScaleModelLevels
+  if (str === smallScaleLevelsStr) return
+  smallScaleLevelsStr = str
+  let a = []
+  try { a = JSON.parse(str) } catch (e) { a = [] }
+  smallScaleLevels = (Array.isArray(a) ? a : []).filter((l) => l && Number.isFinite(Number(l.z)) && typeof l.model === 'string').map((l) => ({ z: Number(l.z), id: l.model })).sort((x, y) => x.z - y.z)
+}
+// entry = a ready cache entry, or null for the hand's own original model.
+function applyHandLod(hand, entry) {
+  if (!hand._lodBase) {
+    if (!entry) return
+    hand._lodBase = { fill: hand.skinnedMesh.geometry, emission: hand.emissionMesh ? hand.emissionMesh.geometry : null }
+  }
+  const fillG = entry ? entry.fill : hand._lodBase.fill
+  if (hand.skinnedMesh.geometry !== fillG) hand.skinnedMesh.geometry = fillG
+  if (hand.outlineMesh && hand.outlineMesh.geometry !== fillG) hand.outlineMesh.geometry = fillG // the negative hull is a clone of the fill mesh
+  const emG = entry && entry.outline ? entry.outline : hand._lodBase.emission
+  if (hand.emissionMesh && emG && hand.emissionMesh.geometry !== emG) hand.emissionMesh.geometry = emG
+  hand._lodGeom = entry ? entry.fill : null
+}
+function updateSmallScaleModels() {
+  const on = cfg.smallScaleModelsEnabled === true
+  if (on) parseSmallScaleLevels()
+  if (!on || !smallScaleLevels.length) {
+    if (smallScaleActiveCount) {
+      for (let i = 0; i < hands.length; i++) { const h = hands[i]; if (h._lodGeom) { applyHandLod(h, null); h._lodIdx = -1 } }
+      smallScaleActiveCount = 0
+      sceneNeedsRedraw = true
+    }
+    return
+  }
+  const ready = []
+  for (let i = 0; i < smallScaleLevels.length; i++) { const e = loadSmallScaleModel(smallScaleLevels[i].id); ready.push(e.state === 'ready' ? e : null) }
+  let used = 0, changed = false
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]
+    if (!h.wrapper || !h.skinnedMesh) continue
+    const z = h.wrapper.position.z
+    const cur = h._lodIdx === undefined ? -1 : h._lodIdx
+    let pick = -1
+    for (let k = 0; k < smallScaleLevels.length; k++) {
+      if (!ready[k]) continue
+      if (z <= smallScaleLevels[k].z + (k === cur ? SMALL_SCALE_HYSTERESIS : 0)) { pick = k; break }
+    }
+    const want = pick >= 0 ? ready[pick].fill : null
+    if ((h._lodGeom || null) !== want) { applyHandLod(h, pick >= 0 ? ready[pick] : null); changed = true }
+    h._lodIdx = pick
+    if (pick >= 0) used++
+  }
+  smallScaleActiveCount = used
+  if (changed) sceneNeedsRedraw = true
+}
+function updateSmallScaleModelsGroupVisibility() {
+  const row = document.querySelector('.dp-row[data-key="smallScaleModelLevels"]')
+  if (row) row.style.display = cfg.smallScaleModelsEnabled === true ? '' : 'none'
+}
+// The Add Level button, and one row per level: a Z slider (with a typed number box), the model dropdown, and a delete button.
+function buildSmallScaleModelWidget() {
+  const row = document.querySelector('.dp-row[data-key="smallScaleModelLevels"]')
+  const input = row && row.querySelector('.dp-text-input')
+  if (!input || row.dataset.ssmWidget) return
+  row.dataset.ssmWidget = '1'
+  input.style.display = 'none'
+  const lab = row.querySelector('label')
+  if (lab && !lab.querySelector('input,select,button')) lab.style.display = 'none'
+  row.style.flexDirection = 'column'; row.style.alignItems = 'stretch'
+  const readItems = () => { try { const a = JSON.parse(input.value); return Array.isArray(a) ? a.filter((l) => l && typeof l === 'object') : [] } catch (e) { return [] } }
+  let items = readItems(), lastSeen = input.value
+  const wrap = elLocal('div', { flex: '1', padding: '2px 0' })
+  const bar = elLocal('div', { display: 'flex', gap: '6px', marginBottom: '4px' })
+  const list = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '6px' })
+  wrap.appendChild(bar); wrap.appendChild(list); row.appendChild(wrap)
+  const write = () => { lastSeen = JSON.stringify(items); commitTextControl(input, lastSeen) }
+  const mkBtn = (text, onClick) => { const b = elLocal('button', null, { type: 'button', text }); b.className = 'dp-action-button'; b.addEventListener('click', onClick); return b }
+  const redraw = () => {
+    list.textContent = ''
+    const models = smallScaleModelOptions()
+    items.forEach((it, idx) => {
+      const r = elLocal('div', { display: 'flex', gap: '6px', alignItems: 'center' })
+      r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '48px', opacity: '.8', fontSize: '.85em' }, { text: 'Level ' + (idx + 1) }))
+      const z = document.createElement('input'); z.type = 'range'; z.min = '-400'; z.max = '400'; z.step = '0.5'; z.value = String(it.z); z.style.flex = '1 1 0'; z.style.minWidth = '0'
+      const zn = document.createElement('input'); zn.type = 'number'; zn.step = '0.5'; zn.value = String(it.z); zn.style.width = '56px'; zn.title = 'World Z at or below which this model is used'
+      z.addEventListener('input', () => { items[idx].z = Number(z.value); zn.value = z.value; write() })
+      zn.addEventListener('change', () => { const v = Number(zn.value); if (Number.isFinite(v)) { items[idx].z = v; z.value = String(v); write() } })
+      const sel = document.createElement('select'); sel.style.flex = '1 1 0'; sel.style.minWidth = '0'
+      const have = models.some((m) => m.id === it.model)
+      ;(have ? models : models.concat([{ id: it.model, name: String(it.model) + ' (not available)' }])).forEach((m) => { const op = document.createElement('option'); op.value = m.id; op.textContent = m.name; sel.appendChild(op) })
+      sel.value = it.model
+      sel.addEventListener('change', () => { items[idx].model = sel.value; write() })
+      const x = mkBtn('\u00d7', () => { items.splice(idx, 1); redraw(); write() }); x.title = 'Delete this level'
+      r.appendChild(z); r.appendChild(zn); r.appendChild(sel); r.appendChild(x)
+      list.appendChild(r)
+    })
+  }
+  bar.appendChild(mkBtn('+ Add Level', () => {
+    const models = smallScaleModelOptions()
+    const def = (models.find((m) => m.id === 'repo:HD-3K') || models[0] || {}).id
+    items.push({ z: -50, model: def })
+    redraw(); write()
+  }))
+  redraw()
+  armLengthWidgetResyncs.push(() => { if (input.value === lastSeen) return; lastSeen = input.value; items = readItems(); redraw() })
+}
+// The Small Scale Models rows -> a toggleable subgroup inside the group the user calls Hands (any capitalisation). Idempotent: a saved layout may already hold the subgroup (key "Small Scale Models").
+function placeSmallScaleModelRows() {
+  const enabledRow = document.querySelector('.dp-row[data-key="smallScaleModelsEnabled"]')
+  const levelsRow = document.querySelector('.dp-row[data-key="smallScaleModelLevels"]')
+  if (!enabledRow || !levelsRow) return
+  const titleOf = (g) => { const t = g.querySelector(':scope > .dp-group-header .dp-group-title-text'); return t ? t.textContent.trim() : '' }
+  const groups = Array.from(document.querySelectorAll('.dp-group'))
+  let sub = groups.find((g) => g.dataset.key === 'Small Scale Models')
+  if (!sub) {
+    const handsGroup = groups.find((g) => /^hands?$/i.test(titleOf(g)))
+    const home = levelsRow.parentElement && levelsRow.parentElement.closest('.dp-group')
+    const host = handsGroup || home
+    if (!host) return
+    const hostBody = host.querySelector(':scope > .dp-group-body')
+    if (!hostBody) return
+    sub = createGroupElement('Small Scale Models')
+    hostBody.appendChild(sub)
+  }
+  const body = sub.querySelector(':scope > .dp-group-body')
+  const header = sub.querySelector(':scope > .dp-group-header')
+  const titleText = header && header.querySelector(':scope > .dp-group-title-text')
+  if (!body || !header || !titleText) return
+  {
+    const handsGroup = groups.find((g) => /^hands?$/i.test(titleOf(g)))
+    const subHome = sub.parentElement && sub.parentElement.closest('.dp-group')
+    const handsBody = handsGroup && handsGroup.querySelector(':scope > .dp-group-body')
+    if (handsBody && subHome && subHome !== handsGroup && titleOf(subHome) === 'Field Layout') handsBody.appendChild(sub)
+  }
+  if (levelsRow.parentElement !== body) body.appendChild(levelsRow)
+  if (enabledRow.parentElement !== header) {
+    enabledRow.classList.add('dp-group-gate-row')
+    enabledRow.querySelectorAll('.dp-dynamic-device-checkbox, .dp-row-handle').forEach((el) => el.remove())
+    titleText.insertAdjacentElement('afterend', enabledRow)
+  }
+  buildSmallScaleModelWidget()
+  updateSmallScaleModelsGroupVisibility()
+}
 function placeLoadingPreviewLightingRows() {
   const rows = LOADING_PREVIEW_LIGHT_ROW_KEYS.map((k) => document.querySelector('.dp-row[data-key="' + k + '"]')).filter(Boolean)
   if (!rows.length) return
@@ -19465,6 +19665,7 @@ safeRefreshSelectOptions('renderOrderFallbackExcept')
 safeRefreshSelectOptions('renderOrderFallback2Except')
 mergeExceptSelects()
 buildRenderOrderWidgets()
+placeSmallScaleModelRows()
 buildToonGradientWidget()
 gateGroupHeader('Floor', 'floorEnabled')
 updateFloorRowVisibility()
@@ -20002,5 +20203,6 @@ function updateRenderOrder() {
       hand._wasOverriddenLastFrame = overridden
     }
   })
+  updateSmallScaleModels()
 }
 animate()
