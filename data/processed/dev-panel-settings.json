@@ -11774,13 +11774,13 @@
       "rvHoldOnly": false,
       "rvVelocityRange": "{\"min\":400,\"max\":1000}",
       "rvVelocitySmoothing": 0.31,
-      "rvTriggerDistanceRange": "{\"min\":10,\"max\":100}",
+      "rvTriggerDistanceRange": "{\"min\":10,\"max\":50}",
       "rvTriggerDistanceCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3572238009602319,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3288804677939753,\"y\":-0.008645884195963571}}]",
       "rvStartTimeEnabled": true,
       "rvStartTimeRange": "{\"min\":0,\"max\":500}",
       "rvStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3174898914645726,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3223635039520899,\"y\":0}}]",
       "rvSpeedEnabled": true,
-      "rvSpeedRange": "{\"min\":400,\"max\":1500}",
+      "rvSpeedRange": "{\"min\":1000,\"max\":1500}",
       "rvSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2515702070184387,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.24036571904091975,\"y\":0}}]",
       "rvRetransitionEnabled": true,
       "rvRetransitionSpeedMs": 400,
@@ -11793,13 +11793,13 @@
       "rvRetransitionEasingCurveEnabled": true,
       "rvRetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13192274029367795,\"y\":0.00958328247070317}},{\"x\":0.4876786159319298,\"y\":1,\"h2\":{\"x\":-0.21182526574229643,\"y\":0},\"h1\":{\"x\":0.2234719746970209,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.18443573828960846,\"y\":0.0029164632161458037}}]",
       "rvEasingCurveEnabled": true,
-      "rvEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.9185415903727213}},{\"x\":0.596011699711758,\"y\":1,\"h2\":{\"x\":-0.2777915537566246,\"y\":0},\"h1\":{\"x\":0.16826240944716064,\"y\":0}},{\"x\":1,\"y\":0.29854164123535154,\"h2\":{\"x\":-0.21032795125519754,\"y\":0.02666651407877607}}]",
       "rvSet1Enabled": true,
       "rvSet1Angle": 0,
       "rvSet1DisplacementRange": "{\"min\":0,\"max\":5}",
-      "rvSet1DisplacementCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "rvSet1DisplacementDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "rvSet1TriggerAngleRange": "{\"min\":0,\"max\":0}",
+      "rvSet1DisplacementCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3467930399273888,\"y\":0.031666692097981786}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.34525527736555806,\"y\":0}}]",
+      "rvSet1DisplacementDistCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3674290323637406,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3595416032441794,\"y\":0}}]",
+      "rvSet1TriggerAngleRange": "{\"min\":90,\"max\":270}",
       "rvSet1AngleCurveEnabled": false,
       "rvSet1AngleCurveRange": "{\"min\":0,\"max\":180}",
       "rvSet1AngleCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -37558,7 +37558,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -37657,7 +37657,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Angle to Velocity 1",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
