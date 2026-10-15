@@ -12659,7 +12659,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       if (progress >= 1 && chp.releasePending) {
         chp.lastAppliedValues = values
         applyPoseValuesToHand(hand, values, splayNow)
-        applyOffsetRotationToHand(hand, p, chp.offsetBaked ? 0 : progress)
+        applyOffsetRotationToHand(hand, p, chp.offsetBaked ? 0 : easedProgress) // Easing Curve shapes the Offset / Rotation ramp like the pose (2026-10-15); 1 at the end either way
         if (!chp.offsetBaked) { bakeOffsetRotationIntoAccum(hand, p); chp.offsetBaked = true }
         beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, liveDistRange, now)
         return
@@ -12701,7 +12701,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // progress=1 once, correctly, before 'looping' phase takes over next
     // frame.
     if (!chp.offsetBaked) {
-      applyOffsetRotationToHand(hand, p, progress)
+      // Easing Curve (2026-10-15, direct request: "easing should also apply to all offset and rotation modifications in the click function"): the ramp follows the SAME eased progress as the pose. It used to run on the raw
+      // 0..1 time ratio (only the pose and splay were reshaped); the phase transitions still test the raw progress, and an eased 1 is the same 1.
+      applyOffsetRotationToHand(hand, p, easedProgress)
       if (progress >= 1) { bakeOffsetRotationIntoAccum(hand, p); chp.offsetBaked = true }
     } else {
       applyOffsetRotationToHand(hand, p, 0)
@@ -12858,8 +12860,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       speedMs = Math.max(speedMs * (chp.glideTimeFactor || 1), 1) // First Transition Time Scale
       chp.stoppingVirtualElapsedMs += dt * decayFactor * (chp.liveTempo || 1)
       const progressRaw = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
-      stopRamp = Math.max(progressRaw - THREE.MathUtils.clamp(chp.stoppingBaseElapsedMs / speedMs, 0, 1), 0) // the forward ramp's own 0..1, minus the part already baked at release
       const progress = stopEasing ? easingProfilePAt(stopEasing, progressRaw) : progressRaw
+      const progressAtRelease = THREE.MathUtils.clamp(chp.stoppingBaseElapsedMs / speedMs, 0, 1)
+      stopRamp = Math.max(progress - (stopEasing ? easingProfilePAt(stopEasing, progressAtRelease) : progressAtRelease), 0) // the (eased) forward ramp minus the part already baked at release
       // `* frozenTweenFractionCap` (CORRECTED 2026-09-28) -- the forward
       // phase this continues from applies Start Distance Curve's cap
       // (`cappedT`); without it here too, a capped hand would jump from
@@ -13704,7 +13707,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     }
     cp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, splayNow)
-    applyOffsetRotationToHand(hand, p, progress)
+    applyOffsetRotationToHand(hand, p, easedProgress) // eased like the pose (2026-10-15)
     if (progress >= 1) {
       // Item 5/2 (2026-09-27): this ramp just completed -- lock its own
       // Offset/Rotation contribution permanently into the hand's
