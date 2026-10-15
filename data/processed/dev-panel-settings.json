@@ -390,7 +390,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713558,
+      "loadingPreviewRotationY": -109.10457274713559,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -8415,17 +8415,41 @@
           ]
         }
       ],
-      "cameraX": 1.9636363636363634,
-      "cameraY": 6.062001655779398e-15,
-      "cameraZ": 223.4004898795015,
-      "cameraFov": 20,
+      "cameraX": 1.9534883720930232,
+      "cameraY": 5.541526766141773e-15,
+      "cameraZ": 115.97925521912504,
+      "cameraFov": 30,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 98.99999999999999,
+      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":5.541526766141773e-15,\"cameraZ\":115.97925521912504,\"cameraFov\":30,\"cameraZoom\":90.5,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":0,\"targetZ\":25.479255219125044}",
+      "cameraZoom": 90.5,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
+        {
+          "name": "HD - DESKTOP - 30 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 5.541526766141773e-15,
+          "cameraZ": 115.97925521912504,
+          "cameraFov": 30,
+          "cameraZoom": 90.5,
+          "cameraRoll": 0,
+          "targetX": 1.9534883720930232,
+          "targetY": 0,
+          "targetZ": 25.479255219125044
+        },
+        {
+          "name": "HD - MOBILE - 30FOV",
+          "cameraX": -3.1777777777777776,
+          "cameraY": 2.071011807676939e-13,
+          "cameraZ": 260.17068872666084,
+          "cameraFov": 35,
+          "cameraZoom": 260.17068872666084,
+          "cameraRoll": 0,
+          "targetX": -3.1777777777777776,
+          "targetY": 1.9117032070864052e-13,
+          "targetZ": 0
+        },
         {
           "name": "HD - DESKTOP - 20 FOV",
           "cameraX": 1.9534883720930232,
@@ -12208,7 +12232,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713558,
+      "loadingPreviewRotationY": -109.10457274713559,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -20240,10 +20264,34 @@
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
+      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":5.541526766141773e-15,\"cameraZ\":115.97925521912504,\"cameraFov\":30,\"cameraZoom\":90.5,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":0,\"targetZ\":25.479255219125044}",
       "cameraZoom": 260.17068872666084,
       "cameraZoomSpeed": 1,
       "savedCameras": [
+        {
+          "name": "HD - DESKTOP - 30 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 5.541526766141773e-15,
+          "cameraZ": 115.97925521912504,
+          "cameraFov": 30,
+          "cameraZoom": 90.5,
+          "cameraRoll": 0,
+          "targetX": 1.9534883720930232,
+          "targetY": 0,
+          "targetZ": 25.479255219125044
+        },
+        {
+          "name": "HD - MOBILE - 30FOV",
+          "cameraX": -3.1777777777777776,
+          "cameraY": 2.071011807676939e-13,
+          "cameraZ": 260.17068872666084,
+          "cameraFov": 35,
+          "cameraZoom": 260.17068872666084,
+          "cameraRoll": 0,
+          "targetX": -3.1777777777777776,
+          "targetY": 1.9117032070864052e-13,
+          "targetZ": 0
+        },
         {
           "name": "HD - DESKTOP - 20 FOV",
           "cameraX": 1.9534883720930232,
@@ -24026,7 +24074,7 @@
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
       "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713558,
+      "loadingPreviewRotationY": -109.10457274713559,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -32058,10 +32106,34 @@
       "cameraYaw": 1.464,
       "cameraPitch": -2.946,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
+      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":5.541526766141773e-15,\"cameraZ\":115.97925521912504,\"cameraFov\":30,\"cameraZoom\":90.5,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":0,\"targetZ\":25.479255219125044}",
       "cameraZoom": 260.17068872666084,
       "cameraZoomSpeed": 1,
       "savedCameras": [
+        {
+          "name": "HD - DESKTOP - 30 FOV",
+          "cameraX": 1.9534883720930232,
+          "cameraY": 5.541526766141773e-15,
+          "cameraZ": 115.97925521912504,
+          "cameraFov": 30,
+          "cameraZoom": 90.5,
+          "cameraRoll": 0,
+          "targetX": 1.9534883720930232,
+          "targetY": 0,
+          "targetZ": 25.479255219125044
+        },
+        {
+          "name": "HD - MOBILE - 30FOV",
+          "cameraX": -3.1777777777777776,
+          "cameraY": 2.071011807676939e-13,
+          "cameraZ": 260.17068872666084,
+          "cameraFov": 35,
+          "cameraZoom": 260.17068872666084,
+          "cameraRoll": 0,
+          "targetX": -3.1777777777777776,
+          "targetY": 1.9117032070864052e-13,
+          "targetZ": 0
+        },
         {
           "name": "HD - DESKTOP - 20 FOV",
           "cameraX": 1.9534883720930232,
@@ -35989,14 +36061,14 @@
     },
     {
       "key": "Saved Dev Settings",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [],
       "settings": []
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -42490,8 +42562,8 @@
   "devHotkeys": {},
   "panelGeometry": {
     "desktop": {
-      "left": 839.2250366210938,
-      "top": 5.599999904632568,
+      "left": 1001.625,
+      "top": 0,
       "width": 556.7750244140625,
       "height": 711.6000366210938
     },
