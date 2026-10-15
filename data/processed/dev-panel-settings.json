@@ -87,7 +87,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -8538,7 +8538,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": false,
+      "dp_textEditMode": true,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -19312,7 +19312,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": false,
+      "dp_textEditMode": true,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -21635,7 +21635,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -30086,7 +30086,7 @@
       "dp_capsTabText": true,
       "dp_capsGroupNames": true,
       "dp_capsSettingsText": false,
-      "dp_textEditMode": false,
+      "dp_textEditMode": true,
       "dp_capsTitleText": false,
       "dp_boldTitle": true,
       "dp_boldTab": true,
@@ -32864,7 +32864,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -32960,7 +32960,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -32983,7 +32983,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -33045,7 +33045,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -33102,7 +33102,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -33189,14 +33189,14 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -33407,7 +33407,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Z Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -34281,6 +34281,107 @@
       "locked": true,
       "items": [
         {
+          "type": "group",
+          "group": {
+            "key": "New Group (12)",
+            "collapsed": false,
+            "locked": false,
+            "items": [
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 20",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 21",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 22",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 23",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 24",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 25",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 26",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 31",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Custom Click Function 27",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
+              }
+            ],
+            "settings": []
+          }
+        },
+        {
           "type": "row",
           "key": "holdConfirmMs"
         },
@@ -34315,16 +34416,6 @@
         {
           "type": "group",
           "group": {
-            "key": "Custom Click Function 31",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
             "key": "Custom Click Function 30",
             "collapsed": true,
             "locked": false,
@@ -34346,86 +34437,6 @@
           "type": "group",
           "group": {
             "key": "Custom Click Function 28",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 27",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 26",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 25",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 24",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 23",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 22",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 21",
-            "collapsed": true,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 20",
             "collapsed": true,
             "locked": false,
             "items": [],
@@ -35598,7 +35609,8 @@
     "Custom Click Function 33": "TC - 3",
     "custom25Trig1Enabled": "ON/ OFF",
     "custom25Trig1Type": "Trigger Type",
-    "custom25Trig1ClickCount": "Trigger Count"
+    "custom25Trig1ClickCount": "Trigger Count",
+    "New Group (12)": "TESTING"
   },
   "devVisibility": {
     "custom17Enabled": true,
