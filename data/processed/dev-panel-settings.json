@@ -114,7 +114,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-300,\"max\":-100}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-250,\"max\":-100}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -12071,7 +12071,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-300,\"max\":-100}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-250,\"max\":-100}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -24028,7 +24028,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-300,\"max\":-100}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-250,\"max\":-100}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -36406,7 +36406,7 @@
     },
     {
       "key": "Saved Dev Settings",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [],
       "settings": []
@@ -36785,7 +36785,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -36796,7 +36796,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
