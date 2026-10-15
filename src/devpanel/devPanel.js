@@ -477,6 +477,13 @@ function renderListPickerItemRow(entry, item) {
     })
     row.appendChild(checkbox)
   }
+  // ctrl.itemToggle { isOn(item), setOn(item, on) } (2026-10-14): an on / off checkbox on the left of every item (and of every group, see buildGroupHeader()), driven by the host so it can mirror a setting that lives elsewhere.
+  if (entry.ctrl.itemToggle) {
+    const tcb = el('input', 'dp-lp-toggle-checkbox', { type: 'checkbox', checked: !!entry.ctrl.itemToggle.isOn(item) })
+    tcb.addEventListener('click', (e) => e.stopPropagation())
+    tcb.addEventListener('change', () => { entry.ctrl.itemToggle.setOn(item, tcb.checked); refreshListPickerToggles(entry) })
+    row.appendChild(tcb)
+  }
   row.appendChild(el('span', 'dp-lp-row-label', { textContent: item.name }))
   row.__item = item
   // Direct user report, 2026-09-11: on mobile, tapping a name and hitting
@@ -548,6 +555,15 @@ function buildGroupHeader(entry, path) {
   const header = el('div', 'dp-lp-group-header')
   header.appendChild(el('span', 'dp-lp-group-handle', { textContent: '⠿' }))
   header.appendChild(el('span', 'arrow', { textContent: '▼' }))
+  if (entry.ctrl.itemToggle) {
+    const gcb = el('input', 'dp-lp-group-toggle', { type: 'checkbox' })
+    gcb.addEventListener('click', (e) => e.stopPropagation())
+    gcb.addEventListener('change', () => {
+      listPickerGroupItems(entry, path).forEach((it) => entry.ctrl.itemToggle.setOn(it, gcb.checked))
+      refreshListPickerToggles(entry)
+    })
+    header.appendChild(gcb)
+  }
   const titleSpan = el('span', 'dp-lp-group-title', { textContent: path.split(LP_GROUP_PATH_SEP).pop() })
   titleSpan.addEventListener('click', (e) => {
     e.stopPropagation()
@@ -618,6 +634,32 @@ function buildGroupHeader(entry, path) {
 // won't survive a reload if it's still empty at Save time (its existence
 // isn't persisted separately from its members' own .group field, only
 // inferred from them).
+// Items in a group, including everything in its subgroups.
+function listPickerGroupItems(entry, path) {
+  return entry.items.filter((it) => it.group && (it.group === path || it.group.startsWith(path + LP_GROUP_PATH_SEP)))
+}
+// Re-reads every item / group checkbox from the host (ctrl.itemToggle.isOn): a row is its own item; a group is on when all its items are, mixed when some are.
+function refreshListPickerToggles(entry) {
+  const t = entry.ctrl.itemToggle
+  if (!t) return
+  entry.listEl.querySelectorAll('.dp-list-picker-row').forEach((r) => {
+    const cb = r.querySelector(':scope > .dp-lp-toggle-checkbox')
+    if (cb && r.__item) cb.checked = !!t.isOn(r.__item)
+  })
+  entry.listEl.querySelectorAll('.dp-lp-group').forEach((g) => {
+    const cb = g.querySelector(':scope > .dp-lp-group-header > .dp-lp-group-toggle')
+    if (!cb) return
+    const items = listPickerGroupItems(entry, g.__groupName)
+    const on = items.filter((it) => t.isOn(it)).length
+    cb.disabled = items.length === 0
+    cb.checked = items.length > 0 && on === items.length
+    cb.indeterminate = on > 0 && on < items.length
+  })
+}
+export function refreshListPickerTogglesByKey(key) {
+  const entry = numEls[key]
+  if (entry && entry.type === 'list-picker') refreshListPickerToggles(entry)
+}
 function renderListPickerRows(entry) {
   entry.listEl.innerHTML = ''
   // One-level tree: top[name] = { items, subs: { subName: { items } }, subOrder }
@@ -691,6 +733,7 @@ function renderListPickerRows(entry) {
     g.appendChild(body)
     entry.listEl.appendChild(g)
   })
+  refreshListPickerToggles(entry)
 }
 
 // A plain dropdown whose OPTION LIST is host-supplied and can change at
@@ -790,6 +833,28 @@ export function saveCurrentSettings() {
 // in place. Re-commits the resulting value (which may differ from
 // before, if the previous selection no longer exists) so `cfg` and any
 // dependent onChange stay consistent with what's actually shown.
+// Sets a control the way a user edit does (every device slot rule, cfg, onChange, change hooks) and refreshes its visible row.
+export function setControlValue(key, v) {
+  const ctrl = findCtrl(key)
+  if (!ctrl) return false
+  commit(ctrl, v)
+  displayValue(ctrl, v)
+  return true
+}
+// Copies one control's whole state onto another (every device's stored value, its Show-in-Mobile/Landscape flag and its Independent-from-Desktop flags) - for duplicating a group of controls. `fireOnChange` re-runs the target's onChange once.
+export function copyControlState(fromKey, toKey, fireOnChange = true) {
+  const from = findCtrl(fromKey), to = findCtrl(toKey)
+  if (!from || !to) return false
+  DEVICES.forEach((d) => { if (fromKey in store[d]) store[d][toKey] = JSON.parse(JSON.stringify(store[d][fromKey])) })
+  if (fromKey in devVisibility) devVisibility[toKey] = devVisibility[fromKey]
+  ;['mobile', 'landscape'].forEach((d) => { if (devIndependence[d] && fromKey in devIndependence[d]) devIndependence[d][toKey] = devIndependence[d][fromKey] })
+  const real = store[realDeviceClass()] && store[realDeviceClass()][toKey]
+  if (real !== undefined) cfg[toKey] = real
+  const shown = store[editingDevice] && store[editingDevice][toKey]
+  if (shown !== undefined) displayValue(to, shown)
+  if (fireOnChange && to.onChange && cfg[toKey] !== undefined) { try { to.onChange(cfg[toKey]) } catch (err) { /* a handler that needs UI that is not built yet */ } }
+  return true
+}
 export function refreshSelectOptions(key) {
   const ctrl = findCtrl(key)
   const entry = numEls[key]
@@ -1249,7 +1314,11 @@ function buildListPickerRow(ctrl, row) {
   // since using it doesn't update that dropdown's own persisted
   // selection. A control without this flag keeps the button exactly as
   // before.
-  if (ctrl.hideUseButton) btnRow.append(saveBtn, overwriteBtn, renameBtn, deleteBtn, addGroupBtn)
+  // ctrl.hostManaged (2026-10-14, Custom Click Function Selector): the items are things the HOST already owns (custom click functions), so there is nothing to Save / Overwrite / Use / Rename / Delete here - just organizing them
+  // (+ Group, drag to order / nest) and, when the host supplies ctrl.onDuplicate, a Duplicate button. See also ctrl.itemToggle (a checkbox per item + group).
+  const duplicateBtn = el('button', null, { type: 'button', textContent: 'Duplicate' })
+  if (ctrl.hostManaged) { if (ctrl.onDuplicate) btnRow.append(duplicateBtn); btnRow.append(addGroupBtn) }
+  else if (ctrl.hideUseButton) btnRow.append(saveBtn, overwriteBtn, renameBtn, deleteBtn, addGroupBtn)
   else btnRow.append(saveBtn, overwriteBtn, useBtn, renameBtn, deleteBtn, addGroupBtn)
   // Cross-project pose export/import (direct user request): export ships
   // whatever's CHECKED (entry.exportChecked) as a plain JSON array to the
@@ -1395,6 +1464,12 @@ function buildListPickerRow(ctrl, row) {
   // see renderListPickerRows()'s own comment for why array position alone
   // (an earlier version of this fix) wasn't enough once an empty AND an
   // auto-assigned group could both be in play at once.
+  const flashBtn = (btn, msg) => { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1400) }
+  duplicateBtn.addEventListener('click', () => {
+    const it = entry.selectedItem
+    if (!it) { flashBtn(duplicateBtn, 'Select one'); return }
+    if (ctrl.onDuplicate) ctrl.onDuplicate(it)
+  })
   addGroupBtn.addEventListener('click', () => {
     const existingNames = new Set([...entry.items.map((it) => it.group).filter(Boolean), ...entry.pendingGroups])
     let name = 'New Group'
@@ -1412,7 +1487,6 @@ function buildListPickerRow(ctrl, row) {
     }
     renderListPickerRows(entry)
   })
-  const flashBtn = (btn, msg) => { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1400) }
   if (exportBtn) {
     exportBtn.addEventListener('click', async () => {
       const checked = entry.items.filter((it) => entry.exportChecked.has(it))

@@ -537,6 +537,7 @@ html, body {
    `.dp-multi-select-row` (a sibling class, not a `.dp-row`). The label
    shares the row's own flex layout, styled distinctly from a dropdown. */
 .dp-multi-select-row input[type=range] { flex: 1 1 auto; min-width: 0; accent-color: var(--dp-slider-color, #7d8cff); }
+.dp-lp-toggle-checkbox, .dp-lp-group-toggle { flex: 0 0 auto; margin: 0 6px 0 2px; accent-color: var(--dp-accent3, var(--dp-accent, #6c8cff)); cursor: pointer; }
 .dp-using-label { font-size: var(--dp-body-font-size, 11px); color: var(--dp-text-color, #e8e8f0); opacity: 0.7; padding: 1px 2px 3px; overflow-wrap: anywhere; }
 .dp-multi-select-hold-label { flex: 0 0 auto; color: var(--dp-text-color, #e8e8f0); font-size: var(--dp-body-font-size, 11px); padding: 3px 2px; opacity: 0.85; }
 .dp-multi-select-add-row { display: flex; gap: 4px; margin-bottom: 2px; }
