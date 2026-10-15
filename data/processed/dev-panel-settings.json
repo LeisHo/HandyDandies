@@ -351,8 +351,9 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 598.4173100809887,
       "loadingPreviewTextEnabled": true,
-      "loadingPreviewTextContent": "LOADING...",
+      "loadingPreviewTextContent": "loading ...",
       "loadingPreviewTextFontSize": 32,
+      "loadingPreviewTextLetterSpacing": 0,
       "loadingPreviewTextColor": "#ffffff",
       "loadingPreviewTextFont": "Georgia",
       "loadingPreviewTextOffsetX": 0,
@@ -11137,8 +11138,9 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 598.4173100809887,
       "loadingPreviewTextEnabled": true,
-      "loadingPreviewTextContent": "LOADING...",
+      "loadingPreviewTextContent": "loading ...",
       "loadingPreviewTextFontSize": 22,
+      "loadingPreviewTextLetterSpacing": 5,
       "loadingPreviewTextColor": "#ffffff",
       "loadingPreviewTextFont": "Georgia",
       "loadingPreviewTextOffsetX": -104,
@@ -18641,7 +18643,7 @@
         }
       ],
       "cameraX": -3.1777777777777776,
-      "cameraY": 4.4606408165349395e-13,
+      "cameraY": 4.938566618306538e-13,
       "cameraZ": 260.17068872666084,
       "cameraFov": 35,
       "cameraYaw": 0,
@@ -21923,8 +21925,9 @@
       "loadingPreviewCameraFov": 32,
       "loadingPreviewCameraZoom": 598.4173100809887,
       "loadingPreviewTextEnabled": true,
-      "loadingPreviewTextContent": "LOADING...",
+      "loadingPreviewTextContent": "loading ...",
       "loadingPreviewTextFontSize": 32,
+      "loadingPreviewTextLetterSpacing": 0,
       "loadingPreviewTextColor": "#ffffff",
       "loadingPreviewTextFont": "Georgia",
       "loadingPreviewTextOffsetX": 0,
@@ -33237,6 +33240,10 @@
                     {
                       "type": "row",
                       "key": "loadingPreviewTextOffsetY"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewTextLetterSpacing"
                     }
                   ],
                   "settings": [
@@ -33245,7 +33252,8 @@
                     "loadingPreviewTextColor",
                     "loadingPreviewTextFont",
                     "loadingPreviewTextOffsetX",
-                    "loadingPreviewTextOffsetY"
+                    "loadingPreviewTextOffsetY",
+                    "loadingPreviewTextLetterSpacing"
                   ]
                 }
               }
@@ -39358,8 +39366,8 @@
     "mobile": {
       "left": 20,
       "top": 88.04762268066406,
-      "width": 390.5714416503906,
-      "height": 381.58929443359375
+      "width": 397.4285888671875,
+      "height": 384.63690185546875
     }
   }
 }
