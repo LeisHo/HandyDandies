@@ -8262,9 +8262,9 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "staticPoseOnStartup": false,
+      "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
-      "handOffsetOnStartupEnabled": true,
+      "handOffsetOnStartupEnabled": false,
       "startupHandMaxClicks": 2,
       "startupHandOffsetZ": 0,
       "startupHandWaitForAll": true,
@@ -8328,7 +8328,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":225}",
-      "sphereSeqEnabled": true,
+      "sphereSeqEnabled": false,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
@@ -30820,9 +30820,9 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "staticPoseOnStartup": false,
+      "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
-      "handOffsetOnStartupEnabled": true,
+      "handOffsetOnStartupEnabled": false,
       "startupHandMaxClicks": 2,
       "startupHandOffsetZ": 0,
       "startupHandWaitForAll": true,
@@ -30886,7 +30886,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":225}",
-      "sphereSeqEnabled": true,
+      "sphereSeqEnabled": false,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
@@ -36906,7 +36906,7 @@
                 "type": "group",
                 "group": {
                   "key": "Whole-Hand Rotation at Base",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -37264,7 +37264,7 @@
               },
               {
                 "key": "Whole-Hand Rotation at Base",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -38710,7 +38710,7 @@
               "type": "group",
               "group": {
                 "key": "Whole-Hand Rotation at Base",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": false,
                 "items": [
                   {
@@ -39068,7 +39068,7 @@
             },
             {
               "key": "Whole-Hand Rotation at Base",
-              "collapsed": true,
+              "collapsed": false,
               "locked": false,
               "items": [
                 {
@@ -257193,7 +257193,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -257272,7 +257272,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -257797,7 +257797,7 @@
               },
               {
                 "key": "Startup > Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -258520,7 +258520,7 @@
       "subgroups": [
         {
           "key": "Hand Offset On Startup",
-          "collapsed": false,
+          "collapsed": true,
           "locked": true,
           "items": [
             {
@@ -258599,7 +258599,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Retransition",
-                "collapsed": false,
+                "collapsed": true,
                 "locked": true,
                 "items": [
                   {
@@ -259124,7 +259124,7 @@
             },
             {
               "key": "Startup > Retransition",
-              "collapsed": false,
+              "collapsed": true,
               "locked": true,
               "items": [
                 {
