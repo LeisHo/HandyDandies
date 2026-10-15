@@ -7799,7 +7799,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":504,\"max\":728}",
+      "startupFnSpeedCurveRange": "{\"min\":942,\"max\":1467}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -7843,9 +7843,9 @@
       "sphereFnStartTimeCurveVisibleOnly": true,
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":2173}",
-      "sphereFnStartDistanceCurveEnabled": false,
+      "sphereFnStartDistanceCurveEnabled": true,
       "sphereFnStartDistanceMin": 0,
-      "sphereFnStartDistanceMax": 55,
+      "sphereFnStartDistanceMax": 65,
       "sphereFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4903901949768603,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5496817246187704,\"y\":0}}]",
       "sphereRadiusCurveEnabled": true,
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5352221846639439,\"y\":0}},{\"x\":0.5614528862320837,\"y\":1,\"h1\":{\"x\":0.11037376290175072,\"y\":0},\"h2\":{\"x\":-0.11706297360857076,\"y\":0}},{\"x\":1,\"y\":0.24968694051106766,\"h2\":{\"x\":-0.453301867765189,\"y\":0.07239583333333333}}]",
@@ -18576,7 +18576,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":504,\"max\":728}",
+      "startupFnSpeedCurveRange": "{\"min\":942,\"max\":1467}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -18620,9 +18620,9 @@
       "sphereFnStartTimeCurveVisibleOnly": true,
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":2173}",
-      "sphereFnStartDistanceCurveEnabled": false,
+      "sphereFnStartDistanceCurveEnabled": true,
       "sphereFnStartDistanceMin": 0,
-      "sphereFnStartDistanceMax": 55,
+      "sphereFnStartDistanceMax": 65,
       "sphereFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4903901949768603,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5496817246187704,\"y\":0}}]",
       "sphereRadiusCurveEnabled": true,
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5352221846639439,\"y\":0}},{\"x\":0.5614528862320837,\"y\":1,\"h1\":{\"x\":0.11037376290175072,\"y\":0},\"h2\":{\"x\":-0.11706297360857076,\"y\":0}},{\"x\":1,\"y\":0.24968694051106766,\"h2\":{\"x\":-0.453301867765189,\"y\":0.07239583333333333}}]",
@@ -29353,7 +29353,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":504,\"max\":728}",
+      "startupFnSpeedCurveRange": "{\"min\":942,\"max\":1467}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -29397,9 +29397,9 @@
       "sphereFnStartTimeCurveVisibleOnly": true,
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.2470832824707031}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":2173}",
-      "sphereFnStartDistanceCurveEnabled": false,
+      "sphereFnStartDistanceCurveEnabled": true,
       "sphereFnStartDistanceMin": 0,
-      "sphereFnStartDistanceMax": 55,
+      "sphereFnStartDistanceMax": 65,
       "sphereFnStartDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4903901949768603,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5496817246187704,\"y\":0}}]",
       "sphereRadiusCurveEnabled": true,
       "sphereRadiusCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5352221846639439,\"y\":0}},{\"x\":0.5614528862320837,\"y\":1,\"h1\":{\"x\":0.11037376290175072,\"y\":0},\"h2\":{\"x\":-0.11706297360857076,\"y\":0}},{\"x\":1,\"y\":0.24968694051106766,\"h2\":{\"x\":-0.453301867765189,\"y\":0.07239583333333333}}]",
@@ -256298,7 +256298,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -257044,7 +257044,7 @@
               },
               {
                 "key": "Startup > Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -257174,7 +257174,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -257275,7 +257275,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Start Distance Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -257426,7 +257426,7 @@
               },
               {
                 "key": "Sphere > Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -258112,7 +258112,7 @@
               "type": "group",
               "group": {
                 "key": "Startup > Animation Speed Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -258858,7 +258858,7 @@
             },
             {
               "key": "Startup > Animation Speed Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": true,
               "items": [
                 {
@@ -258985,7 +258985,7 @@
         },
         {
           "key": "Field Grid Sphere Sequence",
-          "collapsed": true,
+          "collapsed": false,
           "locked": true,
           "items": [
             {
@@ -259086,7 +259086,7 @@
               "type": "group",
               "group": {
                 "key": "Sphere > Start Distance Curve",
-                "collapsed": true,
+                "collapsed": false,
                 "locked": true,
                 "items": [
                   {
@@ -259237,7 +259237,7 @@
             },
             {
               "key": "Sphere > Start Distance Curve",
-              "collapsed": true,
+              "collapsed": false,
               "locked": true,
               "items": [
                 {
