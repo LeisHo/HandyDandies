@@ -33179,7 +33179,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > Text",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
