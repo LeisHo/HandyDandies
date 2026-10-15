@@ -529,6 +529,14 @@ function renderListPickerItemRow(entry, item) {
       // further shift-click keeps extending/shrinking from the SAME
       // original anchor rather than the most recent endpoint.
       entry.selectedItem = item
+    } else if (e.ctrlKey || e.metaKey) {
+      // Ctrl / Cmd-click (2026-10-14, direct request): add this row to the selection, or take it out if it is already in, without touching the others. The clicked row becomes the new anchor for a following shift-click.
+      const next = new Set(entry.multiSelected)
+      if (next.has(item)) next.delete(item)
+      else next.add(item)
+      entry.multiSelected = next
+      entry.selectAnchor = item
+      entry.selectedItem = next.has(item) ? item : (Array.from(next).pop() || null) // the active single-item target is the last row still selected
     } else {
       entry.selectedItem = item
       entry.selectAnchor = item
@@ -1466,9 +1474,10 @@ function buildListPickerRow(ctrl, row) {
   // auto-assigned group could both be in play at once.
   const flashBtn = (btn, msg) => { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1400) }
   duplicateBtn.addEventListener('click', () => {
-    const it = entry.selectedItem
-    if (!it) { flashBtn(duplicateBtn, 'Select one'); return }
-    if (ctrl.onDuplicate) ctrl.onDuplicate(it)
+    const picked = entry.items.filter((x) => entry.multiSelected.has(x))
+    if (!picked.length && entry.selectedItem) picked.push(entry.selectedItem)
+    if (!picked.length) { flashBtn(duplicateBtn, 'Select one'); return }
+    if (ctrl.onDuplicate) picked.forEach((it) => ctrl.onDuplicate(it)) // every selected item, in list order
   })
   addGroupBtn.addEventListener('click', () => {
     const existingNames = new Set([...entry.items.map((it) => it.group).filter(Boolean), ...entry.pendingGroups])
