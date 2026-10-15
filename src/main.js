@@ -12822,6 +12822,10 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const tDecay = THREE.MathUtils.clamp((elapsedSinceRelease - chp.stoppingStartDelay) / chp.stoppingDelayMs, 0, 1) // 0 for the whole Start Time window
     const decayFactor = 1 - tDecay // linear ease-out to 0 -- "progressively slowdown to a stop"
     let values
+    // The Offset / Camera Offset / Rotation ramp keeps going through Tween Stop exactly like the pose (2026-10-15, direct request: "tween stop start time and delay applies to rotation and offset functions within the click
+    // function as well, not just the pose"). It used to be frozen at release (the in-flight part is baked into the accumulator there, and this phase applied progress 0), so only the pose obeyed the Start Time
+    // (keeps running at normal speed) and the Delay (slows to a halt). stopRamp is the progress made SINCE the release, taken from the same virtual-elapsed accumulator that drives the pose; it is baked when the stop ends.
+    let stopRamp = 0
     if (chp.stoppingWasLooping) {
       // CORRECTED 2026-10-04 (was: hold the release-moment pose for the whole
       // delay, so Tween Stop appeared to work only on the first playthrough).
@@ -12833,7 +12837,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // bounces). Falls back to the old hold if the sequence data is gone.
       chp.stoppingVirtualElapsedMs += dt * decayFactor * (chp.liveTempo || 1)
       if (chp.stoppingLoopBaseSegments != null && trig.loopPoses && trig.loopPoses.length >= 2) {
-        values = loopPoseValuesBeyondLap(p, chp, trig, chp.stoppingLoopBaseSegments + chp.stoppingVirtualElapsedMs / loopSegmentMsFor(p, chp, trig))
+        const loopSegNow = chp.stoppingLoopBaseSegments + chp.stoppingVirtualElapsedMs / loopSegmentMsFor(p, chp, trig)
+        values = loopPoseValuesBeyondLap(p, chp, trig, loopSegNow)
+        // The current lap's own ramp carries on from where the release left it, to the lap's end at most (further laps are not added while stopping).
+        const stopOsc = cfg[`${p}LoopMode`] === 'Oscillate'
+        const lapSeg = Math.max(stopOsc ? (trig.loopFwdW || trig.loopPoses.length - 1) : (trig.loopRingW || trig.loopPoses.length), 1e-6)
+        const lapNow = normOffsetProgress(loopLapProgress(p, 'hold', loopSegNow / lapSeg, chp.loopCarry || 0, trig.loopPoses.length, stopOsc, chp.loopDirection))
+        const lapThen = normOffsetProgress(loopLapProgress(p, 'hold', chp.stoppingLoopBaseSegments / lapSeg, chp.loopCarry || 0, trig.loopPoses.length, stopOsc, chp.loopDirection))
+        stopRamp = { o: lapNow.o - lapThen.o, c: lapNow.c - lapThen.c, r: lapNow.r - lapThen.r }
       } else {
         values = chp.lastAppliedValues
       }
@@ -12847,6 +12858,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       speedMs = Math.max(speedMs * (chp.glideTimeFactor || 1), 1) // First Transition Time Scale
       chp.stoppingVirtualElapsedMs += dt * decayFactor * (chp.liveTempo || 1)
       const progressRaw = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
+      stopRamp = Math.max(progressRaw - THREE.MathUtils.clamp(chp.stoppingBaseElapsedMs / speedMs, 0, 1), 0) // the forward ramp's own 0..1, minus the part already baked at release
       const progress = stopEasing ? easingProfilePAt(stopEasing, progressRaw) : progressRaw
       // `* frozenTweenFractionCap` (CORRECTED 2026-09-28) -- the forward
       // phase this continues from applies Start Distance Curve's cap
@@ -12857,8 +12869,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, 0) // 'stopping' is a deceleration of the POSE, not a new offset/rotation ramp -- nothing new to add
+    applyOffsetRotationToHand(hand, p, stopRamp) // continues the ramp the release interrupted (see stopRamp above); 0 when nothing was left to add
     if (tDecay >= 1) {
+      bakeInFlightOffsetRotation(hand, p) // the stop is over: lock in the part of the ramp added while stopping, so a retransition (or a freeze) starts from the real total
       if (chp.stoppingFreezeAtEnd) {
         // "the hand will just stop where it is" -- Retransition off, Tween
         // Stop decay just finished. Logged BEFORE the phase change, same
