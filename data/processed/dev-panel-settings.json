@@ -12365,7 +12365,7 @@
       "rvStartTimeRange": "{\"min\":20,\"max\":500}",
       "rvStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.26224496887956517,\"y\":0.46552073160807295}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3223635039520899,\"y\":0}}]",
       "rvSpeedEnabled": true,
-      "rvSpeedRange": "{\"min\":904,\"max\":1807}",
+      "rvSpeedRange": "{\"min\":904,\"max\":1531}",
       "rvSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2515702070184387,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.24036571904091975,\"y\":0}}]",
       "rvRetransitionEnabled": true,
       "rvRetransitionSpeedMs": 3000,
