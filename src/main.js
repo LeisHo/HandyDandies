@@ -398,7 +398,13 @@ const _brAX = new THREE.Vector3(1, 0, 0), _brAY = new THREE.Vector3(0, 1, 0), _b
 // Render Order Mode / Fallback options (2026-10-11). Z modes order by a Z position (closest to the camera on top); the cursor modes order by distance to the cursor: XY = screen-space only, XYZ = also the Z gap
 // to the cursor target (its Cursor Target Depth). 'closest' = nearest the cursor on top, 'farthest' = furthest on top.
 // '-' modes (2026-10-11): the same Z with the sign flipped, so the hand with the LOWER Z value is drawn on top.
-const RO_NEG_BASE = { negZ: 'z', negArmBase: 'armBase', negArmEnd: 'armEnd', negPalmCenter: 'palmCenter' }
+const RO_NEG_BASE = { negZ: 'z', negArmBase: 'armBase', negArmEnd: 'armEnd', negPalmCenter: 'palmCenter', negCamPalmCenter: 'camPalmCenter', negCamArmBase: 'camArmBase', negCamArmEnd: 'camArmEnd' }
+// "Closest to Camera (XY)" modes (2026-10-16): the same points (rig nodes), ordered by their XY distance to the camera - how far the point sits from the centre of the view on screen (the camera's own X / Y; depth is ignored), the
+// same screen-space meaning as the (XY) cursor modes but measured to the camera. Scalar: the point nearer the camera's XY is drawn on top. Pair modes: the same former-hand rule as the Z pair modes below, comparing those
+// distances instead of Z. The '-' versions reverse the verdict.
+const RO_CAM_NODES = { camPalmCenter: 'palmCenter', camArmBase: 'armBase', camArmEnd: 'armEnd' }
+const RO_CAM_PAIR_NEG = { negCamArmBaseToPalm: 'camArmBaseToPalm', negCamArmEndToPalm: 'camArmEndToPalm', negCamArmEndToArmBase: 'camArmEndToArmBase' }
+const RO_CAM_PAIR_DEFS = { camArmBaseToPalm: ['armBase', 'palmCenter'], camArmEndToPalm: ['armEnd', 'palmCenter'], camArmEndToArmBase: ['armEnd', 'armBase'] }
 // '-' pair modes (2026-10-11): the same test with the verdict reversed (the LOWER former point goes on top).
 const RO_PAIR_NEG = { negPalmToArm: 'palmToArm', negPalmToArmEnd: 'palmToArmEnd', negArmBaseToPalm: 'armBaseToPalm', negArmEndToPalm: 'armEndToPalm', negArmBaseToArmEnd: 'armBaseToArmEnd', negArmEndToArmBase: 'armEndToArmBase' }
 const RO_PAIR_DEFS = { palmToArm: ['palmCenter', 'armBase'], palmToArmEnd: ['palmCenter', 'armEnd'], armBaseToPalm: ['armBase', 'palmCenter'], armEndToPalm: ['armEnd', 'palmCenter'], armBaseToArmEnd: ['armBase', 'armEnd'], armEndToArmBase: ['armEnd', 'armBase'] }
@@ -419,7 +425,13 @@ const RENDER_ORDER_MODE_OPTIONS = [
   { value: 'negArmBaseToPalm', text: '-Arm Base To Palm Center' },
   { value: 'negArmEndToPalm', text: '-Arm End To Palm Center' },
   { value: 'negArmBaseToArmEnd', text: '-Arm Base To Arm End' },
-  { value: 'negArmEndToArmBase', text: '-Arm End To Arm Base' }
+  { value: 'negArmEndToArmBase', text: '-Arm End To Arm Base' },
+  { value: 'camArmBaseToPalm', text: 'Arm Base To Palm Center Closest to Camera (XY)' }, { value: 'negCamArmBaseToPalm', text: '-Arm Base To Palm Center Closest to Camera (XY)' },
+  { value: 'camArmEndToPalm', text: 'Arm End To Palm Center Closest to Camera (XY)' }, { value: 'negCamArmEndToPalm', text: '-Arm End To Palm Center Closest to Camera (XY)' },
+  { value: 'camArmEndToArmBase', text: 'Arm End To Arm Base Closest to Camera (XY)' }, { value: 'negCamArmEndToArmBase', text: '-Arm End To Arm Base Closest to Camera (XY)' },
+  { value: 'camPalmCenter', text: 'Palm Center Closest to Camera (XY)' }, { value: 'negCamPalmCenter', text: '-Palm Center Closest to Camera (XY)' },
+  { value: 'camArmBase', text: 'Arm Base Closest to Camera (XY)' }, { value: 'negCamArmBase', text: '-Arm Base Closest to Camera (XY)' },
+  { value: 'camArmEnd', text: 'Arm End Closest to Camera (XY)' }, { value: 'negCamArmEnd', text: '-Arm End Closest to Camera (XY)' }
 ]
 // Cursor tracking point (2026-10-11): the point on each hand that every cursor-tracking measurement (aim, palm angle, screen-space distances, splay / crop distances) is taken from. Computed at the hand's
 // no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
@@ -1154,7 +1166,7 @@ function lpApplyProgressCrop(h, crop, flip) {
   pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
 }
 let lpCropLast = { progress: 0, crop: 0 }
-window.__lpCropDbg = { get cfg() { return cfg }, update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
+window.__lpCropDbg = { get cfg() { return cfg }, update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
 window.__lpCrop = () => ({ ...lpCropLast, boxMs: lpProgressCropBox && lpProgressCropBox.ms, hand1: loadingPreviewHand && loadingPreviewHand.progressCrop ? { ext: loadingPreviewHand.progressCrop.ext, wrist: loadingPreviewHand.progressCrop.wrist, tip: loadingPreviewHand.progressCrop.tip, yMin: loadingPreviewHand.progressCrop.yMin, yMax: loadingPreviewHand.progressCrop.yMax, sgn: loadingPreviewHand.progressCrop.sgn, plane: loadingPreviewHand.progressCrop.uni.value.toArray() } : null, hand2: !!loadingPreviewHand2 }) // debug read-out for tests
 function updateLoadingPreviewProgressCrop() {
   let crop = 0, progress = 0
@@ -1662,7 +1674,9 @@ function roExplain(lv, r, lo, hi, loAbove) {
     const nm = (n) => (n === 'armBase' ? 'arm base' : n === 'armEnd' ? 'arm end' : 'palm center')
     const fa = hands[up]._xyCursorDist ?? 0, fd = hands[down]._xyCursorDist ?? 0
     const F = (fa < fd || (fa === fd && up < down)) ? up : down, Lh = F === up ? down : up
-    cond = 'Hand ' + (F + 1) + ' (the closer to the cursor, the former) ' + nm(ev.fromNode) + ' Z ' + ev.fromZ[F].toFixed(2) + ((F === up) === !ev.neg ? ' is higher than ' : ' is lower than ') + 'Hand ' + (Lh + 1) + ' ' + nm(ev.toNode) + ' Z ' + ev.toZ[Lh].toFixed(2)
+    cond = ev.cam
+      ? 'Hand ' + (F + 1) + ' (the closer to the cursor, the former) ' + nm(ev.fromNode) + ' XY distance to the camera ' + (-ev.fromZ[F]).toFixed(2) + ((F === up) === !ev.neg ? ' is nearer than ' : ' is farther than ') + 'Hand ' + (Lh + 1) + ' ' + nm(ev.toNode) + ' ' + (-ev.toZ[Lh]).toFixed(2)
+      : 'Hand ' + (F + 1) + ' (the closer to the cursor, the former) ' + nm(ev.fromNode) + ' Z ' + ev.fromZ[F].toFixed(2) + ((F === up) === !ev.neg ? ' is higher than ' : ' is lower than ') + 'Hand ' + (Lh + 1) + ' ' + nm(ev.toNode) + ' Z ' + ev.toZ[Lh].toFixed(2)
   } else {
     const neg = ev.mode === 'closest' || ev.mode === 'closestZ' // their key is minus the distance
     const show = (i) => ((neg ? -1 : 1) * ev.k[i] * 0.01).toFixed(2)
@@ -1712,8 +1726,16 @@ function computeRenderOrderRanks() {
     if (!mode || mode === 'none') return null
     if (evs.has(mode)) return evs.get(mode)
     let ev
+    const camPairBase = RO_CAM_PAIR_NEG[mode] || mode
     const pairBase = RO_PAIR_NEG[mode] || mode
-    if (RO_PAIR_DEFS[pairBase]) {
+    if (RO_CAM_PAIR_DEFS[camPairBase]) {
+      // Camera-XY pair modes: the same former-hand rule and tolerance as the Z pair modes below; the compared number is minus the point's XY distance to the camera (larger = nearer the camera = on top).
+      const fromNode = RO_CAM_PAIR_DEFS[camPairBase][0], toNode = RO_CAM_PAIR_DEFS[camPairBase][1]
+      let arr = roA2A[mode]
+      if (!arr || arr.fromZ.length !== n) arr = roA2A[mode] = { fromZ: new Float64Array(n), toZ: new Float64Array(n) }
+      for (let i = 0; i < n; i++) { arr.fromZ[i] = -cameraDistXYOfNode(hands[i], fromNode); arr.toZ[i] = -cameraDistXYOfNode(hands[i], toNode) }
+      ev = { pair: true, a2a: true, cam: true, fromZ: arr.fromZ, toZ: arr.toZ, fromNode, toNode, mode, neg: !!RO_CAM_PAIR_NEG[mode] }
+    } else if (RO_PAIR_DEFS[pairBase]) {
       // Pair modes (2026-10-11): the hand CLOSER to the cursor in screen XY is always the FORMER hand (ties: the lower index); its FIRST-named point is compared with the other hand's SECOND-named point. Former point higher in Z by
       // more than the tolerance = the former hand is on top; lower = the other hand is on top; within the tolerance = no decision (the next level decides).
       const fromNode = RO_PAIR_DEFS[pairBase][0], toNode = RO_PAIR_DEFS[pairBase][1]
@@ -2108,6 +2130,7 @@ function renderOrderPriority(hand, mode) {
     case 'farthest': return hand._xyCursorDist ?? 0
     case 'closestZ': return -hand.effectiveRenderOrder
     case 'farthestZ': return hand.effectiveRenderOrder
+    case 'camPalmCenter': case 'camArmBase': case 'camArmEnd': return -cameraDistXYOfNode(hand, RO_CAM_NODES[mode]) // nearer the camera's XY = higher = on top
     default: return renderOrderModeZ(hand, mode) * (camera.position.z >= 0 ? 1 : -1)
   }
 }
@@ -12410,6 +12433,19 @@ function cursorDistXY(pos) {
     return Math.hypot((_scrV.x - cursorNDC.x) * w / 2, (_scrV.y - cursorNDC.y) * h / 2) * screenUnitsPerPx
   }
   return Math.hypot(pos.x - cursorTarget.x, pos.y - cursorTarget.y)
+}
+// XY distance from the camera to a hand's rig node (arm base / arm end / palm center; last render's world position): how far the point projects from the centre of the view, in world units at the field plane
+// (pixels x screenUnitsPerPx, the same conversion cursorDistXY() uses); before the scale exists, the plain world XY distance to the camera's own X / Y. A hand with no skeleton yet uses its field position.
+const _camXYV = new THREE.Vector3()
+function cameraDistXYOfNode(hand, nodeKey) {
+  const bone = renderOrderBone(hand, nodeKey)
+  if (bone) { const e = bone.matrixWorld.elements; _camXYV.set(e[12], e[13], e[14]) } else _camXYV.copy(hand.wrapper.position)
+  if (screenUnitsPerPx > 0) {
+    const w = window.innerWidth, h = window.innerHeight
+    _camXYV.project(camera)
+    return Math.hypot(_camXYV.x * w / 2, _camXYV.y * h / 2) * screenUnitsPerPx
+  }
+  return Math.hypot(_camXYV.x - camera.position.x, _camXYV.y - camera.position.y)
 }
 // 2026-10-04: world-XY distance (see xyFieldMinDist's comment).
 function handRestDist(hand) {
