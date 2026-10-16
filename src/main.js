@@ -1256,7 +1256,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy] }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -10010,12 +10010,13 @@ const RV_LIN = JSON.stringify([{ x: 0, y: 0 }, { x: 1, y: 1 }])
 const RV_FLAT1 = JSON.stringify([{ x: 0, y: 1 }, { x: 1, y: 1 }])
 const RV_FLAT_HALF = JSON.stringify([{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]) // an Easing curve is a SPEED profile (constant speed by default), like the click functions' Easing
 const RV_CURVE_X_VELOCITY = 'X: Cursor Velocity (Min -> Max Tracked)'
-const RV_CURVE_X_DIST = 'X: Hand Distance From The Trigger Cursor (where the cursor was when it started moving fast enough; 0 = Min Trigger Distance, 1 = Max Trigger Distance)'
+const RV_CURVE_X_DIST = 'X: Hand Distance From The Cursor Path (the line the cursor has travelled since it started moving fast enough; see Distance Measured From; 0 = Min Trigger Distance, 1 = Max Trigger Distance)'
 let rvSetList = [] // [{ prefix, title }] in panel order
 let rvNextSetN = 1
 let rvHasState = false // some hand holds velocity-effect state (cleared when the feature is switched off)
 let rvLastMs = 0, rvLastPx = 0, rvLastPy = 0, rvVx = 0, rvVy = 0, rvDirX = 1, rvDirY = 0, rvSpeed = 0
 let rvReconcileBusy = false, rvUiQueued = false
+let rvTrail = [] // the cursor's track since the trigger point (screen px), the Path Line the distance curves measure from
 let rvTrigPx = 0, rvTrigPy = 0, rvTrigWas = false // the Trigger Cursor: where the cursor was (screen px) the moment its speed first reached the Min Velocity
 const rvJsonCache = new Map()
 const _rvR = new THREE.Vector3(), _rvU = new THREE.Vector3(), _rvP = new THREE.Vector3(), _rvD = new THREE.Vector3(), _rvAxis = new THREE.Vector3(), _rvQ = new THREE.Quaternion(), _rvQi = new THREE.Quaternion(), _rvLocal = new THREE.Vector3(), _rvHP = new THREE.Vector3()
@@ -10072,6 +10073,9 @@ function rvSharedControls() {
     { key: 'rvVelocitySmoothing', label: 'Velocity Smoothing (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 0.35, ...pd },
     { key: 'rvTriggerDistanceRange', label: 'Min / Max Trigger Distance (World Units)', type: 'text', def: '{"min":15,"max":90}', ...pd },
     { key: 'rvTriggerDistanceCurve', label: 'Trigger Distance Curve (Velocity -> Max Distance)', type: 'text', def: RV_LIN, ...pd },
+    // What every distance curve measures (2026-10-15): Path Line = the hand's perpendicular distance from the line the cursor has travelled (a wake: hands beside the track move most, hands further out least / later), fixed when
+    // the cursor passes the hand; Trigger Point = the straight distance from where the cursor started moving; Live Cursor = the distance from the cursor as it is now.
+    { key: 'rvDistanceFrom', label: 'Distance Measured From', type: 'select', def: 'Path Line', options: () => ['Path Line', 'Trigger Point', 'Live Cursor'], ...pd },
     // Displacement Start Time Curve
     { key: 'rvStartTimeEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
     { key: 'rvStartTimeRange', label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', ...pd },
@@ -10375,6 +10379,24 @@ function rvResetAll() {
   })
   rvHasState = false
   rvTrigWas = false
+  rvTrail = []
+}
+// Shortest distance (screen px) from a point to the cursor's path: the recorded track (points joined in order, ending at the cursor's current position (px, py)) plus the straight line ahead of the cursor along its direction of travel.
+function rvPathDistPx(hx, hy, px, py) {
+  const t = rvTrail
+  let best = Infinity
+  for (let i = 0; i < t.length; i++) {
+    const ax = t[i][0], ay = t[i][1]
+    const bx = i + 1 < t.length ? t[i + 1][0] : px, by = i + 1 < t.length ? t[i + 1][1] : py
+    const vx = bx - ax, vy = by - ay, L2 = vx * vx + vy * vy
+    const u = L2 > 1e-9 ? THREE.MathUtils.clamp(((hx - ax) * vx + (hy - ay) * vy) / L2, 0, 1) : 0
+    const d = Math.hypot(hx - (ax + vx * u), hy - (ay + vy * u))
+    if (d < best) best = d
+  }
+  // ...and the line the cursor is heading along, ahead of it: a hand the cursor has not reached yet is at its sideways distance from that line (otherwise it would read its distance to the cursor itself, which is far).
+  const ft = Math.max(0, (hx - px) * rvDirX + (hy - py) * rvDirY)
+  best = Math.min(best, Math.hypot(hx - (px + rvDirX * ft), hy - (py + rvDirY * ft)))
+  return best === Infinity ? Math.hypot(hx - px, hy - py) : best
 }
 function updateResponsiveVelocity(nowMs) {
   if (!cfg.rvEnabled || !rvSetList.length) { if (rvHasState) rvResetAll(); rvLastMs = 0; rvVx = rvVy = rvSpeed = 0; return }
@@ -10394,7 +10416,9 @@ function updateResponsiveVelocity(nowMs) {
   const trigActive = rvSpeed >= vr.min && rvSpeed > 0 && (!cfg.rvHoldOnly || leftPointerDown)
   // Every distance curve measures from the Trigger Cursor, not the live cursor (2026-10-15, direct request): the cursor keeps moving during a sweep and a live distance changed the animation / retransition speed (and the
   // amount scalers) under the hands' feet. The point is fixed when the speed first reaches the minimum and stays until it drops below it again.
-  if (trigActive && !rvTrigWas) { rvTrigPx = px; rvTrigPy = py }
+  if (trigActive && !rvTrigWas) { rvTrigPx = px; rvTrigPy = py; rvTrail = [[px, py]] }
+  else if (trigActive) { const l = rvTrail[rvTrail.length - 1]; if (!l || Math.hypot(px - l[0], py - l[1]) >= 3) { rvTrail.push([px, py]); if (rvTrail.length > 600) rvTrail.shift() } }
+  const rvm = cfg.rvDistanceFrom, distMode = rvm === 'Trigger Point' ? 1 : (rvm === 'Live Cursor' ? 2 : 0)
   rvTrigWas = trigActive
   const vn = THREE.MathUtils.clamp((rvSpeed - vr.min) / Math.max(vr.max - vr.min, 1e-6), 0, 1)
   const dr = rvRange('rvTriggerDistanceRange', 15, 90)
@@ -10437,6 +10461,8 @@ function updateResponsiveVelocity(nowMs) {
     // x of every distance curve: the hand's distance from the TRIGGER cursor, Min Trigger Distance -> 0, Max Trigger Distance -> 1 (constant for the whole sweep).
     const distT = Math.hypot((_rvHP.x + 1) * 0.5 * W - rvTrigPx, (1 - _rvHP.y) * 0.5 * H - rvTrigPy) * unitsPerPx
     const nd = dr.max > dr.min ? THREE.MathUtils.clamp((distT - dr.min) / (dr.max - dr.min), 0, 1) : 0
+    const ndLive = dr.max > dr.min ? THREE.MathUtils.clamp((dist - dr.min) / (dr.max - dr.min), 0, 1) : 0
+    let ndPath = -1 // this hand's distance from the cursor path, worked out once, at its onset
     const dispSum = hand._rvDisp.set(0, 0, 0), tiltSum = hand._rvTilt.set(0, 0, 0)
     let splay = 0, crop = 0, curl = 0, ceil = Infinity, live = false
     for (let si = 0; si < sets.length; si++) {
@@ -10445,6 +10471,17 @@ function updateResponsiveVelocity(nowMs) {
       if (!st) st = rv.s[c.S] = { p: 0, wasTrig: false, onAt: 0, delay: 0, dur: 0, offAt: 0, rdelay: 0, rdur: 0, nd: 0, disp: 0, arm: 0, splay: 0, crop: 0, curl: 0, ceil: 100, wx: 0, wy: 0, wz: 0 }
       const angleOk = (c.trig.min === 0 && c.trig.max === 0) || (angAbs >= c.trig.min && angAbs <= c.trig.max)
       const trig = trigActive && c.on && dist <= D && angleOk
+      // x of every distance curve for this set (see Distance Measured From). Path Line is fixed when the cursor passes the hand, so the speeds, start times and scalers stay put as the cursor moves on.
+      let ndU
+      if (distMode === 1) ndU = nd
+      else if (distMode === 2) ndU = ndLive
+      else {
+        if (trig && !st.wasTrig) {
+          if (ndPath < 0) { const dpx = rvPathDistPx((_rvHP.x + 1) * 0.5 * W, (1 - _rvHP.y) * 0.5 * H, px, py); ndPath = dr.max > dr.min ? THREE.MathUtils.clamp((dpx * unitsPerPx - dr.min) / (dr.max - dr.min), 0, 1) : 0 }
+          st.ndPath = ndPath
+        }
+        ndU = st.ndPath !== undefined ? st.ndPath : nd
+      }
       if (trig) {
         // Target amounts at this moment (kept while the effect is retracting, when the cursor has already stopped).
         let theta = c.angle
@@ -10456,18 +10493,18 @@ function updateResponsiveVelocity(nowMs) {
         const ax = -rvDirY * side, ay = rvDirX * side // unit vector away from the path (screen px, y down)
         const dx = ax * ct + rvDirX * sn, dy = ay * ct + rvDirY * sn
         st.wx = _rvR.x * dx - _rvU.x * dy; st.wy = _rvR.y * dx - _rvU.y * dy; st.wz = _rvR.z * dx - _rvU.z * dy
-        const dsc = rvCurveY(c.kDD, nd)
+        const dsc = rvCurveY(c.kDD, ndU)
         st.disp = rvLerp(c.disp, rvCurveY(c.kD, vn)) * dsc
-        st.arm = c.arm ? rvLerp(c.arm, rvCurveY(c.kA, vn)) * rvCurveY(c.kAD, nd) : 0
-        st.splay = c.splay ? rvLerp(c.splay, rvCurveY(c.kS, vn)) * rvCurveY(c.kSD, nd) : 0
-        st.crop = c.crop ? rvLerp(c.crop, rvCurveY(c.kC, vn)) * rvCurveY(c.kCD, nd) : 0
-        st.curl = c.curl ? rvLerp(c.curl, rvCurveY(c.kL, vn)) * rvCurveY(c.kLD, nd) : 0
+        st.arm = c.arm ? rvLerp(c.arm, rvCurveY(c.kA, vn)) * rvCurveY(c.kAD, ndU) : 0
+        st.splay = c.splay ? rvLerp(c.splay, rvCurveY(c.kS, vn)) * rvCurveY(c.kSD, ndU) : 0
+        st.crop = c.crop ? rvLerp(c.crop, rvCurveY(c.kC, vn)) * rvCurveY(c.kCD, ndU) : 0
+        st.curl = c.curl ? rvLerp(c.curl, rvCurveY(c.kL, vn)) * rvCurveY(c.kLD, ndU) : 0
         st.ceil = c.curlMax
-        st.nd = nd
+        st.nd = ndU
       }
       // Timing: start delay -> onset (duration from the Speed curve) while triggered; start delay -> retransition when not.
       if (trig) {
-        if (!st.wasTrig) { st.onAt = nowMs; st.delay = startOn ? rvLerp(startR, rvCurveY('rvStartTimeCurve', nd)) : 0; st.dur = speedOn ? rvLerp(speedR, rvCurveY('rvSpeedCurve', nd)) : 0 }
+        if (!st.wasTrig) { st.onAt = nowMs; st.delay = startOn ? rvLerp(startR, rvCurveY('rvStartTimeCurve', ndU)) : 0; st.dur = speedOn ? rvLerp(speedR, rvCurveY('rvSpeedCurve', ndU)) : 0 }
         if (nowMs - st.onAt >= st.delay) st.p = st.dur > 0 ? Math.min(1, st.p + dt / st.dur) : 1
       } else {
         if (st.wasTrig) {
