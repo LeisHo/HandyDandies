@@ -23,7 +23,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatmahp",
+      "handModelId": "local:mvatrkwl",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -168,6 +168,36 @@
         {
           "name": "HD-1K-500OL",
           "id": "local:mvatmahp",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-1400OL",
+          "id": "local:mvatradn",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-1200OL",
+          "id": "local:mvatrdwu",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-600OL",
+          "id": "local:mvatrgg3",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-800OL",
+          "id": "local:mvatrij7",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-200OL",
+          "id": "local:mvatrkwl",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-100OL",
+          "id": "local:mvatroih",
           "source": "local"
         }
       ],
@@ -19603,7 +19633,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatmahp",
+      "handModelId": "local:mvatrkwl",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -19748,6 +19778,36 @@
         {
           "name": "HD-1K-500OL",
           "id": "local:mvatmahp",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-1400OL",
+          "id": "local:mvatradn",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-1200OL",
+          "id": "local:mvatrdwu",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-600OL",
+          "id": "local:mvatrgg3",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-800OL",
+          "id": "local:mvatrij7",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-200OL",
+          "id": "local:mvatrkwl",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-100OL",
+          "id": "local:mvatroih",
           "source": "local"
         }
       ],
@@ -39183,7 +39243,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatmahp",
+      "handModelId": "local:mvatrkwl",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -39328,6 +39388,36 @@
         {
           "name": "HD-1K-500OL",
           "id": "local:mvatmahp",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-1400OL",
+          "id": "local:mvatradn",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-1200OL",
+          "id": "local:mvatrdwu",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-600OL",
+          "id": "local:mvatrgg3",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-800OL",
+          "id": "local:mvatrij7",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-200OL",
+          "id": "local:mvatrkwl",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-100OL",
+          "id": "local:mvatroih",
           "source": "local"
         }
       ],
