@@ -389,19 +389,19 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
-      "loadingPreviewLayout": "{\"loadingPreviewCanvas\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewCanvas\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}},\"loadingPreviewText\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewText\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\",\"gap\":\"15\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}}}",
+      "loadingPreviewLayout": "{\"loadingPreviewCanvas\":{\"layout\":{\"position\":{\"mode\":\"anchor\",\"horizontal\":{\"anchor\":\"left\",\"offset\":\"2%\"},\"vertical\":{\"anchor\":\"bottom\",\"offset\":\"2%\"}},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}},\"loadingPreviewText\":{\"layout\":{\"position\":{\"mode\":\"anchor\",\"horizontal\":{\"anchor\":\"left\",\"offset\":\"1.5%\"},\"vertical\":{\"anchor\":\"bottom\",\"offset\":\"4%\"}},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}}}",
       "loadingPreviewScalePct": 100,
-      "loadingPreviewScaleRefPx": 1360,
+      "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713552,
+      "loadingPreviewRotationX": -85.46587001602177,
+      "loadingPreviewRotationY": -109.1051701667218,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -1.1325151052008238,
-      "loadingPreviewOffsetY": -0.06726533502820686,
-      "loadingPreviewOffsetZ": 0.6781114689622285,
+      "loadingPreviewOffsetX": 1,
+      "loadingPreviewOffsetY": 3.552713678800501e-15,
+      "loadingPreviewOffsetZ": -2.842170943040401e-14,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1394.7784318421322,
+      "loadingPreviewCameraZoom": 1394.7784318421304,
       "loadingPreviewTextEnabled": true,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -8421,7 +8421,7 @@
         }
       ],
       "cameraX": 1.5544272264775383,
-      "cameraY": 1.9520685262324363e-13,
+      "cameraY": 2.1339285759058179e-13,
       "cameraZ": 197.98779599525176,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -11777,6 +11777,7 @@
       "rvVelocitySmoothing": 0.31,
       "rvTriggerDistanceRange": "{\"min\":15,\"max\":35}",
       "rvTriggerDistanceCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3572238009602319,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3288804677939753,\"y\":-0.008645884195963571}}]",
+      "rvDistanceFrom": "Path Line",
       "rvStartTimeEnabled": true,
       "rvStartTimeRange": "{\"min\":0,\"max\":500}",
       "rvStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3174898914645726,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3223635039520899,\"y\":0}}]",
@@ -12212,19 +12213,19 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1390,
-      "loadingPreviewLayout": "{\"loadingPreviewCanvas\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewCanvas\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}},\"loadingPreviewText\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewText\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\",\"gap\":\"15\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}}}",
+      "loadingPreviewLayout": "{\"loadingPreviewCanvas\":{\"layout\":{\"position\":{\"mode\":\"anchor\",\"horizontal\":{\"anchor\":\"left\",\"offset\":\"2%\"},\"vertical\":{\"anchor\":\"bottom\",\"offset\":\"2%\"}},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}},\"loadingPreviewText\":{\"layout\":{\"position\":{\"mode\":\"anchor\",\"horizontal\":{\"anchor\":\"left\",\"offset\":\"1.5%\"},\"vertical\":{\"anchor\":\"bottom\",\"offset\":\"4%\"}},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}}}",
       "loadingPreviewScalePct": 100,
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713552,
+      "loadingPreviewRotationX": -85.46587001602177,
+      "loadingPreviewRotationY": -109.1051701667218,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -1.1325151052008238,
-      "loadingPreviewOffsetY": -0.06726533502820686,
-      "loadingPreviewOffsetZ": 0.6781114689622285,
+      "loadingPreviewOffsetX": 14.499999999999986,
+      "loadingPreviewOffsetY": 3.552713678800501e-15,
+      "loadingPreviewOffsetZ": -2.842170943040401e-14,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1394.7784318421322,
+      "loadingPreviewCameraZoom": 1394.7784318421304,
       "loadingPreviewTextEnabled": true,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 16,
@@ -23600,6 +23601,7 @@
       "rvVelocitySmoothing": 0.35,
       "rvTriggerDistanceRange": "{\"min\":15,\"max\":90}",
       "rvTriggerDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvDistanceFrom": "Path Line",
       "rvStartTimeEnabled": true,
       "rvStartTimeRange": "{\"min\":0,\"max\":300}",
       "rvStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -24035,19 +24037,19 @@
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
       "loadingPreviewSize": 1600,
-      "loadingPreviewLayout": "{\"loadingPreviewCanvas\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewCanvas\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}},\"loadingPreviewText\":{\"layout\":{\"position\":{\"mode\":\"relative\",\"relativeTo\":\"loadingPreviewText\",\"myAnchor\":\"bottom-left\",\"targetAnchor\":\"bottom-left\",\"gap\":\"15\"},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}}}",
+      "loadingPreviewLayout": "{\"loadingPreviewCanvas\":{\"layout\":{\"position\":{\"mode\":\"anchor\",\"horizontal\":{\"anchor\":\"left\",\"offset\":\"2%\"},\"vertical\":{\"anchor\":\"bottom\",\"offset\":\"2%\"}},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}},\"loadingPreviewText\":{\"layout\":{\"position\":{\"mode\":\"anchor\",\"horizontal\":{\"anchor\":\"left\",\"offset\":\"1.5%\"},\"vertical\":{\"anchor\":\"bottom\",\"offset\":\"4%\"}},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}}}",
       "loadingPreviewScalePct": 100,
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -85.46571581217302,
-      "loadingPreviewRotationY": -109.10457274713552,
+      "loadingPreviewRotationX": -85.46587001602177,
+      "loadingPreviewRotationY": -109.1051701667218,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -1.1325151052008238,
-      "loadingPreviewOffsetY": -0.06726533502820686,
-      "loadingPreviewOffsetZ": 0.6781114689622285,
+      "loadingPreviewOffsetX": 1,
+      "loadingPreviewOffsetY": 3.552713678800501e-15,
+      "loadingPreviewOffsetZ": -2.842170943040401e-14,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1394.7784318421322,
+      "loadingPreviewCameraZoom": 1394.7784318421304,
       "loadingPreviewTextEnabled": true,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -35423,6 +35425,7 @@
       "rvVelocitySmoothing": 0.35,
       "rvTriggerDistanceRange": "{\"min\":15,\"max\":90}",
       "rvTriggerDistanceCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "rvDistanceFrom": "Path Line",
       "rvStartTimeEnabled": true,
       "rvStartTimeRange": "{\"min\":0,\"max\":300}",
       "rvStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -36011,7 +36014,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -36107,7 +36110,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -36212,7 +36215,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36393,7 +36396,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > Layout",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [],
                   "settings": []
@@ -37505,7 +37508,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Velocity",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -37529,10 +37532,14 @@
                       "key": "rvTriggerDistanceCurve"
                     },
                     {
+                      "type": "row",
+                      "key": "rvDistanceFrom"
+                    },
+                    {
                       "type": "group",
                       "group": {
                         "key": "Displacement Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -37554,7 +37561,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -37576,7 +37583,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -37587,7 +37594,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -37631,7 +37638,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Easing Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -37675,7 +37682,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Angle to Velocity 1",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -37853,6 +37860,7 @@
                     "rvVelocitySmoothing",
                     "rvTriggerDistanceRange",
                     "rvTriggerDistanceCurve",
+                    "rvDistanceFrom",
                     "rvSets",
                     null
                   ]
@@ -42542,9 +42550,9 @@
   "panelGeometry": {
     "desktop": {
       "left": 844.8250122070312,
-      "top": 48.79999923706055,
-      "width": 569.5750122070312,
-      "height": 527.6000366210938
+      "top": 49.587501525878906,
+      "width": 575.9750366210938,
+      "height": 530
     },
     "mobile": {
       "left": 20,
