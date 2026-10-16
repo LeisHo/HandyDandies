@@ -212,7 +212,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewModelId": "",
+      "loadingPreviewModelId": "repo:HD-1K",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
@@ -15296,7 +15296,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewModelId": "",
+      "loadingPreviewModelId": "repo:HD-1K",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
@@ -30380,7 +30380,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
-      "loadingPreviewModelId": "",
+      "loadingPreviewModelId": "repo:HD-1K",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
@@ -45794,7 +45794,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -45890,7 +45890,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -52389,9 +52389,9 @@
   "panelGeometry": {
     "desktop": {
       "left": 0,
-      "top": 198.3874969482422,
-      "width": 591.9750366210938,
-      "height": 534.7999877929688
+      "top": 162.40000915527344,
+      "width": 595.1749877929688,
+      "height": 569.1875
     },
     "mobile": {
       "left": 87.69047546386719,
