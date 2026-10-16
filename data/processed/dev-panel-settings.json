@@ -9177,7 +9177,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "Max Palm -20",
@@ -9701,7 +9702,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "SOFT NEUTRAL +55",
@@ -9775,7 +9777,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "SOFT NEUTRAL +60",
@@ -9849,7 +9852,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "Fist +15",
@@ -10223,7 +10227,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "Waiting Horizontal Tap - 5.5",
@@ -10371,7 +10376,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "SOFT NN +30",
@@ -10445,7 +10451,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NN"
         },
         {
           "name": "SOFT NNN +60",
@@ -10519,7 +10526,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NNN"
         },
         {
           "name": "NEUTRAL B -30",
@@ -10593,7 +10601,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL B"
         },
         {
           "name": "NEUTRAL BB -45",
@@ -10667,7 +10676,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL BB"
         },
         {
           "name": "NEUTRAL -30",
@@ -10741,7 +10751,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "SOFT NEUTRAL",
@@ -10815,7 +10826,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "SOFT NN +15",
@@ -10889,7 +10901,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NN"
         },
         {
           "name": "SOFT NNN +30",
@@ -10963,7 +10976,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NNN"
         },
         {
           "name": "NEUTRAL B -15",
@@ -11037,7 +11051,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL B"
         },
         {
           "name": "NEUTRAL BB -30",
@@ -11111,7 +11126,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL BB"
         }
       ],
       "cropWristEnabled": true,
@@ -24289,7 +24305,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "Max Palm -20",
@@ -24813,7 +24830,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "SOFT NEUTRAL +55",
@@ -24887,7 +24905,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "SOFT NEUTRAL +60",
@@ -24961,7 +24980,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "Fist +15",
@@ -25335,7 +25355,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "Waiting Horizontal Tap - 5.5",
@@ -25483,7 +25504,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "SOFT NN +30",
@@ -25557,7 +25579,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NN"
         },
         {
           "name": "SOFT NNN +60",
@@ -25631,7 +25654,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NNN"
         },
         {
           "name": "NEUTRAL B -30",
@@ -25705,7 +25729,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL B"
         },
         {
           "name": "NEUTRAL BB -45",
@@ -25779,7 +25804,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL BB"
         },
         {
           "name": "NEUTRAL -30",
@@ -25853,7 +25879,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "SOFT NEUTRAL",
@@ -25927,7 +25954,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "SOFT NN +15",
@@ -26001,7 +26029,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NN"
         },
         {
           "name": "SOFT NNN +30",
@@ -26075,7 +26104,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NNN"
         },
         {
           "name": "NEUTRAL B -15",
@@ -26149,7 +26179,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL B"
         },
         {
           "name": "NEUTRAL BB -30",
@@ -26223,7 +26254,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL BB"
         }
       ],
       "cropWristEnabled": true,
@@ -39401,7 +39433,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "Max Palm -20",
@@ -39925,7 +39958,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "SOFT NEUTRAL +55",
@@ -39999,7 +40033,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "SOFT NEUTRAL +60",
@@ -40073,7 +40108,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "Fist +15",
@@ -40447,7 +40483,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "Waiting Horizontal Tap - 5.5",
@@ -40595,7 +40632,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "SOFT NN +30",
@@ -40669,7 +40707,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NN"
         },
         {
           "name": "SOFT NNN +60",
@@ -40743,7 +40782,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NNN"
         },
         {
           "name": "NEUTRAL B -30",
@@ -40817,7 +40857,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL B"
         },
         {
           "name": "NEUTRAL BB -45",
@@ -40891,7 +40932,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL BB"
         },
         {
           "name": "NEUTRAL -30",
@@ -40965,7 +41007,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL"
         },
         {
           "name": "SOFT NEUTRAL",
@@ -41039,7 +41082,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NEUTRAL"
         },
         {
           "name": "SOFT NN +15",
@@ -41113,7 +41157,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NN"
         },
         {
           "name": "SOFT NNN +30",
@@ -41187,7 +41232,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "SOFT NNN"
         },
         {
           "name": "NEUTRAL B -15",
@@ -41261,7 +41307,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL B"
         },
         {
           "name": "NEUTRAL BB -30",
@@ -41335,7 +41382,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "NEUTRAL BB"
         }
       ],
       "cropWristEnabled": true,
