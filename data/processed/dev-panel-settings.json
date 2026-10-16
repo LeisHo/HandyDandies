@@ -514,7 +514,7 @@
       ],
       "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
       "loadingPreviewKeyAzimuth": 71,
-      "loadingPreviewKeyElevation": -29.999999999999996,
+      "loadingPreviewKeyElevation": -30.000000000000004,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 3,
       "loadingPreviewKeyTargetHeight": -100,
@@ -20124,7 +20124,7 @@
       ],
       "loadingPreviewLightingSelector": "LOADING HANDS",
       "loadingPreviewKeyAzimuth": 71,
-      "loadingPreviewKeyElevation": -29.999999999999996,
+      "loadingPreviewKeyElevation": -30.000000000000004,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 3,
       "loadingPreviewKeyTargetHeight": -100,
@@ -39734,7 +39734,7 @@
       ],
       "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
       "loadingPreviewKeyAzimuth": 71,
-      "loadingPreviewKeyElevation": -29.999999999999996,
+      "loadingPreviewKeyElevation": -30.000000000000004,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 3,
       "loadingPreviewKeyTargetHeight": -100,
@@ -67117,8 +67117,8 @@
     "desktop": {
       "left": 85.5999984741211,
       "top": 100.7874984741211,
-      "width": 655.9750366210938,
-      "height": 599.5875244140625
+      "width": 659.1749877929688,
+      "height": 601.1875
     },
     "mobile": {
       "left": 20,
