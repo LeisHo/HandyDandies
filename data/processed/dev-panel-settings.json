@@ -12,7 +12,7 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "negCamArmBase",
+      "renderOrderMode": "negCamArmEnd",
       "renderOrderModeExcept": "palmCenter",
       "renderOrderFallback": "palmToArm",
       "renderOrderFallbackExcept": "armEnd",
@@ -167,7 +167,7 @@
       "fieldCols": 55,
       "rowSpacing": 4,
       "columnSpacing": 7.5,
-      "handScale": 0.7,
+      "handScale": 0.6,
       "alternateRowOffset": 4,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
@@ -39152,7 +39152,7 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "negCamArmBase",
+      "renderOrderMode": "negCamArmEnd",
       "renderOrderModeExcept": "palmCenter",
       "renderOrderFallback": "palmToArm",
       "renderOrderFallbackExcept": "armEnd",
@@ -59718,7 +59718,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -59993,7 +59993,7 @@
           "type": "group",
           "group": {
             "key": "Render Order",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
