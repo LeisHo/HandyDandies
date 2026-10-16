@@ -15507,6 +15507,18 @@
           "targetX": -3.4222222222222225,
           "targetY": 0,
           "targetZ": 124.40048987950149
+        },
+        {
+          "name": "HD - Mobile - 20 FOV",
+          "cameraX": -3.4222222222222225,
+          "cameraY": 1.7419533236278442e-13,
+          "cameraZ": 495.98765636647585,
+          "cameraFov": 20,
+          "cameraZoom": 496,
+          "cameraRoll": 0,
+          "targetX": -3.4222222222222225,
+          "targetY": 1.4382409174393005e-13,
+          "targetZ": -0.012343633524153574
         }
       ],
       "lockCameraPan": true,
@@ -19570,8 +19582,8 @@
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
       "fieldRows": 45,
       "fieldCols": 30,
-      "rowSpacing": 8.5,
-      "columnSpacing": 17,
+      "rowSpacing": 6,
+      "columnSpacing": 15,
       "handScale": 1,
       "alternateRowOffset": -7,
       "progressiveRowOffset": 1,
@@ -34894,14 +34906,14 @@
         }
       ],
       "cameraX": -3.4222222222222225,
-      "cameraY": 1.7750187872048227e-13,
-      "cameraZ": 549.9876563664759,
+      "cameraY": 1.7419533236278442e-13,
+      "cameraZ": 495.98765636647585,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":-3.4222222222222225,\"cameraY\":2.1431318985078682e-14,\"cameraZ\":474.4004898795015,\"cameraFov\":20,\"cameraZoom\":350,\"cameraRoll\":0,\"targetX\":-3.4222222222222225,\"targetY\":0,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 550,
+      "cameraDefaultPreset": "{\"cameraX\":-3.4222222222222225,\"cameraY\":1.7419533236278442e-13,\"cameraZ\":495.98765636647585,\"cameraFov\":20,\"cameraZoom\":496,\"cameraRoll\":0,\"targetX\":-3.4222222222222225,\"targetY\":1.4382409174393005e-13,\"targetZ\":-0.012343633524153574}",
+      "cameraZoom": 496,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -34927,6 +34939,18 @@
           "targetX": -3.4222222222222225,
           "targetY": 0,
           "targetZ": 124.40048987950149
+        },
+        {
+          "name": "HD - Mobile - 20 FOV",
+          "cameraX": -3.4222222222222225,
+          "cameraY": 1.7419533236278442e-13,
+          "cameraZ": 495.98765636647585,
+          "cameraFov": 20,
+          "cameraZoom": 496,
+          "cameraRoll": 0,
+          "targetX": -3.4222222222222225,
+          "targetY": 1.4382409174393005e-13,
+          "targetZ": -0.012343633524153574
         }
       ],
       "lockCameraPan": true,
@@ -54347,6 +54371,18 @@
           "targetX": -3.4222222222222225,
           "targetY": 0,
           "targetZ": 124.40048987950149
+        },
+        {
+          "name": "HD - Mobile - 20 FOV",
+          "cameraX": -3.4222222222222225,
+          "cameraY": 1.7419533236278442e-13,
+          "cameraZ": 495.98765636647585,
+          "cameraFov": 20,
+          "cameraZoom": 496,
+          "cameraRoll": 0,
+          "targetX": -3.4222222222222225,
+          "targetY": 1.4382409174393005e-13,
+          "targetZ": -0.012343633524153574
         }
       ],
       "lockCameraPan": false,
@@ -59268,7 +59304,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -59280,7 +59316,7 @@
           "group": {
             "key": "Field Layout",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [
               {
                 "type": "row",
@@ -59347,7 +59383,7 @@
                 "group": {
                   "key": "Render Order",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [],
                   "settings": []
                 }
@@ -59361,7 +59397,7 @@
                 "group": {
                   "key": "Hand Position Min X Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59387,7 +59423,7 @@
                 "group": {
                   "key": "Hand Position Max X Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59413,7 +59449,7 @@
                 "group": {
                   "key": "Hand Position Min Y Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59439,7 +59475,7 @@
                 "group": {
                   "key": "Hand Position Max Y Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59465,7 +59501,7 @@
                 "group": {
                   "key": "Hand Position Min Z Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59491,7 +59527,7 @@
                 "group": {
                   "key": "Hand Position Max Z Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -65779,9 +65815,9 @@
     },
     "mobile": {
       "left": 20,
-      "top": 368.2678527832031,
-      "width": 408.7083435058594,
-      "height": 375.6428527832031
+      "top": 360.2678527832031,
+      "width": 415.56549072265625,
+      "height": 378.69049072265625
     }
   }
 }
