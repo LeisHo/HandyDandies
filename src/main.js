@@ -66,10 +66,22 @@ const HAND_MODEL_BUILTINS = [
   { id: 'repo:HD-4k', name: 'HD 4k (4,074 tris)', url: '../data/processed/HAND3D/HD-4k.glb', source: 'repo' },
   { id: 'repo:HD-5K', name: 'HD 5K (5,000 tris)', url: '../data/processed/HAND3D/HD-5K.glb', source: 'repo' },
   { id: 'repo:HD-6k', name: 'HD 6k (6,014 tris)', url: '../data/processed/HAND3D/HD-6k.glb', source: 'repo' },
-  { id: 'repo:HD-8k', name: 'HD 8k (8,144 tris)', url: '../data/processed/HAND3D/HD-8k.glb', source: 'repo' }
+  { id: 'repo:HD-8k', name: 'HD 8k (8,144 tris)', url: '../data/processed/HAND3D/HD-8k.glb', source: 'repo' },
+  // 2026-10-16: the 13 HD IK exports - same 23-joint rig names and Hand + OUTLINE primitives as the HD files above, a different bind pose (so poses will not match exactly). Triangle counts read from each file's Hand index accessor.
+  { id: 'repo:HD_IK_100', name: 'HD IK 100 (110 tris)', url: '../data/processed/HAND3D/HD_IK_100.glb', source: 'repo' },
+  { id: 'repo:HD_IK_200', name: 'HD IK 200 (194 tris)', url: '../data/processed/HAND3D/HD_IK_200.glb', source: 'repo' },
+  { id: 'repo:HD_IK_300', name: 'HD IK 300 (304 tris)', url: '../data/processed/HAND3D/HD_IK_300.glb', source: 'repo' },
+  { id: 'repo:HD_IK_400', name: 'HD IK 400 (402 tris)', url: '../data/processed/HAND3D/HD_IK_400.glb', source: 'repo' },
+  { id: 'repo:HD_IK_500', name: 'HD IK 500 (544 tris)', url: '../data/processed/HAND3D/HD_IK_500.glb', source: 'repo' },
+  { id: 'repo:HD_IK_800', name: 'HD IK 800 (810 tris)', url: '../data/processed/HAND3D/HD_IK_800.glb', source: 'repo' },
+  { id: 'repo:HD_IK_1k', name: 'HD IK 1k (1,090 tris)', url: '../data/processed/HAND3D/HD_IK_1k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_2k', name: 'HD IK 2k (2,062 tris)', url: '../data/processed/HAND3D/HD_IK_2k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_4k', name: 'HD IK 4k (4,008 tris)', url: '../data/processed/HAND3D/HD_IK_4k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_6k', name: 'HD IK 6k (6,034 tris)', url: '../data/processed/HAND3D/HD_IK_6k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_8k', name: 'HD IK 8k (8,018 tris)', url: '../data/processed/HAND3D/HD_IK_8k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_10k', name: 'HD IK 10k (10,004 tris)', url: '../data/processed/HAND3D/HD_IK_10k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_12k', name: 'HD IK 12k (12,224 tris)', url: '../data/processed/HAND3D/HD_IK_12k.glb', source: 'repo' }
 ]
-// The 13 HD_IK exports (data/processed/HAND3D/HD_IK_*.glb): same 23-joint rig names (rHand, rMid3, rForearmBend ...) and Hand + OUTLINE primitives as the other HD models, a different bind pose. Offered for the Loading Preview only.
-const HD_IK_MODELS = ['100', '200', '300', '400', '500', '800', '1k', '2k', '4k', '6k', '8k', '10k', '12k'].map((n) => ({ id: 'repo:HD_IK_' + n, name: 'HD IK ' + n, url: '../data/processed/HAND3D/HD_IK_' + n + '.glb', source: 'repo' }))
 const lpLoadedRoots = new Map() // model id -> the loaded, prepared scene root (only for ids that loaded fine)
 const lpModelLoads = new Map() // model id -> the load promise (a model is fetched once)
 const HAND_MODEL_LS_KEY = 'handyDandies.handModelId'
@@ -17558,13 +17570,13 @@ const SMALL_SCALE_HYSTERESIS = 0.5
 // ---- Loading Preview model (2026-10-16) ----
 function loadingPreviewModelOptions() {
   const out = [{ value: '', text: 'Same As Hand Model' }]
-  HAND_MODEL_BUILTINS.concat(HD_IK_MODELS).forEach((m) => out.push({ value: m.id, text: m.name }))
+  HAND_MODEL_BUILTINS.forEach((m) => out.push({ value: m.id, text: m.name }))
   const saved = Array.isArray(cfg.handModels) ? cfg.handModels : []
   saved.forEach((it) => { if (it && it.source === 'local' && it.id && localHandModelPresent[it.id] !== false) out.push({ value: it.id, text: it.name + ' (imported)' }) })
   return out
 }
 function lpPreviewModelUrl(id) {
-  const m = HAND_MODEL_BUILTINS.concat(HD_IK_MODELS).find((x) => x.id === id)
+  const m = HAND_MODEL_BUILTINS.find((x) => x.id === id)
   if (m) return Promise.resolve(m.url)
   if (id.startsWith('local:')) return handModelIdbGet(id).then((rec) => { if (!rec || !rec.blob) throw new Error('not on this device'); return URL.createObjectURL(rec.blob) })
   return Promise.reject(new Error('unknown model'))
