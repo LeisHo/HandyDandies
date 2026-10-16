@@ -205,8 +205,8 @@
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
       "fieldRows": 55,
       "fieldCols": 55,
-      "rowSpacing": 4,
-      "columnSpacing": 7.5,
+      "rowSpacing": 4.5,
+      "columnSpacing": 8.5,
       "handScale": 0.6,
       "alternateRowOffset": 4,
       "progressiveRowOffset": 1,
@@ -59849,7 +59849,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
