@@ -16678,7 +16678,7 @@
       "custom39CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom39CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom39CameraOffsetZEnabled": true,
-      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.08382305672368212,\"y\":0}},{\"x\":0.08673865242744794,\"y\":0.6636459350585937,\"h2\":{\"x\":-0.010204557157999047,\"y\":0.1933333079020183},\"h1\":{\"x\":0.024782452261284185,\"y\":-0.3000001271565754}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
+      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.08382305672368212,\"y\":0}},{\"x\":0.11589449824438085,\"y\":0.6503122965494792,\"h2\":{\"x\":-0.010204557157999047,\"y\":0.1933333079020183},\"h1\":{\"x\":0.024782452261284185,\"y\":-0.3000001271565754}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
       "custom39CameraOffsetZRange": "{\"min\":5,\"max\":20}",
       "custom39RotationCurveVisibleOnly": true,
       "custom39RotationXCurveEnabled": false,
@@ -16718,7 +16718,7 @@
       "custom39SpeedCurveEnabled": true,
       "custom39SpeedCurveVisibleOnly": true,
       "custom39SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3614426923386011,\"y\":-0.06291694641113277}},{\"x\":0.5434193258084055,\"y\":0,\"h1\":{\"x\":0.1377118711641958,\"y\":0},\"h2\":{\"x\":-0.1619136237453131,\"y\":-0.0011459350585938388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.45658067419159454,\"y\":0}}]",
-      "custom39SpeedCurveRange": "{\"min\":1758,\"max\":2000}",
+      "custom39SpeedCurveRange": "{\"min\":1847,\"max\":2000}",
       "custom39StartTimeCurveEnabled": true,
       "custom39StartTimeCurveVisibleOnly": true,
       "custom39StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -36124,7 +36124,7 @@
       "custom39CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom39CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom39CameraOffsetZEnabled": true,
-      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.08382305672368212,\"y\":0}},{\"x\":0.08673865242744794,\"y\":0.6636459350585937,\"h2\":{\"x\":-0.010204557157999047,\"y\":0.1933333079020183},\"h1\":{\"x\":0.024782452261284185,\"y\":-0.3000001271565754}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
+      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.08382305672368212,\"y\":0}},{\"x\":0.11589449824438085,\"y\":0.6503122965494792,\"h2\":{\"x\":-0.010204557157999047,\"y\":0.1933333079020183},\"h1\":{\"x\":0.024782452261284185,\"y\":-0.3000001271565754}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
       "custom39CameraOffsetZRange": "{\"min\":5,\"max\":20}",
       "custom39RotationCurveVisibleOnly": true,
       "custom39RotationXCurveEnabled": false,
@@ -36164,7 +36164,7 @@
       "custom39SpeedCurveEnabled": true,
       "custom39SpeedCurveVisibleOnly": true,
       "custom39SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3614426923386011,\"y\":-0.06291694641113277}},{\"x\":0.5434193258084055,\"y\":0,\"h1\":{\"x\":0.1377118711641958,\"y\":0},\"h2\":{\"x\":-0.1619136237453131,\"y\":-0.0011459350585938388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.45658067419159454,\"y\":0}}]",
-      "custom39SpeedCurveRange": "{\"min\":1758,\"max\":2000}",
+      "custom39SpeedCurveRange": "{\"min\":1847,\"max\":2000}",
       "custom39StartTimeCurveEnabled": true,
       "custom39StartTimeCurveVisibleOnly": true,
       "custom39StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -55570,7 +55570,7 @@
       "custom39CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom39CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom39CameraOffsetZEnabled": true,
-      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.08382305672368212,\"y\":0}},{\"x\":0.08673865242744794,\"y\":0.6636459350585937,\"h2\":{\"x\":-0.010204557157999047,\"y\":0.1933333079020183},\"h1\":{\"x\":0.024782452261284185,\"y\":-0.3000001271565754}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
+      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.08382305672368212,\"y\":0}},{\"x\":0.11589449824438085,\"y\":0.6503122965494792,\"h2\":{\"x\":-0.010204557157999047,\"y\":0.1933333079020183},\"h1\":{\"x\":0.024782452261284185,\"y\":-0.3000001271565754}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
       "custom39CameraOffsetZRange": "{\"min\":5,\"max\":20}",
       "custom39RotationCurveVisibleOnly": true,
       "custom39RotationXCurveEnabled": false,
@@ -55610,7 +55610,7 @@
       "custom39SpeedCurveEnabled": true,
       "custom39SpeedCurveVisibleOnly": true,
       "custom39SpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3614426923386011,\"y\":-0.06291694641113277}},{\"x\":0.5434193258084055,\"y\":0,\"h1\":{\"x\":0.1377118711641958,\"y\":0},\"h2\":{\"x\":-0.1619136237453131,\"y\":-0.0011459350585938388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.45658067419159454,\"y\":0}}]",
-      "custom39SpeedCurveRange": "{\"min\":1758,\"max\":2000}",
+      "custom39SpeedCurveRange": "{\"min\":1847,\"max\":2000}",
       "custom39StartTimeCurveEnabled": true,
       "custom39StartTimeCurveVisibleOnly": true,
       "custom39StartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -59346,7 +59346,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -59357,7 +59357,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -59568,7 +59568,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
