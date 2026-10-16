@@ -392,10 +392,10 @@
         }
       ],
       "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
-      "loadingPreviewKeyAzimuth": 71,
-      "loadingPreviewKeyElevation": -29.999999999999996,
-      "loadingPreviewKeyTargetHeight": -100,
-      "loadingPreviewKeyIntensity": 5.1,
+      "loadingPreviewKeyAzimuth": 52,
+      "loadingPreviewKeyElevation": 0,
+      "loadingPreviewKeyTargetHeight": 106,
+      "loadingPreviewKeyIntensity": 3.6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
@@ -417,14 +417,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -88.91087562505113,
-      "loadingPreviewRotationY": 6.08134045506204,
+      "loadingPreviewRotationX": -74.25563724415528,
+      "loadingPreviewRotationY": -170.13767016803934,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
-      "loadingPreviewOffsetY": 0,
-      "loadingPreviewOffsetZ": 0,
+      "loadingPreviewOffsetX": -17.77738943553913,
+      "loadingPreviewOffsetY": 1.1762389585735349,
+      "loadingPreviewOffsetZ": 26.86836563291229,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043954,
+      "loadingPreviewCameraZoom": 1070.468870640396,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -434,6 +434,7 @@
       "loadingPreviewTextOffsetX": -660,
       "loadingPreviewTextOffsetY": 318,
       "loadingPreviewProgressCropEnabled": true,
+      "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
       "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.04579794190871655,\"y\":-0.24499994913736978},\"bg\":0.18},{\"x\":0.3085730225423663,\"y\":0.6349998474121094,\"h2\":{\"x\":-0.109614736465381,\"y\":0.12666676839192703},\"h1\":{\"x\":0.07357704548959065,\"y\":-0.09333318074544272}},{\"x\":0.5308056507078829,\"y\":0.5083333333333333,\"h1\":{\"x\":0.11411949795772391,\"y\":-0.013333892822265603}},{\"x\":0.786072871894857,\"y\":0.18833312988281248,\"h2\":{\"x\":-0.13213831480540805,\"y\":-0.006666564941406272}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.017221176233986446,\"y\":0.16833343505859377}}]",
@@ -9380,7 +9381,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -12799,10 +12800,10 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING HANDS",
-      "loadingPreviewKeyAzimuth": 71,
-      "loadingPreviewKeyElevation": -29.999999999999996,
-      "loadingPreviewKeyTargetHeight": -100,
-      "loadingPreviewKeyIntensity": 5.1,
+      "loadingPreviewKeyAzimuth": 52,
+      "loadingPreviewKeyElevation": 0,
+      "loadingPreviewKeyTargetHeight": 106,
+      "loadingPreviewKeyIntensity": 3.6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
@@ -12824,14 +12825,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -88.91087562505113,
-      "loadingPreviewRotationY": 6.08134045506204,
+      "loadingPreviewRotationX": -74.25563724415528,
+      "loadingPreviewRotationY": -170.13767016803934,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
-      "loadingPreviewOffsetY": 0,
-      "loadingPreviewOffsetZ": 0,
+      "loadingPreviewOffsetX": -17.77738943553913,
+      "loadingPreviewOffsetY": 1.1762389585735349,
+      "loadingPreviewOffsetZ": 26.86836563291229,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043954,
+      "loadingPreviewCameraZoom": 1070.468870640396,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -12841,6 +12842,7 @@
       "loadingPreviewTextOffsetX": -104,
       "loadingPreviewTextOffsetY": 370,
       "loadingPreviewProgressCropEnabled": true,
+      "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
       "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.04579794190871655,\"y\":-0.24499994913736978},\"bg\":0.18},{\"x\":0.3085730225423663,\"y\":0.6349998474121094,\"h2\":{\"x\":-0.109614736465381,\"y\":0.12666676839192703},\"h1\":{\"x\":0.07357704548959065,\"y\":-0.09333318074544272}},{\"x\":0.5308056507078829,\"y\":0.5083333333333333,\"h1\":{\"x\":0.11411949795772391,\"y\":-0.013333892822265603}},{\"x\":0.786072871894857,\"y\":0.18833312988281248,\"h2\":{\"x\":-0.13213831480540805,\"y\":-0.006666564941406272}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.017221176233986446,\"y\":0.16833343505859377}}]",
@@ -21411,7 +21413,7 @@
         }
       ],
       "cameraX": -2.126590009170077,
-      "cameraY": 5.023720059492325e-13,
+      "cameraY": 5.205580109165705e-13,
       "cameraZ": 124.48460156825621,
       "cameraFov": 35,
       "cameraYaw": 0,
@@ -21787,7 +21789,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -25206,10 +25208,10 @@
         }
       ],
       "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
-      "loadingPreviewKeyAzimuth": 71,
-      "loadingPreviewKeyElevation": -29.999999999999996,
-      "loadingPreviewKeyTargetHeight": -100,
-      "loadingPreviewKeyIntensity": 5.1,
+      "loadingPreviewKeyAzimuth": 52,
+      "loadingPreviewKeyElevation": 0,
+      "loadingPreviewKeyTargetHeight": 106,
+      "loadingPreviewKeyIntensity": 3.6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
@@ -25231,14 +25233,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -88.91087562505113,
-      "loadingPreviewRotationY": 6.08134045506204,
+      "loadingPreviewRotationX": -74.25563724415528,
+      "loadingPreviewRotationY": -170.13767016803934,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": 0,
-      "loadingPreviewOffsetY": 0,
-      "loadingPreviewOffsetZ": 0,
+      "loadingPreviewOffsetX": -17.77738943553913,
+      "loadingPreviewOffsetY": 1.1762389585735349,
+      "loadingPreviewOffsetZ": 26.86836563291229,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043954,
+      "loadingPreviewCameraZoom": 1070.468870640396,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -25248,6 +25250,7 @@
       "loadingPreviewTextOffsetX": 0,
       "loadingPreviewTextOffsetY": 0,
       "loadingPreviewProgressCropEnabled": true,
+      "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
       "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.04579794190871655,\"y\":-0.24499994913736978},\"bg\":0.18},{\"x\":0.3085730225423663,\"y\":0.6349998474121094,\"h2\":{\"x\":-0.109614736465381,\"y\":0.12666676839192703},\"h1\":{\"x\":0.07357704548959065,\"y\":-0.09333318074544272}},{\"x\":0.5308056507078829,\"y\":0.5083333333333333,\"h1\":{\"x\":0.11411949795772391,\"y\":-0.013333892822265603}},{\"x\":0.786072871894857,\"y\":0.18833312988281248,\"h2\":{\"x\":-0.13213831480540805,\"y\":-0.006666564941406272}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.017221176233986446,\"y\":0.16833343505859377}}]",
@@ -34194,7 +34197,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1.25,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -37859,7 +37862,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -37964,7 +37967,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -38021,7 +38024,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -38180,12 +38183,17 @@
                     {
                       "type": "row",
                       "key": "loadingPreviewProgressCropCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewProgressCropRealtime"
                     }
                   ],
                   "settings": [
                     "loadingPreviewProgressCropFlip",
                     "loadingPreviewProgressCropRange",
-                    "loadingPreviewProgressCropCurve"
+                    "loadingPreviewProgressCropCurve",
+                    "loadingPreviewProgressCropRealtime"
                   ]
                 }
               }
@@ -39296,7 +39304,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Velocity",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -39349,7 +39357,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -39470,7 +39478,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Angle to Velocity 1",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -44343,10 +44351,10 @@
       "height": 531.6000366210938
     },
     "mobile": {
-      "left": 97.98214721679688,
+      "left": 91.125,
       "top": 193.33929443359375,
-      "width": 293.0178527832031,
-      "height": 35.52381134033203
+      "width": 303.3035888671875,
+      "height": 455.6190490722656
     }
   }
 }
