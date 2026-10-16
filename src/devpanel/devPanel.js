@@ -395,6 +395,21 @@ export function syncValue(key, v) {
   if (hostOnAnyValueChange) hostOnAnyValueChange(key, v)
 }
 
+// Per-device access for a host action that targets a specific device's tab (2026-10-16, direct request: a Default set on the Mobile tab must be Mobile's own and not touch Desktop's). getEditingDevice() = the tab the panel is
+// showing; getDeviceValue() reads a device's own stored value; setDeviceValue() writes ONE device's slot of a perDevice control (every slot of a shared one), updates cfg when that device is the real one, and refreshes
+// the row when its tab is the one showing. It fires no onChange - the host decides what is live.
+export function getEditingDevice() { return editingDevice }
+export function getDeviceValue(device, key) { return store[device] ? store[device][key] : undefined }
+export function setDeviceValue(device, key, v) {
+  const ctrl = findCtrl(key)
+  if (!ctrl || !store[device]) return false
+  if (ctrl.perDevice) store[device][key] = v
+  else DEVICES.forEach((d) => { store[d][key] = v })
+  if (!ctrl.perDevice || device === realDeviceClass()) cfg[key] = v
+  if (!ctrl.perDevice || device === editingDevice) displayValue(ctrl, v)
+  return true
+}
+
 // Rebuilds entry.items (order + each item's .group) from the LIVE DOM after
 // a drag-drop -- see setupReorder()'s own onDrop param. Ungrouped items
 // (sitting directly in entry.ungroupedBody) always serialize first, then

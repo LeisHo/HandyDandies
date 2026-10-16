@@ -11,7 +11,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=88'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=89'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -1138,7 +1138,7 @@ function lpApplyProgressCrop(h, crop, flip) {
   pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
 }
 let lpCropLast = { progress: 0, crop: 0 }
-window.__lpCropDbg = { get cfg() { return cfg }, update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
+window.__lpCropDbg = { get cfg() { return cfg }, update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
 window.__lpCrop = () => ({ ...lpCropLast, boxMs: lpProgressCropBox && lpProgressCropBox.ms, hand1: loadingPreviewHand && loadingPreviewHand.progressCrop ? { ext: loadingPreviewHand.progressCrop.ext, wrist: loadingPreviewHand.progressCrop.wrist, tip: loadingPreviewHand.progressCrop.tip, yMin: loadingPreviewHand.progressCrop.yMin, yMax: loadingPreviewHand.progressCrop.yMax, sgn: loadingPreviewHand.progressCrop.sgn, plane: loadingPreviewHand.progressCrop.uni.value.toArray() } : null, hand2: !!loadingPreviewHand2 }) // debug read-out for tests
 function updateLoadingPreviewProgressCrop() {
   let crop = 0, progress = 0
@@ -3405,7 +3405,7 @@ const DEV_GROUPS = [
       { key: 'cameraPitch', label: 'Camera Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 0.5, def: -2.946, perDevice: true, onChange: () => applyCameraOrientation() },
       { key: 'cameraRoll', label: 'Camera Roll (Deg)', type: 'slider', min: -180, max: 180, step: 0.5, def: 0, perDevice: true, onChange: () => applyCameraOrientation() },
       // The Default camera of this set of settings (2026-10-15): Default on a Saved Camera stores the full view here (position, field of view, zoom, roll AND the pan target), so it is saved with every dev setting, comes back on load and on Use, and marks the right item. Hidden bookkeeping row.
-      { key: 'cameraDefaultPreset', label: 'Default Camera (internal)', type: 'text', def: '' },
+      { key: 'cameraDefaultPreset', label: 'Default Camera (internal)', type: 'text', def: '', perDevice: true }, // per device (2026-10-16): the Default set on the Mobile tab is Mobile's own and never replaces Desktop's
       // Direct 2-way binding with scroll/pinch zoom, same pattern as the
       // X/Y/Z sliders above: this slider both SETS the camera's distance
       // to its own pan target (setCameraDistance(), below) and is kept in
@@ -4018,7 +4018,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // devPanel.js `onDeviceTabChanged` hook (called from both a real click
   // AND the self-heal correction) re-runs the exact same sweep the
   // click listener already does, so either path now stays correct.
-  onDeviceTabChanged: () => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() },
+  onDeviceTabChanged: () => { try { refreshAllItemSelectorMarks() } catch (e) { /* lists not built yet */ } refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() },
   // A desktop-family custom function's own "also active on Mobile/
   // Landscape" state is now read directly from `${id}Enabled`'s own
   // devVisibility (see customFunctionActiveForDeviceFamily()'s own
@@ -7919,17 +7919,36 @@ const nearNum = (a, b, eps) => (typeof a === 'number' && typeof b === 'number') 
 function poseItemMatchesDefault(item) {
   return POSE_PRESET_KEYS.every((k) => nearNum(item[k] !== undefined ? item[k] : POSE_KEY_DEFAULTS[k], poseDefaultValues[k], 1e-6))
 }
+// The Default camera of a device's own settings (2026-10-16: per device). The real device's is the live cameraDefaultValues; another device's tab (viewed from here) is read from that device's stored slot, or - when it
+// never had one stored - from its own camera sliders, exactly like loadCameraDefaultFromCfg() does for the real device.
+function cameraDefaultStateFor(dev) {
+  if (dev === realDeviceClass()) return { vals: cameraDefaultValues, known: cameraDefaultTargetKnown, dir: cameraDefaultDir }
+  let p = null
+  try { const raw = getDeviceValue(dev, 'cameraDefaultPreset'); p = raw ? JSON.parse(raw) : null } catch (e) { p = null }
+  const vals = {}
+  if (p && typeof p === 'object' && typeof p.cameraX === 'number') {
+    CAMERA_PRESET_KEYS.forEach((k) => { vals[k] = p[k] !== undefined ? p[k] : CAMERA_KEY_DEFAULTS[k] })
+    vals.targetX = p.targetX || 0; vals.targetY = p.targetY || 0; vals.targetZ = p.targetZ || 0
+    return { vals, known: true, dir: null }
+  }
+  CAMERA_PRESET_KEYS.forEach((k) => { const sv = getDeviceValue(dev, k); vals[k] = sv !== undefined ? sv : CAMERA_KEY_DEFAULTS[k] })
+  vals.targetX = 0; vals.targetY = 0; vals.targetZ = 0
+  _camEuler.set(THREE.MathUtils.degToRad(getDeviceValue(dev, 'cameraPitch') || 0), THREE.MathUtils.degToRad(getDeviceValue(dev, 'cameraYaw') || 0), 0, 'YXZ')
+  _camQ.setFromEuler(_camEuler)
+  return { vals, known: false, dir: new THREE.Vector3(0, 0, -1).applyQuaternion(_camQ) }
+}
 function cameraItemMatchesDefault(rawItem) {
   const item = normalizeCameraPresetItem(rawItem)
+  const D = cameraDefaultStateFor(getEditingDevice()) // the default of the tab being shown
   const v = (k) => (item[k] !== undefined ? item[k] : CAMERA_KEY_DEFAULTS[k])
-  if (!(nearNum(v('cameraX'), cameraDefaultValues.cameraX, 0.01) && nearNum(v('cameraY'), cameraDefaultValues.cameraY, 0.01) && nearNum(v('cameraZ'), cameraDefaultValues.cameraZ, 0.01) && nearNum(v('cameraFov'), cameraDefaultValues.cameraFov, 0.01))) return false
-  if (cameraDefaultTargetKnown) {
-    return nearNum(item.targetX !== undefined ? item.targetX : 0, cameraDefaultValues.targetX, 0.01) && nearNum(item.targetY !== undefined ? item.targetY : 0, cameraDefaultValues.targetY, 0.01) && nearNum(item.targetZ !== undefined ? item.targetZ : 0, cameraDefaultValues.targetZ, 0.01)
+  if (!(nearNum(v('cameraX'), D.vals.cameraX, 0.01) && nearNum(v('cameraY'), D.vals.cameraY, 0.01) && nearNum(v('cameraZ'), D.vals.cameraZ, 0.01) && nearNum(v('cameraFov'), D.vals.cameraFov, 0.01))) return false
+  if (D.known) {
+    return nearNum(item.targetX !== undefined ? item.targetX : 0, D.vals.targetX, 0.01) && nearNum(item.targetY !== undefined ? item.targetY : 0, D.vals.targetY, 0.01) && nearNum(item.targetZ !== undefined ? item.targetZ : 0, D.vals.targetZ, 0.01)
   }
   // The pan target of an older default was never kept: same place and field of view, looking the same way (yaw / pitch of the stored default).
-  if (item.targetX === undefined || !cameraDefaultDir) return true
+  if (item.targetX === undefined || !D.dir) return true
   _camMatchDir.set(item.targetX - v('cameraX'), item.targetY - v('cameraY'), item.targetZ - v('cameraZ'))
-  return _camMatchDir.lengthSq() < 1e-12 || _camMatchDir.normalize().dot(cameraDefaultDir) >= 0.9995
+  return _camMatchDir.lengthSq() < 1e-12 || _camMatchDir.normalize().dot(D.dir) >= 0.9995
 }
 const _camMatchDir = new THREE.Vector3()
 let cameraDefaultTargetKnown = false, cameraDefaultDir = null
@@ -7998,24 +8017,43 @@ function lightingItemMatchesLive(item) {
 function refreshAllItemSelectorMarks() {
   ;['savedPoses', 'savedCameras', 'savedLighting', 'loadingPreviewSavedCameras', 'loadingPreviewSavedLighting'].forEach(refreshListPickerMarksByKey)
 }
+// Default is PER DEVICE (2026-10-16, direct request: a Default set on the Mobile tab is Mobile's own and does not override Desktop's). It goes to the device whose tab is showing: on the real device's own tab it also puts the
+// live camera there (as before); on another device's tab nothing live moves - that device's stored default is set and its camera sliders (what it starts from) are put on the same view.
+function setCameraSlidersForDevice(dev, vals) {
+  const c = new THREE.PerspectiveCamera()
+  c.position.set(vals.cameraX, vals.cameraY, vals.cameraZ)
+  c.up.set(0, 1, 0)
+  _camFwd.set(vals.targetX, vals.targetY, vals.targetZ)
+  c.lookAt(_camFwd)
+  _camQ.copy(c.quaternion).multiply(_camQ2.setFromAxisAngle(_camAxisZ, THREE.MathUtils.degToRad(vals.cameraRoll || 0)))
+  _camEuler.setFromQuaternion(_camQ, 'YXZ')
+  const r3 = (n) => Math.round(THREE.MathUtils.radToDeg(n) * 1000) / 1000
+  setDeviceValue(dev, 'cameraX', vals.cameraX); setDeviceValue(dev, 'cameraY', vals.cameraY); setDeviceValue(dev, 'cameraZ', vals.cameraZ)
+  setDeviceValue(dev, 'cameraFov', vals.cameraFov)
+  setDeviceValue(dev, 'cameraZoom', c.position.distanceTo(_camFwd))
+  setDeviceValue(dev, 'cameraYaw', r3(_camEuler.y)); setDeviceValue(dev, 'cameraPitch', r3(_camEuler.x)); setDeviceValue(dev, 'cameraRoll', r3(_camEuler.z))
+}
 function setSelectedCameraAsDefault() {
   const rawItem = getSelectedSavedCameraItem()
   if (!rawItem) return
-  applyCameraPreset(rawItem)
-  // Normalized independently here too -- applyCameraPreset() above
-  // normalizes its OWN internal copy, but never exposes it, and this
-  // function's own direct item[key]/item.targetX reads below need the
-  // same short-name fallback to correctly seed cameraDefaultValues.
+  // Normalized here (applyCameraPreset() normalizes its own copy and never exposes it).
   const item = normalizeCameraPresetItem(rawItem)
-  CAMERA_PRESET_KEYS.forEach((key) => { cameraDefaultValues[key] = item[key] !== undefined ? item[key] : CAMERA_KEY_DEFAULTS[key] })
-  cameraDefaultValues.targetX = item.targetX !== undefined ? item.targetX : 0
-  cameraDefaultValues.targetY = item.targetY !== undefined ? item.targetY : 0
-  cameraDefaultValues.targetZ = item.targetZ !== undefined ? item.targetZ : 0
-  cameraDefaultTargetKnown = true
-  cameraDefaultDir = null
-  cfg.cameraDefaultPreset = JSON.stringify({ ...cameraDefaultValues }) // saved with this set of dev settings, so the Default mark survives a reload and a Use
-  try { syncValue('cameraDefaultPreset', cfg.cameraDefaultPreset) } catch (e) { /* no panel */ }
-  updateCameraMaxExtentsBound()
+  const vals = {}
+  CAMERA_PRESET_KEYS.forEach((key) => { vals[key] = item[key] !== undefined ? item[key] : CAMERA_KEY_DEFAULTS[key] })
+  vals.targetX = item.targetX !== undefined ? item.targetX : 0
+  vals.targetY = item.targetY !== undefined ? item.targetY : 0
+  vals.targetZ = item.targetZ !== undefined ? item.targetZ : 0
+  const dev = getEditingDevice()
+  if (dev === realDeviceClass()) {
+    applyCameraPreset(rawItem)
+    Object.assign(cameraDefaultValues, vals)
+    cameraDefaultTargetKnown = true
+    cameraDefaultDir = null
+    updateCameraMaxExtentsBound()
+  } else {
+    setCameraSlidersForDevice(dev, vals)
+  }
+  setDeviceValue(dev, 'cameraDefaultPreset', JSON.stringify(vals)) // that device's slot of this set of dev settings (saved with it), so the Default mark survives a reload and a Use
   saveCurrentSettings()
   refreshListPickerMarksByKey('savedCameras')
 }
