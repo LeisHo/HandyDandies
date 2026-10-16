@@ -368,13 +368,24 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "Loading Preview Lighting 6",
+          "keyAzimuth": 71,
+          "keyElevation": -29.999999999999996,
+          "keyTargetHeight": -100,
+          "keyIntensity": 5.1,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
-      "loadingPreviewLightingSelector": "LOADING HANDS",
-      "loadingPreviewKeyAzimuth": 52,
-      "loadingPreviewKeyElevation": 0,
-      "loadingPreviewKeyTargetHeight": 106,
-      "loadingPreviewKeyIntensity": 3.6,
+      "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
+      "loadingPreviewKeyAzimuth": 71,
+      "loadingPreviewKeyElevation": -29.999999999999996,
+      "loadingPreviewKeyTargetHeight": -100,
+      "loadingPreviewKeyIntensity": 5.1,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
@@ -403,7 +414,7 @@
       "loadingPreviewOffsetY": -6.606117391031177,
       "loadingPreviewOffsetZ": 61.59653795460865,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043943,
+      "loadingPreviewCameraZoom": 554.0259642043942,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -8366,7 +8377,7 @@
             "hand2MirrorX": true,
             "hand2MirrorY": false,
             "hand2MirrorZ": false,
-            "hand2OffsetX": -43,
+            "hand2OffsetX": -33.5,
             "hand2OffsetY": -4,
             "hand2OffsetZ": 0,
             "hand2RotX": 0,
@@ -8377,9 +8388,9 @@
           },
           "handoScale": 388.436,
           "handoAnchorRaw": {
-            "x": 0.0021321606725857377,
-            "y": 0.3351155550179231,
-            "z": -0.0987886594508207
+            "x": 0.015533775454095804,
+            "y": 0.21520952465950793,
+            "z": 0.0032924961962063097
           }
         },
         {
@@ -12194,13 +12205,24 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "Loading Preview Lighting 6",
+          "keyAzimuth": 71,
+          "keyElevation": -29.999999999999996,
+          "keyTargetHeight": -100,
+          "keyIntensity": 5.1,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
       "loadingPreviewLightingSelector": "LOADING HANDS",
-      "loadingPreviewKeyAzimuth": 52,
-      "loadingPreviewKeyElevation": 0,
-      "loadingPreviewKeyTargetHeight": 106,
-      "loadingPreviewKeyIntensity": 3.6,
+      "loadingPreviewKeyAzimuth": 71,
+      "loadingPreviewKeyElevation": -29.999999999999996,
+      "loadingPreviewKeyTargetHeight": -100,
+      "loadingPreviewKeyIntensity": 5.1,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
@@ -12229,7 +12251,7 @@
       "loadingPreviewOffsetY": -6.606117391031177,
       "loadingPreviewOffsetZ": 61.59653795460865,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043943,
+      "loadingPreviewCameraZoom": 554.0259642043942,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -20192,7 +20214,7 @@
             "hand2MirrorX": true,
             "hand2MirrorY": false,
             "hand2MirrorZ": false,
-            "hand2OffsetX": -43,
+            "hand2OffsetX": -33.5,
             "hand2OffsetY": -4,
             "hand2OffsetZ": 0,
             "hand2RotX": 0,
@@ -20203,9 +20225,9 @@
           },
           "handoScale": 388.436,
           "handoAnchorRaw": {
-            "x": 0.0021321606725857377,
-            "y": 0.3351155550179231,
-            "z": -0.0987886594508207
+            "x": 0.015533775454095804,
+            "y": 0.21520952465950793,
+            "z": 0.0032924961962063097
           }
         },
         {
@@ -24020,13 +24042,24 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "Loading Preview Lighting 6",
+          "keyAzimuth": 71,
+          "keyElevation": -29.999999999999996,
+          "keyTargetHeight": -100,
+          "keyIntensity": 5.1,
+          "keyColor": "#ffffff",
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
-      "loadingPreviewLightingSelector": "LOADING HANDS",
-      "loadingPreviewKeyAzimuth": 52,
-      "loadingPreviewKeyElevation": 0,
-      "loadingPreviewKeyTargetHeight": 106,
-      "loadingPreviewKeyIntensity": 3.6,
+      "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
+      "loadingPreviewKeyAzimuth": 71,
+      "loadingPreviewKeyElevation": -29.999999999999996,
+      "loadingPreviewKeyTargetHeight": -100,
+      "loadingPreviewKeyIntensity": 5.1,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
@@ -24055,7 +24088,7 @@
       "loadingPreviewOffsetY": -6.606117391031177,
       "loadingPreviewOffsetZ": 61.59653795460865,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043943,
+      "loadingPreviewCameraZoom": 554.0259642043942,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -32018,7 +32051,7 @@
             "hand2MirrorX": true,
             "hand2MirrorY": false,
             "hand2MirrorZ": false,
-            "hand2OffsetX": -43,
+            "hand2OffsetX": -33.5,
             "hand2OffsetY": -4,
             "hand2OffsetZ": 0,
             "hand2RotX": 0,
@@ -32029,9 +32062,9 @@
           },
           "handoScale": 388.436,
           "handoAnchorRaw": {
-            "x": 0.0021321606725857377,
-            "y": 0.3351155550179231,
-            "z": -0.0987886594508207
+            "x": 0.015533775454095804,
+            "y": 0.21520952465950793,
+            "z": 0.0032924961962063097
           }
         },
         {
@@ -36139,7 +36172,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -36278,7 +36311,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -42568,9 +42601,9 @@
   "panelGeometry": {
     "desktop": {
       "left": 956.8250122070312,
-      "top": 118.38750457763672,
-      "width": 579.1749877929688,
-      "height": 531.6000366210938
+      "top": 121.5875015258789,
+      "width": 582.375,
+      "height": 530
     },
     "mobile": {
       "left": 97.98214721679688,
