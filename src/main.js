@@ -732,6 +732,8 @@ let startupCacheApplied = false
 let fieldBuildAllowed = false
 let fieldBuildStarted = false
 let fieldBuildDone = false
+let fieldBuildFrac = 0 // 0..1 share of the field's hands created so far (feeds the Loading Preview's Progress Crop)
+let loadingProgressShown = 0 // running maximum of the loading progress, so it never goes backwards
 let fieldBuildInProgress = false
 let fieldBuildDirty = false
 let startupValuesApplied = false // static cfg values restored (custom functions may still be building)
@@ -1040,6 +1042,117 @@ function setupLoadingPreviewTextGroup() {
   safeRefreshSelectOptions('loadingPreviewTextFont')
   updateLoadingPreviewTextGroupVisibility()
   updateLoadingPreviewText()
+}
+// ---- Loading Preview: Progress Crop (2026-10-15) ----
+const LOADING_CROP_ROW_KEYS = ['loadingPreviewProgressCropFlip', 'loadingPreviewProgressCropRange', 'loadingPreviewProgressCropCurve']
+const LOADING_CROP_GROUP_KEY = 'Loading Preview > Progress Crop'
+function updateLoadingPreviewProgressCropGroupVisibility() {
+  const g = document.querySelector('.dp-group[data-key="' + LOADING_CROP_GROUP_KEY + '"]')
+  const body = g && g.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  if (!document.getElementById('dpStartupStyle')) { const st = document.createElement('style'); st.id = 'dpStartupStyle'; st.textContent = '.dp-startup-off > * { display: none !important }'; document.head.appendChild(st) }
+  body.classList.toggle('dp-startup-off', !cfg.loadingPreviewProgressCropEnabled)
+}
+function setupLoadingPreviewProgressCropGroup() {
+  const lpGroup = document.querySelector('.dp-group[data-key="Loading Preview"]')
+  if (!lpGroup) return
+  let g = document.querySelector('.dp-group[data-key="' + LOADING_CROP_GROUP_KEY + '"]')
+  if (!g) {
+    g = createGroupElement('Progress Crop')
+    g.dataset.key = LOADING_CROP_GROUP_KEY // unique internal key (a bare title could be adopted by an unrelated group by the saved layout)
+    lpGroup.querySelector(':scope > .dp-group-body').appendChild(g)
+  }
+  const lpBody = lpGroup.querySelector(':scope > .dp-group-body')
+  const gb = g.querySelector(':scope > .dp-group-body')
+  LOADING_CROP_ROW_KEYS.forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row && row.parentElement === lpBody) gb.appendChild(row) })
+  const curveRow = document.querySelector('.dp-row[data-key="loadingPreviewProgressCropCurve"]'), rangeRow = document.querySelector('.dp-row[data-key="loadingPreviewProgressCropRange"]')
+  if (curveRow && !curveRow.querySelector('svg')) buildGenericCurveWidget(curveRow, { caption: 'X: Loading Progress (0 = Just Started, 100% = Loading Done)  ·  Y: Crop (0 = Min Crop, 1 = Max Crop)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 0 }] })
+  if (rangeRow && !rangeRow.dataset.pcBuilt) { rangeRow.dataset.pcBuilt = '1'; buildGenericRangeBarWidget(rangeRow, { trackMin: 0, trackMax: 100, unit: '%', defaultValue: { min: 0, max: 100 } }) }
+  gateGroupHeader(LOADING_CROP_GROUP_KEY, 'loadingPreviewProgressCropEnabled')
+  updateLoadingPreviewProgressCropGroupVisibility()
+}
+// The loading progress, 0..1. There is no single measured progress value in this app, so it is built from the real startup stages: model (10%), settings applied (10%), the hands built in slices (45%), the shader warm-up and
+// hand reveal (35%) - and never ahead of the elapsed share of Min Loading Time (the reveal is held back until both are done, so the two reach 100% together). Those weights are a judgment call, not a measurement.
+// Once the loading screen is gone (the live preview), it loops 0 -> 100% over Min Loading Time (at least 1.5 s) so the curve can be tuned by eye.
+function loadingProgressNow() {
+  const now = performance.now()
+  if (fieldRevealed) { const period = Math.max(cfg.loadingMinTimeMs || 0, 1500); return (now % period) / period }
+  if (fieldStarted) return 1
+  const warm = fieldWarmStage >= 3 ? 1 : fieldWarmStage >= 1 ? 0.3 * (fieldWarmStage >= 2 ? 1 : Math.min(1, (now - fieldWarmStartMs) / FIELD_WARM_CAP_MS)) + 0.7 * (hands.length ? fieldWarmRevealIndex / hands.length : 0) : 0
+  const work = 0.1 * (modelMeasurementsReady ? 1 : 0) + 0.1 * (startupSettingsReady ? 1 : 0) + 0.45 * (fieldBuildDone ? 1 : fieldBuildFrac) + 0.35 * warm
+  const timeFrac = Math.min(1, (now - pageLoadStartMs) / Math.max(cfg.loadingMinTimeMs || 0, 1))
+  loadingProgressShown = Math.max(loadingProgressShown, Math.min(work, timeFrac))
+  return loadingProgressShown
+}
+// Per loading hand: a fragment-shader clip against ONE plane in the hand's own frame (injected through onBeforeCompile on top of the toon shader, so it is independent per hand - the optional second hand has its own orientation -
+// and does not collide with the Clipping Block planes, which are an intersection set). The plane is {normal = the hand's local Y axis}; the model's extent along Y comes from its bind-pose bounding box.
+let lpProgressCropBox = null
+const _pcCorner = new THREE.Vector3(), _pcTip = new THREE.Vector3(), _pcWrist = new THREE.Vector3()
+function lpSetupProgressCrop(h) {
+  if (!h || !h.skinnedMesh || !h.skinnedMesh.material) return
+  try {
+    const mesh = h.skinnedMesh, clone = h.clone
+    clone.updateMatrixWorld(true)
+    // The skinned bounding box (the vertices as posed by the skeleton, mesh space) - the geometry's own box is the unskinned one and does not match the rig's scale here. It walks every vertex, so it is done once per model.
+    if (!lpProgressCropBox || lpProgressCropBox.root !== modelRoot) { const t0 = performance.now(); mesh.computeBoundingBox(); lpProgressCropBox = { root: modelRoot, box: mesh.boundingBox.clone(), ms: Math.round(performance.now() - t0) } }
+    const bb = lpProgressCropBox.box
+    const cloneInv = new THREE.Matrix4().copy(clone.matrixWorld).invert()
+    const toClone = new THREE.Matrix4().multiplyMatrices(cloneInv, mesh.matrixWorld)
+    let yMin = Infinity, yMax = -Infinity
+    const ext = { x: [Infinity, -Infinity], z: [Infinity, -Infinity] } // other axes, kept for the debug read-out
+    for (let i = 0; i < 8; i++) {
+      _pcCorner.set(i & 1 ? bb.max.x : bb.min.x, i & 2 ? bb.max.y : bb.min.y, i & 4 ? bb.max.z : bb.min.z).applyMatrix4(toClone)
+      yMin = Math.min(yMin, _pcCorner.y); yMax = Math.max(yMax, _pcCorner.y)
+      ext.x = [Math.min(ext.x[0], _pcCorner.x), Math.max(ext.x[1], _pcCorner.x)]; ext.z = [Math.min(ext.z[0], _pcCorner.z), Math.max(ext.z[1], _pcCorner.z)]
+    }
+    // which way along Y the fingers lie (wrist -> middle fingertip, in the hand's own frame)
+    let sgn = 1
+    const wb = mesh.skeleton.getBoneByName('rHand'), tb = mesh.skeleton.getBoneByName('rMid3')
+    if (wb && tb) { wb.getWorldPosition(_pcWrist).applyMatrix4(cloneInv); tb.getWorldPosition(_pcTip).applyMatrix4(cloneInv); if (_pcTip.y < _pcWrist.y) sgn = -1 }
+    const uni = { value: new THREE.Vector4(0, 1, 0, 1e9) } // everything kept
+    const base = mesh.material.onBeforeCompile
+    mesh.material.onBeforeCompile = function (shader, r) {
+      if (base) base.call(this, shader, r)
+      shader.uniforms.uProgressCropPlane = uni
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vPcPos;')
+        .replace('#include <project_vertex>', '#include <project_vertex>\nvPcPos = transformed;')
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vPcPos;\nuniform vec4 uProgressCropPlane;')
+        .replace('void main() {', 'void main() {\nif (dot(vPcPos, uProgressCropPlane.xyz) + uProgressCropPlane.w < 0.0) discard;')
+    }
+    mesh.material.needsUpdate = true
+    h.progressCrop = { uni, yMin, yMax, ext, wrist: _pcWrist.toArray(), tip: _pcTip.toArray(), sgn, fromClone: new THREE.Matrix4().copy(toClone).invert(), plane: new THREE.Plane() }
+  } catch (e) { console.error('Progress Crop setup failed', e) }
+}
+function lpApplyProgressCrop(h, crop, flip) {
+  const pc = h && h.progressCrop
+  if (!pc) return
+  if (!(crop > 0)) { pc.uni.value.set(0, 1, 0, 1e9); return } // nothing cropped
+  if (crop >= 1) { pc.uni.value.set(0, 0, 0, -1); return } // everything cropped
+  const sg = flip ? -pc.sgn : pc.sgn // s = sg * y grows toward the end that is cropped last
+  const sMin = sg > 0 ? pc.yMin : -pc.yMax, sMax = sg > 0 ? pc.yMax : -pc.yMin
+  const m = (sMax - sMin) * 0.05 // a little margin: the posed fingers can reach slightly past the bind-pose box
+  const thr = THREE.MathUtils.lerp(sMin - m, sMax + m, crop)
+  pc.plane.set(_pcCorner.set(0, sg, 0), -thr).applyMatrix4(pc.fromClone) // the plane in the clone's frame -> the mesh's frame, where the vertex shader works
+  pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
+}
+let lpCropLast = { progress: 0, crop: 0 }
+window.__lpCropDbg = { get cfg() { return cfg }, update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
+window.__lpCrop = () => ({ ...lpCropLast, boxMs: lpProgressCropBox && lpProgressCropBox.ms, hand1: loadingPreviewHand && loadingPreviewHand.progressCrop ? { ext: loadingPreviewHand.progressCrop.ext, wrist: loadingPreviewHand.progressCrop.wrist, tip: loadingPreviewHand.progressCrop.tip, yMin: loadingPreviewHand.progressCrop.yMin, yMax: loadingPreviewHand.progressCrop.yMax, sgn: loadingPreviewHand.progressCrop.sgn, plane: loadingPreviewHand.progressCrop.uni.value.toArray() } : null, hand2: !!loadingPreviewHand2 }) // debug read-out for tests
+function updateLoadingPreviewProgressCrop() {
+  let crop = 0, progress = 0
+  if (cfg.loadingPreviewProgressCropEnabled) {
+    progress = loadingProgressNow()
+    const pts = sphereParse(cfg.loadingPreviewProgressCropCurve, [{ x: 0, y: 1 }, { x: 1, y: 0 }])
+    const range = sphereParse(cfg.loadingPreviewProgressCropRange, { min: 0, max: 100 })
+    const t = THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, progress), 0, 1)
+    crop = THREE.MathUtils.clamp((range.min + (range.max - range.min) * t) / 100, 0, 1)
+  }
+  lpCropLast = { progress, crop }
+  const flip = !!cfg.loadingPreviewProgressCropFlip
+  lpApplyProgressCrop(loadingPreviewHand, crop, flip)
+  lpApplyProgressCrop(loadingPreviewHand2, crop, flip)
 }
 // Loading Preview's own "Min Loading Time" (direct request) -- captured
 // here, at the earliest point this module runs, so the min-time window
@@ -2708,6 +2821,12 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewTextFont', label: 'Font', type: 'select', def: 'Inter', options: () => LOADING_TEXT_FONTS.map((f) => ({ value: f.name, group: f.group })), onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewTextOffsetX', label: 'Text Offset X (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
       { key: 'loadingPreviewTextOffsetY', label: 'Text Offset Y (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
+      // Progress Crop (2026-10-15, direct request): a flat clip plane across each loading hand, normal = the hand's own Y axis, driven by the loading progress. The rows are moved into a nested, toggleable "Progress Crop" subgroup by
+      // setupLoadingPreviewProgressCropGroup(). 100% crop hides the whole model, 0% hides nothing.
+      { key: 'loadingPreviewProgressCropEnabled', label: 'Progress Crop On/Off', type: 'checkbox', def: false, onChange: () => { updateLoadingPreviewProgressCropGroupVisibility(); sceneNeedsRedraw = true } },
+      { key: 'loadingPreviewProgressCropFlip', label: 'Crop From The Fingertip End (Off = From The Arm End)', type: 'checkbox', def: false },
+      { key: 'loadingPreviewProgressCropRange', label: 'Min / Max Crop (%)', type: 'text', def: '{"min":0,"max":100}' },
+      { key: 'loadingPreviewProgressCropCurve', label: 'Crop Curve (Loading Progress -> Crop Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]' },
       { key: 'loadingPreviewCameraEditMode', label: 'Loading Preview Camera Edit Mode', type: 'checkbox', def: false, onChange: (v) => { if (loadingPreviewOrbitControls) loadingPreviewOrbitControls.enabled = v; if (loadingPreviewCanvas) loadingPreviewCanvas.style.pointerEvents = v ? 'auto' : 'none' } }
     ]
   },
@@ -3825,6 +3944,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
+    prof('setupLoadingPreviewProgressCropGroup', setupLoadingPreviewProgressCropGroup)
     prof('setupLoadingPreviewLayoutGroup', setupLoadingPreviewLayoutGroup)
     try { await setupResponsiveVelocity() } catch (e) { console.error('Responsive Velocity setup failed', e) }
     exclusiveTriggersReady = true // from here on a user turning a click function on / changing its trigger switches an overlapping one off
@@ -8211,6 +8331,7 @@ function ensureLoadingPreviewHand2(seq) {
   clone.matrixAutoUpdate = false // its matrix is composed by hand each frame (it can be a reflection)
   loadingPreviewScene.add(clone)
   loadingPreviewHand2 = { clone, skinnedMesh, wristClipPlane: plane, clipRig: rig }
+  lpSetupProgressCrop(loadingPreviewHand2)
 }
 const _lp2U = new THREE.Matrix4(), _lp2Pivot = new THREE.Matrix4(), _lp2Tmp = new THREE.Matrix4(), _lp2A = new THREE.Matrix4(), _lp2Ai = new THREE.Matrix4(), _lp2Mir = new THREE.Matrix4(), _lp2Final = new THREE.Matrix4()
 const _lp2Rh = new THREE.Quaternion(), _lp2Anchor = new THREE.Vector3()
@@ -8440,6 +8561,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   }
   loadingPreviewScene.add(clone)
   loadingPreviewHand = { clone, skinnedMesh, wristClipPlane: loadingPreviewWristClipPlane, clipRig: loadingPreviewClipRig }
+  lpSetupProgressCrop(loadingPreviewHand)
   loadingPreviewHand2 = null // belonged to the previous scene; rebuilt on demand
 
   // A selected Camera preset (direct follow-up request) overrides the
@@ -8908,6 +9030,7 @@ function startLoadingPreviewLiveLoop() {
     }
     try {
       updateLoadingPreviewAnimation()
+      updateLoadingPreviewProgressCrop()
       syncLoadingPreviewCameraFromOrbit()
       loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
     } catch (err) {
@@ -19436,6 +19559,7 @@ async function rebuildFieldChunked() {
     const t0 = performance.now()
     do { pending.push(createFieldHand()) } while (pending.length < total && performance.now() - t0 < 6)
     slices++
+    fieldBuildFrac = total ? pending.length / total : 1
     await yieldFrame()
   }
   hands.forEach((hand) => scene.remove(hand.wrapper))
@@ -20697,6 +20821,7 @@ function animate(dt, now) {
     if (!fieldRevealed && loadingPreviewRenderer) {
       try {
         updateLoadingPreviewAnimation()
+        updateLoadingPreviewProgressCrop()
         syncLoadingPreviewCameraFromOrbit()
         loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
         if (!loadingPreviewFirstFrameLogged) { loadingPreviewFirstFrameLogged = true; logLoadingPreview('first loading-screen preview frame rendered') }
