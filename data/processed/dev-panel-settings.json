@@ -79,10 +79,75 @@
           "name": "HD 8k (8,144 tris)",
           "id": "repo:HD-8k",
           "source": "repo"
+        },
+        {
+          "name": "HD IK 100 (110 tris)",
+          "id": "repo:HD_IK_100",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 200 (194 tris)",
+          "id": "repo:HD_IK_200",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 300 (304 tris)",
+          "id": "repo:HD_IK_300",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 400 (402 tris)",
+          "id": "repo:HD_IK_400",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 500 (544 tris)",
+          "id": "repo:HD_IK_500",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 800 (810 tris)",
+          "id": "repo:HD_IK_800",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 1k (1,090 tris)",
+          "id": "repo:HD_IK_1k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 2k (2,062 tris)",
+          "id": "repo:HD_IK_2k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 4k (4,008 tris)",
+          "id": "repo:HD_IK_4k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 6k (6,034 tris)",
+          "id": "repo:HD_IK_6k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 8k (8,018 tris)",
+          "id": "repo:HD_IK_8k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 10k (10,004 tris)",
+          "id": "repo:HD_IK_10k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 12k (12,224 tris)",
+          "id": "repo:HD_IK_12k",
+          "source": "repo"
         }
       ],
       "smallScaleModelsEnabled": true,
-      "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD-300\"}]",
+      "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
       "fieldRows": 55,
       "fieldCols": 55,
       "rowSpacing": 5,
@@ -147,6 +212,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewModelId": "",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
@@ -11603,7 +11669,7 @@
         }
       ],
       "cameraX": 1.5544272264775383,
-      "cameraY": 2.6795087249259613e-13,
+      "cameraY": 2.861368774599342e-13,
       "cameraZ": 197.98779599525176,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -15097,10 +15163,75 @@
           "name": "HD 8k (8,144 tris)",
           "id": "repo:HD-8k",
           "source": "repo"
+        },
+        {
+          "name": "HD IK 100 (110 tris)",
+          "id": "repo:HD_IK_100",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 200 (194 tris)",
+          "id": "repo:HD_IK_200",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 300 (304 tris)",
+          "id": "repo:HD_IK_300",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 400 (402 tris)",
+          "id": "repo:HD_IK_400",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 500 (544 tris)",
+          "id": "repo:HD_IK_500",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 800 (810 tris)",
+          "id": "repo:HD_IK_800",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 1k (1,090 tris)",
+          "id": "repo:HD_IK_1k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 2k (2,062 tris)",
+          "id": "repo:HD_IK_2k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 4k (4,008 tris)",
+          "id": "repo:HD_IK_4k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 6k (6,034 tris)",
+          "id": "repo:HD_IK_6k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 8k (8,018 tris)",
+          "id": "repo:HD_IK_8k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 10k (10,004 tris)",
+          "id": "repo:HD_IK_10k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 12k (12,224 tris)",
+          "id": "repo:HD_IK_12k",
+          "source": "repo"
         }
       ],
       "smallScaleModelsEnabled": false,
-      "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD-300\"}]",
+      "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
       "fieldRows": 45,
       "fieldCols": 30,
       "rowSpacing": 8.5,
@@ -15165,6 +15296,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewModelId": "",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
@@ -30115,10 +30247,75 @@
           "name": "HD 8k (8,144 tris)",
           "id": "repo:HD-8k",
           "source": "repo"
+        },
+        {
+          "name": "HD IK 100 (110 tris)",
+          "id": "repo:HD_IK_100",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 200 (194 tris)",
+          "id": "repo:HD_IK_200",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 300 (304 tris)",
+          "id": "repo:HD_IK_300",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 400 (402 tris)",
+          "id": "repo:HD_IK_400",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 500 (544 tris)",
+          "id": "repo:HD_IK_500",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 800 (810 tris)",
+          "id": "repo:HD_IK_800",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 1k (1,090 tris)",
+          "id": "repo:HD_IK_1k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 2k (2,062 tris)",
+          "id": "repo:HD_IK_2k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 4k (4,008 tris)",
+          "id": "repo:HD_IK_4k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 6k (6,034 tris)",
+          "id": "repo:HD_IK_6k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 8k (8,018 tris)",
+          "id": "repo:HD_IK_8k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 10k (10,004 tris)",
+          "id": "repo:HD_IK_10k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 12k (12,224 tris)",
+          "id": "repo:HD_IK_12k",
+          "source": "repo"
         }
       ],
       "smallScaleModelsEnabled": false,
-      "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD-300\"}]",
+      "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
       "fieldRows": 15,
       "fieldCols": 3,
       "rowSpacing": 9.5,
@@ -30183,6 +30380,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewModelId": "",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
@@ -45705,6 +45903,10 @@
               },
               {
                 "type": "row",
+                "key": "loadingPreviewModelId"
+              },
+              {
+                "type": "row",
                 "key": "loadingPreviewCameraEditMode"
               },
               {
@@ -46041,6 +46243,7 @@
             "settings": [
               "loadingPreviewShowLive",
               "loadingPreviewEnabled",
+              "loadingPreviewModelId",
               "loadingPreviewCameraEditMode",
               "loadingMinTimeMs",
               "loadingPreviewScalePct",
@@ -47515,7 +47718,7 @@
           "type": "group",
           "group": {
             "key": "Small Scale Models",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -52187,8 +52390,8 @@
     "desktop": {
       "left": 0,
       "top": 198.3874969482422,
-      "width": 588.7750244140625,
-      "height": 533.2000122070312
+      "width": 591.9750366210938,
+      "height": 534.7999877929688
     },
     "mobile": {
       "left": 87.69047546386719,
