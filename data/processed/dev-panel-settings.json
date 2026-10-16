@@ -23,7 +23,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD-500",
+      "handModelId": "repo:HD_IK_500",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -15543,7 +15543,7 @@
         }
       ],
       "cameraX": 1.5625001668540408,
-      "cameraY": 2.569509918679634e-13,
+      "cameraY": 2.751369968353015e-13,
       "cameraZ": 197.9876688948102,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -19633,7 +19633,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD-500",
+      "handModelId": "repo:HD_IK_500",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -39243,7 +39243,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD-500",
+      "handModelId": "repo:HD_IK_500",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
