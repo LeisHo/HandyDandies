@@ -1415,7 +1415,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, get rigLocalAxisPosing() { return RIG_LOCAL_AXIS_POSING }, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -3086,6 +3086,9 @@ const DEV_GROUPS = [
       { key: 'midOnlyCurlThumb', label: 'Thumb 2nd Segment Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
       { key: 'tipOnlyCurlThumb', label: 'Thumb Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
       { key: 'tipTwistThumb', label: 'Thumb Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 4, onChange: () => applyCurl('thumb') },
+      { key: 'thumbBaseSplay', label: 'Thumb Base Splay (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      { key: 'midTwistThumb', label: 'Thumb 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      { key: 'baseTwistThumb', label: 'Thumb Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('thumb') },
       { key: 'curlIndex', label: 'Index Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 96, lockRange: true, onChange: () => applyCurl('index') },
       { key: 'splayIndex', label: 'Index Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 15, onChange: () => applyCurl('index') },
       { key: 'splayIndex2', label: 'Index 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 72, onChange: () => applyCurl('index') },
@@ -3094,6 +3097,8 @@ const DEV_GROUPS = [
       { key: 'midOnlyCurlIndex', label: 'Index Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'tipOnlyCurlIndex', label: 'Index Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'tipTwistIndex', label: 'Index Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 1, onChange: () => applyCurl('index') },
+      { key: 'midTwistIndex', label: 'Index 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('index') },
+      { key: 'baseTwistIndex', label: 'Index Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'curlMiddle', label: 'Middle Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -89, lockRange: true, onChange: () => applyCurl('middle') },
       { key: 'splayMiddle', label: 'Middle Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -14, onChange: () => applyCurl('middle') },
       { key: 'splayMiddle2', label: 'Middle 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -13, onChange: () => applyCurl('middle') },
@@ -3102,6 +3107,8 @@ const DEV_GROUPS = [
       { key: 'midOnlyCurlMiddle', label: 'Middle Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'tipOnlyCurlMiddle', label: 'Middle Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'tipTwistMiddle', label: 'Middle Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -5, onChange: () => applyCurl('middle') },
+      { key: 'midTwistMiddle', label: 'Middle 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('middle') },
+      { key: 'baseTwistMiddle', label: 'Middle Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'curlRing', label: 'Ring Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -95, lockRange: true, onChange: () => applyCurl('ring') },
       { key: 'splayRing', label: 'Ring Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 37, onChange: () => applyCurl('ring') },
       { key: 'splayRing2', label: 'Ring 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -32, onChange: () => applyCurl('ring') },
@@ -3110,6 +3117,8 @@ const DEV_GROUPS = [
       { key: 'midOnlyCurlRing', label: 'Ring Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'tipOnlyCurlRing', label: 'Ring Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'tipTwistRing', label: 'Ring Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -5, onChange: () => applyCurl('ring') },
+      { key: 'midTwistRing', label: 'Ring 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('ring') },
+      { key: 'baseTwistRing', label: 'Ring Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'curlPinky', label: 'Pinky Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 89, lockRange: true, onChange: () => applyCurl('pinky') },
       { key: 'splayPinky', label: 'Pinky Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -82, onChange: () => applyCurl('pinky') },
       { key: 'splayPinky2', label: 'Pinky 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 33, onChange: () => applyCurl('pinky') },
@@ -3118,6 +3127,8 @@ const DEV_GROUPS = [
       { key: 'midOnlyCurlPinky', label: 'Pinky Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'tipOnlyCurlPinky', label: 'Pinky Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'tipTwistPinky', label: 'Pinky Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -3, onChange: () => applyCurl('pinky') },
+      { key: 'midTwistPinky', label: 'Pinky 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
+      { key: 'baseTwistPinky', label: 'Pinky Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'wristBend', label: 'Wrist Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
       { key: 'wristSplay', label: 'Wrist Splay (Deg)', type: 'slider', min: -30, max: 30, step: 1, def: -1, onChange: () => applyWristPose() },
       // Ported from HANDO (direct request: "check Hando. I added a wrist
@@ -3136,6 +3147,10 @@ const DEV_GROUPS = [
       // rotation isn't affected by the alignQuat difference between the 2
       // projects).
       { key: 'wristRotation', label: 'Wrist Rotation (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0, lockRange: true, onChange: () => applyWristPose() },
+      // IK rig only (see IK RIG above): HANDO's forearm joints. The sliders exist for every model so poses carry the values, but only the IK rig reads them.
+      { key: 'elbowBend', label: 'Elbow Bend (Deg)', type: 'slider', min: -10, max: 150, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'elbowSideBend', label: 'Elbow Side Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'forearmTwist', label: 'Forearm Twist (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
       { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
@@ -3880,13 +3895,13 @@ const SNAPSHOT_SUBGROUP_SPECS = [
   { title: 'Snapshot', collapsed: false, keys: ['snapshotCursor', 'snapshotMouse', 'snapshotHandBehaviour', 'snapshotFrameRate', 'snapshotPoseJumps', 'snapshotRenderOrder', 'snapshotTrackingPoints', 'snapshotTakeBtn'] }
 ]
 const POSE_SUBGROUP_SPECS = [
-  { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb'] },
+  { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb', 'thumbBaseSplay', 'midTwistThumb', 'baseTwistThumb'] },
   { title: 'Whole-Hand Rotation at Base', collapsed: true, keys: ['baseRotationX', 'baseRotationY', 'baseRotationZ'] },
-  { title: 'Wrist', collapsed: true, keys: ['wristBend', 'wristSplay', 'wristRotation'] },
-  { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2', 'baseOnlyCurlIndex', 'midOnlyCurlIndex', 'tipOnlyCurlIndex'] },
-  { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2', 'baseOnlyCurlMiddle', 'midOnlyCurlMiddle', 'tipOnlyCurlMiddle'] },
-  { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2', 'baseOnlyCurlRing', 'midOnlyCurlRing', 'tipOnlyCurlRing'] },
-  { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2', 'baseOnlyCurlPinky', 'midOnlyCurlPinky', 'tipOnlyCurlPinky'] },
+  { title: 'Wrist', collapsed: true, keys: ['wristBend', 'wristSplay', 'wristRotation', 'elbowBend', 'elbowSideBend', 'forearmTwist'] },
+  { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2', 'baseOnlyCurlIndex', 'midOnlyCurlIndex', 'tipOnlyCurlIndex', 'midTwistIndex', 'baseTwistIndex'] },
+  { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2', 'baseOnlyCurlMiddle', 'midOnlyCurlMiddle', 'tipOnlyCurlMiddle', 'midTwistMiddle', 'baseTwistMiddle'] },
+  { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2', 'baseOnlyCurlRing', 'midOnlyCurlRing', 'tipOnlyCurlRing', 'midTwistRing', 'baseTwistRing'] },
+  { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2', 'baseOnlyCurlPinky', 'midOnlyCurlPinky', 'tipOnlyCurlPinky', 'midTwistPinky', 'baseTwistPinky'] },
 ]
 // Shared anti-abuse token for /api/save-settings (CLAUDE.md §12l) -- NOT a
 // real secret (it ships in this page's own source, same as every other
@@ -6308,6 +6323,135 @@ const FINGER_SPLAY2_KEY = { thumb: 'thumbSplay2', index: 'splayIndex2', middle: 
 const FINGER_CURL_KEY = { thumb: 'thumbCurl', index: 'curlIndex', middle: 'curlMiddle', ring: 'curlRing', pinky: 'curlPinky' }
 const FINGER_SPLAY_KEY = { thumb: 'thumbSplay', index: 'splayIndex', middle: 'splayMiddle', ring: 'splayRing', pinky: 'splayPinky' }
 const FINGER_CURL_BIAS_KEY = { thumb: 'curlBiasThumb', index: 'curlBiasIndex', middle: 'curlBiasMiddle', ring: 'curlBiasRing', pinky: 'curlBiasPinky' }
+// =======================================================================================================
+// IK RIG ("FixedBones", ported from HANDO's RIG_PROFILES.hand021FixedBones, 2026-10-16). Direct report: the poses and sequences re-exported from HANDO with the user's IK model
+// ("HandiBonesB-IK", HD_IK_*.glb here) "still don't look right ... it looks like a rotational axis thing". Cause (MEASURED): the IK model is a DIFFERENT RIG from the one every pose maths
+// here was built for -- same 23 bone names, but bone rest rotations differ hugely from this project's earlier model (rHand 89.2 deg, rThumb1 106.4 deg, rForearmBend 90.0 deg, six
+// more by 3-13 deg), while the IK glb matches HANDO's HandiBonesB-IK to within 0.05 deg on every bone. HANDO poses that rig with its own profile: every curl-family rotation is about the
+// joint's own LOCAL Z, splay about local X, segment twists about local Y, with FINGER_SIGN / FINGER_SPLAY_SIGN / FINGER_SPLAY2_SIGN all -1 and the thumb's 2nd splay pivoting at its tip
+// joint; this project posed it with the old rig's WORLD-axis maths, so every joint turned about the wrong axis. The old maths stays EXACTLY as it was for every other model
+// (RIG_LOCAL_AXIS_POSING is false for them); only a model detected as this rig (detectLocalAxisRig(), called once its rest pose is measured) takes the local-axis path below.
+// Also new: the pose keys that rig's poses carry and this project never had -- thumbBaseSplay, midTwist* / baseTwist* (per finger) and the forearm joints elbowBend / elbowSideBend /
+// forearmTwist (HANDO's armAxes for this rig: rForearmBend local Z / X, rForearmTwist local Y; the rig has no shoulder bone, so HANDO's shoulder* keys do nothing and are not ported).
+// =======================================================================================================
+const FINGER_MID_TWIST_KEY = { thumb: 'midTwistThumb', index: 'midTwistIndex', middle: 'midTwistMiddle', ring: 'midTwistRing', pinky: 'midTwistPinky' }
+const FINGER_BASE_TWIST_KEY = { thumb: 'baseTwistThumb', index: 'baseTwistIndex', middle: 'baseTwistMiddle', ring: 'baseTwistRing', pinky: 'baseTwistPinky' }
+const THUMB_BASE_SPLAY_KEY = 'thumbBaseSplay'
+const IK_RIG_SIGN = { thumb: -1, index: -1, middle: -1, ring: -1, pinky: -1 } // HANDO: FINGER_SIGN, FINGER_SPLAY_SIGN and FINGER_SPLAY2_SIGN are all -1 for this rig
+const IK_RIG_SPLAY2_JOINT_INDEX = { thumb: 2, index: 1, middle: 1, ring: 1, pinky: 1 } // HANDO: the thumb's tip splay pivots at its LAST joint (rThumb3); the other fingers keep joint 1
+// The IK rig's bind-pose rest rotations (read from HandiBonesB-IK.glb / HD_IK_*.glb node rotations): a loaded model whose rHand and rThumb1 rest rotations are both within IK_RIG_TOLERANCE_DEG of
+// these is this rig. The earlier model differs by 89.2 / 106.4 deg, the IK LOD files by <= 0.05 deg, so the separation is not a close call.
+const IK_RIG_REST_REF = { rHand: [-0.11599858850240707, 0.9928736090660095, -0.00641510309651494, 0.026555685326457024], rThumb1: [0.04745800793170929, 0.7883297801017761, 0.4728289842605591, 0.3907897472381592] }
+const IK_RIG_TOLERANCE_DEG = 3
+let RIG_LOCAL_AXIS_POSING = false
+const _ikRigRefQ = new THREE.Quaternion()
+function detectLocalAxisRig() {
+  const diffs = Object.keys(IK_RIG_REST_REF).map((name) => {
+    const rest = boneRestQuat[name]
+    if (!rest) return Infinity
+    _ikRigRefQ.fromArray(IK_RIG_REST_REF[name])
+    return THREE.MathUtils.radToDeg(rest.angleTo(_ikRigRefQ))
+  })
+  RIG_LOCAL_AXIS_POSING = diffs.every((d) => d <= IK_RIG_TOLERANCE_DEG)
+  console.info('[rig] local-axis (IK rig) posing ' + (RIG_LOCAL_AXIS_POSING ? 'ON' : 'off') + ' -- rest-rotation difference from the IK rig, deg: ' + diffs.map((d, i) => Object.keys(IK_RIG_REST_REF)[i] + ' ' + (Number.isFinite(d) ? d.toFixed(2) : 'missing')).join(', '))
+}
+const _lcChainQ = new THREE.Quaternion()
+const _lcParentPos = new THREE.Vector3()
+const _lcParentScale = new THREE.Vector3()
+// The IK rig's finger posing (HANDO's applyCurlToSkeletonLocalAxis(), reading a values object like this project's other pose functions): reset each joint to its rest rotation, then
+// rotate about its OWN local axes in HANDO's order -- thumb base splay (joint 0, X), splay (X), 2nd splay (X), curl weighted by Curl Bias (Z), Base-/Mid-/Tip-Only curl (Z on joint 0 / 1 / last),
+// Tip Twist (about the segment direction, unchanged from the world-axis path), then 2nd-segment twist (joint 1, Y) and base-segment twist (joint 0, Y). The chain / matrix bookkeeping
+// (a running parent world quaternion, one refreshed matrixWorld per joint) is the same as applyCurlToSkeleton()'s, so it costs the same per hand.
+function applyCurlToSkeletonLocal(fingerName, skeleton, values, parentFresh) {
+  const joints = FINGER_JOINTS[fingerName]
+  const maxDegs = FINGER_MAX_DEG[fingerName]
+  const sign = IK_RIG_SIGN[fingerName]
+  const rad = THREE.MathUtils.degToRad
+  const val = (key) => (key ? (values[key] || 0) : 0)
+  const curlT = val(FINGER_CURL_KEY[fingerName]) / 100
+  const splayT = val(FINGER_SPLAY_KEY[fingerName]) / 100
+  const curlBias = val(FINGER_CURL_BIAS_KEY[fingerName]) / 100
+  const tipTwistT = val(FINGER_TIP_TWIST_KEY[fingerName]) / 100
+  const baseOnlyCurlT = val(FINGER_BASE_ONLY_CURL_KEY[fingerName]) / 100
+  const tipOnlyCurlT = val(FINGER_TIP_ONLY_CURL_KEY[fingerName]) / 100
+  const midOnlyCurlT = val(FINGER_MID_ONLY_CURL_KEY[fingerName]) / 100
+  const midTwistDeg = val(FINGER_MID_TWIST_KEY[fingerName])
+  const baseTwistDeg = val(FINGER_BASE_TWIST_KEY[fingerName])
+  const splayDeg = sign * FINGER_SPLAY_MAX_DEG[fingerName] * splayT
+  const splay2Deg = sign * FINGER_SPLAY2_MAX_DEG[fingerName] * (val(FINGER_SPLAY2_KEY[fingerName]) / 100)
+  const thumbBaseSplayDeg = fingerName === 'thumb' ? val(THUMB_BASE_SPLAY_KEY) : 0
+  const splayJointIndex = FINGER_SPLAY_JOINT_INDEX[fingerName]
+  const splay2JointIndex = IK_RIG_SPLAY2_JOINT_INDEX[fingerName]
+  const wristBone = skeletonBone(skeleton, 'rHand')
+  const bones = []
+  const chainWorldQ = _lcChainQ // world quaternion of the CURRENT joint's parent, advanced joint to joint
+  let chainReady = false
+  let prevBone = null
+  joints.forEach((boneName, i) => {
+    const bone = skeletonBone(skeleton, boneName)
+    const rest = boneRestQuat[boneName]
+    if (!bone || !rest) return
+    bones[i] = bone
+    if (!chainReady || bone.parent !== prevBone) {
+      const par = bone.parent
+      if (parentFresh && wristBone && (par === wristBone || par.parent === wristBone)) {
+        if (par !== wristBone) { par.updateMatrix(); par.matrixWorld.multiplyMatrices(wristBone.matrixWorld, par.matrix) }
+        par.matrixWorld.decompose(_lcParentPos, chainWorldQ, _lcParentScale)
+      } else {
+        par.getWorldQuaternion(chainWorldQ)
+      }
+      chainReady = true
+    }
+    bone.quaternion.copy(rest)
+    if (i === 0 && thumbBaseSplayDeg) bone.rotateX(rad(thumbBaseSplayDeg))
+    if (i === splayJointIndex) bone.rotateX(rad(splayDeg))
+    if (i === splay2JointIndex) bone.rotateX(rad(splay2Deg))
+    const weight = curlBiasWeight(i, joints.length, curlBias)
+    bone.rotateZ(rad(sign * maxDegs[i] * curlT * weight))
+    if (i === 0) bone.rotateZ(rad(sign * maxDegs[0] * baseOnlyCurlT))
+    if (i === 1) bone.rotateZ(rad(sign * maxDegs[1] * midOnlyCurlT))
+    if (i === joints.length - 1) bone.rotateZ(rad(sign * maxDegs[i] * tipOnlyCurlT))
+    if (i === joints.length - 1 && i > 0) {
+      let twistAxis
+      if (bone.parent === bones[i - 1]) {
+        _segFromPos.setFromMatrixPosition(bones[i - 1].matrixWorld)
+        _segToPos.copy(bone.position).applyMatrix4(bones[i - 1].matrixWorld)
+        twistAxis = _segDir.subVectors(_segToPos, _segFromPos).normalize()
+      } else {
+        twistAxis = segmentDirection(bones[i - 1], bone)
+      }
+      rotateOnTrueWorldAxisFast(bone, chainWorldQ, twistAxis, rad(FINGER_TIP_TWIST_MAX_DEG * tipTwistT))
+    }
+    if (i === 1) bone.rotateY(rad(midTwistDeg))
+    if (i === 0) bone.rotateY(rad(baseTwistDeg))
+    chainWorldQ.multiply(bone.quaternion) // this joint's world quaternion = the next joint's parent
+    if (parentFresh || bone.parent === prevBone) {
+      bone.updateMatrix()
+      bone.matrixWorld.multiplyMatrices(bone.parent.matrixWorld, bone.matrix)
+    } else {
+      bone.updateMatrixWorld(true)
+    }
+    prevBone = bone
+  })
+}
+// The IK rig's forearm joints (HANDO's applyArmPoseToSkeleton() with its armAxes for this rig): reset to rest, then rotate about the bone's own local axes in HANDO's order --
+// rForearmBend: Elbow Bend about Z, Elbow Side Bend about X; rForearmTwist: Forearm Twist about Y. Called from applyWristPoseToSkeleton(), i.e. at every site that poses a hand, before
+// the fingers (so applyAllFingerCurls()'s wrist.updateWorldMatrix(true, false) already carries the new forearm into the finger chain). A no-op for every other model.
+function applyIkRigForearmToSkeleton(skeleton, values) {
+  const elbow = skeletonBone(skeleton, 'rForearmBend')
+  const elbowRest = boneRestQuat.rForearmBend
+  if (elbow && elbowRest) {
+    elbow.quaternion.copy(elbowRest)
+    elbow.rotateZ(THREE.MathUtils.degToRad(values.elbowBend || 0))
+    elbow.rotateX(THREE.MathUtils.degToRad(values.elbowSideBend || 0))
+  }
+  const twist = skeletonBone(skeleton, 'rForearmTwist')
+  const twistRest = boneRestQuat.rForearmTwist
+  if (twist && twistRest) {
+    twist.quaternion.copy(twistRest)
+    twist.rotateY(THREE.MathUtils.degToRad(values.forearmTwist || 0))
+  }
+}
 // Ported from HANDO (direct user request, "maybe check hando for pose
 // settings. maybe there is an extra setting you dont have" -- this WAS
 // exactly that: this project's own Pose group port deliberately omitted
@@ -6511,6 +6655,7 @@ const _curlWristRestInvScratch = new THREE.Quaternion()
 // world matrix (its ancestors included), so joint 0's parent chain only needs the one carpal level recomputed
 // instead of re-walking all 8 ancestors for every finger. Default false = the original behaviour.
 function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values = cfg, parentFresh = false) {
+  if (RIG_LOCAL_AXIS_POSING) return applyCurlToSkeletonLocal(fingerName, skeleton, values, parentFresh) // the IK rig (see IK RIG, above); every other model keeps the world-axis maths below untouched
   const joints = FINGER_JOINTS[fingerName]
   const maxDegs = FINGER_MAX_DEG[fingerName]
   const sign = FINGER_SIGN[fingerName]
@@ -6883,6 +7028,7 @@ function applyWristPoseToSkeleton(skeleton, values = cfg, extraSplayDeg = 0) {
   bone.rotateX(THREE.MathUtils.degToRad(values.wristBend))
   bone.rotateZ(THREE.MathUtils.degToRad(values.wristSplay + extraSplayDeg))
   bone.rotateY(THREE.MathUtils.degToRad(values.wristRotation || 0))
+  if (RIG_LOCAL_AXIS_POSING) applyIkRigForearmToSkeleton(skeleton, values) // IK rig only: Elbow Bend / Elbow Side Bend / Forearm Twist
 }
 function applyWristPose() {
   if (!modelLoaded) return
@@ -6936,7 +7082,10 @@ const POSE_PRESET_KEYS = [
   // applied). `|| 0`/`?? 1` fallbacks throughout cover a pose saved
   // before these keys existed, or imported from a HANDO version that
   // predates them -- same convention as baseOnlyCurl*'s own comment.
-  'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseScale'
+  'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseScale',
+  // IK rig (2026-10-16, ported from HANDO's pose set; see IK RIG above): a 0 default is a no-op for every other model, which never reads them.
+  'thumbBaseSplay', 'midTwistThumb', 'baseTwistThumb', 'midTwistIndex', 'baseTwistIndex', 'midTwistMiddle', 'baseTwistMiddle', 'midTwistRing', 'baseTwistRing', 'midTwistPinky', 'baseTwistPinky',
+  'elbowBend', 'elbowSideBend', 'forearmTwist'
 ]
 // Pose Preview live-sync -- direct follow-up report ("in my pose
 // settings group, the Offset and Scale sliders dont seem to do
@@ -19852,6 +20001,7 @@ resolveHandModelUrl().then((handModelUrl) => gltfLoader.load(
     // clones this skeleton, so every hand's own clone starts from the
     // true bind pose.
     skinned.skeleton.bones.forEach((bone) => { boneRestQuat[bone.name] = bone.quaternion.clone() })
+    detectLocalAxisRig() // the IK rig takes the local-axis pose path (see IK RIG, above)
     wristPosRaw.copy(wristPos)
     { const palmB = skinned.skeleton.getBoneByName('rMid1'); if (palmB) palmB.getWorldPosition(palmCenterPosRaw); else palmCenterPosRaw.copy(wristPos) } // end of rCarpal2
     handoPivotRaw.addVectors(wristPos, palmCenterPosRaw).multiplyScalar(0.5)
