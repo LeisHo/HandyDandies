@@ -12356,16 +12356,16 @@
       "custom52Trig2RetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "rvEnabled": true,
       "rvHoldOnly": false,
-      "rvVelocityRange": "{\"min\":800,\"max\":2000}",
+      "rvVelocityRange": "{\"min\":1000,\"max\":1500}",
       "rvVelocitySmoothing": 0.31,
-      "rvTriggerDistanceRange": "{\"min\":15,\"max\":35}",
+      "rvTriggerDistanceRange": "{\"min\":15,\"max\":30}",
       "rvTriggerDistanceCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3572238009602319,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3288804677939753,\"y\":-0.008645884195963571}}]",
       "rvDistanceFrom": "Path Line",
       "rvStartTimeEnabled": true,
-      "rvStartTimeRange": "{\"min\":0,\"max\":500}",
-      "rvStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3174898914645726,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3223635039520899,\"y\":0}}]",
+      "rvStartTimeRange": "{\"min\":20,\"max\":500}",
+      "rvStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.26224496887956517,\"y\":0.46552073160807295}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3223635039520899,\"y\":0}}]",
       "rvSpeedEnabled": true,
-      "rvSpeedRange": "{\"min\":1000,\"max\":2000}",
+      "rvSpeedRange": "{\"min\":904,\"max\":1807}",
       "rvSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2515702070184387,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.24036571904091975,\"y\":0}}]",
       "rvRetransitionEnabled": true,
       "rvRetransitionSpeedMs": 3000,
@@ -12381,8 +12381,8 @@
       "rvEasingCurve": "[{\"x\":0,\"y\":0.5173957824707032,\"h1\":{\"x\":0.2420761254919111,\"y\":0}},{\"x\":0.596011699711758,\"y\":1,\"h2\":{\"x\":-0.3507807724979016,\"y\":0},\"h1\":{\"x\":0.16826240944716064,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.21032795125519754,\"y\":0.02666651407877607}}]",
       "rvSet1Enabled": true,
       "rvSet1Angle": 0,
-      "rvSet1DisplacementRange": "{\"min\":3,\"max\":15}",
-      "rvSet1DisplacementCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3467930399273888,\"y\":-0.031666692097981786}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2074235499119056,\"y\":0.642812474568685}}]",
+      "rvSet1DisplacementRange": "{\"min\":1,\"max\":4}",
+      "rvSet1DisplacementCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4013953286857133,\"y\":-0.39239578247070317}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4670999077895759,\"y\":0}}]",
       "rvSet1DisplacementDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.33829535165870184,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.08596651168645542,\"y\":1}}]",
       "rvSet1TriggerAngleRange": "{\"min\":90,\"max\":270}",
       "rvSet1AngleCurveEnabled": false,
@@ -37859,7 +37859,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -38209,7 +38209,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -39030,7 +39030,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -39296,7 +39296,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Velocity",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -39349,7 +39349,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -39470,7 +39470,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Angle to Velocity 1",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
