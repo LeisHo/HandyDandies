@@ -7393,7 +7393,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "2 HAND TWIDDLING - 2.6",
@@ -7453,7 +7454,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "2 HAND TWIDDLING - 5",
@@ -7513,7 +7515,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "2 HAND TWIDDLING - 7.5",
@@ -7573,7 +7576,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "TWIDDLING - HAND 2",
@@ -7863,7 +7867,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 1",
@@ -7937,7 +7942,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 2",
@@ -8011,7 +8017,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 3",
@@ -8085,7 +8092,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 4",
@@ -8159,7 +8167,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 5",
@@ -8233,7 +8242,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 6",
@@ -8307,7 +8317,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "2Twids-0",
@@ -8381,7 +8392,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "2Twids-1",
@@ -8455,7 +8467,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "2Twids-2",
@@ -8529,7 +8542,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "2Twids-3",
@@ -8603,7 +8617,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "22Twids-0",
@@ -8937,7 +8952,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "CLOSED FLOWER"
         },
         {
           "name": "Closed Flower - 1",
@@ -9011,7 +9027,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "CLOSED FLOWER"
         },
         {
           "name": "Closed Flower - 2",
@@ -9085,7 +9102,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "CLOSED FLOWER"
         },
         {
           "name": "NEUTRAL",
@@ -9233,7 +9251,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -40",
@@ -9307,7 +9326,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -10",
@@ -9381,7 +9401,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -30",
@@ -9455,7 +9476,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -50",
@@ -9529,7 +9551,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm +30",
@@ -9603,7 +9626,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "NEUTRAL +45",
@@ -9899,7 +9923,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "Fist +30",
@@ -9973,7 +9998,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "Fist +45",
@@ -10047,7 +10073,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "Fist +60",
@@ -10121,7 +10148,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "NEUTRAL -15",
@@ -22477,7 +22505,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "2 HAND TWIDDLING - 2.6",
@@ -22537,7 +22566,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "2 HAND TWIDDLING - 5",
@@ -22597,7 +22627,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "2 HAND TWIDDLING - 7.5",
@@ -22657,7 +22688,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "TWIDDLING - HAND 2",
@@ -22947,7 +22979,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 1",
@@ -23021,7 +23054,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 2",
@@ -23095,7 +23129,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 3",
@@ -23169,7 +23204,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 4",
@@ -23243,7 +23279,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 5",
@@ -23317,7 +23354,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 6",
@@ -23391,7 +23429,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "2Twids-0",
@@ -23465,7 +23504,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "2Twids-1",
@@ -23539,7 +23579,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "2Twids-2",
@@ -23613,7 +23654,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "2Twids-3",
@@ -23687,7 +23729,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "22Twids-0",
@@ -24021,7 +24064,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "CLOSED FLOWER"
         },
         {
           "name": "Closed Flower - 1",
@@ -24095,7 +24139,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "CLOSED FLOWER"
         },
         {
           "name": "Closed Flower - 2",
@@ -24169,7 +24214,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "CLOSED FLOWER"
         },
         {
           "name": "NEUTRAL",
@@ -24317,7 +24363,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -40",
@@ -24391,7 +24438,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -10",
@@ -24465,7 +24513,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -30",
@@ -24539,7 +24588,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -50",
@@ -24613,7 +24663,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm +30",
@@ -24687,7 +24738,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "NEUTRAL +45",
@@ -24983,7 +25035,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "Fist +30",
@@ -25057,7 +25110,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "Fist +45",
@@ -25131,7 +25185,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "Fist +60",
@@ -25205,7 +25260,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "NEUTRAL -15",
@@ -37561,7 +37617,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "2 HAND TWIDDLING - 2.6",
@@ -37621,7 +37678,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "2 HAND TWIDDLING - 5",
@@ -37681,7 +37739,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "2 HAND TWIDDLING - 7.5",
@@ -37741,7 +37800,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2 TWIDDLING 2"
         },
         {
           "name": "TWIDDLING - HAND 2",
@@ -38031,7 +38091,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 1",
@@ -38105,7 +38166,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 2",
@@ -38179,7 +38241,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 3",
@@ -38253,7 +38316,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 4",
@@ -38327,7 +38391,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 5",
@@ -38401,7 +38466,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "FISH - 6",
@@ -38475,7 +38541,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FISH"
         },
         {
           "name": "2Twids-0",
@@ -38549,7 +38616,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "2Twids-1",
@@ -38623,7 +38691,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "2Twids-2",
@@ -38697,7 +38766,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "2Twids-3",
@@ -38771,7 +38841,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "2TWIDS"
         },
         {
           "name": "22Twids-0",
@@ -39105,7 +39176,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "CLOSED FLOWER"
         },
         {
           "name": "Closed Flower - 1",
@@ -39179,7 +39251,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "CLOSED FLOWER"
         },
         {
           "name": "Closed Flower - 2",
@@ -39253,7 +39326,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "CLOSED FLOWER"
         },
         {
           "name": "NEUTRAL",
@@ -39401,7 +39475,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -40",
@@ -39475,7 +39550,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -10",
@@ -39549,7 +39625,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -30",
@@ -39623,7 +39700,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm -50",
@@ -39697,7 +39775,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "Max Palm +30",
@@ -39771,7 +39850,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "MAX PALM"
         },
         {
           "name": "NEUTRAL +45",
@@ -40067,7 +40147,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "Fist +30",
@@ -40141,7 +40222,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "Fist +45",
@@ -40215,7 +40297,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "Fist +60",
@@ -40289,7 +40372,8 @@
           "shoulderRotation": 0,
           "elbowBend": 0,
           "elbowSideBend": 0,
-          "forearmTwist": 0
+          "forearmTwist": 0,
+          "group": "FIST"
         },
         {
           "name": "NEUTRAL -15",
@@ -46659,7 +46743,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -47738,7 +47822,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
