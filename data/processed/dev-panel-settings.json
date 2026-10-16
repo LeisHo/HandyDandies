@@ -18,12 +18,12 @@
       "renderOrderFallbackExcept": "armEnd",
       "renderOrderFallback2": "none",
       "renderOrderFallback2Except": "armBase",
-      "renderOrderModeTerms": "[{\"op\":\"and\",\"m\":\"negCamPalmCenter\"},{\"op\":\"and\",\"m\":\"armBaseToArmEnd\"},{\"op\":\"and\",\"m\":\"armEnd\"},{\"op\":\"and\",\"m\":\"palmCenter\"},{\"op\":\"and\",\"m\":\"armBase\"}]",
+      "renderOrderModeTerms": "[{\"op\":\"and\",\"m\":\"negCamPalmCenter\"},{\"op\":\"and\",\"m\":\"armBaseToArmEnd\"},{\"op\":\"and\",\"m\":\"armEnd\"},{\"op\":\"and\",\"m\":\"palmCenter\"}]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatradn",
+      "handModelId": "local:mvatm73f",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -19628,12 +19628,12 @@
       "renderOrderFallbackExcept": "armBase",
       "renderOrderFallback2": "armEndToPalm",
       "renderOrderFallback2Except": "closest",
-      "renderOrderModeTerms": "[{\"op\":\"and\",\"m\":\"negCamPalmCenter\"},{\"op\":\"and\",\"m\":\"armBaseToArmEnd\"},{\"op\":\"and\",\"m\":\"armEnd\"},{\"op\":\"and\",\"m\":\"palmCenter\"},{\"op\":\"and\",\"m\":\"armBase\"}]",
+      "renderOrderModeTerms": "[{\"op\":\"and\",\"m\":\"negCamPalmCenter\"},{\"op\":\"and\",\"m\":\"armBaseToArmEnd\"},{\"op\":\"and\",\"m\":\"armEnd\"},{\"op\":\"and\",\"m\":\"palmCenter\"}]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatradn",
+      "handModelId": "local:mvatm73f",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -39238,12 +39238,12 @@
       "renderOrderFallbackExcept": "armEnd",
       "renderOrderFallback2": "none",
       "renderOrderFallback2Except": "armBase",
-      "renderOrderModeTerms": "[{\"op\":\"and\",\"m\":\"negCamPalmCenter\"},{\"op\":\"and\",\"m\":\"armBaseToArmEnd\"},{\"op\":\"and\",\"m\":\"armEnd\"},{\"op\":\"and\",\"m\":\"palmCenter\"},{\"op\":\"and\",\"m\":\"armBase\"}]",
+      "renderOrderModeTerms": "[{\"op\":\"and\",\"m\":\"negCamPalmCenter\"},{\"op\":\"and\",\"m\":\"armBaseToArmEnd\"},{\"op\":\"and\",\"m\":\"armEnd\"},{\"op\":\"and\",\"m\":\"palmCenter\"}]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatradn",
+      "handModelId": "local:mvatm73f",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
