@@ -10010,6 +10010,7 @@ const RV_LIN = JSON.stringify([{ x: 0, y: 0 }, { x: 1, y: 1 }])
 const RV_FLAT1 = JSON.stringify([{ x: 0, y: 1 }, { x: 1, y: 1 }])
 const RV_FLAT_HALF = JSON.stringify([{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]) // an Easing curve is a SPEED profile (constant speed by default), like the click functions' Easing
 const RV_CURVE_X_VELOCITY = 'X: Cursor Velocity (Min -> Max Tracked)'
+const RV_CURVE_X_DIST_LIVE = 'X: Hand Distance From The Cursor Right Now (0 = Min Trigger Distance, 1 = Max Trigger Distance)'
 const RV_CURVE_X_DIST = 'X: Hand Distance From The Trigger Cursor (where the cursor was when it started moving fast enough; 0 = Min Trigger Distance, 1 = Max Trigger Distance)'
 let rvSetList = [] // [{ prefix, title }] in panel order
 let rvNextSetN = 1
@@ -10160,7 +10161,7 @@ function rvRegisterSet(prefix, title, mainBody, beforeEl) {
   const gb = g.querySelector(':scope > .dp-group-body')
   rvRangeRow(`${S}DisplacementRange`, { trackMin: 0, trackMax: 60, unit: 'wu', decimals: 1, defaultValue: { min: 0, max: 5 } })
   rvCurveRow(`${S}DisplacementCurve`, RV_CURVE_X_VELOCITY + '  ·  Y: Displacement (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
-  rvCurveRow(`${S}DisplacementDistCurve`, RV_CURVE_X_DIST + '  ·  Y: Displacement Scaler (0 - 1)', [{ x: 0, y: 1 }, { x: 1, y: 1 }])
+  rvCurveRow(`${S}DisplacementDistCurve`, RV_CURVE_X_DIST_LIVE + '  ·  Y: Displacement Scaler (0 - 1)', [{ x: 0, y: 1 }, { x: 1, y: 1 }])
   rvRangeRow(`${S}TriggerAngleRange`, { trackMin: 0, trackMax: 180, unit: 'deg', defaultValue: { min: 0, max: 0 } })
   rvRangeRow(`${S}AngleCurveRange`, { trackMin: -360, trackMax: 360, unit: 'deg', defaultValue: { min: 0, max: 180 } })
   rvCurveRow(`${S}AngleCurve`, 'X: Hand Angle To The Cursor Path (Min -> Max Trigger Angle)  ·  Y: Displacement Angle (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
@@ -10168,7 +10169,7 @@ function rvRegisterSet(prefix, title, mainBody, beforeEl) {
   effects.forEach(([name, , label, trackMax, unit, decimals, defVal]) => {
     rvRangeRow(`${S}${name}Range`, { trackMin: name === 'Curl' ? -200 : (name === 'Arm' || name === 'Splay' ? -trackMax : 0), trackMax, unit: unit || 'x', decimals, defaultValue: defVal })
     rvCurveRow(`${S}${name}Curve`, RV_CURVE_X_VELOCITY + `  ·  Y: ${label} (0 = Min, 1 = Max)`, [{ x: 0, y: 0 }, { x: 1, y: 1 }])
-    rvCurveRow(`${S}${name}DistCurve`, RV_CURVE_X_DIST + `  ·  Y: ${label} Scaler (0 - 1)`, [{ x: 0, y: 1 }, { x: 1, y: 1 }])
+    rvCurveRow(`${S}${name}DistCurve`, RV_CURVE_X_DIST_LIVE + `  ·  Y: ${label} Scaler (0 - 1)`, [{ x: 0, y: 1 }, { x: 1, y: 1 }])
   })
   wrapGatedSubgroup(`${S}AngleCurveEnabled`, [`${S}AngleCurveRange`, `${S}AngleCurve`], 'Displacement Angle Curve')
   effects.forEach(([name, subTitle]) => wrapGatedSubgroup(`${S}${name}Enabled`, [`${S}${name}Range`, `${S}${name}Curve`, `${S}${name}DistCurve`, ...(name === 'Curl' ? [`${S}CurlMax`] : [])], subTitle))
@@ -10437,6 +10438,9 @@ function updateResponsiveVelocity(nowMs) {
     // x of every distance curve: the hand's distance from the TRIGGER cursor, Min Trigger Distance -> 0, Max Trigger Distance -> 1 (constant for the whole sweep).
     const distT = Math.hypot((_rvHP.x + 1) * 0.5 * W - rvTrigPx, (1 - _rvHP.y) * 0.5 * H - rvTrigPy) * unitsPerPx
     const nd = dr.max > dr.min ? THREE.MathUtils.clamp((distT - dr.min) / (dr.max - dr.min), 0, 1) : 0
+    // The AMOUNT scalers (Displacement / Rotation / Splay / Crop / Curl Distance Curves) follow the cursor as it is NOW (2026-10-15): measured from the trigger cursor they read 1 for every hand the sweep had travelled more than
+    // the Max Trigger Distance away from, and a curve that falls to 0 there (the usual shape: nearer hands move more) silenced exactly the hands the cursor was passing. Only the TIMING curves stay on the trigger cursor.
+    const ndLive = dr.max > dr.min ? THREE.MathUtils.clamp((dist - dr.min) / (dr.max - dr.min), 0, 1) : 0
     const dispSum = hand._rvDisp.set(0, 0, 0), tiltSum = hand._rvTilt.set(0, 0, 0)
     let splay = 0, crop = 0, curl = 0, ceil = Infinity, live = false
     for (let si = 0; si < sets.length; si++) {
@@ -10456,12 +10460,12 @@ function updateResponsiveVelocity(nowMs) {
         const ax = -rvDirY * side, ay = rvDirX * side // unit vector away from the path (screen px, y down)
         const dx = ax * ct + rvDirX * sn, dy = ay * ct + rvDirY * sn
         st.wx = _rvR.x * dx - _rvU.x * dy; st.wy = _rvR.y * dx - _rvU.y * dy; st.wz = _rvR.z * dx - _rvU.z * dy
-        const dsc = rvCurveY(c.kDD, nd)
+        const dsc = rvCurveY(c.kDD, ndLive)
         st.disp = rvLerp(c.disp, rvCurveY(c.kD, vn)) * dsc
-        st.arm = c.arm ? rvLerp(c.arm, rvCurveY(c.kA, vn)) * rvCurveY(c.kAD, nd) : 0
-        st.splay = c.splay ? rvLerp(c.splay, rvCurveY(c.kS, vn)) * rvCurveY(c.kSD, nd) : 0
-        st.crop = c.crop ? rvLerp(c.crop, rvCurveY(c.kC, vn)) * rvCurveY(c.kCD, nd) : 0
-        st.curl = c.curl ? rvLerp(c.curl, rvCurveY(c.kL, vn)) * rvCurveY(c.kLD, nd) : 0
+        st.arm = c.arm ? rvLerp(c.arm, rvCurveY(c.kA, vn)) * rvCurveY(c.kAD, ndLive) : 0
+        st.splay = c.splay ? rvLerp(c.splay, rvCurveY(c.kS, vn)) * rvCurveY(c.kSD, ndLive) : 0
+        st.crop = c.crop ? rvLerp(c.crop, rvCurveY(c.kC, vn)) * rvCurveY(c.kCD, ndLive) : 0
+        st.curl = c.curl ? rvLerp(c.curl, rvCurveY(c.kL, vn)) * rvCurveY(c.kLD, ndLive) : 0
         st.ceil = c.curlMax
         st.nd = nd
       }
