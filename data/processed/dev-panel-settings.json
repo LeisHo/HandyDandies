@@ -79,6 +79,71 @@
           "name": "HD 8k (8,144 tris)",
           "id": "repo:HD-8k",
           "source": "repo"
+        },
+        {
+          "name": "HD IK 100 (110 tris)",
+          "id": "repo:HD_IK_100",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 200 (194 tris)",
+          "id": "repo:HD_IK_200",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 300 (304 tris)",
+          "id": "repo:HD_IK_300",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 400 (402 tris)",
+          "id": "repo:HD_IK_400",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 500 (544 tris)",
+          "id": "repo:HD_IK_500",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 800 (810 tris)",
+          "id": "repo:HD_IK_800",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 1k (1,090 tris)",
+          "id": "repo:HD_IK_1k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 2k (2,062 tris)",
+          "id": "repo:HD_IK_2k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 4k (4,008 tris)",
+          "id": "repo:HD_IK_4k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 6k (6,034 tris)",
+          "id": "repo:HD_IK_6k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 8k (8,018 tris)",
+          "id": "repo:HD_IK_8k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 10k (10,004 tris)",
+          "id": "repo:HD_IK_10k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 12k (12,224 tris)",
+          "id": "repo:HD_IK_12k",
+          "source": "repo"
         }
       ],
       "smallScaleModelsEnabled": true,
@@ -147,6 +212,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewModelId": "",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
@@ -303,13 +369,13 @@
         },
         {
           "name": "LOADING HANDS - MOBILE",
-          "cameraX": -21.168243388530225,
-          "cameraY": 1076.3522375267153,
-          "cameraZ": -104.15510518308226,
+          "cameraX": 4.238297226470484,
+          "cameraY": 807.1086899015213,
+          "cameraZ": -86.4799826160318,
           "cameraFov": 15,
-          "targetX": -11.353322020344859,
-          "targetY": -32.07643487687048,
-          "targetZ": -28.637437936977694
+          "targetX": -12.53503306599366,
+          "targetY": -32.210687819690264,
+          "targetZ": -30.44712648725062
         },
         {
           "name": "Loading Preview Camera 17",
@@ -394,6 +460,8 @@
       "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
       "loadingPreviewKeyAzimuth": 52,
       "loadingPreviewKeyElevation": 0,
+      "loadingPreviewKeyLightType": "Directional",
+      "loadingPreviewKeyDistance": 3,
       "loadingPreviewKeyTargetHeight": 106,
       "loadingPreviewKeyIntensity": 3.6,
       "loadingPreviewKeyColor": "#ffffff",
@@ -417,14 +485,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -80.7870264609731,
-      "loadingPreviewRotationY": 176.2029992378066,
+      "loadingPreviewRotationX": -86.01368143278576,
+      "loadingPreviewRotationY": 163.33502779823712,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -1.7117172627402777,
-      "loadingPreviewOffsetY": 0.1970180950260847,
-      "loadingPreviewOffsetZ": 2.272141478494188,
+      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 923.7988094388626,
+      "loadingPreviewCameraZoom": 841.3548855229704,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -19431,6 +19499,71 @@
           "name": "HD 8k (8,144 tris)",
           "id": "repo:HD-8k",
           "source": "repo"
+        },
+        {
+          "name": "HD IK 100 (110 tris)",
+          "id": "repo:HD_IK_100",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 200 (194 tris)",
+          "id": "repo:HD_IK_200",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 300 (304 tris)",
+          "id": "repo:HD_IK_300",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 400 (402 tris)",
+          "id": "repo:HD_IK_400",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 500 (544 tris)",
+          "id": "repo:HD_IK_500",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 800 (810 tris)",
+          "id": "repo:HD_IK_800",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 1k (1,090 tris)",
+          "id": "repo:HD_IK_1k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 2k (2,062 tris)",
+          "id": "repo:HD_IK_2k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 4k (4,008 tris)",
+          "id": "repo:HD_IK_4k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 6k (6,034 tris)",
+          "id": "repo:HD_IK_6k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 8k (8,018 tris)",
+          "id": "repo:HD_IK_8k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 10k (10,004 tris)",
+          "id": "repo:HD_IK_10k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 12k (12,224 tris)",
+          "id": "repo:HD_IK_12k",
+          "source": "repo"
         }
       ],
       "smallScaleModelsEnabled": false,
@@ -19443,7 +19576,7 @@
       "alternateRowOffset": -7,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": true,
+      "hideHands": false,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
       "fieldOffsetZ": 0,
@@ -19499,6 +19632,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewModelId": "",
       "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 7000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
@@ -19655,13 +19789,13 @@
         },
         {
           "name": "LOADING HANDS - MOBILE",
-          "cameraX": -21.168243388530225,
-          "cameraY": 1076.3522375267153,
-          "cameraZ": -104.15510518308226,
+          "cameraX": 4.238297226470484,
+          "cameraY": 807.1086899015213,
+          "cameraZ": -86.4799826160318,
           "cameraFov": 15,
-          "targetX": -11.353322020344859,
-          "targetY": -32.07643487687048,
-          "targetZ": -28.637437936977694
+          "targetX": -12.53503306599366,
+          "targetY": -32.210687819690264,
+          "targetZ": -30.44712648725062
         },
         {
           "name": "Loading Preview Camera 17",
@@ -19746,6 +19880,8 @@
       "loadingPreviewLightingSelector": "LOADING HANDS",
       "loadingPreviewKeyAzimuth": 52,
       "loadingPreviewKeyElevation": 0,
+      "loadingPreviewKeyLightType": "Directional",
+      "loadingPreviewKeyDistance": 3,
       "loadingPreviewKeyTargetHeight": 106,
       "loadingPreviewKeyIntensity": 3.6,
       "loadingPreviewKeyColor": "#ffffff",
@@ -19769,14 +19905,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -80.7870264609731,
-      "loadingPreviewRotationY": 176.2029992378066,
+      "loadingPreviewRotationX": -86.01368143278576,
+      "loadingPreviewRotationY": 163.33502779823712,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -1.7117172627402777,
-      "loadingPreviewOffsetY": 0.1970180950260847,
-      "loadingPreviewOffsetZ": 2.272141478494188,
+      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 923.7988094388626,
+      "loadingPreviewCameraZoom": 841.3548855229704,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -34758,8 +34894,8 @@
         }
       ],
       "cameraX": -3.4222222222222225,
-      "cameraY": 1.0096145374808671e-13,
-      "cameraZ": 349.9876565762178,
+      "cameraY": 1.6525541072900873e-13,
+      "cameraZ": 349.98765636647585,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -38783,6 +38919,71 @@
           "name": "HD 8k (8,144 tris)",
           "id": "repo:HD-8k",
           "source": "repo"
+        },
+        {
+          "name": "HD IK 100 (110 tris)",
+          "id": "repo:HD_IK_100",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 200 (194 tris)",
+          "id": "repo:HD_IK_200",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 300 (304 tris)",
+          "id": "repo:HD_IK_300",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 400 (402 tris)",
+          "id": "repo:HD_IK_400",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 500 (544 tris)",
+          "id": "repo:HD_IK_500",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 800 (810 tris)",
+          "id": "repo:HD_IK_800",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 1k (1,090 tris)",
+          "id": "repo:HD_IK_1k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 2k (2,062 tris)",
+          "id": "repo:HD_IK_2k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 4k (4,008 tris)",
+          "id": "repo:HD_IK_4k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 6k (6,034 tris)",
+          "id": "repo:HD_IK_6k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 8k (8,018 tris)",
+          "id": "repo:HD_IK_8k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 10k (10,004 tris)",
+          "id": "repo:HD_IK_10k",
+          "source": "repo"
+        },
+        {
+          "name": "HD IK 12k (12,224 tris)",
+          "id": "repo:HD_IK_12k",
+          "source": "repo"
         }
       ],
       "smallScaleModelsEnabled": false,
@@ -38851,6 +39052,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewModelId": "",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
@@ -39007,13 +39209,13 @@
         },
         {
           "name": "LOADING HANDS - MOBILE",
-          "cameraX": -21.168243388530225,
-          "cameraY": 1076.3522375267153,
-          "cameraZ": -104.15510518308226,
+          "cameraX": 4.238297226470484,
+          "cameraY": 807.1086899015213,
+          "cameraZ": -86.4799826160318,
           "cameraFov": 15,
-          "targetX": -11.353322020344859,
-          "targetY": -32.07643487687048,
-          "targetZ": -28.637437936977694
+          "targetX": -12.53503306599366,
+          "targetY": -32.210687819690264,
+          "targetZ": -30.44712648725062
         },
         {
           "name": "Loading Preview Camera 17",
@@ -39098,6 +39300,8 @@
       "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
       "loadingPreviewKeyAzimuth": 52,
       "loadingPreviewKeyElevation": 0,
+      "loadingPreviewKeyLightType": "Directional",
+      "loadingPreviewKeyDistance": 3,
       "loadingPreviewKeyTargetHeight": 106,
       "loadingPreviewKeyIntensity": 3.6,
       "loadingPreviewKeyColor": "#ffffff",
@@ -39121,14 +39325,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -80.7870264609731,
-      "loadingPreviewRotationY": 176.2029992378066,
+      "loadingPreviewRotationX": -86.01368143278576,
+      "loadingPreviewRotationY": 163.33502779823712,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -1.7117172627402777,
-      "loadingPreviewOffsetY": 0.1970180950260847,
-      "loadingPreviewOffsetZ": 2.272141478494188,
+      "loadingPreviewOffsetX": 0,
+      "loadingPreviewOffsetY": 0,
+      "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 923.7988094388626,
+      "loadingPreviewCameraZoom": 841.3548855229704,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -58707,6 +58911,10 @@
               },
               {
                 "type": "row",
+                "key": "loadingPreviewModelId"
+              },
+              {
+                "type": "row",
                 "key": "loadingPreviewCameraEditMode"
               },
               {
@@ -58799,7 +59007,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -58894,6 +59102,14 @@
                     {
                       "type": "row",
                       "key": "loadingPreviewAmbientGroundColor"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewKeyLightType"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewKeyDistance"
                     }
                   ],
                   "settings": [
@@ -58905,7 +59121,9 @@
                     "loadingPreviewKeyColor",
                     "loadingPreviewAmbientIntensity",
                     "loadingPreviewAmbientSkyColor",
-                    "loadingPreviewAmbientGroundColor"
+                    "loadingPreviewAmbientGroundColor",
+                    "loadingPreviewKeyLightType",
+                    "loadingPreviewKeyDistance"
                   ]
                 }
               },
@@ -59033,6 +59251,7 @@
             "settings": [
               "loadingPreviewShowLive",
               "loadingPreviewEnabled",
+              "loadingPreviewModelId",
               "loadingPreviewCameraEditMode",
               "loadingMinTimeMs",
               "loadingPreviewScalePct",
@@ -65561,8 +65780,8 @@
     "mobile": {
       "left": 20,
       "top": 193.33929443359375,
-      "width": 381.2797546386719,
-      "height": 460.1845397949219
+      "width": 391.56549072265625,
+      "height": 542.9642944335938
     }
   }
 }
