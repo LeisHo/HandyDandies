@@ -11,7 +11,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=89'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=90'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -4035,7 +4035,10 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // configured. disableDeletedStaticClickTrigger() (below) closes this
   // specific gap; both cleanup functions run for every deletion and are
   // each a no-op for the case the other one handles.
-  onGroupDeleted: (target) => { cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target); cleanupDeletedVelocityGroup(target) },
+  // RULE: any group the host builds at runtime and keeps its own bookkeeping for (a list in cfg, registered keys / trigger state, saved values) must be torn down here when the delete tool removes it - the tool only
+  // removes the DOM node, so without a cleanup the group comes back on the next load (a Multi Trigger did, 2026-10-16). If Undo must rebuild it, also list it in deleteUsesSnapshot below and reconcile it in undoApplyExtra.
+  onGroupDeleted: (target) => { cleanupDeletedMultiTriggerGroups(target); cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target); cleanupDeletedVelocityGroup(target) },
+  deleteUsesSnapshot: (target) => !!(target && target.querySelector && (target.dataset.multiTriggerPrefix || target.querySelector('.dp-group[data-multi-trigger-prefix]')) && !target.dataset.customFunctionFamily), // Multi Trigger groups: Undo rebuilds them through undoApplyExtra
   // Real bug found live 2026-09-24: Custom Click Functions' own tab-
   // dependent visibility (Touch Point Count hidden on Desktop, a
   // function's own group shown/hidden by family, the Zoom/Scroll
@@ -16394,6 +16397,11 @@ async function reconcileCustomFunctions(extra) {
       }
     } finally { endDynamicBatch() }
   }
+  // functions that already existed: their trigger set may differ too (a Multi Trigger was deleted or added since the snapshot)
+  for (const e of target) {
+    if (missing.some((m) => m.id === e.id)) continue
+    await reconcileMultiTriggers(e.id, extra.multiTriggers && extra.multiTriggers[e.id] !== undefined ? extra.multiTriggers[e.id] : '[]')
+  }
   if (gone.length || missing.length) {
     persistCustomClickFunctionIds()
     refreshAllCustomFunctionGroupVisibility()
@@ -18226,6 +18234,70 @@ async function setupMultiTriggerGroupForFunction(id, kind, yielder) {
   }
   updateMultiTriggerGroupVisibility(id)
 }
+// ---- Deleting a Multi Trigger (2026-10-16, direct report: "i cant delete multi triggers 1-4 in 20 FT - 1 - CH") ----
+// The delete tool only removed the trigger's panel group. The function's own list (`${id}MultiTriggers`, what the next load rebuilds the groups from and what the click cycle walks), the trigger's registered controls
+// and saved values, and its runtime state all stayed, so the trigger came back on the next load and kept firing. These tear all of that down together, for a delete and for Undo / Redo (reconcileMultiTriggers()).
+const MT_PREFIX_RE = /^(custom\d+)Trig\d+$/
+function unregisterMultiTriggerRuntime(prefix) {
+  ;[CLICK_POSE_KEYS, CLICK_HOLD_KEYS].forEach((keys) => { const i = keys.indexOf(prefix); if (i !== -1) keys.splice(i, 1) })
+  delete clickPoseTriggers[prefix]
+  delete clickHoldPoseTriggers[prefix]
+  hands.forEach((hand) => { if (hand._cp) delete hand._cp[prefix]; if (hand._chp) delete hand._chp[prefix] })
+  forgetControlsWithPrefix(prefix) // its registered controls and every device's saved values (the uppercase-letter rule keeps Trig1 from matching Trig10)
+}
+function cleanupDeletedMultiTriggerGroups(target) {
+  if (!target || !target.classList || !target.classList.contains('dp-group')) return
+  const groups = (target.dataset.multiTriggerPrefix ? [target] : []).concat(Array.from(target.querySelectorAll('.dp-group[data-multi-trigger-prefix]')))
+  if (!groups.length) return
+  const removedByFn = {}
+  groups.forEach((g) => {
+    const prefix = g.dataset.multiTriggerPrefix
+    const m = MT_PREFIX_RE.exec(prefix || '')
+    if (!m) return
+    ;(removedByFn[m[1]] = removedByFn[m[1]] || new Set()).add(prefix)
+  })
+  Object.keys(removedByFn).forEach((id) => {
+    const gone = removedByFn[id]
+    let list = []
+    try { list = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { list = [] }
+    if (!Array.isArray(list)) list = []
+    cfg[`${id}MultiTriggers`] = JSON.stringify(list.filter((t) => t && t.prefix && !gone.has(t.prefix)))
+    try { syncValue(`${id}MultiTriggers`, cfg[`${id}MultiTriggers`]) } catch (e) { /* no panel */ }
+    gone.forEach(unregisterMultiTriggerRuntime)
+    updateMultiTriggerGroupVisibility(id)
+  })
+  refreshCustomFunctionConflictWarnings()
+}
+function multiTriggerBodiesFor(id) {
+  const functionEnabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+  const functionBody = functionEnabledRow ? functionEnabledRow.parentElement : null
+  const mtGroup = functionBody ? functionBody.querySelector(':scope > .dp-group[data-key="Multi Trigger"]') : null
+  const mtBody = mtGroup ? mtGroup.querySelector(':scope > .dp-group-body') : null
+  return { mtBody, addBtnRow: mtBody ? mtBody.querySelector(':scope > .dp-multi-trigger-add-row') : null }
+}
+// Undo / Redo: puts a function's trigger set back to `wantJson` - tears down the triggers that should not exist, builds the ones that should (their values are applied right after, from the snapshot), and restores the order.
+async function reconcileMultiTriggers(id, wantJson) {
+  const entry = customClickFunctionIds.find((e) => e.id === id)
+  if (!entry) return
+  const parse = (j) => { try { const a = JSON.parse(j || '[]'); return Array.isArray(a) ? a.filter((t) => t && t.prefix) : [] } catch (e) { return [] } }
+  const cur = parse(cfg[`${id}MultiTriggers`]), want = parse(wantJson)
+  const wantSet = new Set(want.map((t) => t.prefix)), curSet = new Set(cur.map((t) => t.prefix))
+  if (cur.length === want.length && cur.every((t, i) => t.prefix === want[i].prefix)) return
+  const { mtBody, addBtnRow } = multiTriggerBodiesFor(id)
+  cur.forEach((t) => {
+    if (wantSet.has(t.prefix)) return
+    if (mtBody) { const g = mtBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${t.prefix}"]`); if (g) g.remove() }
+    unregisterMultiTriggerRuntime(t.prefix)
+  })
+  cfg[`${id}MultiTriggers`] = JSON.stringify(want)
+  try { syncValue(`${id}MultiTriggers`, cfg[`${id}MultiTriggers`]) } catch (e) { /* no panel */ }
+  for (const t of want) {
+    if (curSet.has(t.prefix)) continue
+    await registerMultiTriggerTrigger(t.prefix, t.title || t.prefix, mtBody, addBtnRow, entry.kind, undefined)
+  }
+  if (mtBody && addBtnRow) want.forEach((t) => { const g = mtBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${t.prefix}"]`); if (g) mtBody.insertBefore(g, addBtnRow) })
+  updateMultiTriggerGroupVisibility(id)
+}
 // "+ Add Trigger" button's own click handler. First trigger added = the
 // tween for the 2nd click on this function; each subsequent one adds the
 // next click after that -- direct spec wording ("if there are none, when
@@ -18235,7 +18307,10 @@ function addMultiTriggerTrigger(id, kind) {
   let triggers = []
   try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
   if (!Array.isArray(triggers)) triggers = []
-  const n = triggers.length + 1
+  // The next number is one past the HIGHEST one in use, not the count: after deleting a middle trigger the count + 1 is a number that is still taken (Trigger 1, 3, 4 -> 4 again), which gave two groups the same prefix.
+  let n = 1
+  triggers.forEach((t) => { const m = t && /Trig(\d+)$/.exec(t.prefix || ''); if (m) n = Math.max(n, Number(m[1]) + 1) })
+  while (triggers.some((t) => t && t.prefix === `${id}Trig${n}`)) n++
   const prefix = `${id}Trig${n}`
   const title = `Trigger ${n}`
   triggers.push({ prefix, title })

@@ -4424,6 +4424,10 @@ export function initDevPanel(groups, opts = {}) {
     // exact original spot.
     const parent = target.parentElement
     const nextSibling = target.nextElementSibling
+    // A group the HOST builds and tears down itself (opts.deleteUsesSnapshot, e.g. a Multi Trigger): Undo has to go through the snapshot + the host's undoApplyExtra (which rebuilds it and its values), because
+    // re-inserting the old DOM node would bring back a group the host has already unregistered. The snapshot is taken now, BEFORE the host's cleanup forgets the group's values.
+    const usesSnapshot = !!(opts.deleteUsesSnapshot && opts.deleteUsesSnapshot(target))
+    if (usesSnapshot) { pushDevPanelUndoSnapshot(); devRedoStack = [] }
     target.remove()
     // `opts.onGroupDeleted` -- a host hook, same pattern as `opts.onRestore`
     // (main.js's own DEV_MODE-agnostic restore callback), letting the host
@@ -4436,7 +4440,7 @@ export function initDevPanel(groups, opts = {}) {
     // external state on an undo is a materially bigger feature this hook
     // doesn't attempt.
     if (opts.onGroupDeleted) opts.onGroupDeleted(target)
-    pushDevDeleteUndoEntry(target, parent, nextSibling)
+    if (!usesSnapshot) pushDevDeleteUndoEntry(target, parent, nextSibling)
     disarmDevDeleteGroup()
   }, true)
   document.addEventListener('click', (e) => {
