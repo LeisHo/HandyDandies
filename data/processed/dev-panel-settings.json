@@ -23,7 +23,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatch0w",
+      "handModelId": "local:mvatha3i",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -148,6 +148,11 @@
         {
           "name": "HD_IK_1k",
           "id": "local:mvatch0w",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-700OL",
+          "id": "local:mvatha3i",
           "source": "local"
         }
       ],
@@ -15493,7 +15498,7 @@
         }
       ],
       "cameraX": 1.5625001668540408,
-      "cameraY": 3.871893225990545e-14,
+      "cameraY": 5.690493722724363e-14,
       "cameraZ": 197.9876688948102,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -19583,7 +19588,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatch0w",
+      "handModelId": "local:mvatha3i",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -19708,6 +19713,11 @@
         {
           "name": "HD_IK_1k",
           "id": "local:mvatch0w",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-700OL",
+          "id": "local:mvatha3i",
           "source": "local"
         }
       ],
@@ -39143,7 +39153,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatch0w",
+      "handModelId": "local:mvatha3i",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -39268,6 +39278,11 @@
         {
           "name": "HD_IK_1k",
           "id": "local:mvatch0w",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-700OL",
+          "id": "local:mvatha3i",
           "source": "local"
         }
       ],
