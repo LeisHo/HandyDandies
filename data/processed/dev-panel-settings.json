@@ -23,7 +23,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatha3i",
+      "handModelId": "local:mvatmahp",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -158,6 +158,16 @@
         {
           "name": "HD-1K-1000OL",
           "id": "local:mvatih5y",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-400OL",
+          "id": "local:mvatm73f",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-500OL",
+          "id": "local:mvatmahp",
           "source": "local"
         }
       ],
@@ -15503,7 +15513,7 @@
         }
       ],
       "cameraX": 1.5625001668540408,
-      "cameraY": 1.1146295212925818e-13,
+      "cameraY": 1.2964895709659637e-13,
       "cameraZ": 197.9876688948102,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -19593,7 +19603,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatha3i",
+      "handModelId": "local:mvatmahp",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -19728,6 +19738,16 @@
         {
           "name": "HD-1K-1000OL",
           "id": "local:mvatih5y",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-400OL",
+          "id": "local:mvatm73f",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-500OL",
+          "id": "local:mvatmahp",
           "source": "local"
         }
       ],
@@ -39163,7 +39183,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatha3i",
+      "handModelId": "local:mvatmahp",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -39298,6 +39318,16 @@
         {
           "name": "HD-1K-1000OL",
           "id": "local:mvatih5y",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-400OL",
+          "id": "local:mvatm73f",
+          "source": "local"
+        },
+        {
+          "name": "HD-1K-500OL",
+          "id": "local:mvatmahp",
           "source": "local"
         }
       ],
@@ -66997,8 +67027,8 @@
     "desktop": {
       "left": 85.5999984741211,
       "top": 100.7874984741211,
-      "width": 630.375,
-      "height": 586.7875366210938
+      "width": 633.5750122070312,
+      "height": 588.3875122070312
     },
     "mobile": {
       "left": 20,
