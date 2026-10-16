@@ -10468,22 +10468,24 @@ function updateResponsiveVelocity(nowMs) {
     for (let si = 0; si < sets.length; si++) {
       const c = sets[si]
       let st = rv.s[c.S]
-      if (!st) st = rv.s[c.S] = { p: 0, wasTrig: false, onAt: 0, delay: 0, dur: 0, offAt: 0, rdelay: 0, rdur: 0, nd: 0, disp: 0, arm: 0, splay: 0, crop: 0, curl: 0, ceil: 100, wx: 0, wy: 0, wz: 0 }
+      if (!st) st = rv.s[c.S] = { p: 0, wasTrig: false, onAt: 0, delay: 0, dur: 0, offAt: 0, rdelay: 0, rdur: 0, phase: 0, armed: true, nd: 0, disp: 0, arm: 0, splay: 0, crop: 0, curl: 0, ceil: 100, wx: 0, wy: 0, wz: 0 }
       const angleOk = (c.trig.min === 0 && c.trig.max === 0) || (angAbs >= c.trig.min && angAbs <= c.trig.max)
       const trig = trigActive && c.on && dist <= D && angleOk
       // x of every distance curve for this set (see Distance Measured From). Path Line is fixed when the cursor passes the hand, so the speeds, start times and scalers stay put as the cursor moves on.
+      const startOnset = trig && st.armed !== false // a (new) trigger: the hand is triggered after having stopped being triggered since its last one
       let ndU
       if (distMode === 1) ndU = nd
       else if (distMode === 2) ndU = ndLive
       else {
-        if (trig && !st.wasTrig) {
+        if (startOnset) {
           if (ndPath < 0) { const dpx = rvPathDistPx((_rvHP.x + 1) * 0.5 * W, (1 - _rvHP.y) * 0.5 * H, px, py); ndPath = dr.max > dr.min ? THREE.MathUtils.clamp((dpx * unitsPerPx - dr.min) / (dr.max - dr.min), 0, 1) : 0 }
           st.ndPath = ndPath
         }
         ndU = st.ndPath !== undefined ? st.ndPath : nd
       }
-      if (trig) {
-        // Target amounts at this moment (kept while the effect is retracting, when the cursor has already stopped).
+      if (startOnset) {
+        // Everything about the effect - direction, amounts, distance x, speeds - is fixed at the moment the hand is triggered (direct request: "its speed and etc is determined fully by the moment it gets triggered"). The cursor moving on, or staying inside the
+        // trigger distance, changes nothing; only a NEW trigger (the cursor coming back around the hand) captures new values and pushes it further, from where it is.
         let theta = c.angle
         if (c.angleCurve) {
           const span = c.trig.max - c.trig.min
@@ -10502,23 +10504,27 @@ function updateResponsiveVelocity(nowMs) {
         st.ceil = c.curlMax
         st.nd = ndU
       }
-      // Timing: start delay -> onset (duration from the Speed curve) while triggered; start delay -> retransition when not.
-      if (trig) {
-        if (!st.wasTrig) { st.onAt = nowMs; st.delay = startOn ? rvLerp(startR, rvCurveY('rvStartTimeCurve', ndU)) : 0; st.dur = speedOn ? rvLerp(speedR, rvCurveY('rvSpeedCurve', ndU)) : 0 }
+      // Sequence (2026-10-15, direct request: hands already triggered finish their sequence even when the cursor has moved away). A hand that is triggered starts an onset: its start delay, then progress 0 -> 1 over
+      // the Displacement Speed (phase 1), which nothing the cursor does afterwards can interrupt. When the progress reaches 1 it turns into the retransition by itself (phase 2: its start delay, then 1 -> 0 over the
+      // Retransition Speed). The live test (distance / angle / velocity) only decides WHETHER a hand is triggered; a hand has to stop being triggered once before it can be triggered again, and a new trigger starts a new onset from the current progress.
+      if (startOnset) { st.phase = 1; st.armed = false; st.onAt = nowMs; st.delay = startOn ? rvLerp(startR, rvCurveY('rvStartTimeCurve', ndU)) : 0; st.dur = speedOn ? rvLerp(speedR, rvCurveY('rvSpeedCurve', ndU)) : 0 }
+      if (!trig) st.armed = true
+      if (st.phase === 1) {
         if (nowMs - st.onAt >= st.delay) st.p = st.dur > 0 ? Math.min(1, st.p + dt / st.dur) : 1
-      } else {
-        if (st.wasTrig) {
-          st.offAt = nowMs
+        if (st.p >= 1) {
+          st.p = 1; st.phase = 2; st.offAt = nowMs
           st.rdelay = retOn && retStartCurveOn ? rvLerp(retStartR, rvCurveY('rvRetransitionStartTimeCurve', st.nd)) : 0
           st.rdur = retSpeedCurveOn ? rvLerp(retSpeedR, rvCurveY('rvRetransitionSpeedCurve', st.nd)) : retFlatMs
-          if (!retOn) st.p = 0
+          if (!retOn) { st.p = 0; st.phase = 0 }
         }
-        if (st.p > 0 && nowMs - st.offAt >= st.rdelay) st.p = st.rdur > 0 ? Math.max(0, st.p - dt / st.rdur) : 0
+      } else if (st.phase === 2) {
+        if (nowMs - st.offAt >= st.rdelay) st.p = st.rdur > 0 ? Math.max(0, st.p - dt / st.rdur) : 0
+        if (st.p <= 0) { st.p = 0; st.phase = 0 }
       }
       st.wasTrig = trig
-      if (st.p <= 0) continue
+      if (!st.phase && st.p <= 0) continue
       live = true
-      const w = trig ? (easeOn ? rvProfile('rvEasingCurve', st.p) : st.p) : (retEaseOn ? 1 - rvProfile('rvRetransitionEasingCurve', 1 - st.p) : st.p)
+      const w = st.phase === 1 ? (easeOn ? rvProfile('rvEasingCurve', st.p) : st.p) : (retEaseOn ? 1 - rvProfile('rvRetransitionEasingCurve', 1 - st.p) : st.p)
       if (st.disp) dispSum.set(dispSum.x + st.wx * st.disp * w, dispSum.y + st.wy * st.disp * w, dispSum.z + st.wz * st.disp * w)
       if (st.arm) tiltSum.set(tiltSum.x + st.wx * st.arm * w, tiltSum.y + st.wy * st.arm * w, tiltSum.z + st.wz * st.arm * w)
       splay += st.splay * w; crop += st.crop * w
