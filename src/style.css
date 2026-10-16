@@ -85,7 +85,7 @@ html, body {
    the checkbox"). The dev panel must always win that comparison, so it
    was the one moved, not this canvas's own already-correct-for-its-own-
    purpose value. */
-#loadingPreviewCanvas { display: none; z-index: 100000; pointer-events: none; } /* position / size: UI Layout Engine (lib/ui-engine, applyLoadingPreviewLayout() in main.js) */
+#loadingPreviewCanvas { display: none; position: fixed; z-index: 100000; pointer-events: none; } /* fixed, not the engine's absolute: an oversized canvas must never widen the page (on a phone it widened the layout viewport and the dev panel disappeared, 2026-10-15) */ /* position / size: UI Layout Engine (lib/ui-engine, applyLoadingPreviewLayout() in main.js) */
 /* Global Pause button (direct request, always visible, not DEV_MODE-
    gated) -- position/size/colors below are just SANE STARTING DEFAULTS;
    every one of these is overridden live by main.js's own

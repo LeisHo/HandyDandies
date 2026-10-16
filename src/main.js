@@ -834,7 +834,7 @@ function updateLoadingPreviewText() {
     loadingPreviewTextEl = document.createElement('div')
     loadingPreviewTextEl.id = 'loadingPreviewText'
     // Above the loading-preview canvas (z-index 100000) and the loading blocker, below the dev panel (200000); never takes a click.
-    loadingPreviewTextEl.style.cssText = 'z-index:100002;pointer-events:none;white-space:pre-wrap;text-align:center;line-height:1.2;user-select:none;' // position / size / offsets come from the UI Layout Engine (applyLoadingPreviewTextLayout())
+    loadingPreviewTextEl.style.cssText = 'position:fixed;z-index:100002;pointer-events:none;white-space:pre-wrap;text-align:center;line-height:1.2;user-select:none;' // position / size / offsets come from the UI Layout Engine (applyLoadingPreviewTextLayout())
     document.body.appendChild(loadingPreviewTextEl)
     const cv0 = document.getElementById('loadingPreviewCanvas')
     if (cv0 && typeof MutationObserver !== 'undefined') new MutationObserver(() => updateLoadingPreviewText()).observe(cv0, { attributes: true, attributeFilter: ['style'] })
@@ -938,8 +938,26 @@ function lpObserveCanvas() {
   if (cv) { lpCanvasObserver = new ResizeObserver(() => { if (loadingPreviewRenderer && cv.offsetWidth > 0) resizeLoadingPreview() }); lpCanvasObserver.observe(cv) }
 }
 // The canvas's real rendered box (what the engine's CSS made of its layout), else the legacy size slider.
-function lpCanvasW() { const w = loadingPreviewCanvas ? loadingPreviewCanvas.offsetWidth : 0; return w > 0 ? w : Math.max(20, Math.round(lpPx(cfg.loadingPreviewSize || 160))) }
-function lpCanvasH() { const h = loadingPreviewCanvas ? loadingPreviewCanvas.offsetHeight : 0; return h > 0 ? h : Math.max(20, Math.round(lpPx(cfg.loadingPreviewSize || 160))) }
+// A canvas has no natural size: with the Inspector's size mode 'content' its CSS box IS its drawing buffer, so measuring the box to size the buffer made them chase each other (about x1.25 a cycle, to 26 million px - the animation
+// vanished, 2026-10-15). In content mode the older size value is used and applied as the box size; every size is also capped.
+const LP_MAX_CSS_PX = 4096
+function lpContentMode(axis) { try { const el = getEngineElement('loadingPreviewCanvas'); const m = el && el.layout && el.layout.size && el.layout.size[axis] && el.layout.size[axis].mode; return m === 'content' } catch (e) { return false } }
+function lpFallbackPx() { return Math.max(20, Math.round(cfg.loadingPreviewSize || 160)) } // unscaled: the animation scale below applies to whatever size the box ends up with
+// Animation Scale With Browser: 1 at the reference browser size, growing / shrinking with the shorter side by the chosen share. Applied as the CSS scale property (it composes with the engine's own centring transform) around the
+// corner / edge the Layout anchors the animation to, so the gap to that side is unchanged.
+function lpAnimFactor() { const b = THREE.MathUtils.clamp((cfg.loadingPreviewAnimScalePct ?? 100) / 100, 0, 1); const vmin = Math.min(window.innerWidth, window.innerHeight); return (1 - b) + b * vmin / lpRef() }
+function lpApplyAnimScale(cv, f) {
+  let h = 'center', v = 'center'
+  const va = cv.getAttribute('data-viewport-anchor')
+  if (va) { if (va !== 'center') va.split('-').forEach((p) => { if (p === 'left' || p === 'right') h = p; else if (p === 'top' || p === 'bottom') v = p }) }
+  else { h = cv.getAttribute('data-anchor-h') || 'center'; v = cv.getAttribute('data-anchor-v') || 'center' }
+  // The engine centres with transform: translate(-50%, -50%), which is applied BEFORE the scale property: the box's top-left then still sits on the centre point, so a centred axis scales about 0% (the centre point itself); the
+  // origin in the middle of the box would slide it off-centre by (1 - scale) x half its size.
+  cv.style.transformOrigin = (h === 'center' ? '0%' : h) + ' ' + (v === 'center' ? '0%' : v)
+  cv.style.scale = String(Math.round(f * 10000) / 10000)
+}
+function lpCanvasW() { const w = (loadingPreviewCanvas && !lpContentMode('width')) ? loadingPreviewCanvas.offsetWidth : 0; return Math.min(w > 0 ? w : lpFallbackPx(), LP_MAX_CSS_PX) }
+function lpCanvasH() { const h = (loadingPreviewCanvas && !lpContentMode('height')) ? loadingPreviewCanvas.offsetHeight : 0; return Math.min(h > 0 ? h : lpFallbackPx(), LP_MAX_CSS_PX) }
 const LP_LAYOUT_GROUP_KEY = 'Loading Preview > Layout'
 const LP_LEGACY_LAYOUT_ROWS = ['loadingPreviewSize', 'loadingPreviewPosX', 'loadingPreviewPosY', 'loadingPreviewTextOffsetX', 'loadingPreviewTextOffsetY', 'loadingPreviewLayout']
 // Builds (or finds again after a saved layout restored it) the Layout subgroup of Loading Preview and mounts the UI engine's Inspector in it: element picker (Animation / Text), Base / Mobile Portrait / Mobile Landscape tabs,
@@ -2588,7 +2606,9 @@ const DEV_GROUPS = [
       // from fixed pixels (0%) to growing / shrinking with the browser's shorter side (100%), so the whole composition keeps its proportions on a phone, a tablet and a big desktop.
       { key: 'loadingPreviewLayout', label: 'Loading Preview Layout (internal, edited in the Layout group)', type: 'text', def: '', onChange: () => lpLoadStoredLayout() },
       { key: 'loadingPreviewScalePct', label: 'Font Scale With Browser (%)', type: 'slider', min: 0, max: 100, step: 1, def: 100, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
-      { key: 'loadingPreviewScaleRefPx', label: 'Font Reference Browser Size (Px, Shorter Side)', type: 'slider', min: 300, max: 3000, step: 10, def: 1080, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
+      // The animation scales the same way (2026-10-15, direct request: "i also want the animation to scale with browser"): the Layout's size is read as the size AT the reference browser size and is scaled by the browser's shorter side / reference, kept pinned to the edge / corner it is anchored to.
+      { key: 'loadingPreviewAnimScalePct', label: 'Animation Scale With Browser (%)', type: 'slider', min: 0, max: 100, step: 1, def: 100, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
+      { key: 'loadingPreviewScaleRefPx', label: 'Reference Browser Size (Px, Shorter Side) (Font + Animation)', type: 'slider', min: 300, max: 3000, step: 10, def: 1080, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
       { key: 'loadingPreviewPosX', label: 'Loading Preview Position X (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
       { key: 'loadingPreviewPosY', label: 'Loading Preview Position Y (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
       // CORRECTED 2026-09-19, direct request+follow-up ("Loading Preview
@@ -8989,9 +9009,15 @@ function resizeLoadingPreview() {
   applyLoadingPreviewLayout() // the canvas's CSS size / position come from the UI Layout Engine (edited in its Inspector); only the WebGL buffer size is set here
   lpObserveCanvas()
   const w = lpCanvasW(), h = lpCanvasH()
+  // Content mode (or a runaway size): the box follows the buffer's CSS size instead of the other way round.
+  loadingPreviewCanvas.style.width = lpContentMode('width') ? w + 'px' : ''
+  loadingPreviewCanvas.style.height = lpContentMode('height') ? h + 'px' : ''
+  const af = lpAnimFactor()
+  lpApplyAnimScale(loadingPreviewCanvas, af)
   loadingPreviewCamera.aspect = w / h
   loadingPreviewCamera.updateProjectionMatrix()
-  loadingPreviewRenderer.setSize(w, h, false)
+  // a bigger-than-reference display gets a bigger buffer, so it stays sharp
+  loadingPreviewRenderer.setSize(Math.min(Math.ceil(w * Math.max(1, af)), LP_MAX_CSS_PX), Math.min(Math.ceil(h * Math.max(1, af)), LP_MAX_CSS_PX), false)
   syncLoadingPreviewBackground() // the blocker's spread follows the size
 }
 // Loading Preview Offset X/Y (Px) -- same "called once at build time and
