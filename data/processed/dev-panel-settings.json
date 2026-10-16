@@ -45787,7 +45787,7 @@
     },
     {
       "key": "Saved Dev Settings",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [],
       "settings": []
@@ -47738,7 +47738,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -47787,7 +47787,7 @@
           "type": "group",
           "group": {
             "key": "New Group (16)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
