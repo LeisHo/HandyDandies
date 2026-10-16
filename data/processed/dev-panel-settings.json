@@ -15927,10 +15927,10 @@
       "startupFnMode": "Sequence",
       "startupFnOffsetLoopRetransition": false,
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "Closed to Open Flower ",
+      "startupFnTweenSelector": "FIST PALM",
       "startupFnReverseSequence": false,
-      "startupFnGlideToFirstPose": false,
-      "startupFnFirstGlideTimeScale": 1,
+      "startupFnGlideToFirstPose": true,
+      "startupFnFirstGlideTimeScale": 3,
       "startupFnTweenSpeedMs": 3800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1000}",
@@ -55067,10 +55067,10 @@
       "startupFnMode": "Sequence",
       "startupFnOffsetLoopRetransition": false,
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "Closed to Open Flower ",
+      "startupFnTweenSelector": "FIST PALM",
       "startupFnReverseSequence": false,
-      "startupFnGlideToFirstPose": false,
-      "startupFnFirstGlideTimeScale": 1,
+      "startupFnGlideToFirstPose": true,
+      "startupFnFirstGlideTimeScale": 3,
       "startupFnTweenSpeedMs": 3800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1000}",
@@ -59718,7 +59718,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -60060,7 +60060,7 @@
           "type": "group",
           "group": {
             "key": "Outline",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -61785,7 +61785,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -61796,7 +61796,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
