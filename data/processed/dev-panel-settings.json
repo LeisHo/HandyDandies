@@ -152,7 +152,7 @@
       "fieldCols": 55,
       "rowSpacing": 4,
       "columnSpacing": 7.5,
-      "handScale": 0.6,
+      "handScale": 0.7,
       "alternateRowOffset": 4,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
@@ -189,12 +189,12 @@
       "fieldBoundsZ": "{\"min\":-400,\"max\":200}",
       "trackingPoint": "armEnd",
       "trackingEnabled": true,
-      "trackingDamping": 0.33,
+      "trackingDamping": 0.5,
       "targetDepthFactor": 279.6,
       "showTargetMarker": false,
       "armRotationEnabled": true,
       "armRotationVisibleOnly": true,
-      "armRotationUseDepth": true,
+      "armRotationUseDepth": false,
       "armRotationTargetDepth": 55,
       "armRotationDefault": 100,
       "armRotationCurveEnabled": true,
@@ -202,7 +202,7 @@
       "armRotationRangePct": "{\"min\":0,\"max\":86}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
-      "armRotationDamping": 0.18,
+      "armRotationDamping": 0.41,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
       "palmRotationUseDepth": false,
@@ -39312,7 +39312,7 @@
       "armRotationRangePct": "{\"min\":0,\"max\":86}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
-      "armRotationDamping": 0.18,
+      "armRotationDamping": 0.41,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
       "palmRotationUseDepth": true,
@@ -60564,7 +60564,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -60654,7 +60654,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (3)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
