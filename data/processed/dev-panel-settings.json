@@ -12,8 +12,8 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "palmToArm",
-      "renderOrderModeExcept": "none",
+      "renderOrderMode": "negCamArmBase",
+      "renderOrderModeExcept": "palmCenter",
       "renderOrderFallback": "palmToArm",
       "renderOrderFallbackExcept": "armEnd",
       "renderOrderFallback2": "none",
@@ -21,7 +21,7 @@
       "renderOrderModeTerms": "[]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"negArmBaseToPalm\",\"q\":\"none\",\"t\":[]},{\"m\":\"none\",\"q\":\"farthest\",\"t\":[]},{\"m\":\"none\",\"q\":\"none\",\"t\":[]}]}",
+      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
       "handModelId": "repo:HD_IK_1k",
       "handModels": [
@@ -15488,7 +15488,7 @@
         }
       ],
       "cameraX": 1.5625001668540408,
-      "cameraY": 2.053292729256726e-14,
+      "cameraY": 3.871893225990545e-14,
       "cameraZ": 197.9876688948102,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -19576,7 +19576,7 @@
       "renderOrderModeTerms": "[]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"negArmBaseToPalm\",\"q\":\"none\",\"t\":[]},{\"m\":\"none\",\"q\":\"farthest\",\"t\":[]},{\"m\":\"none\",\"q\":\"none\",\"t\":[]}]}",
+      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
       "handModelId": "repo:HD_IK_1k",
       "handModels": [
@@ -39122,8 +39122,8 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "palmToArm",
-      "renderOrderModeExcept": "none",
+      "renderOrderMode": "negCamArmBase",
+      "renderOrderModeExcept": "palmCenter",
       "renderOrderFallback": "palmToArm",
       "renderOrderFallbackExcept": "armEnd",
       "renderOrderFallback2": "none",
@@ -39131,7 +39131,7 @@
       "renderOrderModeTerms": "[]",
       "renderOrderFallbackTerms": "[]",
       "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[{\"m\":\"negArmBaseToPalm\",\"q\":\"none\",\"t\":[]},{\"m\":\"none\",\"q\":\"farthest\",\"t\":[]},{\"m\":\"none\",\"q\":\"none\",\"t\":[]}]}",
+      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
       "handModelId": "repo:HD_IK_1k",
       "handModels": [
@@ -66952,8 +66952,8 @@
     "desktop": {
       "left": 85.5999984741211,
       "top": 100.7874984741211,
-      "width": 614.375,
-      "height": 578.7875366210938
+      "width": 617.5750122070312,
+      "height": 580.3875122070312
     },
     "mobile": {
       "left": 20,
