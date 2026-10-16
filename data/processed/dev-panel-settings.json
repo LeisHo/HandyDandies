@@ -303,13 +303,13 @@
         },
         {
           "name": "LOADING HANDS - MOBILE",
-          "cameraX": -70.61503488280705,
-          "cameraY": 772.5576942978488,
-          "cameraZ": -141.14473947325973,
+          "cameraX": -21.168243388530225,
+          "cameraY": 1076.3522375267153,
+          "cameraZ": -104.15510518308226,
           "cameraFov": 15,
-          "targetX": 6.009777061393379,
-          "targetY": -33.67352997650995,
-          "targetZ": -58.487906176909284
+          "targetX": -11.353322020344859,
+          "targetY": -32.07643487687048,
+          "targetZ": -28.637437936977694
         },
         {
           "name": "Loading Preview Camera 17",
@@ -417,14 +417,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -86.06976150038888,
-      "loadingPreviewRotationY": -172.5948601400465,
+      "loadingPreviewRotationX": -80.7870264609731,
+      "loadingPreviewRotationY": 176.2029992378066,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -17.363099081738238,
-      "loadingPreviewOffsetY": 1.5970950996394677,
-      "loadingPreviewOffsetZ": 29.85046823993159,
+      "loadingPreviewOffsetX": -1.7117172627402777,
+      "loadingPreviewOffsetY": 0.1970180950260847,
+      "loadingPreviewOffsetZ": 2.272141478494188,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1111.041571028795,
+      "loadingPreviewCameraZoom": 923.7988094388626,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -19500,7 +19500,7 @@
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
       "loadingPreviewShowLive": true,
-      "loadingMinTimeMs": 5000,
+      "loadingMinTimeMs": 7000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
         {
@@ -19655,13 +19655,13 @@
         },
         {
           "name": "LOADING HANDS - MOBILE",
-          "cameraX": -70.61503488280705,
-          "cameraY": 772.5576942978488,
-          "cameraZ": -141.14473947325973,
+          "cameraX": -21.168243388530225,
+          "cameraY": 1076.3522375267153,
+          "cameraZ": -104.15510518308226,
           "cameraFov": 15,
-          "targetX": 6.009777061393379,
-          "targetY": -33.67352997650995,
-          "targetZ": -58.487906176909284
+          "targetX": -11.353322020344859,
+          "targetY": -32.07643487687048,
+          "targetZ": -28.637437936977694
         },
         {
           "name": "Loading Preview Camera 17",
@@ -19769,14 +19769,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -86.06976150038888,
-      "loadingPreviewRotationY": -172.5948601400465,
+      "loadingPreviewRotationX": -80.7870264609731,
+      "loadingPreviewRotationY": 176.2029992378066,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -17.363099081738238,
-      "loadingPreviewOffsetY": 1.5970950996394677,
-      "loadingPreviewOffsetZ": 29.85046823993159,
+      "loadingPreviewOffsetX": -1.7117172627402777,
+      "loadingPreviewOffsetY": 0.1970180950260847,
+      "loadingPreviewOffsetZ": 2.272141478494188,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1111.041571028795,
+      "loadingPreviewCameraZoom": 923.7988094388626,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -39007,13 +39007,13 @@
         },
         {
           "name": "LOADING HANDS - MOBILE",
-          "cameraX": -70.61503488280705,
-          "cameraY": 772.5576942978488,
-          "cameraZ": -141.14473947325973,
+          "cameraX": -21.168243388530225,
+          "cameraY": 1076.3522375267153,
+          "cameraZ": -104.15510518308226,
           "cameraFov": 15,
-          "targetX": 6.009777061393379,
-          "targetY": -33.67352997650995,
-          "targetZ": -58.487906176909284
+          "targetX": -11.353322020344859,
+          "targetY": -32.07643487687048,
+          "targetZ": -28.637437936977694
         },
         {
           "name": "Loading Preview Camera 17",
@@ -39121,14 +39121,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -86.06976150038888,
-      "loadingPreviewRotationY": -172.5948601400465,
+      "loadingPreviewRotationX": -80.7870264609731,
+      "loadingPreviewRotationY": 176.2029992378066,
       "loadingPreviewRotationZ": 0,
-      "loadingPreviewOffsetX": -17.363099081738238,
-      "loadingPreviewOffsetY": 1.5970950996394677,
-      "loadingPreviewOffsetZ": 29.85046823993159,
+      "loadingPreviewOffsetX": -1.7117172627402777,
+      "loadingPreviewOffsetY": 0.1970180950260847,
+      "loadingPreviewOffsetZ": 2.272141478494188,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1111.041571028795,
+      "loadingPreviewCameraZoom": 923.7988094388626,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -58717,7 +58717,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -58832,11 +58832,11 @@
                     },
                     {
                       "type": "row",
-                      "key": "loadingPreviewCameraZoom"
+                      "key": "loadingPreviewSavedCameras"
                     },
                     {
                       "type": "row",
-                      "key": "loadingPreviewSavedCameras"
+                      "key": "loadingPreviewCameraZoom"
                     }
                   ],
                   "settings": [
@@ -58847,8 +58847,8 @@
                     "loadingPreviewOffsetY",
                     "loadingPreviewOffsetZ",
                     "loadingPreviewCameraFov",
-                    "loadingPreviewCameraZoom",
-                    "loadingPreviewSavedCameras"
+                    "loadingPreviewSavedCameras",
+                    "loadingPreviewCameraZoom"
                   ]
                 }
               },
@@ -65559,7 +65559,7 @@
       "left": 87.69047546386719,
       "top": 193.33929443359375,
       "width": 310.16070556640625,
-      "height": 35.52381134033203
+      "height": 458.6607360839844
     }
   }
 }
