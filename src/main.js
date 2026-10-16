@@ -1044,7 +1044,7 @@ function setupLoadingPreviewTextGroup() {
   updateLoadingPreviewText()
 }
 // ---- Loading Preview: Progress Crop (2026-10-15) ----
-const LOADING_CROP_ROW_KEYS = ['loadingPreviewProgressCropFlip', 'loadingPreviewProgressCropRange', 'loadingPreviewProgressCropCurve']
+const LOADING_CROP_ROW_KEYS = ['loadingPreviewProgressCropRealtime', 'loadingPreviewProgressCropFlip', 'loadingPreviewProgressCropRange', 'loadingPreviewProgressCropCurve']
 const LOADING_CROP_GROUP_KEY = 'Loading Preview > Progress Crop'
 function updateLoadingPreviewProgressCropGroupVisibility() {
   const g = document.querySelector('.dp-group[data-key="' + LOADING_CROP_GROUP_KEY + '"]')
@@ -1072,7 +1072,7 @@ function setupLoadingPreviewProgressCropGroup() {
   updateLoadingPreviewProgressCropGroupVisibility()
 }
 // The loading progress, 0..1. There is no single measured progress value in this app, so it is built from the real startup stages: model (10%), settings applied (10%), the hands built in slices (45%), the shader warm-up and
-// hand reveal (35%) - and never ahead of the elapsed share of Min Loading Time (the reveal is held back until both are done, so the two reach 100% together). Those weights are a judgment call, not a measurement.
+// hand reveal (35%) - and never ahead of the elapsed share of Min Loading Time (the reveal is held back until both are done, so the two reach 100% together). With "Use Real-Time Loading Progress" off it is the Min Loading Time share alone. Those weights are a judgment call, not a measurement.
 // Once the loading screen is gone (the live preview), it loops 0 -> 100% over Min Loading Time (at least 1.5 s) so the curve can be tuned by eye.
 function loadingProgressNow() {
   const now = performance.now()
@@ -1081,7 +1081,7 @@ function loadingProgressNow() {
   const warm = fieldWarmStage >= 3 ? 1 : fieldWarmStage >= 1 ? 0.3 * (fieldWarmStage >= 2 ? 1 : Math.min(1, (now - fieldWarmStartMs) / FIELD_WARM_CAP_MS)) + 0.7 * (hands.length ? fieldWarmRevealIndex / hands.length : 0) : 0
   const work = 0.1 * (modelMeasurementsReady ? 1 : 0) + 0.1 * (startupSettingsReady ? 1 : 0) + 0.45 * (fieldBuildDone ? 1 : fieldBuildFrac) + 0.35 * warm
   const timeFrac = Math.min(1, (now - pageLoadStartMs) / Math.max(cfg.loadingMinTimeMs || 0, 1))
-  loadingProgressShown = Math.max(loadingProgressShown, Math.min(work, timeFrac))
+  loadingProgressShown = Math.max(loadingProgressShown, cfg.loadingPreviewProgressCropRealtime === false ? timeFrac : Math.min(work, timeFrac))
   return loadingProgressShown
 }
 // Per loading hand: a fragment-shader clip against ONE plane in the hand's own frame (injected through onBeforeCompile on top of the toon shader, so it is independent per hand - the optional second hand has its own orientation -
@@ -2824,6 +2824,8 @@ const DEV_GROUPS = [
       // Progress Crop (2026-10-15, direct request): a flat clip plane across each loading hand, normal = the hand's own Y axis, driven by the loading progress. The rows are moved into a nested, toggleable "Progress Crop" subgroup by
       // setupLoadingPreviewProgressCropGroup(). 100% crop hides the whole model, 0% hides nothing.
       { key: 'loadingPreviewProgressCropEnabled', label: 'Progress Crop On/Off', type: 'checkbox', def: false, onChange: () => { updateLoadingPreviewProgressCropGroupVisibility(); sceneNeedsRedraw = true } },
+      // On (default): the curve's X is the REAL loading progress, held back to the Min Loading Time clock - if real loading is slower than the minimum time, the real pace governs. Off: X follows only the Min Loading Time clock.
+      { key: 'loadingPreviewProgressCropRealtime', label: 'Use Real-Time Loading Progress', type: 'checkbox', def: true },
       { key: 'loadingPreviewProgressCropFlip', label: 'Crop From The Fingertip End (Off = From The Arm End)', type: 'checkbox', def: false },
       { key: 'loadingPreviewProgressCropRange', label: 'Min / Max Crop (%)', type: 'text', def: '{"min":0,"max":100}' },
       { key: 'loadingPreviewProgressCropCurve', label: 'Crop Curve (Loading Progress -> Crop Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]' },
