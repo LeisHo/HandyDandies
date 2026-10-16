@@ -1138,7 +1138,7 @@ function lpApplyProgressCrop(h, crop, flip) {
   pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
 }
 let lpCropLast = { progress: 0, crop: 0 }
-window.__lpCropDbg = { get cfg() { return cfg }, update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
+window.__lpCropDbg = { get cfg() { return cfg }, update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
 window.__lpCrop = () => ({ ...lpCropLast, boxMs: lpProgressCropBox && lpProgressCropBox.ms, hand1: loadingPreviewHand && loadingPreviewHand.progressCrop ? { ext: loadingPreviewHand.progressCrop.ext, wrist: loadingPreviewHand.progressCrop.wrist, tip: loadingPreviewHand.progressCrop.tip, yMin: loadingPreviewHand.progressCrop.yMin, yMax: loadingPreviewHand.progressCrop.yMax, sgn: loadingPreviewHand.progressCrop.sgn, plane: loadingPreviewHand.progressCrop.uni.value.toArray() } : null, hand2: !!loadingPreviewHand2 }) // debug read-out for tests
 function updateLoadingPreviewProgressCrop() {
   let crop = 0, progress = 0
@@ -2698,6 +2698,11 @@ const DEV_GROUPS = [
       // when none is selected) and Save / Overwrite above captures them. Saved slider values are NOT re-applied on reload -- the build re-reads the selected preset and re-syncs them.
       { key: 'loadingPreviewKeyAzimuth', label: 'Preview Key Light Azimuth (Deg)', type: 'slider', min: 0, max: 360, step: 1, def: 209, onChange: () => applyLoadingPreviewLightSliders() },
       { key: 'loadingPreviewKeyElevation', label: 'Preview Key Light Elevation (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 56, onChange: () => applyLoadingPreviewLightSliders() },
+      // Light Type (2026-10-15, direct request: "the light moving closer or further away"): Directional (the default, the look every saved lighting has) has no position that matters, only a direction, so a distance cannot change
+      // it. Point is a real positional light: Distance puts it that many hand radii from the hand along the same Azimuth / Elevation direction, with the usual inverse-square falloff (closer = brighter and more local, further = dimmer
+      // and more even). Intensity is scaled so that a Point light at the default Distance of 3 lights the hand as strongly as the Directional one at the same Intensity.
+      { key: 'loadingPreviewKeyLightType', label: 'Preview Key Light Type', type: 'select', def: 'Directional', options: [{ value: 'Directional', text: 'Directional (Sun-Like, No Distance)' }, { value: 'Point', text: 'Point (Has Distance + Falloff)' }], onChange: () => { applyLoadingPreviewLightSliders(); updateLoadingPreviewLightTypeRows() } },
+      { key: 'loadingPreviewKeyDistance', label: 'Preview Key Light Distance (x Hand Radius, Point Only)', type: 'slider', min: 0.5, max: 20, step: 0.1, def: 3, onChange: () => applyLoadingPreviewLightSliders() },
       { key: 'loadingPreviewKeyTargetHeight', label: 'Preview Key Light Aim Height (%)', type: 'slider', min: -100, max: 100, step: 1, def: 2, onChange: () => applyLoadingPreviewLightSliders() },
       { key: 'loadingPreviewKeyIntensity', label: 'Preview Key Light Intensity (x)', type: 'slider', min: 0, max: 6, step: 0.1, def: 6, onChange: () => applyLoadingPreviewLightSliders() },
       { key: 'loadingPreviewKeyColor', label: 'Preview Key Light Color', type: 'color', def: '#ffffff', onChange: () => applyLoadingPreviewLightSliders() },
@@ -3945,6 +3950,8 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
+    updateLoadingPreviewLightTypeRows()
+    safeRefreshSelectOptions('loadingPreviewKeyLightType')
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
     prof('setupLoadingPreviewProgressCropGroup', setupLoadingPreviewProgressCropGroup)
     prof('setupLoadingPreviewLayoutGroup', setupLoadingPreviewLayoutGroup)
@@ -8440,6 +8447,11 @@ const loadingPreviewCameraTarget = new THREE.Vector3()
 // so its list-picker's "Use" button can live-apply a saved lighting item
 // without needing a full buildLoadingPreview() rebuild.
 let loadingPreviewKeyLightRef = null
+let loadingPreviewPointLightRef = null // the Point alternative of the key light (visible only when Preview Key Light Type is Point)
+let lpKeyLightType = 'Directional', lpKeyDistance = 3 // what the preview's key light is set to right now
+const lpKeyDir = new THREE.Vector3(0, 1, 0) // the Azimuth / Elevation direction the Point light is placed along
+let lpKeyBaseIntensity = 1 // the Intensity slider value the Point light's intensity is scaled from
+const _lpPlCenter = new THREE.Vector3()
 let loadingPreviewHemiLightRef = null
 // See loadingPreviewCameraEditMode's own DEV_GROUPS comment -- the
 // Loading Preview's own interactive orbit/pan/zoom camera, built once
@@ -8534,6 +8546,11 @@ function buildLoadingPreview(bypassEnabledGate) {
   loadingPreviewScene.add(key, key.target, hemi)
   loadingPreviewKeyLightRef = key
   loadingPreviewHemiLightRef = hemi
+  const pointKey = new THREE.PointLight(0xffffff, 0, 0, 2) // decay 2 = physical inverse-square
+  pointKey.visible = false
+  loadingPreviewScene.add(pointKey)
+  loadingPreviewPointLightRef = pointKey
+  lpKeyLightType = 'Directional'; lpKeyDistance = 3
   const lightingPreset = (cfg.loadingPreviewSavedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector)
   if (lightingPreset) applyLoadingPreviewLighting(key, hemi, lightingPreset)
   syncLoadingPreviewLightSliders()
@@ -8897,6 +8914,8 @@ function captureLoadingPreviewLightingPreset() {
     keyTargetHeight: handBoundsRadiusLocal > 0 ? (loadingPreviewKeyLightRef.target.position.y / handBoundsRadiusLocal) * 100 : LIGHTING_KEY_DEFAULTS.keyTargetHeight,
     keyIntensity: loadingPreviewKeyLightRef.intensity,
     keyColor: '#' + loadingPreviewKeyLightRef.color.getHexString(),
+    keyLightType: lpKeyLightType,
+    keyDistance: lpKeyDistance,
     ambientIntensity: loadingPreviewHemiLightRef.intensity,
     ambientSkyColor: '#' + loadingPreviewHemiLightRef.color.getHexString(),
     ambientGroundColor: '#' + loadingPreviewHemiLightRef.groundColor.getHexString()
@@ -8936,7 +8955,23 @@ function importFrameAware(item, convert) {
   if (item && item.hdFrame) { const { hdFrame, ...rest } = item; return rest }
   return convert(item)
 }
-const LP_LIGHT_SLIDER_KEYS = { keyAzimuth: 'loadingPreviewKeyAzimuth', keyElevation: 'loadingPreviewKeyElevation', keyTargetHeight: 'loadingPreviewKeyTargetHeight', keyIntensity: 'loadingPreviewKeyIntensity', keyColor: 'loadingPreviewKeyColor', ambientIntensity: 'loadingPreviewAmbientIntensity', ambientSkyColor: 'loadingPreviewAmbientSkyColor', ambientGroundColor: 'loadingPreviewAmbientGroundColor' }
+const LP_LIGHT_SLIDER_KEYS = { keyAzimuth: 'loadingPreviewKeyAzimuth', keyElevation: 'loadingPreviewKeyElevation', keyLightType: 'loadingPreviewKeyLightType', keyDistance: 'loadingPreviewKeyDistance', keyTargetHeight: 'loadingPreviewKeyTargetHeight', keyIntensity: 'loadingPreviewKeyIntensity', keyColor: 'loadingPreviewKeyColor', ambientIntensity: 'loadingPreviewAmbientIntensity', ambientSkyColor: 'loadingPreviewAmbientSkyColor', ambientGroundColor: 'loadingPreviewAmbientGroundColor' }
+// Places the Point light around the hand AS DRAWN (every frame: the hand's size and centre depend on the camera preset in use): the hand's world radius is its local bounds radius times the preview model scale (22.97 under
+// a saved camera, the local radius for the auto-framed default), its centre is the camera preset's anchor (or the auto-frame bounds centre). Distance is in those radii. Intensity is scaled by d^2 so that, with
+// inverse-square falloff, Distance 3 gives the same brightness as the Directional light at that Intensity.
+function updateLoadingPreviewPointLight() {
+  const pl = loadingPreviewPointLightRef
+  if (!pl || !pl.visible || !(handBoundsRadiusLocal > 0)) return
+  const rw = handBoundsRadiusLocal * (loadingPreviewModelScale || 1)
+  if (loadingPreviewAnchorActive) _lpPlCenter.copy(loadingPreviewAnchor); else _lpPlCenter.copy(handBoundsCenterLocal).applyQuaternion(alignQuat)
+  pl.position.copy(_lpPlCenter).addScaledVector(lpKeyDir, rw * lpKeyDistance)
+  pl.intensity = lpKeyBaseIntensity * (rw * 3) * (rw * 3)
+}
+// The Distance row only means something for a Point light.
+function updateLoadingPreviewLightTypeRows() {
+  const row = document.querySelector('.dp-row[data-key="loadingPreviewKeyDistance"]')
+  if (row) row.style.display = cfg.loadingPreviewKeyLightType === 'Point' ? '' : 'none'
+}
 // Sliders -> the preview's lights (live).
 function applyLoadingPreviewLightSliders() {
   if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return
@@ -9032,6 +9067,7 @@ function startLoadingPreviewLiveLoop() {
     }
     try {
       updateLoadingPreviewAnimation()
+      updateLoadingPreviewPointLight()
       updateLoadingPreviewProgressCrop()
       syncLoadingPreviewCameraFromOrbit()
       loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
@@ -9116,6 +9152,19 @@ function applyLoadingPreviewLighting(key, hemi, preset) {
   key.target.updateMatrixWorld()
   key.intensity = preset.keyIntensity ?? LIGHTING_KEY_DEFAULTS.keyIntensity
   key.color.set(preset.keyColor ?? LIGHTING_KEY_DEFAULTS.keyColor)
+  // Light Type: Directional shows 'key' (above); Point shows the point light instead, at Distance hand radii along the same direction (a preset saved before this existed has neither field = Directional).
+  lpKeyLightType = preset.keyLightType === 'Point' ? 'Point' : 'Directional'
+  lpKeyDistance = Math.max(0.1, preset.keyDistance ?? 3)
+  const pl = loadingPreviewPointLightRef
+  if (pl && key === loadingPreviewKeyLightRef) {
+    const isPoint = lpKeyLightType === 'Point'
+    key.visible = !isPoint
+    pl.visible = isPoint
+    lpKeyDir.set(Math.cos(el) * Math.cos(az), Math.sin(el), Math.cos(el) * Math.sin(az))
+    lpKeyBaseIntensity = key.intensity
+    pl.color.copy(key.color)
+    updateLoadingPreviewPointLight()
+  }
   hemi.intensity = preset.ambientIntensity ?? LIGHTING_KEY_DEFAULTS.ambientIntensity
   hemi.color.set(preset.ambientSkyColor ?? LIGHTING_KEY_DEFAULTS.ambientSkyColor)
   hemi.groundColor.set(preset.ambientGroundColor ?? LIGHTING_KEY_DEFAULTS.ambientGroundColor)
@@ -9132,6 +9181,9 @@ function applyLoadingPreviewLightingDefault() {
   loadingPreviewKeyLightRef.target.updateMatrixWorld()
   loadingPreviewKeyLightRef.intensity = keyLight.intensity
   loadingPreviewKeyLightRef.color.copy(keyLight.color)
+  loadingPreviewKeyLightRef.visible = true // the main scene's key light is Directional: back to that
+  if (loadingPreviewPointLightRef) loadingPreviewPointLightRef.visible = false
+  lpKeyLightType = 'Directional'; lpKeyDistance = 3
   loadingPreviewHemiLightRef.intensity = hemiLight.intensity
   loadingPreviewHemiLightRef.color.copy(hemiLight.color)
   loadingPreviewHemiLightRef.groundColor.copy(hemiLight.groundColor)
@@ -17340,7 +17392,7 @@ async function restoreCustomClickFunctions() {
 // Loading Preview lighting sliders -> the "Loading Preview Lighting" group (2026-10-14, direct request: "place all new loading preview lighting settings in the loading preview lighting group"). The group is whatever the user has titled that
 // (their layout already holds an empty one, key "New Group", shown as LOADING PREVIEW LIGHTING); one is created inside the Loading Preview group when none exists. A row that is no longer sitting directly in the Loading Preview group
 // (the default spot for a control the saved layout does not know) was put somewhere on purpose and is left alone.
-const LOADING_PREVIEW_LIGHT_ROW_KEYS = ['loadingPreviewKeyAzimuth', 'loadingPreviewKeyElevation', 'loadingPreviewKeyTargetHeight', 'loadingPreviewKeyIntensity', 'loadingPreviewKeyColor', 'loadingPreviewAmbientIntensity', 'loadingPreviewAmbientSkyColor', 'loadingPreviewAmbientGroundColor']
+const LOADING_PREVIEW_LIGHT_ROW_KEYS = ['loadingPreviewKeyAzimuth', 'loadingPreviewKeyElevation', 'loadingPreviewKeyLightType', 'loadingPreviewKeyDistance', 'loadingPreviewKeyTargetHeight', 'loadingPreviewKeyIntensity', 'loadingPreviewKeyColor', 'loadingPreviewAmbientIntensity', 'loadingPreviewAmbientSkyColor', 'loadingPreviewAmbientGroundColor']
 function flashModelButton(btn, msg) { if (!btn) return; const orig = btn.dataset.origText || btn.textContent; btn.dataset.origText = orig; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1600) }
 // The list always holds the repo models (first) plus whatever was imported; imported ones keep their place.
 function refreshHandModelList() {
@@ -20823,6 +20875,7 @@ function animate(dt, now) {
     if (!fieldRevealed && loadingPreviewRenderer) {
       try {
         updateLoadingPreviewAnimation()
+        updateLoadingPreviewPointLight()
         updateLoadingPreviewProgressCrop()
         syncLoadingPreviewCameraFromOrbit()
         loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
