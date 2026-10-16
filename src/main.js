@@ -68,6 +68,10 @@ const HAND_MODEL_BUILTINS = [
   { id: 'repo:HD-6k', name: 'HD 6k (6,014 tris)', url: '../data/processed/HAND3D/HD-6k.glb', source: 'repo' },
   { id: 'repo:HD-8k', name: 'HD 8k (8,144 tris)', url: '../data/processed/HAND3D/HD-8k.glb', source: 'repo' }
 ]
+// The 13 HD_IK exports (data/processed/HAND3D/HD_IK_*.glb): same 23-joint rig names (rHand, rMid3, rForearmBend ...) and Hand + OUTLINE primitives as the other HD models, a different bind pose. Offered for the Loading Preview only.
+const HD_IK_MODELS = ['100', '200', '300', '400', '500', '800', '1k', '2k', '4k', '6k', '8k', '10k', '12k'].map((n) => ({ id: 'repo:HD_IK_' + n, name: 'HD IK ' + n, url: '../data/processed/HAND3D/HD_IK_' + n + '.glb', source: 'repo' }))
+const lpLoadedRoots = new Map() // model id -> the loaded, prepared scene root (only for ids that loaded fine)
+const lpModelLoads = new Map() // model id -> the load promise (a model is fetched once)
 const HAND_MODEL_LS_KEY = 'handyDandies.handModelId'
 const HAND_MODEL_PENDING_KEY = 'handyDandies.handModelPending' // set by Use, cleared by the next load once the choice is on the server
 const HAND_MODEL_BONES = ['rHand', 'rMid3', 'rForearmBend', 'rMid1'] // the rig names the measurements and poses rely on
@@ -1094,7 +1098,7 @@ function lpSetupProgressCrop(h) {
     const mesh = h.skinnedMesh, clone = h.clone
     clone.updateMatrixWorld(true)
     // The skinned bounding box (the vertices as posed by the skeleton, mesh space) - the geometry's own box is the unskinned one and does not match the rig's scale here. It walks every vertex, so it is done once per model.
-    if (!lpProgressCropBox || lpProgressCropBox.root !== modelRoot) { const t0 = performance.now(); mesh.computeBoundingBox(); lpProgressCropBox = { root: modelRoot, box: mesh.boundingBox.clone(), ms: Math.round(performance.now() - t0) } }
+    if (!lpProgressCropBox || lpProgressCropBox.root !== lpSourceRoot()) { const t0 = performance.now(); mesh.computeBoundingBox(); lpProgressCropBox = { root: lpSourceRoot(), box: mesh.boundingBox.clone(), ms: Math.round(performance.now() - t0) } }
     const bb = lpProgressCropBox.box
     const cloneInv = new THREE.Matrix4().copy(clone.matrixWorld).invert()
     const toClone = new THREE.Matrix4().multiplyMatrices(cloneInv, mesh.matrixWorld)
@@ -1138,7 +1142,7 @@ function lpApplyProgressCrop(h, crop, flip) {
   pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
 }
 let lpCropLast = { progress: 0, crop: 0 }
-window.__lpCropDbg = { get cfg() { return cfg }, update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
+window.__lpCropDbg = { get cfg() { return cfg }, update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
 window.__lpCrop = () => ({ ...lpCropLast, boxMs: lpProgressCropBox && lpProgressCropBox.ms, hand1: loadingPreviewHand && loadingPreviewHand.progressCrop ? { ext: loadingPreviewHand.progressCrop.ext, wrist: loadingPreviewHand.progressCrop.wrist, tip: loadingPreviewHand.progressCrop.tip, yMin: loadingPreviewHand.progressCrop.yMin, yMax: loadingPreviewHand.progressCrop.yMax, sgn: loadingPreviewHand.progressCrop.sgn, plane: loadingPreviewHand.progressCrop.uni.value.toArray() } : null, hand2: !!loadingPreviewHand2 }) // debug read-out for tests
 function updateLoadingPreviewProgressCrop() {
   let crop = 0, progress = 0
@@ -1219,7 +1223,7 @@ function maybeBuildStartupLoadingPreview() {
   if (startupPreviewBuilt || !modelMeasurementsReady || !(startupSettingsReady || startupCacheApplied)) return
   startupPreviewBuilt = true
   logLoadingPreview(`startup preview building from ${startupSettingsReady ? 'restored settings' : 'the startup cache (restore still pending)'}`)
-  buildLoadingPreview(!!cfg.loadingPreviewShowLive)
+  lpWhenPreviewModelReady(() => buildLoadingPreview(!!cfg.loadingPreviewShowLive)) // waits for a chosen (non-Hand) preview model to load first
 }
 function applyStartupCache() {
   try {
@@ -2577,6 +2581,9 @@ const DEV_GROUPS = [
     title: 'Loading Preview',
     controls: [
       { key: 'loadingPreviewEnabled', label: 'Show Hand Loading Animation', type: 'checkbox', def: true },
+      // Loading Preview model (2026-10-16, direct request: "allow me to select the model to use for Preview Loading. provide a dropdown"). Same As Hand Model (default) = the model the field uses. Any other choice is loaded separately
+      // just for the preview; its measurements (alignment, bounds, bone rest poses) still come from the Hand model, so a model with a different rest pose / proportions will not pose exactly like the saved poses (accepted for now).
+      { key: 'loadingPreviewModelId', label: 'Loading Preview Model', type: 'select', def: '', placeAfter: 'loadingPreviewEnabled', options: () => loadingPreviewModelOptions(), onChange: () => onLoadingPreviewModelChanged() },
       // Direct request, following up on the Offset X/Y sliders below
       // ("so i can position the loading hand preview" implies actually
       // being able to SEE it while tuning, not just during the real
@@ -3950,6 +3957,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
+    safeRefreshSelectOptions('loadingPreviewModelId')
     updateLoadingPreviewLightTypeRows()
     safeRefreshSelectOptions('loadingPreviewKeyLightType')
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
@@ -8356,7 +8364,7 @@ async function importTwoHandTween(btn) {
   flash('Imported + selected "' + pick + '"')
 }
 function ensureLoadingPreviewHand2(seq) {
-  const need = !!(seq && seq.twoHand && loadingPreviewScene && loadingPreviewHand && modelRoot)
+  const need = !!(seq && seq.twoHand && loadingPreviewScene && loadingPreviewHand && lpSourceRoot())
   loadingPreviewTwoHandActive = need
   if (!need) {
     if (loadingPreviewHand2) {
@@ -8366,7 +8374,7 @@ function ensureLoadingPreviewHand2(seq) {
     return
   }
   if (loadingPreviewHand2) return
-  const clone = cloneSkeletal(modelRoot)
+  const clone = cloneSkeletal(lpSourceRoot())
   const skinnedMesh = findSkinnedMesh(clone)
   const plane = new THREE.Plane()
   const rig = makeClipRig(clone)
@@ -8593,7 +8601,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   if (lightingPreset) applyLoadingPreviewLighting(key, hemi, lightingPreset)
   syncLoadingPreviewLightSliders()
 
-  const clone = cloneSkeletal(modelRoot)
+  const clone = cloneSkeletal(lpSourceRoot())
   clone.quaternion.copy(alignQuat)
   const skinnedMesh = findSkinnedMesh(clone)
   // Own cloned material + own Plane, mirroring rebuildField()'s per-field-
@@ -9168,11 +9176,13 @@ function setLoadingPreviewLiveVisible(show) {
     return
   }
   logLoadingPreview('Show Loading Preview: ON -- rebuilding')
-  buildLoadingPreview(true)
-  // Pre-fieldStarted, the main animate() loop's own existing branch is
-  // already animating this renderer every frame -- only start the
-  // separate loop once that branch has permanently stopped.
-  if (fieldRevealed) startLoadingPreviewLiveLoop()
+  lpWhenPreviewModelReady(() => {
+    buildLoadingPreview(true)
+    // Pre-fieldStarted, the main animate() loop's own existing branch is
+    // already animating this renderer every frame -- only start the
+    // separate loop once that branch has permanently stopped.
+    if (fieldRevealed) startLoadingPreviewLiveLoop()
+  })
 }
 // Applies a Lighting preset's own values to the loading preview's own
 // cloned key/hemi lights -- a bespoke version of the main scene's
@@ -17545,6 +17555,59 @@ function placeHandModelRows() {
 // A hand keeps its current level until its Z leaves it by SMALL_SCALE_HYSTERESIS world units (an unmeasured judgment call, to stop a hand on a threshold from flickering between two silhouettes). Levels whose model has not
 // loaded yet (or cannot be used) are skipped, so a hand never shows a missing mesh.
 const SMALL_SCALE_HYSTERESIS = 0.5
+// ---- Loading Preview model (2026-10-16) ----
+function loadingPreviewModelOptions() {
+  const out = [{ value: '', text: 'Same As Hand Model' }]
+  HAND_MODEL_BUILTINS.concat(HD_IK_MODELS).forEach((m) => out.push({ value: m.id, text: m.name }))
+  const saved = Array.isArray(cfg.handModels) ? cfg.handModels : []
+  saved.forEach((it) => { if (it && it.source === 'local' && it.id && localHandModelPresent[it.id] !== false) out.push({ value: it.id, text: it.name + ' (imported)' }) })
+  return out
+}
+function lpPreviewModelUrl(id) {
+  const m = HAND_MODEL_BUILTINS.concat(HD_IK_MODELS).find((x) => x.id === id)
+  if (m) return Promise.resolve(m.url)
+  if (id.startsWith('local:')) return handModelIdbGet(id).then((rec) => { if (!rec || !rec.blob) throw new Error('not on this device'); return URL.createObjectURL(rec.blob) })
+  return Promise.reject(new Error('unknown model'))
+}
+function lpLoadPreviewModel(id) {
+  if (!id) return Promise.resolve(null)
+  let p = lpModelLoads.get(id)
+  if (p) return p
+  p = lpPreviewModelUrl(id).then((url) => new Promise((resolve, reject) => gltfLoader.load(url, resolve, undefined, reject))).then((gltf) => {
+    const root = gltf.scene
+    const skinned = findSkinnedMesh(root)
+    if (!skinned) throw new Error('no skinned mesh')
+    const missing = HAND_MODEL_BONES.filter((n) => !skinned.skeleton.getBoneByName(n))
+    if (missing.length) throw new Error('missing rig bones ' + missing.join(', '))
+    root.traverse((o) => { if (o.isMesh && o !== skinned) o.visible = false }) // the outline / crop-block meshes, like the Hand model's own load
+    root.updateMatrixWorld(true)
+    lpLoadedRoots.set(id, root)
+    logLoadingPreview('preview model "' + id + '" loaded')
+    return root
+  }).catch((err) => { console.error('Loading Preview model "' + id + '" unusable, using the Hand model instead:', err); logLoadingPreview('preview model "' + id + '" unusable (' + ((err && err.message) || err) + ') - using the Hand model'); return null })
+  lpModelLoads.set(id, p)
+  return p
+}
+// The model the preview hands are cloned from: the chosen one once it has loaded, else the Hand model.
+function lpSourceRoot() {
+  const id = cfg.loadingPreviewModelId
+  return (id && lpLoadedRoots.get(id)) || modelRoot
+}
+// Runs fn once the chosen preview model is ready (at once when it is the Hand model or already loaded; a failed load falls back to the Hand model).
+function lpWhenPreviewModelReady(fn) {
+  const id = cfg.loadingPreviewModelId
+  if (!id || lpLoadedRoots.has(id)) { fn(); return }
+  lpLoadPreviewModel(id).then(() => fn())
+}
+function onLoadingPreviewModelChanged() {
+  if (!modelMeasurementsReady) return
+  const id = cfg.loadingPreviewModelId
+  lpLoadPreviewModel(id).then(() => {
+    if (cfg.loadingPreviewModelId !== id) return // changed again meanwhile
+    // rebuild only a preview that is on screen (its canvas shown); otherwise the next build uses the new model
+    if (loadingPreviewCanvas && loadingPreviewCanvas.style.display !== 'none') { logLoadingPreview('preview model changed -- rebuilding'); buildLoadingPreview(true) }
+  })
+}
 function smallScaleModelOptions() {
   const out = HAND_MODEL_BUILTINS.map((m) => ({ id: m.id, name: m.name }))
   const saved = Array.isArray(cfg.handModels) ? cfg.handModels : []
