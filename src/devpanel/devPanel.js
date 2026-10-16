@@ -2954,6 +2954,7 @@ function refreshEmptyGroupVisibility() {
       const body = g.querySelector(':scope > .dp-group-body')
       if (!body) return
       // A group whose content is not made of per-device rows (Saved Dev Settings: a status line, a list and buttons) has none of the rows this check looks for, so it was hidden on Mobile / Landscape; it is marked always-visible instead.
+      if (g.dataset.hideOnDevices === '1') { g.classList.add('dp-group-hidden-empty'); return } // the host switched the group off for Mobile / Landscape (Loading Preview > Layout: Show Layout In Mobile / Landscape)
       if (g.dataset.alwaysVisible === '1') { g.classList.remove('dp-group-hidden-empty'); return }
       const hasVisibleRow = !!Array.from(body.children).find((child) => child.classList.contains('dp-row') && !child.classList.contains('dp-row-device-hidden'))
       const hasVisibleSubgroup = !!Array.from(body.children).find((child) => child.classList.contains('dp-group') && !child.classList.contains('dp-group-hidden-empty'))

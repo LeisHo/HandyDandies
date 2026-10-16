@@ -11,7 +11,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=87'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey } from './devpanel/devPanel.js?v=88'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -959,6 +959,13 @@ function lpApplyAnimScale(cv, f) {
 function lpCanvasW() { const w = (loadingPreviewCanvas && !lpContentMode('width')) ? loadingPreviewCanvas.offsetWidth : 0; return Math.min(w > 0 ? w : lpFallbackPx(), LP_MAX_CSS_PX) }
 function lpCanvasH() { const h = (loadingPreviewCanvas && !lpContentMode('height')) ? loadingPreviewCanvas.offsetHeight : 0; return Math.min(h > 0 ? h : lpFallbackPx(), LP_MAX_CSS_PX) }
 const LP_LAYOUT_GROUP_KEY = 'Loading Preview > Layout'
+// The Mobile and Landscape tabs show a group only while it has per-device rows; the Layout group's content is the Inspector, so it is flagged always-visible there while Show Layout In Mobile / Landscape is on.
+function lpUpdateLayoutGroupDeviceVisibility() {
+  const g = document.querySelector('.dp-group[data-key="' + LP_LAYOUT_GROUP_KEY + '"]')
+  if (!g) return
+  if (cfg.loadingPreviewLayoutOnMobile === false) { delete g.dataset.alwaysVisible; g.dataset.hideOnDevices = '1' } else { delete g.dataset.hideOnDevices; g.dataset.alwaysVisible = '1' }
+  try { refreshRowDisplaysForEditingTab() } catch (e) { /* panel not ready */ }
+}
 const LP_LEGACY_LAYOUT_ROWS = ['loadingPreviewSize', 'loadingPreviewPosX', 'loadingPreviewPosY', 'loadingPreviewTextOffsetX', 'loadingPreviewTextOffsetY', 'loadingPreviewLayout']
 // Builds (or finds again after a saved layout restored it) the Layout subgroup of Loading Preview and mounts the UI engine's Inspector in it: element picker (Animation / Text), Base / Mobile Portrait / Mobile Landscape tabs,
 // position mode (anchor / fixed / absolute ...), alignment to a browser side, offsets and size in any CSS unit. Idempotent.
@@ -985,7 +992,12 @@ function setupLoadingPreviewLayoutGroup() {
   if (title && title.textContent === LP_LAYOUT_GROUP_KEY) title.textContent = 'Layout (UI Engine Inspector)'
   const body = g.querySelector(':scope > .dp-group-body')
   if (!body) return
-  body.innerHTML = ''
+  body.querySelectorAll(':scope > .dp-ui-inspector').forEach((x) => x.remove())
+  // The Show In Mobile / Landscape checkbox sits at the top of the group, and the group's own whole-group device checkboxes (which cover rows, and this group's content is the Inspector) are not needed.
+  const mobRow = document.querySelector('.dp-row[data-key="loadingPreviewLayoutOnMobile"]')
+  if (mobRow && mobRow.parentElement !== body) body.insertBefore(mobRow, body.firstChild)
+  g.querySelectorAll(':scope > .dp-group-header .dp-group-cascade-checkbox').forEach((x) => { x.style.display = 'none' })
+  lpUpdateLayoutGroupDeviceVisibility()
   const mount = document.createElement('div')
   mount.className = 'dp-ui-inspector'
   body.appendChild(mount)
@@ -2605,6 +2617,9 @@ const DEV_GROUPS = [
       // applyLoadingPreviewLayout()). Every Px value of the Loading Preview (animation size, its position, the text's size, letter spacing and offsets) is the value AT the reference browser size; Scale With Browser blends it
       // from fixed pixels (0%) to growing / shrinking with the browser's shorter side (100%), so the whole composition keeps its proportions on a phone, a tablet and a big desktop.
       { key: 'loadingPreviewLayout', label: 'Loading Preview Layout (internal, edited in the Layout group)', type: 'text', def: '', onChange: () => lpLoadStoredLayout() },
+      // Show In Mobile / Landscape (2026-10-15, direct request, so the Layout - anchor, gaps, sizes, with the Inspector's own Mobile Portrait / Mobile Landscape overrides - can be edited on the Mobile and Landscape tabs): lives in the
+      // Layout group; see lpUpdateLayoutGroupDeviceVisibility().
+      { key: 'loadingPreviewLayoutOnMobile', label: 'Show Layout In Mobile / Landscape', type: 'checkbox', def: true, onChange: () => lpUpdateLayoutGroupDeviceVisibility() },
       { key: 'loadingPreviewScalePct', label: 'Font Scale With Browser (%)', type: 'slider', min: 0, max: 100, step: 1, def: 100, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
       // The animation scales the same way (2026-10-15, direct request: "i also want the animation to scale with browser"): the Layout's size is read as the size AT the reference browser size and is scaled by the browser's shorter side / reference, kept pinned to the edge / corner it is anchored to.
       { key: 'loadingPreviewAnimScalePct', label: 'Animation Scale With Browser (%)', type: 'slider', min: 0, max: 100, step: 1, def: 100, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
