@@ -23,7 +23,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatrij7",
+      "handModelId": "repo:HD_IK_300",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -15543,7 +15543,7 @@
         }
       ],
       "cameraX": 1.5625001668540408,
-      "cameraY": 2.2057898193328726e-13,
+      "cameraY": 2.3876498690062534e-13,
       "cameraZ": 197.9876688948102,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -19633,7 +19633,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatrij7",
+      "handModelId": "repo:HD_IK_300",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -39243,7 +39243,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvatrij7",
+      "handModelId": "repo:HD_IK_300",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -67117,8 +67117,8 @@
     "desktop": {
       "left": 85.5999984741211,
       "top": 100.7874984741211,
-      "width": 649.5750122070312,
-      "height": 596.3875122070312
+      "width": 652.7750244140625,
+      "height": 597.9874877929688
     },
     "mobile": {
       "left": 20,
