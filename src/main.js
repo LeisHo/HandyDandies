@@ -10877,7 +10877,7 @@ const RV_LIN = JSON.stringify([{ x: 0, y: 0 }, { x: 1, y: 1 }])
 const RV_FLAT1 = JSON.stringify([{ x: 0, y: 1 }, { x: 1, y: 1 }])
 const RV_FLAT_HALF = JSON.stringify([{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]) // an Easing curve is a SPEED profile (constant speed by default), like the click functions' Easing
 const RV_CURVE_X_VELOCITY = 'X: Cursor Velocity (Min -> Max Tracked)'
-const RV_CURVE_X_DIST = 'X: Hand Distance From The Cursor Path (the line the cursor has travelled since it started moving fast enough; see Distance Measured From; 0 = Min Trigger Distance, 1 = Max Trigger Distance)'
+const RV_CURVE_X_DIST = 'X: Hand Distance From The Cursor Path (the line the cursor has travelled since it started moving fast enough; see Distance Measured From; 0 = Distance 0, 1 = Max Trigger Distance)'
 let rvSetList = [] // [{ prefix, title }] in panel order
 let rvNextSetN = 1
 let rvHasState = false // some hand holds velocity-effect state (cleared when the feature is switched off)
@@ -11325,10 +11325,11 @@ function updateResponsiveVelocity(nowMs) {
     const cross = rvDirX * ry - rvDirY * rx, dot = rvDirX * rx + rvDirY * ry
     const angAbs = Math.abs(Math.atan2(cross, dot)) * 180 / Math.PI
     const side = cross >= 0 ? 1 : -1
-    // x of every distance curve: the hand's distance from the TRIGGER cursor, Min Trigger Distance -> 0, Max Trigger Distance -> 1 (constant for the whole sweep).
+    // x of every distance curve: the hand's distance from the TRIGGER cursor, Distance 0 -> 0, Max Trigger Distance -> 1 (constant for the whole sweep). (2026-10-17, direct request: the left end of the X axis is distance 0, not
+    // Min Trigger Distance; Min Trigger Distance still sets how far the trigger reaches at the lowest velocity, see D above.)
     const distT = Math.hypot((_rvHP.x + 1) * 0.5 * W - rvTrigPx, (1 - _rvHP.y) * 0.5 * H - rvTrigPy) * unitsPerPx
-    const nd = dr.max > dr.min ? THREE.MathUtils.clamp((distT - dr.min) / (dr.max - dr.min), 0, 1) : 0
-    const ndLive = dr.max > dr.min ? THREE.MathUtils.clamp((dist - dr.min) / (dr.max - dr.min), 0, 1) : 0
+    const nd = dr.max > 0 ? THREE.MathUtils.clamp(distT / dr.max, 0, 1) : 0
+    const ndLive = dr.max > 0 ? THREE.MathUtils.clamp(dist / dr.max, 0, 1) : 0
     let ndPath = -1 // this hand's distance from the cursor path, worked out once, at its onset
     const dispSum = hand._rvDisp.set(0, 0, 0), tiltSum = hand._rvTilt.set(0, 0, 0)
     let splay = 0, crop = 0, curl = 0, ceil = Infinity, live = false
@@ -11345,7 +11346,7 @@ function updateResponsiveVelocity(nowMs) {
       else if (distMode === 2) ndU = ndLive
       else {
         if (startOnset) {
-          if (ndPath < 0) { const dpx = rvPathDistPx((_rvHP.x + 1) * 0.5 * W, (1 - _rvHP.y) * 0.5 * H, px, py); ndPath = dr.max > dr.min ? THREE.MathUtils.clamp((dpx * unitsPerPx - dr.min) / (dr.max - dr.min), 0, 1) : 0 }
+          if (ndPath < 0) { const dpx = rvPathDistPx((_rvHP.x + 1) * 0.5 * W, (1 - _rvHP.y) * 0.5 * H, px, py); ndPath = dr.max > 0 ? THREE.MathUtils.clamp((dpx * unitsPerPx) / dr.max, 0, 1) : 0 }
           st.ndPath = ndPath
         }
         ndU = st.ndPath !== undefined ? st.ndPath : nd
