@@ -60237,7 +60237,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -60667,7 +60667,7 @@
                 "type": "group",
                 "group": {
                   "key": "Whole-Hand Rotation at Base",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
