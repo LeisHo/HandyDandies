@@ -431,13 +431,13 @@ const RO_POINTS = [
 const RO_MEASURES = [{ value: 'cam', text: 'Camera XY' }, { value: 'z', text: 'Z (Toward Camera)' }, { value: 'cur', text: 'Cursor XY' }, { value: 'cur3', text: 'Cursor XYZ' }]
 const RO_DEFAULT_RULES = JSON.stringify({ v: 3, rules: [
   // 1: every point of A (arm base + palm center) is nearer the camera in Z than every point of B -> A on top
-  { t: 'if', on: true, join: 'and', win: 'A', conds: [{ xs: 'A', xp: ['armBase', 'palmCenter'], xq: 'all', m: 'z', cmp: 'beats', ys: 'B', yp: ['armBase', 'palmCenter'], yq: 'all' }] },
+  { t: 'if', name: 'A entirely above B in Z', on: true, join: 'and', win: 'A', conds: [{ xs: 'A', xp: ['armBase', 'palmCenter'], xq: 'all', m: 'z', cmp: 'beats', ys: 'B', yp: ['armBase', 'palmCenter'], yq: 'all' }] },
   // 2: A's palm is nearer the camera XY than B's palm, AND B's palm is nearer than A's arm base -> B on top
-  { t: 'if', on: true, join: 'and', win: 'B', conds: [
+  { t: 'if', name: 'B palm between A palm and A arm base', on: true, join: 'and', win: 'B', conds: [
     { xs: 'A', xp: ['palmCenter'], xq: 'all', m: 'cam', cmp: 'beats', ys: 'B', yp: ['palmCenter'], yq: 'all' },
     { xs: 'B', xp: ['palmCenter'], xq: 'all', m: 'cam', cmp: 'beats', ys: 'A', yp: ['armBase'], yq: 'all' }] },
   // 3: whatever the rules above leave undecided: the hand nearest the camera in Z on top
-  { t: 'sort', on: true, p: 'position', m: 'z', dir: 'best' }
+  { t: 'sort', name: 'Tie-break: nearest in Z on top', on: true, p: 'position', m: 'z', dir: 'best' }
 ] })
 // Cursor tracking point (2026-10-11): the point on each hand that every cursor-tracking measurement (aim, palm angle, screen-space distances, splay / crop distances) is taken from. Computed at the hand's
 // no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
@@ -1610,7 +1610,6 @@ function roUpdateSequences() {
   }
 }
 let roPrevRank = null, roLocks = new Map(), roLockPruneCounter = 0
-const roLevelName = (l) => 'Rule ' + (l + 1)
 // ---- Render Order Rules: parsing, text, and the per-frame point keys ----
 const RO_PT_TEXT = {}
 RO_POINTS.forEach((o) => { RO_PT_TEXT[o.value] = o.text })
@@ -1622,8 +1621,9 @@ function roCleanCond(c) {
 }
 function roCleanRule(r) {
   r = r || {}
-  if (r.t === 'sort') return { t: 'sort', on: r.on !== false, p: RO_PT_OK.has(r.p) ? r.p : 'position', m: RO_M_OK.has(r.m) ? r.m : 'z', dir: r.dir === 'worst' ? 'worst' : 'best' }
-  return { t: 'if', on: r.on !== false, join: r.join === 'or' ? 'or' : 'and', win: r.win === 'B' ? 'B' : 'A', conds: (Array.isArray(r.conds) ? r.conds : []).map(roCleanCond) }
+  const name = typeof r.name === 'string' ? r.name.slice(0, 60) : '' // optional label shown in the editor, the Render Reordering Log and the snapshot
+  if (r.t === 'sort') return { t: 'sort', name, on: r.on !== false, p: RO_PT_OK.has(r.p) ? r.p : 'position', m: RO_M_OK.has(r.m) ? r.m : 'z', dir: r.dir === 'worst' ? 'worst' : 'best' }
+  return { t: 'if', name, on: r.on !== false, join: r.join === 'or' ? 'or' : 'and', win: r.win === 'B' ? 'B' : 'A', conds: (Array.isArray(r.conds) ? r.conds : []).map(roCleanCond) }
 }
 // Fresh, cleaned copy of the rule list stored in str (safe for the widget to mutate); an unreadable value = the default rules.
 function roParseRules(str) {
@@ -1666,7 +1666,7 @@ function roExplain(lv, r, lo, hi, loAbove) {
   const ev = lv[l].m
   const ruleLoAbove = r > 0
   const up = ruleLoAbove ? lo : hi, down = ruleLoAbove ? hi : lo
-  return roLevelName(l) + ' [' + ev.desc + ']: Hand ' + (up + 1) + ' above Hand ' + (down + 1) + ' (' + ev.detail(up, down) + ')' + (ruleLoAbove === loAbove ? '' : ' -- NOTE the rule wanted Hand ' + (up + 1) + ' above, but the final order differs (flip lock / conflicting constraint)')
+  return 'Rule ' + (ev.ruleNo || l + 1) + (ev.name ? ' "' + ev.name + '"' : '') + ' [' + ev.desc + ']: Hand ' + (up + 1) + ' above Hand ' + (down + 1) + ' (' + ev.detail(up, down) + ')' + (ruleLoAbove === loAbove ? '' : ' -- NOTE the rule wanted Hand ' + (up + 1) + ' above, but the final order differs (flip lock / conflicting constraint)')
 }
 function roFinishFrame(n, np, cmpLevels, logOn, lockOn, lv) {
   if (!logOn && !lockOn) { roPrevRank = null; roLocks.clear(); return }
@@ -1757,7 +1757,7 @@ function computeRenderOrderRanks() {
     return d > 0 ? 1 : d < 0 ? -1 : 0
   }
   const lv = []
-  roRules().forEach((r) => { if (r.on === false) return; const ev = compileRule(r); if (ev) lv.push({ m: ev, q: null }) })
+  roRules().forEach((r, ri) => { if (r.on === false) return; const ev = compileRule(r); if (ev) { ev.ruleNo = ri + 1; ev.name = r.name || ''; lv.push({ m: ev, q: null }) } })
   // The three levels (each with its optional Except) as one pairwise decision: +1 = a above b, -1 = b above a, 0 = every level ties.
   // roPriority (set as a side effect) = how strong the deciding rule is: 2 * level, +1 when it was a Palm To Arm 'both palms higher' tie-break by arm distance. Lower = stronger.
   const cmpLevels = (a, b) => {
@@ -2023,7 +2023,11 @@ function buildRenderOrderRulesWidget() {
     const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = r.on !== false; cb.title = 'Rule on / off'
     cb.addEventListener('change', () => { r.on = cb.checked; changed() })
     head.appendChild(cb)
-    head.appendChild(elLocal('span', { fontWeight: 'bold' }, { text: 'Rule ' + (i + 1) + (r.t === 'sort' ? ' - Order By' : ' - IF') }))
+    head.appendChild(elLocal('span', { fontWeight: 'bold', whiteSpace: 'nowrap' }, { text: (i + 1) + (r.t === 'sort' ? ' Order By' : ' IF') }))
+    const nameBox = elLocal('input', { flex: '1 1 60px', minWidth: '40px' }, { type: 'text', placeholder: 'Name this rule', maxlength: '60', title: 'Rule name (optional): shown here, in the Render Reordering Log and in the snapshot' })
+    nameBox.value = r.name || ''
+    nameBox.addEventListener('change', () => { r.name = nameBox.value.trim().slice(0, 60); write() })
+    head.appendChild(nameBox)
     const rt = elLocal('span', { marginLeft: 'auto', display: 'flex', gap: '4px' })
     rt.appendChild(mkBtn('\u2191', () => { if (i > 0) { data.splice(i - 1, 0, data.splice(i, 1)[0]); changed() } }, 'Move up (rules are tried in this order)'))
     rt.appendChild(mkBtn('\u2193', () => { if (i < data.length - 1) { data.splice(i + 1, 0, data.splice(i, 1)[0]); changed() } }, 'Move down'))
@@ -5956,7 +5960,7 @@ function buildSnapshotText() {
   if (cfg.snapshotRenderOrder) {
     any = true
     L.push('', '--- Render Order ---')
-    roRules().forEach((r, i) => L.push('Rule ' + (i + 1) + (r.on === false ? ' (off)' : '') + ': ' + roRuleText(r)))
+    roRules().forEach((r, i) => L.push('Rule ' + (i + 1) + (r.name ? ' "' + r.name + '"' : '') + (r.on === false ? ' (off)' : '') + ': ' + roRuleText(r)))
     L.push('flip once per sequence: ' + (cfg.renderOrderFlipLock !== false) + ' | active flip locks: ' + roLocks.size)
     L.push('the ' + NEAR + ' hands nearest the cursor (screen XY), rank = drawn order (higher = on top):')
     nearest(NEAR).forEach((o) => {
