@@ -3778,6 +3778,15 @@ export function initDevPanel(groups, opts = {}) {
   // button -- the same kind of host hook syncValue()/refreshSelectOptions()
   // already are, just for "persist now" instead of "push a value."
   saveSettingsRef = saveSettings
+  // CORRECTED 2026-10-17, direct report ("my hotkeys are not saving"). Save always wrote devHotkeys, but the LOAD
+  // path (resetSettings(): the boot-time restore and the Reset button) never read it back -- only
+  // applyFullPanelState() (Undo / Use / Set as Default) did. After a reload devHotkeys therefore stayed {} and the
+  // very next Save committed {} over the saved hotkeys, so they looked unsaved. Runs after onRestore so rows built
+  // by the host (custom click functions) already exist when the badges render.
+  function restoreSavedHotkeys(settings) {
+    devHotkeys = settings && settings.devHotkeys ? { ...settings.devHotkeys } : {}
+    renderAllHotkeyBadges()
+  }
   function resetSettings() {
     if (opts.remoteSave) {
       fetchRemoteSettingsUntilSuccess(opts.remoteSave, async (settings) => {
@@ -3807,6 +3816,7 @@ export function initDevPanel(groups, opts = {}) {
         // slices so the loading-screen preview keeps animating.
         if (opts.onRestore) await dpTime('onRestore (host callback)', () => opts.onRestore())
         if (settings.extra !== undefined && devSaveApplyExtra) devSaveApplyExtra(settings.extra)
+        restoreSavedHotkeys(settings)
         // Saved panel size/position for this device class (2026-10-04).
         const savedGeom = settings.panelGeometry && settings.panelGeometry[realDeviceClass()]
         if (savedGeom) {
@@ -3831,6 +3841,7 @@ export function initDevPanel(groups, opts = {}) {
       applyTextOverrides()
       if (opts.onRestore) dpTime('onRestore (host callback)', () => opts.onRestore())
       if (saved.extra !== undefined && devSaveApplyExtra) devSaveApplyExtra(saved.extra)
+      restoreSavedHotkeys(saved)
     } else {
       // A brand-new visitor with nothing saved yet still needs an initial
       // chrome paint for dynamicDevice rows (§12f-1) -- checkbox checked

@@ -11,7 +11,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=91'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=92'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -1401,7 +1401,6 @@ function tryStartField() {
   logStartupTiming('fieldStarted = true')
   logLoadingPreview(`field starting -- loading screen hides; preview ${cfg.loadingPreviewShowLive ? 'stays visible (Show Loading Preview is on)' : 'is hidden'}`)
   // (the field itself was built in slices earlier -- see rebuildFieldChunked())
-  { const __t = performance.now(); buildPosePreview(); logStartupTiming('buildPosePreview() took ' + Math.round(performance.now() - __t) + 'ms') }
   // ROOT CAUSE of the REAL startup jank, found 2026-09-16 after the
   // settings-restore-race fix above turned out NOT to be it (direct user
   // report: same issue persisted after that fix; further direct report --
@@ -1442,7 +1441,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, get rigLocalAxisPosing() { return RIG_LOCAL_AXIS_POSING }, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, get rigLocalAxisPosing() { return RIG_LOCAL_AXIS_POSING }, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -3010,14 +3009,6 @@ const DEV_GROUPS = [
   {
     title: 'Pose',
     controls: [
-      // Direct request 2026-09-16: "I now want a checkbox in the Pose
-      // group. It allows me to turn on the Pose Preview, which will no
-      // longer show by default in the dev panel. When turned on, the
-      // pose preview will be its own separate panel that can be resized
-      // and moved around." Replaces the old always-embedded "Pose
-      // Preview" dev-group entirely -- see `buildPosePreview()`'s own
-      // comment for the floating-panel chrome this now drives.
-      { key: 'posePreviewEnabled', label: 'Show Pose Preview (Floating Panel)', type: 'checkbox', def: false, onChange: (v) => setPosePreviewVisible(v) },
       // Ported from HANDO's own Pose group (identical rig/bone names, same
       // Hand2.glb asset) -- applies identically to every hand for now, per
       // direct request ("For now, the pose settings apply to every hand").
@@ -3126,8 +3117,9 @@ const DEV_GROUPS = [
       // Direct user request: import poses exported from HANDO (identical
       // rig/bone names, same Pose-slider set) and preview them without
       // reposing every hand in the field -- "Use" is wired to
-      // previewPosePreset() (below), which poses only the standalone
-      // preview hand in the "Pose Preview" group underneath this one.
+      // syncCfgAndSlidersFromPose() (below), which only loads the pose's
+      // values into the Pose sliders. (The floating Pose Preview panel it
+      // used to also drive was removed 2026-10-17.)
       // Deliberately does NOT include the Crop Wrist / Arm Length family
       // (cropWristEnabled/hideWrist/reactiveArmLengthEnabled/
       // armLengthRange/armLengthCurve) in what a saved pose captures --
@@ -3325,14 +3317,6 @@ const DEV_GROUPS = [
     title: 'Tween',
     controls: withDynamicDevice([
       { key: 'tweenPoses', label: 'Tween Poses (In Order)', type: 'multi-select', def: [], options: () => (cfg.savedPoses || []).map((p) => ({ value: p.name, group: p.group || null })) },
-      // Paces the Saved Tween Sequences list-picker's own "Run" button
-      // (direct request) -- the FULL sequence's own total duration, spread
-      // evenly across however many named poses it has, same convention
-      // `${p}TweenSpeedMs` already uses for the field hands' own Tween
-      // mode. Deliberately its own separate control, not reused from any
-      // single trigger's own TweenSpeedMs -- Run plays on the Pose Preview
-      // model, independent of any live field trigger.
-      { key: 'tweenPreviewSpeedMs', label: 'Tween Speed (Preview Run) (Ms)', type: 'slider', def: 2000, min: 100, max: 10000 },
       {
         key: 'savedTweenSequences',
         label: 'Saved Tween Sequences',
@@ -3349,12 +3333,6 @@ const DEV_GROUPS = [
       }
     ])
   },
-  // "Pose Preview" used to be its own always-embedded, 0-control dev-
-  // group here (a <canvas> injected directly into its .dp-group-body).
-  // REMOVED 2026-09-16, direct request: it's now an opt-in FLOATING
-  // panel instead, toggled by the Pose group's own `posePreviewEnabled`
-  // checkbox -- see `buildPosePreview()`'s own comment for the new
-  // resizable/movable chrome this drives.
   {
     title: 'Camera',
     // Live position/behavior controls below are perDevice (added
@@ -7351,73 +7329,20 @@ const POSE_PRESET_KEYS = [
   'thumbBaseSplay', 'midTwistThumb', 'baseTwistThumb', 'midTwistIndex', 'baseTwistIndex', 'midTwistMiddle', 'baseTwistMiddle', 'midTwistRing', 'baseTwistRing', 'midTwistPinky', 'baseTwistPinky',
   'elbowBend', 'elbowSideBend', 'forearmTwist'
 ]
-// Pose Preview live-sync -- direct follow-up report ("in my pose
-// settings group, the Offset and Scale sliders dont seem to do
-// anything. They should be reflected in the pose preview"). Investigated
-// and found this applied to EVERY Pose-group slider, not just Offset/
-// Scale -- none of them ever touched `previewHand` at all. Each one's
-// own `onChange` (applyCurl()/applyWristPose()/onWholeHandRotationChange())
-// only reposes the live FIELD's hands; `previewPosePreset()` was only
-// ever called from "Use"/"Run"/the initial default-pose load, never from
-// a live slider drag. Confirmed via AskUserQuestion this should apply to
-// the WHOLE Pose group for consistency, not just Offset/Scale narrowly.
-//
-// Wraps every Pose-group control's own `onChange` (preserving whatever
-// it already does -- this never replaces the existing field-repose
-// behavior, only adds to it) with an additional live re-apply of the
-// CURRENT `cfg` state to the Pose Preview. `previewPosePreset(cfg)`
-// works directly here since `cfg` itself already carries every
-// POSE_PRESET_KEYS field live (the exact same shape a saved pose object
-// has) -- no separate "current slider snapshot" object needed. Scoped to
-// POSE_PRESET_KEYS members only, so non-pose-data controls in this same
-// group (posePreviewEnabled, savedPoses itself, action buttons) are
-// left untouched. Placed here (after POSE_PRESET_KEYS's own
-// declaration, not immediately after DEV_GROUPS closes) since
-// referencing POSE_PRESET_KEYS any earlier would hit its own temporal
-// dead zone -- `previewPosePreset` itself is a hoisted function
-// declaration, safe to reference from anywhere, but this array isn't.
-;(function wirePoseGroupLivePreviewSync() {
-  const poseGroup = DEV_GROUPS.find((g) => g.title === 'Pose')
-  if (!poseGroup) return
-  poseGroup.controls.forEach((ctrl) => {
-    if (!POSE_PRESET_KEYS.includes(ctrl.key)) return
-    const original = ctrl.onChange
-    ctrl.onChange = (v) => {
-      if (original) original(v)
-      previewPosePreset(cfg)
-    }
-  })
-})()
-// savedPoses' own "Use" button -- direct follow-up report ("when i
-// select a pose and hit Use, the pose preview changes accordingly, but
-// i want the Offset and scale slides and all the other pose sliders to
-// adjust accordingly"). The reverse direction of
-// wirePoseGroupLivePreviewSync() above: that made every slider push
-// INTO the preview; this makes "Use" pull the selected pose's own
-// values back OUT into `cfg` and the slider UI, so the panel always
-// shows what's actually being previewed instead of staying at whatever
-// it was left at before Use was clicked.
-//
-// Writes `cfg[key]` directly (not `commit()`) and uses `syncValue()` --
-// same "externally-driven update" convention already established for
-// useTweenSequencePreset() -- so the main FIELD's own hands are never
-// touched (`cfg[key] = ...` alone doesn't trigger any repose; only an
-// explicit applyCurl()/applyWristPose()/onWholeHandRotationChange()
-// call would, none of which run here), preserving the original,
-// already-established "Use should NOT repose every hand in the field"
-// design. `syncValue()` itself doesn't fire a control's own `onChange`
-// (a deliberate devPanel.js behavior, avoiding exactly the kind of
-// feedback loop that would otherwise re-trigger here), so the explicit
-// `previewPosePreset(cfg)` call at the end is still needed to actually
-// update the preview's own render -- this fully replaces the old
-// `onUse: (item) => previewPosePreset(item)`, not just adds to it.
+// savedPoses' own "Use" button: pulls the selected pose's values into `cfg`
+// and the Pose slider UI, so the panel shows what was picked. Writes
+// `cfg[key]` directly (not `commit()`) and uses `syncValue()` -- same
+// "externally-driven update" convention as useTweenSequencePreset() -- so the
+// main FIELD's hands are never touched (`syncValue()` doesn't fire a
+// control's `onChange`, and only an explicit applyCurl()/applyWristPose()/
+// onWholeHandRotationChange() call would repose the field). Previously this
+// also re-posed the floating Pose Preview hand (removed 2026-10-17).
 function syncCfgAndSlidersFromPose(item) {
   POSE_PRESET_KEYS.forEach((key) => {
     const value = item[key] !== undefined ? item[key] : POSE_KEY_DEFAULTS[key]
     cfg[key] = value
     syncValue(key, value)
   })
-  previewPosePreset(cfg)
 }
 function capturePosePreset() {
   const item = {}
@@ -10059,334 +9984,6 @@ function updateLoadingPreviewAnimation() {
       if (lapStyle === 'Oscillate') loadingPreviewDirection *= -1
     }
   }
-}
-
-// -----------------------------------------------------------------------
-// Pose Preview -- a small, independent Three.js viewport embedded in the
-// dev panel's own collapsible "Pose Preview" group (direct user request:
-// "Use" should NOT repose every hand in the field). Its own scene/camera/
-// renderer/OrbitControls/hand clone, entirely separate from the main
-// field -- never touches `hands`, `cfg`, or `cloneBaseQuat`.
-// -----------------------------------------------------------------------
-let previewHand = null // { clone, skinnedMesh }
-let previewRenderer = null
-let previewScene = null
-let previewCamera = null
-let previewControls = null
-let posePreviewPanel = null // the floating panel element itself, once built
-const previewBaseQuat = new THREE.Quaternion()
-const _previewWholeHandRotEuler = new THREE.Euler()
-const POSE_PREVIEW_CAMERA_KEY = 'hd-pose-preview-camera-default'
-const POSE_PREVIEW_MIN_W = 220
-const POSE_PREVIEW_MIN_H = 200
-
-// Restores this hand's default framing (the same one-time bounding-sphere
-// auto-frame buildPosePreview() always falls back to) -- shared by both
-// the initial build and a future "reset" if ever needed.
-function defaultPosePreviewCamera() {
-  const target = handBoundsCenterLocal.clone().applyQuaternion(alignQuat)
-  // CORRECTED 2026-09-19 -- same distance-too-close bug as
-  // applyLoadingPreviewCameraAutoFrame()'s own identical formula, fixed
-  // together; see that function's own comment for the full math.
-  const pos = target.clone().add(new THREE.Vector3(0, handBoundsRadiusLocal * 0.15, handBoundsRadiusLocal * 3.6))
-  return { pos, target }
-}
-// "Set Default Camera" (direct request) -- captures the preview's OWN
-// current camera position/orbit-target and persists it (localStorage,
-// this panel has no devPanel.js-tracked control of its own) so a later
-// panel rebuild (page reload, or toggling the checkbox off/on) restores
-// THIS framing instead of the generic auto-frame.
-function setPosePreviewDefaultCamera() {
-  if (!previewCamera || !previewControls) return
-  const data = { pos: previewCamera.position.toArray(), target: previewControls.target.toArray() }
-  try { localStorage.setItem(POSE_PREVIEW_CAMERA_KEY, JSON.stringify(data)) } catch (err) { /* best-effort only */ }
-}
-function loadPosePreviewDefaultCamera() {
-  try {
-    const raw = localStorage.getItem(POSE_PREVIEW_CAMERA_KEY)
-    if (!raw) return null
-    const data = JSON.parse(raw)
-    return { pos: new THREE.Vector3().fromArray(data.pos), target: new THREE.Vector3().fromArray(data.target) }
-  } catch (err) { return null }
-}
-// Pose Preview -- REBUILT 2026-09-16 as an opt-in FLOATING panel (direct
-// request: "the pose preview will be its own separate panel that can be
-// resized and moved around"), toggled by the Pose group's own
-// `posePreviewEnabled` checkbox rather than always-embedded in the dev
-// panel body. Appended directly to `document.body` (a sibling of the dev
-// panel itself, NOT inside it) so it can be dragged/resized independently
-// and stay visible even if the dev panel is hidden/collapsed. Chrome is a
-// deliberately minimal version of the main dev panel's own §12c geometry
-// (resizable from all 4 edges + 4 corners, movable by dragging the title
-// bar, clamped to the viewport, a close button) -- hand-built here rather
-// than reusing devPanel.js internals, since this project's own convention
-// is not to fork that shared engine and its resize/drag helpers aren't
-// exported for reuse anyway.
-let posePreviewCanvas = null
-function ensurePosePreviewPanel() {
-  if (posePreviewPanel) return
-  const panel = document.createElement('div')
-  panel.id = 'posePreviewPanel'
-  Object.assign(panel.style, {
-    position: 'fixed', left: '20px', top: '80px', width: '280px', height: '260px',
-    background: '#0f0f18', border: '1px solid #3a3a4a', borderRadius: '6px',
-    display: 'none', flexDirection: 'column', overflow: 'hidden', zIndex: 9998,
-    boxShadow: '0 4px 16px rgba(0,0,0,0.5)', fontFamily: 'inherit'
-  })
-  const titlebar = document.createElement('div')
-  titlebar.className = 'pp-titlebar'
-  Object.assign(titlebar.style, {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px',
-    padding: '4px 6px', background: '#1a1a26', color: '#e8e8f0', fontSize: '11px',
-    cursor: 'move', userSelect: 'none', touchAction: 'none', flex: '0 0 auto'
-  })
-  const title = document.createElement('div')
-  title.textContent = 'POSE PREVIEW'
-  title.style.fontWeight = 'bold'
-  const btnRow = document.createElement('div')
-  btnRow.style.display = 'flex'
-  btnRow.style.gap = '4px'
-  const camBtn = document.createElement('button')
-  camBtn.type = 'button'
-  camBtn.textContent = 'Set Default Camera'
-  Object.assign(camBtn.style, { fontSize: '10px', padding: '2px 6px', background: '#3a3a4a', color: 'inherit', border: 'none', borderRadius: '4px', cursor: 'pointer' })
-  camBtn.addEventListener('click', () => {
-    setPosePreviewDefaultCamera()
-    const orig = camBtn.textContent
-    camBtn.textContent = 'Saved!'
-    setTimeout(() => { camBtn.textContent = orig }, 900)
-  })
-  const closeBtn = document.createElement('button')
-  closeBtn.type = 'button'
-  closeBtn.textContent = '✕'
-  Object.assign(closeBtn.style, { fontSize: '11px', padding: '2px 6px', background: '#3a3a4a', color: 'inherit', border: 'none', borderRadius: '4px', cursor: 'pointer' })
-  closeBtn.addEventListener('click', () => { cfg.posePreviewEnabled = false; syncValue('posePreviewEnabled', false); setPosePreviewVisible(false) })
-  btnRow.append(camBtn, closeBtn)
-  titlebar.append(title, btnRow)
-
-  const canvas = document.createElement('canvas')
-  canvas.className = 'dp-pose-preview-canvas'
-  Object.assign(canvas.style, { flex: '1 1 auto', minHeight: '0', display: 'block', width: '100%', height: '100%' })
-  posePreviewCanvas = canvas
-
-  panel.append(titlebar, canvas)
-  document.body.appendChild(panel)
-  posePreviewPanel = panel
-
-  initPosePreviewDrag(panel, titlebar)
-  initPosePreviewResize(panel)
-}
-// Movable by dragging the title bar, clamped to the viewport (§12c) --
-// same "stop at the window edge, never let it go offscreen" rule the main
-// dev panel itself follows, so all 4 resize corners stay reachable.
-function initPosePreviewDrag(panel, handle) {
-  handle.addEventListener('pointerdown', (e) => {
-    if (e.target !== handle && e.target.tagName === 'BUTTON') return
-    e.preventDefault()
-    const startX = e.clientX, startY = e.clientY
-    const startLeft = panel.offsetLeft, startTop = panel.offsetTop
-    try { handle.setPointerCapture(e.pointerId) } catch (err) { /* best-effort */ }
-    function move(ev) {
-      const w = panel.offsetWidth, h = panel.offsetHeight
-      let left = startLeft + (ev.clientX - startX)
-      let top = startTop + (ev.clientY - startY)
-      left = Math.max(0, Math.min(left, window.innerWidth - w))
-      top = Math.max(0, Math.min(top, window.innerHeight - h))
-      panel.style.left = left + 'px'
-      panel.style.top = top + 'px'
-    }
-    function up(ev) {
-      try { handle.releasePointerCapture(ev.pointerId) } catch (err) { /* best-effort */ }
-      window.removeEventListener('pointermove', move)
-      window.removeEventListener('pointerup', up)
-    }
-    window.addEventListener('pointermove', move)
-    window.addEventListener('pointerup', up)
-  })
-}
-// Resizable from all 4 edges + all 4 corners (§12c), floored at a size
-// that still keeps the title bar and its 2 buttons usable.
-function initPosePreviewResize(panel) {
-  const EDGE_PX = 7
-  const edges = [
-    { cursor: 'nwse-resize', x: -1, y: -1 }, { cursor: 'ns-resize', x: 0, y: -1 }, { cursor: 'nesw-resize', x: 1, y: -1 },
-    { cursor: 'ew-resize', x: -1, y: 0 }, { cursor: 'ew-resize', x: 1, y: 0 },
-    { cursor: 'nesw-resize', x: -1, y: 1 }, { cursor: 'ns-resize', x: 0, y: 1 }, { cursor: 'nwse-resize', x: 1, y: 1 }
-  ]
-  edges.forEach(({ cursor, x, y }) => {
-    const h = document.createElement('div')
-    Object.assign(h.style, {
-      position: 'absolute', cursor, zIndex: 1, touchAction: 'none',
-      left: x === -1 ? '0' : x === 1 ? 'auto' : EDGE_PX + 'px',
-      right: x === 1 ? '0' : 'auto',
-      top: y === -1 ? '0' : y === 1 ? 'auto' : EDGE_PX + 'px',
-      bottom: y === 1 ? '0' : 'auto',
-      width: x === 0 ? `calc(100% - ${EDGE_PX * 2}px)` : EDGE_PX * 2 + 'px',
-      height: y === 0 ? `calc(100% - ${EDGE_PX * 2}px)` : EDGE_PX * 2 + 'px'
-    })
-    h.addEventListener('pointerdown', (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-      const startX = e.clientX, startY = e.clientY
-      const startW = panel.offsetWidth, startH = panel.offsetHeight
-      const startLeft = panel.offsetLeft, startTop = panel.offsetTop
-      try { h.setPointerCapture(e.pointerId) } catch (err) { /* best-effort */ }
-      function move(ev) {
-        const dx = ev.clientX - startX, dy = ev.clientY - startY
-        if (x !== 0) {
-          let newW = x === 1 ? startW + dx : startW - dx
-          newW = Math.max(POSE_PREVIEW_MIN_W, newW)
-          if (x === -1) panel.style.left = (startLeft + startW - newW) + 'px'
-          panel.style.width = newW + 'px'
-        }
-        if (y !== 0) {
-          let newH = y === 1 ? startH + dy : startH - dy
-          newH = Math.max(POSE_PREVIEW_MIN_H, newH)
-          if (y === -1) panel.style.top = (startTop + startH - newH) + 'px'
-          panel.style.height = newH + 'px'
-        }
-        resizePosePreview()
-      }
-      function up(ev) {
-        try { h.releasePointerCapture(ev.pointerId) } catch (err) { /* best-effort */ }
-        window.removeEventListener('pointermove', move)
-        window.removeEventListener('pointerup', up)
-      }
-      window.addEventListener('pointermove', move)
-      window.addEventListener('pointerup', up)
-    })
-    panel.appendChild(h)
-  })
-}
-// Show/hide -- called directly by `posePreviewEnabled`'s own onChange.
-// Builds the panel (and its scene/camera/hand clone) lazily, the first
-// time it's ever shown, rather than at page load -- most sessions never
-// turn this on at all.
-function setPosePreviewVisible(visible) {
-  if (visible) {
-    if (!posePreviewPanel) buildPosePreview()
-    posePreviewPanel.style.display = 'flex'
-    resizePosePreview()
-  } else if (posePreviewPanel) {
-    posePreviewPanel.style.display = 'none'
-  }
-}
-// Called once, the first time the panel is ever shown (modelRoot/
-// alignQuat/boneRestQuat/toonMaterial all ready well before then, since
-// this only runs on a user's own explicit checkbox click) -- clones the
-// SAME already-loaded GLB one more time (no extra network fetch), same as
-// rebuildField() clones it per field hand.
-function buildPosePreview() {
-  ensurePosePreviewPanel()
-  const canvas = posePreviewCanvas
-
-  previewScene = new THREE.Scene()
-  previewCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 2000)
-  previewRenderer = new THREE.WebGLRenderer({ canvas, antialias: true })
-  previewRenderer.outputColorSpace = THREE.SRGBColorSpace
-
-  // Clones of the MAIN scene's own already-tuned key/ambient lights rather
-  // than inventing fresh ones -- a from-scratch light produced a flat,
-  // washed-out white silhouette (confirmed live: no visible toon-shading
-  // steps at all), while the main field's own hands show clear shaded
-  // detail under their own tuned lighting. A DirectionalLight's actual
-  // effect only depends on the position-to-target DIRECTION, not
-  // magnitude, so reusing keyLight's exact position/target vectors is
-  // correct even though they're scaled for the much larger main scene
-  // (sceneState.fieldRadius * 3) -- only a one-time snapshot at build
-  // time, not live-synced to further Lighting-tab tweaks (a minor,
-  // acceptable gap for what's meant to be a quick pose check).
-  const previewKey = keyLight.clone()
-  previewKey.target = keyLight.target.clone()
-  previewScene.add(previewKey)
-  previewScene.add(previewKey.target)
-  previewScene.add(hemiLight.clone())
-
-  const clone = cloneSkeletal(modelRoot)
-  clone.quaternion.copy(alignQuat)
-  const skinnedMesh = findSkinnedMesh(clone)
-  if (skinnedMesh && toonMaterial) skinnedMesh.material = toonMaterial
-  previewScene.add(clone)
-  previewHand = { clone, skinnedMesh }
-  // Direct request: "the pose preview hand should have the same default
-  // pose as i have set" -- otherwise the preview opens showing the raw,
-  // un-posed GLB bind pose (long straight fingers) until something else
-  // (a saved-pose "Use", or a tween Run) happens to pose it.
-  previewPosePreset(poseDefaultValues)
-
-  // Framed from the SAME bounding-sphere measurement taken once at load
-  // (handBoundsCenterLocal/handBoundsRadiusLocal) the main scene's own
-  // one-time auto-frame already uses -- no separate measurement needed.
-  // Aimed at the mesh's own measured center (rotated by alignQuat, the
-  // same transform the clone itself carries), NOT the raw origin -- this
-  // asset's visible mesh includes a full forearm hanging below the wrist
-  // (documented in handBoundsCenterLocal's own declaration comment), so
-  // the bounding sphere's center sits well away from the wrist/bone-
-  // origin point; aiming at (0,0,0) framed mostly forearm instead of the
-  // hand+fingers. A saved "Set Default Camera" (direct request) overrides
-  // this auto-frame when present.
-  const saved = loadPosePreviewDefaultCamera()
-  const fallback = defaultPosePreviewCamera()
-  const framing = saved || fallback
-  previewCamera.position.copy(framing.pos)
-  previewControls = new OrbitControls(previewCamera, canvas)
-  previewControls.target.copy(framing.target)
-  previewControls.enableDamping = true
-  previewControls.update()
-
-  resizePosePreview()
-  window.addEventListener('resize', resizePosePreview)
-}
-// canvas.clientWidth/Height (CSS layout size) drives the resize, same
-// self-heal reasoning as the main scene's own applyRendererSize() --
-// re-read on demand (called after building, on window resize, after every
-// manual panel resize-drag above, and cheap to guard in the per-frame
-// render call below) rather than assumed fixed, since the panel is now
-// user-resizable at any time.
-function resizePosePreview() {
-  if (!previewRenderer) return
-  const canvas = previewRenderer.domElement
-  const w = canvas.clientWidth || 200
-  const h = canvas.clientHeight || 200
-  if (previewCamera.aspect !== w / h) {
-    previewCamera.aspect = w / h
-    previewCamera.updateProjectionMatrix()
-  }
-  previewRenderer.setSize(w, h, false)
-}
-// Applies one saved pose's OWN values (not cfg) to ONLY the preview hand's
-// skeleton, via applyCurlToSkeleton()/applyWristPoseToSkeleton()'s own
-// `values` param -- reuses the exact same posing math the main field uses,
-// just pointed at different data and a different (single, untracked)
-// hand. No `wrapperQuat` (previewHand has no cursor-tracking wrapper
-// layer at all, unlike a field hand) -- omitted (null), matching how Tip
-// Twist's own axis conversion already omits it for the same "nothing to
-// exclude" reason.
-function previewPosePreset(item) {
-  if (!previewHand || !previewHand.skinnedMesh) return
-  const values = {}
-  POSE_PRESET_KEYS.forEach((k) => { values[k] = item[k] !== undefined ? item[k] : POSE_KEY_DEFAULTS[k] })
-  _previewWholeHandRotEuler.set(
-    THREE.MathUtils.degToRad(values.modelRotX),
-    THREE.MathUtils.degToRad(values.modelRotY),
-    THREE.MathUtils.degToRad(values.modelRotZ)
-  )
-  previewBaseQuat.copy(alignQuat).multiply(new THREE.Quaternion().setFromEuler(_previewWholeHandRotEuler)).multiply(computeBaseRotationQuat(values.baseRotationX || 0, values.baseRotationY || 0, values.baseRotationZ || 0, _poseBaseRb))
-  previewHand.clone.quaternion.copy(previewBaseQuat)
-  // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment for
-  // why (rThumb1's parent is rHand, the same bone the wrist rotates;
-  // posing it first ensures the finger loop below reads the wrist's
-  // NEW target rotation, not whatever was left over from before).
-  applyWristPoseToSkeleton(previewHand.skinnedMesh.skeleton, values)
-  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, previewHand.skinnedMesh.skeleton, previewBaseQuat, null, values))
-  // Same fix as applyLoadingPreviewPose()'s own matching comment
-  // (2026-09-20, corrected same day to be camera-relative via
-  // applyPoseOffsetToPosition() -- see that function's own comment) --
-  // this standalone preview hand's clone (fixed at (0,0,0)/scale-1 by
-  // buildPosePreview(), never otherwise touched) needs Pose Offset/Scale
-  // applied against `previewCamera`'s own basis, not world axes.
-  applyPoseOffsetToPosition(previewHand.clone, _poseOffsetZeroVec, previewCamera, values)
-  previewHand.clone.scale.setScalar(values.poseScale ?? 1)
 }
 
 // Whole-Hand Rotation X/Y/Z -- changes `cloneBaseQuat` only (a single
@@ -20900,25 +20497,7 @@ function setupColorPresetUi() {
   applyColorPresetButtonStyle()
 }
 setupColorPresetUi()
-// The Pose Preview panel's own "Run" button (Saved Tween Sequences list-
-// picker, direct request) -- plays the resolved named-pose sequence on
-// the PREVIEW hand only (never the field), paced by the Tween group's own
-// `tweenPreviewSpeedMs` slider. Always anchored from `poseDefaultValues`
-// (there's no tracked "current pose values" for the preview hand to
-// transition FROM -- its skeleton only ever gets posed via direct slider
-// application, not a value object kept in sync -- so a deterministic
-// anchor is the only feasible choice, same tradeoff already accepted
-// elsewhere in this file). Deliberately NOT gated by Global Pause (direct
-// request) -- see animate()'s own preview-render block.
-let previewTweenPlay = null // { poses, segments, startMs, speedMs } -- segments = the Hold-aware weighted timeline (2026-10-15), poses the flat list it replaces
-function runTweenSequenceOnPreview(item) {
-  if (!previewHand || !item) return
-  const namedPoses = resolveTweenSequencePoses(item.tweenPoses)
-  if (namedPoses.length < 1) return
-  const segments = resolveTweenSegmentsWithAnchor(poseDefaultValues, item.tweenPoses) // from the default pose through every entry; a Hold holds the pose before it
-  previewTweenPlay = { poses: [poseDefaultValues, ...namedPoses], segments: segments.length > 0 ? segments : null, startMs: nowVirtual(), speedMs: Math.max(safeTweenSpeedMs(cfg.tweenPreviewSpeedMs), 1) }
-}
-// Both Saved Tween Sequences' new "Edit"/"Run" buttons act on the list-
+// Both Saved Tween Sequences' new "Edit" button acts on the list-
 // picker's own currently-SELECTED row -- same convention as Saved Poses'
 // own "Default" button (getSelectedSavedPoseItem()), just scoped to this
 // different list-picker's own data-key.
@@ -20938,11 +20517,6 @@ function editSelectedTweenSequence() {
   if (!item) return
   useTweenSequencePreset(item)
 }
-function runSelectedTweenSequenceOnPreview() {
-  const item = getSelectedTweenSequenceItem()
-  if (!item) return
-  runTweenSequenceOnPreview(item)
-}
 // Injected into the Saved Tween Sequences list-picker's own button row,
 // same DOM-injection pattern as buildPoseDefaultButton()/
 // buildCameraDefaultButton() (devPanel.js's generic list-picker has no
@@ -20958,11 +20532,6 @@ function buildTweenSequenceButtons() {
   editBtn.addEventListener('click', () => editSelectedTweenSequence())
   if (useBtn && useBtn.nextSibling) actionsRow.insertBefore(editBtn, useBtn.nextSibling)
   else actionsRow.appendChild(editBtn)
-  const runBtn = document.createElement('button')
-  runBtn.type = 'button'
-  runBtn.textContent = 'Run'
-  runBtn.addEventListener('click', () => runSelectedTweenSequenceOnPreview())
-  actionsRow.insertBefore(runBtn, editBtn.nextSibling)
   // "Import" -- direct request: "in the tween setting group, add an
   // 'Import' button. It imports whatever is in my clipboard. The
   // imported data will include both pose data and tween sequence data.
@@ -20978,7 +20547,7 @@ function buildTweenSequenceButtons() {
   // import and this project's convention is not to fork that engine for
   // a one-off need. Placed here (not a brand-new standalone row) since
   // this is already the Tween group's own established action-button
-  // location (Save/Overwrite/Use/Edit/Run/Rename/Delete/+Group).
+  // location (Save/Overwrite/Use/Edit/Rename/Delete/+Group).
   const importBtn = document.createElement('button')
   importBtn.type = 'button'
   importBtn.textContent = 'Import'
@@ -21542,7 +21111,7 @@ function animate(dt, now) {
       if (fieldStarted && !fieldRevealed && ++fieldRevealFrames >= 2) finalizeReveal() // two painted field frames, then the loading screen goes
     }
     // Covers everything from the true top of animate() through the
-    // frame-profile block itself -- NOT the trailing Pose Preview render
+    // frame-profile block itself -- NOT the Loading Preview render
     // pass further below (a rare, usually-off edge case, not worth
     // chasing through the rest of this large function for this
     // diagnostic's purposes). Still a large improvement over only having
@@ -21567,27 +21136,6 @@ function animate(dt, now) {
         console.log(`[frame-profile] fps=${(f / (elapsed / 1000)).toFixed(1)} avgTotal=${avgTotal.toFixed(2)}ms avgUpdateRenderOrder=${avgURO.toFixed(2)}ms avgComposerRender=${avgRender.toFixed(2)}ms avgCursorTracking=${avgCursorTracking.toFixed(2)}ms avgOther=${avgOther.toFixed(2)}ms hands=${hands.length} over ${f} frames`)
         __frameProfiler = { frames: 0, updateRenderOrderMs: 0, composerRenderMs: 0, cursorTrackingMs: 0, animateTotalMs: 0, windowStart: performance.now() }
       }
-    }
-    // Pose Preview's own tiny render pass -- guarded by offsetParent (null
-    // whenever the floating panel is hidden via display:none, i.e. the
-    // "Show Pose Preview" checkbox is off) so an orbit-controllable mini-
-    // viewport nobody can currently see doesn't still cost a render every
-    // frame. The "Run" tween playback is deliberately NOT gated by Global
-    // Pause (direct request: "Pause button should not pause the pose
-    // preview hand") -- Pause only freezes the live FIELD's own
-    // animations; the preview is a separate, isolated model the user is
-    // actively previewing/tuning and shouldn't be affected by a control
-    // meant for the field.
-    if (previewRenderer && previewRenderer.domElement.offsetParent !== null) {
-      resizePosePreview()
-      previewControls.update()
-      if (previewTweenPlay) {
-        const elapsed = nowVirtual() - previewTweenPlay.startMs
-        const progress = THREE.MathUtils.clamp(elapsed / previewTweenPlay.speedMs, 0, 1)
-        previewPosePreset(previewTweenPlay.segments ? lerpTweenSegments(previewTweenPlay.segments, progress) : lerpTweenSequence(previewTweenPlay.poses, progress))
-        if (progress >= 1) previewTweenPlay = null
-      }
-      previewRenderer.render(previewScene, previewCamera)
     }
     // Loading Preview's own tiny render pass -- only while the loading
     // screen is actually still up (`!fieldStarted`); once the real field
