@@ -1257,7 +1257,7 @@ function maybeBuildStartupLoadingPreview() {
   if (startupPreviewBuilt || !modelMeasurementsReady || !(startupSettingsReady || startupCacheApplied)) return
   startupPreviewBuilt = true
   logLoadingPreview(`startup preview building from ${startupSettingsReady ? 'restored settings' : 'the startup cache (restore still pending)'}`)
-  lpWhenPreviewModelReady(() => buildLoadingPreview(!!cfg.loadingPreviewShowLive)) // waits for a chosen (non-Hand) preview model to load first
+  lpWhenPreviewModelReady(() => buildLoadingPreview(lpLiveOn())) // waits for a chosen (non-Hand) preview model to load first
 }
 function applyStartupCache() {
   try {
@@ -1402,7 +1402,7 @@ function tryStartField() {
   }
   fieldStarted = true
   logStartupTiming('fieldStarted = true')
-  logLoadingPreview(`field starting -- loading screen hides; preview ${cfg.loadingPreviewShowLive ? 'stays visible (Show Loading Preview is on)' : 'is hidden'}`)
+  logLoadingPreview(`field starting -- loading screen hides; preview ${lpLiveOn() ? 'stays visible (Show Loading Preview is on)' : 'is hidden'}`)
   // (the field itself was built in slices earlier -- see rebuildFieldChunked())
   // ROOT CAUSE of the REAL startup jank, found 2026-09-16 after the
   // settings-restore-race fix above turned out NOT to be it (direct user
@@ -1467,7 +1467,7 @@ function finalizeReveal() {
   // checked before the model even finished loading while
   // loadingPreviewEnabled was off, in which case NOTHING was ever built
   // yet for the loop to animate.
-  if (cfg.loadingPreviewShowLive) {
+  if (lpLiveOn()) {
     setLoadingPreviewLiveVisible(true)
   } else if (loadingPreviewCanvas) {
     loadingPreviewCanvas.style.display = 'none'
@@ -6666,10 +6666,14 @@ function updateOutlineVisibility() {
 // it) in one shot, rather than removing/re-adding hands from the scene or
 // hiding the fill/outline meshes separately (which would leave the
 // outline visible on its own if `outlineEnabled` happens to be on).
+// 2026-10-17, direct request: Hide Hands and Show Loading Preview (Live) only take effect in dev mode (DEV_MODE: localhost / file: / ?dev=1). A normal visitor restores the same saved settings
+// (and a startup cache written by a dev session), so the gate is applied where the value is READ, not where it is restored: every use goes through these two helpers.
+function handsHiddenByPanel() { return DEV_MODE && !!cfg.hideHands }
+function lpLiveOn() { return DEV_MODE && !!cfg.loadingPreviewShowLive }
 function updateHandsVisibility() {
   // CORRECTED 2026-10-13 (direct request: "all hand models should be loaded on startup, so they will be visible on startup if not being covered by the floor object"): the Field Grid Sphere Sequence no longer hides the hands
   // until its second click; they are always built and shown, and the Floor's clipping plane is what covers them.
-  const hide = !!cfg.hideHands
+  const hide = handsHiddenByPanel()
   hands.forEach((h) => { h.wrapper.visible = !hide && !h._warmHidden })
 }
 
@@ -9689,8 +9693,8 @@ function startLoadingPreviewLiveLoop() {
   if (loadingPreviewLiveRafId !== null) return // already running
   logLoadingPreview('live render loop started')
   const tick = () => {
-    if (!cfg.loadingPreviewShowLive || !loadingPreviewRenderer) {
-      logLoadingPreview(`live render loop stopped (${!cfg.loadingPreviewShowLive ? 'Show Loading Preview is off' : 'renderer is gone'})`)
+    if (!lpLiveOn() || !loadingPreviewRenderer) {
+      logLoadingPreview(`live render loop stopped (${!lpLiveOn() ? 'Show Loading Preview is off' : 'renderer is gone'})`)
       loadingPreviewLiveRafId = null
       return
     }
@@ -9740,6 +9744,7 @@ function syncLoadingPreviewBackground() {
   } catch (err) { /* not built yet */ }
 }
 function setLoadingPreviewLiveVisible(show) {
+  if (!DEV_MODE) show = false // 2026-10-17: Show Loading Preview is a dev-only checkbox; a saved "on" must not show it to a normal visitor
   if (!show) {
     // While the loading screen is up the startup preview owns the canvas: the
     // settings restore applies the saved (usually OFF) checkbox value here, which used
