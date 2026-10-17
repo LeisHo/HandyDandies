@@ -12,16 +12,7 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "negCamArmEnd",
-      "renderOrderModeExcept": "palmToArmEnd",
-      "renderOrderFallback": "palmToArm",
-      "renderOrderFallbackExcept": "armEnd",
-      "renderOrderFallback2": "none",
-      "renderOrderFallback2Except": "armBase",
-      "renderOrderModeTerms": "[{\"op\":\"and\",\"m\":\"negCamPalmCenter\"},{\"op\":\"and\",\"m\":\"armBaseToArmEnd\"},{\"op\":\"and\",\"m\":\"armEnd\"},{\"op\":\"and\",\"m\":\"palmCenter\"}]",
-      "renderOrderFallbackTerms": "[]",
-      "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
+      "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\",\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\",\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"sort\",\"on\":true,\"p\":\"position\",\"m\":\"z\",\"dir\":\"best\"}]}",
       "renderOrderFlipLock": true,
       "handModelId": "repo:HD_IK_500",
       "handModels": [
@@ -267,6 +258,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewRealTimeLoading": false,
       "loadingPreviewModelId": "repo:HD_IK_1k",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -524,6 +516,8 @@
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 1150,
+      "loadingPreviewEasingCurveEnabled": false,
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -15543,7 +15537,7 @@
         }
       ],
       "cameraX": 1.5625001668540408,
-      "cameraY": 2.9332300180263953e-13,
+      "cameraY": 3.115090067699776e-13,
       "cameraZ": 197.9876688948102,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -15593,6 +15587,19 @@
       "lockCameraPan": true,
       "lockCameraZoom": true,
       "cameraMaxExtentsEnabled": true,
+      "cameraPreviewEnabled": false,
+      "cameraPreviewX": 0,
+      "cameraPreviewY": 0,
+      "cameraPreviewZ": 0,
+      "cameraPreviewFov": 35,
+      "cameraPreviewZoom": 260,
+      "lockCameraPreviewPan": false,
+      "lockCameraPreviewZoom": false,
+      "lockCameraPreviewRotate": false,
+      "cameraPreviewYaw": 0,
+      "cameraPreviewPitch": 0,
+      "savedCameraPreviews": [],
+      "cameraPreviewCount": "0",
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
@@ -19622,16 +19629,7 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "palmToArm",
-      "renderOrderModeExcept": "palmCenter",
-      "renderOrderFallback": "palmToArmEnd",
-      "renderOrderFallbackExcept": "armBase",
-      "renderOrderFallback2": "armEndToPalm",
-      "renderOrderFallback2Except": "closest",
-      "renderOrderModeTerms": "[{\"op\":\"and\",\"m\":\"negCamPalmCenter\"},{\"op\":\"and\",\"m\":\"armBaseToArmEnd\"},{\"op\":\"and\",\"m\":\"armEnd\"},{\"op\":\"and\",\"m\":\"palmCenter\"}]",
-      "renderOrderFallbackTerms": "[]",
-      "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
+      "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\",\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\",\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"sort\",\"on\":true,\"p\":\"position\",\"m\":\"z\",\"dir\":\"best\"}]}",
       "renderOrderFlipLock": true,
       "handModelId": "repo:HD_IK_500",
       "handModels": [
@@ -19877,6 +19875,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewRealTimeLoading": false,
       "loadingPreviewModelId": "repo:HD_IK_1k",
       "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 0,
@@ -20134,6 +20133,8 @@
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 700,
+      "loadingPreviewEasingCurveEnabled": false,
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -35203,6 +35204,19 @@
       "lockCameraPan": true,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": false,
+      "cameraPreviewEnabled": false,
+      "cameraPreviewX": 0,
+      "cameraPreviewY": 0,
+      "cameraPreviewZ": 0,
+      "cameraPreviewFov": 35,
+      "cameraPreviewZoom": 260,
+      "lockCameraPreviewPan": false,
+      "lockCameraPreviewZoom": false,
+      "lockCameraPreviewRotate": false,
+      "cameraPreviewYaw": 0,
+      "cameraPreviewPitch": 0,
+      "savedCameraPreviews": [],
+      "cameraPreviewCount": "0",
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
@@ -39232,16 +39246,7 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderMode": "negCamArmEnd",
-      "renderOrderModeExcept": "palmToArmEnd",
-      "renderOrderFallback": "palmToArm",
-      "renderOrderFallbackExcept": "armEnd",
-      "renderOrderFallback2": "none",
-      "renderOrderFallback2Except": "armBase",
-      "renderOrderModeTerms": "[{\"op\":\"and\",\"m\":\"negCamPalmCenter\"},{\"op\":\"and\",\"m\":\"armBaseToArmEnd\"},{\"op\":\"and\",\"m\":\"armEnd\"},{\"op\":\"and\",\"m\":\"palmCenter\"}]",
-      "renderOrderFallbackTerms": "[]",
-      "renderOrderFallback2Terms": "[]",
-      "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
+      "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\",\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\",\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"sort\",\"on\":true,\"p\":\"position\",\"m\":\"z\",\"dir\":\"best\"}]}",
       "renderOrderFlipLock": true,
       "handModelId": "repo:HD_IK_500",
       "handModels": [
@@ -39487,6 +39492,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewRealTimeLoading": false,
       "loadingPreviewModelId": "repo:HD_IK_1k",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -39744,6 +39750,8 @@
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 1150,
+      "loadingPreviewEasingCurveEnabled": false,
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -54813,6 +54821,19 @@
       "lockCameraPan": false,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": false,
+      "cameraPreviewEnabled": false,
+      "cameraPreviewX": 0,
+      "cameraPreviewY": 0,
+      "cameraPreviewZ": 0,
+      "cameraPreviewFov": 35,
+      "cameraPreviewZoom": 260,
+      "lockCameraPreviewPan": false,
+      "lockCameraPreviewZoom": false,
+      "lockCameraPreviewRotate": false,
+      "cameraPreviewYaw": 0,
+      "cameraPreviewPitch": 0,
+      "savedCameraPreviews": [],
+      "cameraPreviewCount": "0",
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
@@ -59485,6 +59506,10 @@
               },
               {
                 "type": "row",
+                "key": "loadingPreviewRealTimeLoading"
+              },
+              {
+                "type": "row",
                 "key": "loadingPreviewCameraEditMode"
               },
               {
@@ -59816,12 +59841,30 @@
                     "loadingPreviewProgressCropRealtime"
                   ]
                 }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Easing",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewEasingCurve"
+                    }
+                  ],
+                  "settings": [
+                    "loadingPreviewEasingCurve"
+                  ]
+                }
               }
             ],
             "settings": [
               "loadingPreviewShowLive",
               "loadingPreviewEnabled",
               "loadingPreviewModelId",
+              "loadingPreviewRealTimeLoading",
               "loadingPreviewCameraEditMode",
               "loadingMinTimeMs",
               "loadingPreviewScalePct",
@@ -59839,7 +59882,7 @@
     {
       "key": "New Group (2)",
       "collapsed": false,
-      "locked": true,
+      "locked": false,
       "items": [
         {
           "type": "row",
@@ -59849,7 +59892,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -59911,16 +59954,6 @@
               {
                 "type": "row",
                 "key": "fieldOffsetZ"
-              },
-              {
-                "type": "group",
-                "group": {
-                  "key": "Render Order",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
-                }
               },
               {
                 "type": "row",
@@ -60113,48 +60146,12 @@
           "type": "group",
           "group": {
             "key": "Render Order",
-            "collapsed": true,
-            "locked": true,
+            "collapsed": false,
+            "locked": false,
             "items": [
               {
                 "type": "row",
-                "key": "renderOrderMode"
-              },
-              {
-                "type": "row",
-                "key": "renderOrderModeExcept"
-              },
-              {
-                "type": "row",
-                "key": "renderOrderModeTerms"
-              },
-              {
-                "type": "row",
-                "key": "renderOrderFallback"
-              },
-              {
-                "type": "row",
-                "key": "renderOrderFallbackExcept"
-              },
-              {
-                "type": "row",
-                "key": "renderOrderFallbackTerms"
-              },
-              {
-                "type": "row",
-                "key": "renderOrderFallback2"
-              },
-              {
-                "type": "row",
-                "key": "renderOrderFallback2Except"
-              },
-              {
-                "type": "row",
-                "key": "renderOrderFallback2Terms"
-              },
-              {
-                "type": "row",
-                "key": "renderOrderExtraFallbacks"
+                "key": "renderOrderRules"
               },
               {
                 "type": "row",
@@ -60162,16 +60159,7 @@
               }
             ],
             "settings": [
-              "renderOrderMode",
-              "renderOrderModeExcept",
-              "renderOrderModeTerms",
-              "renderOrderFallback",
-              "renderOrderFallbackExcept",
-              "renderOrderFallbackTerms",
-              "renderOrderFallback2",
-              "renderOrderFallback2Except",
-              "renderOrderFallback2Terms",
-              "renderOrderExtraFallbacks",
+              "renderOrderRules",
               "renderOrderFlipLock"
             ]
           }
@@ -60181,7 +60169,7 @@
           "group": {
             "key": "Outline",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [
               {
                 "type": "row",
@@ -60238,7 +60226,7 @@
           "group": {
             "key": "Pose",
             "collapsed": false,
-            "locked": true,
+            "locked": false,
             "items": [
               {
                 "type": "row",
@@ -60257,7 +60245,7 @@
                 "group": {
                   "key": "New Group (8)",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -60284,7 +60272,7 @@
                 "group": {
                   "key": "Whole-Hand Rotation & Thumb",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -60326,7 +60314,7 @@
                 "group": {
                   "key": "Wrist",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -60368,7 +60356,7 @@
                 "group": {
                   "key": "New Group (6)",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -60420,7 +60408,7 @@
                 "group": {
                   "key": "Index",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -60482,7 +60470,7 @@
                 "group": {
                   "key": "Middle",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -60544,7 +60532,7 @@
                 "group": {
                   "key": "Ring",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -60606,7 +60594,7 @@
                 "group": {
                   "key": "Pinky",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -60668,7 +60656,7 @@
                 "group": {
                   "key": "Whole-Hand Rotation at Base",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -60703,7 +60691,7 @@
           "group": {
             "key": "Tween",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [
               {
                 "type": "row",
@@ -60995,7 +60983,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Velocity",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -61081,7 +61069,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -61125,7 +61113,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Easing Curve",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -61148,7 +61136,7 @@
                       "type": "group",
                       "group": {
                         "key": "Easing",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -61367,7 +61355,7 @@
           "group": {
             "key": "Small Scale Models",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [
               {
                 "type": "row",
@@ -61744,6 +61732,93 @@
               {
                 "type": "row",
                 "key": "cameraDefaultPreset"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Preview Camera",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewX"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewY"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewZ"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewFov"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewZoom"
+                    },
+                    {
+                      "type": "row",
+                      "key": "lockCameraPreviewPan"
+                    },
+                    {
+                      "type": "row",
+                      "key": "lockCameraPreviewZoom"
+                    },
+                    {
+                      "type": "row",
+                      "key": "lockCameraPreviewRotate"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewYaw"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewPitch"
+                    },
+                    {
+                      "type": "row",
+                      "key": "savedCameraPreviews"
+                    },
+                    {
+                      "type": "row",
+                      "key": "addCameraPreviewBtn"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewCount"
+                    },
+                    {
+                      "type": "row",
+                      "key": "deleteAllCameraPreviewsBtn"
+                    }
+                  ],
+                  "settings": [
+                    "cameraPreviewEnabled",
+                    "cameraPreviewX",
+                    "cameraPreviewY",
+                    "cameraPreviewZ",
+                    "cameraPreviewFov",
+                    "cameraPreviewZoom",
+                    "lockCameraPreviewPan",
+                    "lockCameraPreviewZoom",
+                    "lockCameraPreviewRotate",
+                    "cameraPreviewYaw",
+                    "cameraPreviewPitch",
+                    "savedCameraPreviews",
+                    "addCameraPreviewBtn",
+                    "cameraPreviewCount",
+                    "deleteAllCameraPreviewsBtn"
+                  ]
+                }
               }
             ],
             "settings": [
@@ -67117,8 +67192,8 @@
     "desktop": {
       "left": 85.5999984741211,
       "top": 100.7874984741211,
-      "width": 662.375,
-      "height": 602.7875366210938
+      "width": 668.7750244140625,
+      "height": 605.9874877929688
     },
     "mobile": {
       "left": 59.61309814453125,
