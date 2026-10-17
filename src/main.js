@@ -1617,7 +1617,7 @@ const RO_PT_OK = new Set(RO_POINTS.map((o) => o.value)), RO_M_OK = new Set(RO_ME
 function roCleanPts(a) { const v = Array.isArray(a) ? a.filter((p) => RO_PT_OK.has(p)) : []; return v.length ? v : ['palmCenter'] }
 function roCleanCond(c) {
   c = c || {}
-  return { k: c.k === 'hit' ? 'hit' : c.k === 'nohit' ? 'nohit' : 'cmp', xs: c.xs === 'B' ? 'B' : 'A', xp: roCleanPts(c.xp), xq: c.xq === 'any' ? 'any' : 'all', m: RO_M_OK.has(c.m) ? c.m : 'cam', cmp: c.cmp === 'loses' ? 'loses' : c.cmp === 'equal' ? 'equal' : 'beats', ys: c.ys === 'A' ? 'A' : 'B', yp: roCleanPts(c.yp), yq: c.yq === 'any' ? 'any' : 'all' }
+  return { k: c.k === 'hit' ? 'hit' : c.k === 'nohit' ? 'nohit' : 'cmp', xs: c.xs === 'B' ? 'B' : 'A', xp: roCleanPts(c.xp), xq: c.xq === 'any' ? 'any' : 'all', m: RO_M_OK.has(c.m) ? c.m : 'cam', cmp: c.cmp === 'loses' ? 'loses' : c.cmp === 'equal' ? 'equal' : 'beats', orEq: c.orEq === true, ys: c.ys === 'A' ? 'A' : 'B', yp: roCleanPts(c.yp), yq: c.yq === 'any' ? 'any' : 'all' }
 }
 function roCleanRule(r) {
   r = r || {}
@@ -1645,7 +1645,7 @@ function roCondText(c) {
   if (c.k === 'nohit') return "the two hands' models do not intersect"
   const pts = (arr) => arr.map((p) => RO_PT_TEXT[p] || p).join(' + ')
   const meas = c.m === 'z' ? 'Z' : c.m === 'cur' ? 'Cursor XY' : c.m === 'cur3' ? 'Cursor XYZ' : 'Camera XY'
-  const cmp = c.cmp === 'equal' ? 'equal to (within 0.01)' : c.m === 'z' ? (c.cmp === 'beats' ? 'higher than' : 'lower than') : (c.cmp === 'beats' ? 'closer than' : 'farther than')
+  const cmp = c.cmp === 'equal' ? 'equal to (within 0.01)' : (c.m === 'z' ? (c.cmp === 'beats' ? 'higher than' : 'lower than') : (c.cmp === 'beats' ? 'closer than' : 'farther than')) + (c.orEq ? ' or equal to' : '')
   return (c.xq === 'any' ? 'any of ' : 'all of ') + 'Hand ' + c.xs + ' [' + pts(c.xp) + '] ' + meas + ' is ' + cmp + ' ' + (c.yq === 'any' ? 'any of ' : 'all of ') + 'Hand ' + c.ys + ' [' + pts(c.yp) + ']'
 }
 function roRuleText(r) {
@@ -1875,9 +1875,9 @@ function computeRenderOrderRanks() {
           const ok = c.xq === 'all' ? xv.every((p) => (c.yq === 'all' ? yv.every((q) => eq(p, q)) : yv.some((q) => eq(p, q)))) : xv.some((p) => (c.yq === 'all' ? yv.every((q) => eq(p, q)) : yv.some((q) => eq(p, q))))
           return { ok, L: aggOf(xa, hx, false), R: aggOf(ya, hy, false) }
         }
-        if (c.cmp === 'beats') { const L = aggOf(xa, hx, c.xq === 'any'), R = aggOf(ya, hy, c.yq === 'all'); return { ok: L > R + TOL, L, R } }
+        if (c.cmp === 'beats') { const L = aggOf(xa, hx, c.xq === 'any'), R = aggOf(ya, hy, c.yq === 'all'); return { ok: c.orEq ? L >= R - TOL : L > R + TOL, L, R } }
         const L = aggOf(xa, hx, c.xq === 'all'), R = aggOf(ya, hy, c.yq === 'any')
-        return { ok: L < R - TOL, L, R }
+        return { ok: c.orEq ? L <= R + TOL : L < R - TOL, L, R }
       }
     })
     const fires = (a, b) => { let any = false, all = true; for (let i = 0; i < conds.length; i++) { if (conds[i](a, b).ok) any = true; else all = false } return r.join === 'or' ? any : all }
@@ -2162,6 +2162,13 @@ function buildRenderOrderRulesWidget() {
     l2.appendChild(mkSel(RO_MEASURES, c.m, (v) => { c.m = v; changed() }))
     l2.appendChild(elLocal('span', { opacity: '.8', fontSize: '.85em' }, { text: 'is' }))
     l2.appendChild(mkSel(cmpOpts(c.m), c.cmp, (v) => { c.cmp = v; changed() }))
+    if (c.cmp !== 'equal') {
+      const oe = elLocal('label', { display: 'flex', alignItems: 'center', gap: '3px', fontSize: '.85em', whiteSpace: 'nowrap' }, { title: 'Also true when the two values are equal (within 0.01): e.g. "farther than or equal to"' })
+      const ob = document.createElement('input'); ob.type = 'checkbox'; ob.checked = !!c.orEq
+      ob.addEventListener('change', () => { c.orEq = ob.checked; changed() })
+      oe.appendChild(ob); oe.appendChild(document.createTextNode('or equals'))
+      l2.appendChild(oe)
+    }
     box.appendChild(l2)
     const l3 = line()
     l3.appendChild(mkSel(QUANT, c.yq, (v) => { c.yq = v; changed() }))
