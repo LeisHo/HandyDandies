@@ -23,7 +23,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD_IK_500",
+      "handModelId": "repo:HD_IK_300",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -267,6 +267,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewRealTimeLoading": false,
       "loadingPreviewModelId": "repo:HD_IK_1k",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -524,6 +525,8 @@
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 1150,
+      "loadingPreviewEasingCurveEnabled": false,
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -15593,6 +15596,19 @@
       "lockCameraPan": true,
       "lockCameraZoom": true,
       "cameraMaxExtentsEnabled": true,
+      "cameraPreviewEnabled": false,
+      "cameraPreviewX": 0,
+      "cameraPreviewY": 0,
+      "cameraPreviewZ": 0,
+      "cameraPreviewFov": 35,
+      "cameraPreviewZoom": 260,
+      "lockCameraPreviewPan": false,
+      "lockCameraPreviewZoom": false,
+      "lockCameraPreviewRotate": false,
+      "cameraPreviewYaw": 0,
+      "cameraPreviewPitch": 0,
+      "savedCameraPreviews": [],
+      "cameraPreviewCount": "0",
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
@@ -19633,7 +19649,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD_IK_500",
+      "handModelId": "repo:HD_IK_300",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -19877,6 +19893,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewRealTimeLoading": false,
       "loadingPreviewModelId": "repo:HD_IK_1k",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 0,
@@ -20134,6 +20151,8 @@
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 700,
+      "loadingPreviewEasingCurveEnabled": false,
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -35152,9 +35171,9 @@
           ]
         }
       ],
-      "cameraX": -3.4222222222222225,
-      "cameraY": 3.564227102601027e-13,
-      "cameraZ": 495.98819379333213,
+      "cameraX": -3.4222222222222234,
+      "cameraY": 4.475364321150992e-13,
+      "cameraZ": 495.9881938061241,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -35203,6 +35222,19 @@
       "lockCameraPan": true,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": false,
+      "cameraPreviewEnabled": false,
+      "cameraPreviewX": 0,
+      "cameraPreviewY": 0,
+      "cameraPreviewZ": 0,
+      "cameraPreviewFov": 35,
+      "cameraPreviewZoom": 260,
+      "lockCameraPreviewPan": false,
+      "lockCameraPreviewZoom": false,
+      "lockCameraPreviewRotate": false,
+      "cameraPreviewYaw": 0,
+      "cameraPreviewPitch": 0,
+      "savedCameraPreviews": [],
+      "cameraPreviewCount": "0",
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
@@ -39243,7 +39275,7 @@
       "renderOrderFallback2Terms": "[]",
       "renderOrderExtraFallbacks": "{\"v\":2,\"items\":[]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD_IK_500",
+      "handModelId": "repo:HD_IK_300",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -39487,6 +39519,7 @@
       "palmFacesCursorDistanceCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
       "palmFacesCursorDistanceRange": "{\"min\":1,\"max\":100}",
       "loadingPreviewEnabled": true,
+      "loadingPreviewRealTimeLoading": false,
       "loadingPreviewModelId": "repo:HD_IK_1k",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
@@ -39744,6 +39777,8 @@
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 1150,
+      "loadingPreviewEasingCurveEnabled": false,
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -54813,6 +54848,19 @@
       "lockCameraPan": false,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": false,
+      "cameraPreviewEnabled": false,
+      "cameraPreviewX": 0,
+      "cameraPreviewY": 0,
+      "cameraPreviewZ": 0,
+      "cameraPreviewFov": 35,
+      "cameraPreviewZoom": 260,
+      "lockCameraPreviewPan": false,
+      "lockCameraPreviewZoom": false,
+      "lockCameraPreviewRotate": false,
+      "cameraPreviewYaw": 0,
+      "cameraPreviewPitch": 0,
+      "savedCameraPreviews": [],
+      "cameraPreviewCount": "0",
       "keyAzimuth": 27,
       "keyElevation": 67,
       "keyTargetHeight": 65,
@@ -59489,6 +59537,10 @@
               },
               {
                 "type": "row",
+                "key": "loadingPreviewRealTimeLoading"
+              },
+              {
+                "type": "row",
                 "key": "loadingMinTimeMs"
               },
               {
@@ -59816,6 +59868,23 @@
                     "loadingPreviewProgressCropRealtime"
                   ]
                 }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Easing",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewEasingCurve"
+                    }
+                  ],
+                  "settings": [
+                    "loadingPreviewEasingCurve"
+                  ]
+                }
               }
             ],
             "settings": [
@@ -59823,6 +59892,7 @@
               "loadingPreviewEnabled",
               "loadingPreviewCameraEditMode",
               "loadingPreviewModelId",
+              "loadingPreviewRealTimeLoading",
               "loadingMinTimeMs",
               "loadingPreviewScalePct",
               "loadingPreviewScaleRefPx",
@@ -59849,7 +59919,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -60180,7 +60250,7 @@
           "type": "group",
           "group": {
             "key": "Outline",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -61571,7 +61641,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -61744,6 +61814,93 @@
               {
                 "type": "row",
                 "key": "cameraDefaultPreset"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Preview Camera",
+                  "collapsed": true,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewEnabled"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewX"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewY"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewZ"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewFov"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewZoom"
+                    },
+                    {
+                      "type": "row",
+                      "key": "lockCameraPreviewPan"
+                    },
+                    {
+                      "type": "row",
+                      "key": "lockCameraPreviewZoom"
+                    },
+                    {
+                      "type": "row",
+                      "key": "lockCameraPreviewRotate"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewYaw"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewPitch"
+                    },
+                    {
+                      "type": "row",
+                      "key": "savedCameraPreviews"
+                    },
+                    {
+                      "type": "row",
+                      "key": "addCameraPreviewBtn"
+                    },
+                    {
+                      "type": "row",
+                      "key": "cameraPreviewCount"
+                    },
+                    {
+                      "type": "row",
+                      "key": "deleteAllCameraPreviewsBtn"
+                    }
+                  ],
+                  "settings": [
+                    "cameraPreviewEnabled",
+                    "cameraPreviewX",
+                    "cameraPreviewY",
+                    "cameraPreviewZ",
+                    "cameraPreviewFov",
+                    "cameraPreviewZoom",
+                    "lockCameraPreviewPan",
+                    "lockCameraPreviewZoom",
+                    "lockCameraPreviewRotate",
+                    "cameraPreviewYaw",
+                    "cameraPreviewPitch",
+                    "savedCameraPreviews",
+                    "addCameraPreviewBtn",
+                    "cameraPreviewCount",
+                    "deleteAllCameraPreviewsBtn"
+                  ]
+                }
               }
             ],
             "settings": [
@@ -61886,7 +62043,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -62323,7 +62480,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -67123,8 +67280,8 @@
     "mobile": {
       "left": 59.61309814453125,
       "top": 237.88690185546875,
-      "width": 334.81549072265625,
-      "height": 524.4761962890625
+      "width": 338.2440490722656,
+      "height": 526
     }
   }
 }
