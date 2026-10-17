@@ -20153,10 +20153,10 @@
       "rvSet1ArmRange": "{\"min\":0,\"max\":12}",
       "rvSet1ArmCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "rvSet1ArmDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
-      "rvSet1SplayEnabled": false,
-      "rvSet1SplayRange": "{\"min\":0,\"max\":25}",
-      "rvSet1SplayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "rvSet1SplayDistCurve": "[{\"x\":0,\"y\":1},{\"x\":1,\"y\":1}]",
+      "rvSet1SplayEnabled": true,
+      "rvSet1SplayRange": "{\"min\":-15,\"max\":0}",
+      "rvSet1SplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4880543791992367,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3702201659306481,\"y\":0}}]",
+      "rvSet1SplayDistCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900505574107783,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4360926001296773,\"y\":-0.021145884195963527}}]",
       "rvSet1CropEnabled": false,
       "rvSet1CropRange": "{\"min\":0,\"max\":0.4}",
       "rvSet1CropCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -62886,7 +62886,7 @@
                             "type": "group",
                             "group": {
                               "key": "Velocity Wrist Splay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
