@@ -85,7 +85,7 @@ html, body {
    the checkbox"). The dev panel must always win that comparison, so it
    was the one moved, not this canvas's own already-correct-for-its-own-
    purpose value. */
-#loadingPreviewCanvas { display: none; position: fixed; top: 50%; left: 50%; z-index: 100000; pointer-events: none; }
+#loadingPreviewCanvas { display: none; position: fixed; z-index: 100000; pointer-events: none; } /* fixed, not the engine's absolute: an oversized canvas must never widen the page (on a phone it widened the layout viewport and the dev panel disappeared, 2026-10-15) */ /* position / size: UI Layout Engine (lib/ui-engine, applyLoadingPreviewLayout() in main.js) */
 /* Global Pause button (direct request, always visible, not DEV_MODE-
    gated) -- position/size/colors below are just SANE STARTING DEFAULTS;
    every one of these is overridden live by main.js's own
@@ -106,6 +106,8 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 #pauseButton:hover, #resetButton:hover { background: rgba(0, 0, 0, 0.75); }
+/* The three corner buttons (Pause, Reset, Color Presets) stay hidden until the loading screen is gone (2026-10-15, direct request): body gets .hd-revealed in finalizeReveal(). visibility, not display, so their own styling code is untouched. */
+body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:not(.hd-revealed) #presetButton, body:not(.hd-revealed) #presetPanel { visibility: hidden; pointer-events: none; }
 
 /* ---------------------------------------------------------------------
    Dev panel (CLAUDE.md Section 12) -- reused verbatim from ADA BATHROOM's
@@ -235,6 +237,21 @@ html, body {
 }
 .dp-tabs .dp-tab.dp-tab-active { background: var(--dp-accent-color, #7d8cff); color: #14142a; font-weight: 600; }
 .dp-actions { display: flex; gap: 6px; padding: 2px 2px 8px; }
+/* Saved Dev Settings item selector (2026-10-15) */
+.dp-ss-list { max-height: 170px; overflow-y: auto; margin-bottom: 5px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px; }
+.dp-ss-row { display: flex; align-items: center; gap: 6px; padding: 3px 6px; cursor: pointer; user-select: none; }
+.dp-ss-row:hover { background: rgba(255, 255, 255, 0.08); }
+.dp-ss-row.selected { background: rgba(108, 140, 255, 0.3); }
+.dp-ss-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dp-ss-badge { flex: 0 0 auto; font-size: 0.85em; padding: 0 6px; border-radius: 8px; background: var(--dp-accent, #6c8cff); color: #000; }
+.dp-ss-badge-use { background: #4ade80; }
+.dp-ss-status { margin-bottom: 4px; font-size: 0.9em; line-height: 1.35; }
+.dp-ss-status-line b { font-weight: 700; }
+.dp-ss-status-none { color: #fbbf24; }
+/* Item selector rows whose triggers overlap another enabled item (Custom Click Function Selector) */
+.dp-list-picker-row-conflict { background: rgba(239, 68, 68, 0.22); box-shadow: inset 3px 0 0 #ef4444; }
+.dp-list-picker-row-conflict .dp-lp-row-label { color: #fecaca; }
+.dp-ss-empty { opacity: 0.6; padding: 4px 6px; }
 .dp-actions button {
   flex: 1 1 auto; background: var(--dp-button-bg-color, #3a3a4a); border: none; border-radius: 4px;
   padding: 5px 4px; cursor: pointer;
@@ -337,6 +354,10 @@ html, body {
    enabled custom function). The header's own `title` attribute carries
    the actual explanation as a native tooltip. */
 .dp-group.dp-group-conflict-warning { box-shadow: inset 3px 0 0 0 #e0a030; }
+/* Responsive Velocity (Cursor Tracking): a Displacement Angle set whose instructions conflict is red, and so is the setting that conflicts. */
+.dp-group.dp-rv-conflict { background: rgba(239, 68, 68, 0.14); box-shadow: inset 3px 0 0 0 #ef4444; }
+.dp-row.dp-rv-conflict-row { background: rgba(239, 68, 68, 0.28); box-shadow: inset 3px 0 0 #ef4444; }
+.dp-rv-add-row button { width: 100%; }
 /* A group nested one level inside another (see setupReorder's own nesting
    cap) gets an indent + accent border instead of its own top-level
    top-border, so nesting is visually obvious without needing extra text. */
@@ -489,6 +510,10 @@ html, body {
   font-size: var(--dp-body-font-size, 11px); color: var(--dp-text-color, #c9c9d8);
 }
 .dp-list-picker-row-selected { background: #3a3a4a; color: var(--dp-title-color, #e8e8f0); }
+/* Default item of a selector (left accent bar) and the item that matches what is live right now (accent-coloured name); see listPickerMarks() in devPanel.js. */
+.dp-list-picker-row-default { box-shadow: inset 3px 0 0 var(--dp-accent, #6c8cff); }
+.dp-list-picker-row-default .dp-lp-row-label { font-weight: 600; }
+.dp-list-picker-row-inuse .dp-lp-row-label { color: var(--dp-accent, #6c8cff); }
 /* Shift-click multi-select (added 2026-09-15) -- a distinct outline, not
    the same solid fill as -selected above, so the single "active" item
    (what Use/Rename/Overwrite/Delete act on) stays visually distinguishable
@@ -558,6 +583,9 @@ html, body {
    `.dp-multi-select-row` (a sibling class, not a `.dp-row`). The label
    shares the row's own flex layout, styled distinctly from a dropdown. */
 .dp-multi-select-row input[type=range] { flex: 1 1 auto; min-width: 0; accent-color: var(--dp-slider-color, #7d8cff); }
+.dp-lp-group-selected > .dp-lp-group-header { outline: 1px solid var(--dp-accent, #6c8cff); outline-offset: -1px; background: rgba(108, 140, 255, 0.18); }
+.dp-lp-toggle-checkbox, .dp-lp-group-toggle { flex: 0 0 auto; margin: 0 6px 0 2px; accent-color: var(--dp-accent3, var(--dp-accent, #6c8cff)); cursor: pointer; }
+.dp-using-label { font-size: var(--dp-body-font-size, 11px); color: var(--dp-text-color, #e8e8f0); opacity: 0.7; padding: 1px 2px 3px; overflow-wrap: anywhere; }
 .dp-multi-select-hold-label { flex: 0 0 auto; color: var(--dp-text-color, #e8e8f0); font-size: var(--dp-body-font-size, 11px); padding: 3px 2px; opacity: 0.85; }
 .dp-multi-select-add-row { display: flex; gap: 4px; margin-bottom: 2px; }
 .dp-multi-select-add-row .dp-action-button { flex: 1 1 auto; }
@@ -646,3 +674,19 @@ html, body {
 .camera-preview-viewport:active { cursor: grabbing; }
 /* A slider whose motion is locked (Lock Camera Pan/Zoom/Rotate on the active preview). */
 .dp-row-locked { opacity: 0.4; }
+/* UI Layout Engine Inspector (lib/ui-engine/inspector.mjs) mounted in Loading Preview > Layout. The engine ships these classes unstyled; themed here with the panel's own colours. */
+.dp-ui-inspector { font-size: 11px; }
+.dp-ui-inspector .ui-inspector-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+.dp-ui-inspector .ui-inspector-label { color: inherit; opacity: 0.7; min-width: 90px; font-size: 10px; }
+.dp-ui-inspector .ui-inspector-select, .dp-ui-inspector .ui-inspector-text-input { background: rgba(0,0,0,0.35); color: inherit; border: 1px solid rgba(255,255,255,0.25); border-radius: 3px; font-size: 11px; padding: 2px 4px; flex: 1; min-width: 60px; }
+.dp-ui-inspector .ui-inspector-button { background: var(--dp-accent, #7d8cff); color: #000; border: none; border-radius: 3px; padding: 3px 8px; font-size: 10px; font-weight: bold; cursor: pointer; }
+.dp-ui-inspector .ui-inspector-section { margin: 8px 0; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 6px; }
+.dp-ui-inspector .ui-inspector-section-title { font-weight: bold; margin-bottom: 4px; cursor: pointer; }
+.dp-ui-inspector .ui-inspector-section-body.ui-inspector-collapsed { display: none; }
+.dp-ui-inspector .ui-inspector-hint, .dp-ui-inspector .ui-inspector-note { opacity: 0.6; font-style: italic; }
+.dp-ui-inspector .ui-inspector-config-dump { background: rgba(0,0,0,0.4); padding: 6px; font-size: 9px; max-height: 160px; overflow: auto; white-space: pre-wrap; word-break: break-all; }
+.dp-ui-inspector .ui-inspector-context-tabs { gap: 4px; }
+.dp-ui-inspector .ui-inspector-tab-button { opacity: 0.6; }
+.dp-ui-inspector .ui-inspector-tab-active { opacity: 1; box-shadow: 0 0 0 2px #fff inset; }
+.dp-ui-inspector .ui-inspector-group-label { opacity: 0.7; font-size: 10px; font-style: italic; }
+.dp-ui-inspector .ui-inspector-add-override-picker { border: 1px dashed var(--dp-accent, #7d8cff); padding: 6px; margin-top: 6px; border-radius: 4px; }

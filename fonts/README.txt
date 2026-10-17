@@ -1,0 +1,37 @@
+Bundled fonts for Loading Preview > Text (added 2026-10-15)
+
+Each file is the Latin subset, regular (400) weight, woff2, taken unmodified from the fontsource packages (https://fontsource.org) via https://cdn.jsdelivr.net/fontsource/fonts/<id>@latest/latin-400-normal.woff2. Every family listed here is published under the SIL Open Font License 1.1 (https://openfontlicense.org), which allows bundling and redistribution with an application; the fonts must not be sold on their own. Copyright stays with each font's authors (see each family's page on fontsource.org / fonts.google.com).
+
+Latin subset only: characters outside it (Cyrillic, Greek, Vietnamese, CJK ...) fall back to the system font.
+
+Files:
+Inter (inter.woff2, 23664 bytes)
+Roboto (roboto.woff2, 21884 bytes)
+Open Sans (open-sans.woff2, 18640 bytes)
+Montserrat (montserrat.woff2, 18780 bytes)
+Lato (lato.woff2, 23580 bytes)
+Poppins (poppins.woff2, 7884 bytes)
+Nunito (nunito.woff2, 16316 bytes)
+Raleway (raleway.woff2, 22408 bytes)
+Work Sans (work-sans.woff2, 19900 bytes)
+Source Sans 3 (source-sans-3.woff2, 15696 bytes)
+Quicksand (quicksand.woff2, 15776 bytes)
+Josefin Sans (josefin-sans.woff2, 12372 bytes)
+Oswald (oswald.woff2, 12248 bytes)
+DM Sans (dm-sans.woff2, 14200 bytes)
+Fira Sans (fira-sans.woff2, 23872 bytes)
+Playfair Display (playfair-display.woff2, 21856 bytes)
+Merriweather (merriweather.woff2, 49168 bytes)
+Lora (lora.woff2, 21148 bytes)
+Cormorant Garamond (cormorant-garamond.woff2, 22876 bytes)
+EB Garamond (eb-garamond.woff2, 23820 bytes)
+Libre Baskerville (libre-baskerville.woff2, 20108 bytes)
+Crimson Text (crimson-text.woff2, 25184 bytes)
+PT Serif (pt-serif.woff2, 33116 bytes)
+Bitter (bitter.woff2, 18568 bytes)
+Cinzel (cinzel.woff2, 14128 bytes)
+DM Serif Display (dm-serif-display.woff2, 24744 bytes)
+Source Serif 4 (source-serif-4.woff2, 20088 bytes)
+Spectral (spectral.woff2, 21696 bytes)
+Zilla Slab (zilla-slab.woff2, 26468 bytes)
+Domine (domine.woff2, 17720 bytes)

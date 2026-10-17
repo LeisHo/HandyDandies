@@ -18,6 +18,10 @@ work seamlessly from there.
 
 ## Currently working on
 
+**2026-10-15: Small Scale Models shipped (Hands group > "Small Scale Models", default off).** 9 lower-res models (HD-300 ... HD-8k, 366 ... 8,144 tris, same rig) are in data/processed/HAND3D/; the subgroup has an on/off checkbox, + Add Level, and per level a Z slider + model dropdown + delete; a hand uses the deepest level whose Z >= its world Z. Verified through the real controls in the page; NOT yet checked on the user's real saved layout (HANDS group restore), imported local models as levels, or real frame time. See CHANGELOG.txt / CLAUDE.md 2026-10-15.
+
+**2026-10-15: off-screen finger-curl skip shipped (Quality / Performance > "Skip Finger Curls For Off-Screen Hands", default on).** Hands outside every camera's view (plus a margin) keep all their pose numbers current but skip the finger-curl bone writes until they are back in view; verified bit-identical on return in the page, real frame-time gain NOT yet measured (check with the Frame Rate Log PROFILE lines, toggling the checkbox, on a real device). Next planned: distance-based low-poly hand models (user is preparing 2-3 lower-res versions of the GLB with the same skeleton); not started. See CHANGELOG.txt / CLAUDE.md 2026-10-15.
+
 **Nothing in progress right now.** Most recent work (2026-10-11): all 3 curve-editor widgets now have bezier handles -- Arm Length and Wrist
 Splay's own curve widgets were deliberately separate, older code that never got the interaction layer `buildGenericCurveWidget()` already had;
 ported it in verbatim (UI-only, the underlying curve math already read a point's h1/h2 override unconditionally). Verified live via real

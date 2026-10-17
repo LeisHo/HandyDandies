@@ -8,7 +8,15 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=66'
+import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
+import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
+import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=91'
+
+// Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
+// its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
+// makeGradientTexture() tint each toon step with the Toon Shade Color Gradient. No effect if three's chunk text changes.
+THREE.ShaderChunk.gradientmap_pars_fragment = THREE.ShaderChunk.gradientmap_pars_fragment.replace('vec3( texture2D( gradientMap, coord ).r )', 'texture2D( gradientMap, coord ).rgb')
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -25,8 +33,106 @@ function safeRefreshSelectOptions(key) {
 function safeRefreshMultiSelectOptions(key) {
   try { refreshMultiSelectOptions(key) } catch (err) { console.error(`safeRefreshMultiSelectOptions('${key}') failed`, err) }
 }
+// Every dropdown that lists the saved tween sequences: the Loading Tween Sequence, and the Sequence / Chain rows of EVERY click function (the Starting State one, custom functions, their Multi Triggers).
+// Found by the rows that exist right now instead of a hard-coded key list, which missed the loading preview and every custom function (2026-10-15, direct report: an imported tween did not show up in them).
+function refreshAllTweenSequenceSelectors() {
+  const keys = new Set(['loadingPreviewTweenSelector', 'dcHoldTweenSelector', 'rcTweenSelector', 'chpTweenSelector', 'rchpTweenSelector', 'clickTweenSelector', 'dblclickTweenSelector'])
+  const chains = new Set()
+  document.querySelectorAll('.dp-row[data-key]').forEach((row) => {
+    const k = row.dataset.key
+    if (/TweenSelector$/.test(k)) keys.add(k)
+    else if (/TweenChain$/.test(k)) chains.add(k)
+  })
+  CLICK_HOLD_KEYS.forEach((p) => chains.add(`${p}TweenChain`))
+  keys.forEach(safeRefreshSelectOptions)
+  chains.forEach(safeRefreshMultiSelectOptions)
+}
 
-const MODEL_URL = '../data/processed/HAND3D/HandipantsOL_Clip.glb' // Draco-compressed, carries the 'Clipping Block' mesh (2026-10-11)
+const MODEL_URL = '../data/processed/HAND3D/HandipantsOL_Clip.glb' // Draco-compressed, carries the 'Clipping Block' mesh (2026-10-11) - no longer loaded directly, see resolveHandModelUrl()
+// ---- Hand model (2026-10-14, direct request: use HandipantsFixedBone.glb; Hand group > item selector with Use / Delete / Import) ----
+// The model is chosen BEFORE it loads, so the choice lives in localStorage (readable the instant the page starts, like the startup background); it is also saved with the settings (handModelId) so other devices follow it.
+// Models are the repo ones below plus any the user imports: an imported .glb is kept in this browser's IndexedDB (it cannot go into the repo from here), so it exists on this device only. Use reloads the page: everything that
+// is measured from the model (alignQuat, bounds, bone rest poses, the crop block) is taken once at load.
+const HAND_MODEL_DEFAULT_ID = 'repo:HandipantsFixedBone'
+const HAND_MODEL_BUILTINS = [
+  { id: 'repo:HandipantsFixedBone', name: 'Handipants Fixed Bone', url: '../data/processed/HAND3D/HandipantsFixedBone.glb', source: 'repo' },
+  { id: 'repo:HandipantsOL_Clip', name: 'Handipants OL (Crop Block, Draco)', url: '../data/processed/HAND3D/HandipantsOL_Clip.glb', source: 'repo' },
+  // 2026-10-15: the lower-resolution exports from HANDO (HAND-021), same 23-bone rig / bind matrices as HandipantsOL_Clip. Triangle counts are measured from the files (the Hand mesh); HD-2k and HD-4k were re-exported on 2026-10-15 after the first copy (2k was a duplicate of 4k).
+  { id: 'repo:HD-300', name: 'HD 300 (366 tris)', url: '../data/processed/HAND3D/HD-300.glb', source: 'repo' },
+  { id: 'repo:HD-500', name: 'HD 500 (488 tris)', url: '../data/processed/HAND3D/HD-500.glb', source: 'repo' },
+  { id: 'repo:HD-1K', name: 'HD 1K (1,018 tris)', url: '../data/processed/HAND3D/HD-1K.glb', source: 'repo' },
+  { id: 'repo:HD-2k', name: 'HD 2k (2,036 tris)', url: '../data/processed/HAND3D/HD-2k.glb', source: 'repo' },
+  { id: 'repo:HD-3K', name: 'HD 3K (3,052 tris)', url: '../data/processed/HAND3D/HD-3K.glb', source: 'repo' },
+  { id: 'repo:HD-4k', name: 'HD 4k (4,074 tris)', url: '../data/processed/HAND3D/HD-4k.glb', source: 'repo' },
+  { id: 'repo:HD-5K', name: 'HD 5K (5,000 tris)', url: '../data/processed/HAND3D/HD-5K.glb', source: 'repo' },
+  { id: 'repo:HD-6k', name: 'HD 6k (6,014 tris)', url: '../data/processed/HAND3D/HD-6k.glb', source: 'repo' },
+  { id: 'repo:HD-8k', name: 'HD 8k (8,144 tris)', url: '../data/processed/HAND3D/HD-8k.glb', source: 'repo' },
+  // 2026-10-16: the 13 HD IK exports - same 23-joint rig names and Hand + OUTLINE primitives as the HD files above, a different bind pose (so poses will not match exactly). Triangle counts read from each file's Hand index accessor.
+  { id: 'repo:HD_IK_100', name: 'HD IK 100 (110 tris)', url: '../data/processed/HAND3D/HD_IK_100.glb', source: 'repo' },
+  { id: 'repo:HD_IK_200', name: 'HD IK 200 (194 tris)', url: '../data/processed/HAND3D/HD_IK_200.glb', source: 'repo' },
+  { id: 'repo:HD_IK_300', name: 'HD IK 300 (304 tris)', url: '../data/processed/HAND3D/HD_IK_300.glb', source: 'repo' },
+  { id: 'repo:HD_IK_400', name: 'HD IK 400 (402 tris)', url: '../data/processed/HAND3D/HD_IK_400.glb', source: 'repo' },
+  { id: 'repo:HD_IK_500', name: 'HD IK 500 (544 tris)', url: '../data/processed/HAND3D/HD_IK_500.glb', source: 'repo' },
+  { id: 'repo:HD_IK_800', name: 'HD IK 800 (810 tris)', url: '../data/processed/HAND3D/HD_IK_800.glb', source: 'repo' },
+  { id: 'repo:HD_IK_1k', name: 'HD IK 1k (1,090 tris)', url: '../data/processed/HAND3D/HD_IK_1k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_2k', name: 'HD IK 2k (2,062 tris)', url: '../data/processed/HAND3D/HD_IK_2k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_4k', name: 'HD IK 4k (4,008 tris)', url: '../data/processed/HAND3D/HD_IK_4k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_6k', name: 'HD IK 6k (6,034 tris)', url: '../data/processed/HAND3D/HD_IK_6k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_8k', name: 'HD IK 8k (8,018 tris)', url: '../data/processed/HAND3D/HD_IK_8k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_10k', name: 'HD IK 10k (10,004 tris)', url: '../data/processed/HAND3D/HD_IK_10k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_12k', name: 'HD IK 12k (12,224 tris)', url: '../data/processed/HAND3D/HD_IK_12k.glb', source: 'repo' }
+]
+const lpLoadedRoots = new Map() // model id -> the loaded, prepared scene root (only for ids that loaded fine)
+const lpModelLoads = new Map() // model id -> the load promise (a model is fetched once)
+const HAND_MODEL_LS_KEY = 'handyDandies.handModelId'
+const HAND_MODEL_PENDING_KEY = 'handyDandies.handModelPending' // set by Use, cleared by the next load once the choice is on the server
+const HAND_MODEL_BONES = ['rHand', 'rMid3', 'rForearmBend', 'rMid1'] // the rig names the measurements and poses rely on
+let activeHandModelId = HAND_MODEL_DEFAULT_ID
+const localHandModelPresent = {} // id -> true when this browser holds the imported file
+function handModelIdb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('handyDandiesHandModels', 1)
+    req.onupgradeneeded = () => req.result.createObjectStore('models')
+    req.onsuccess = () => resolve(req.result)
+    req.onerror = () => reject(req.error)
+  })
+}
+function handModelIdbRun(mode, fn) {
+  return handModelIdb().then((db) => new Promise((resolve, reject) => {
+    const tx = db.transaction('models', mode)
+    const out = fn(tx.objectStore('models'))
+    tx.oncomplete = () => { db.close(); resolve(out && out.result) }
+    tx.onerror = () => { db.close(); reject(tx.error) }
+  }))
+}
+const handModelIdbGet = (id) => handModelIdbRun('readonly', (st) => st.get(id))
+const handModelIdbPut = (id, rec) => handModelIdbRun('readwrite', (st) => st.put(rec, id))
+const handModelIdbDelete = (id) => handModelIdbRun('readwrite', (st) => st.delete(id))
+const handModelIdbKeys = () => handModelIdbRun('readonly', (st) => st.getAllKeys())
+async function resolveHandModelUrl() {
+  let id = null
+  try { id = localStorage.getItem(HAND_MODEL_LS_KEY) } catch (e) { /* storage blocked */ }
+  id = id || HAND_MODEL_DEFAULT_ID
+  const builtin = HAND_MODEL_BUILTINS.find((m) => m.id === id)
+  if (builtin) { activeHandModelId = id; return builtin.url }
+  if (id.startsWith('local:')) {
+    try {
+      const rec = await handModelIdbGet(id)
+      if (rec && rec.blob) { activeHandModelId = id; return URL.createObjectURL(rec.blob) }
+    } catch (e) { /* fall through to the default */ }
+  }
+  activeHandModelId = HAND_MODEL_DEFAULT_ID // the chosen model is not available here (imported on another device, or removed)
+  try { localStorage.removeItem(HAND_MODEL_LS_KEY) } catch (e) { /* ignore */ }
+  return HAND_MODEL_BUILTINS[0].url
+}
+// A load that cannot work (bad file, missing rig bones): go back to the default model once instead of leaving a dead page.
+function revertHandModelAndReload(reason) {
+  if (activeHandModelId === HAND_MODEL_DEFAULT_ID) return false
+  console.error('Hand model "' + activeHandModelId + '" unusable: ' + reason + ' - going back to the default model')
+  try { localStorage.removeItem(HAND_MODEL_LS_KEY) } catch (e) { /* ignore */ }
+  location.reload()
+  return true
+}
 // Measured once after the first load -- the rig's own bind-pose "pointing"
 // axis (wrist -> middle fingertip), not assumed to be +Y/-Z.
 let alignQuat = new THREE.Quaternion()
@@ -281,7 +387,7 @@ let loadingPreviewAnchorActive = false
 // functions: the restore can call its onChange at top level (TDZ gotcha).
 let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: null, speedRangeParsed: null }
 const loadingPreviewAnchor = new THREE.Vector3()
-const _loadingPreviewBase = new THREE.Vector3()
+const _loadingPreviewBase = new THREE.Vector3(), _loadingPreviewV2 = new THREE.Vector3()
 // World-XY-only cursor distance for click-function settings (2026-10-04,
 // direct request: "for any click function settings that depend on distance
 // from cursor, the distance should only be based off of world XY vectors").
@@ -310,7 +416,13 @@ const _brAX = new THREE.Vector3(1, 0, 0), _brAY = new THREE.Vector3(0, 1, 0), _b
 // Render Order Mode / Fallback options (2026-10-11). Z modes order by a Z position (closest to the camera on top); the cursor modes order by distance to the cursor: XY = screen-space only, XYZ = also the Z gap
 // to the cursor target (its Cursor Target Depth). 'closest' = nearest the cursor on top, 'farthest' = furthest on top.
 // '-' modes (2026-10-11): the same Z with the sign flipped, so the hand with the LOWER Z value is drawn on top.
-const RO_NEG_BASE = { negZ: 'z', negArmBase: 'armBase', negArmEnd: 'armEnd', negPalmCenter: 'palmCenter' }
+const RO_NEG_BASE = { negZ: 'z', negArmBase: 'armBase', negArmEnd: 'armEnd', negPalmCenter: 'palmCenter', negCamPalmCenter: 'camPalmCenter', negCamArmBase: 'camArmBase', negCamArmEnd: 'camArmEnd' }
+// "Closest to Camera (XY)" modes (2026-10-16): the same points (rig nodes), ordered by their XY distance to the camera - how far the point sits from the centre of the view on screen (the camera's own X / Y; depth is ignored), the
+// same screen-space meaning as the (XY) cursor modes but measured to the camera. Scalar: the point nearer the camera's XY is drawn on top. Pair modes: the same former-hand rule as the Z pair modes below, comparing those
+// distances instead of Z. The '-' versions reverse the verdict.
+const RO_CAM_NODES = { camPalmCenter: 'palmCenter', camArmBase: 'armBase', camArmEnd: 'armEnd' }
+const RO_CAM_PAIR_NEG = { negCamArmBaseToPalm: 'camArmBaseToPalm', negCamArmEndToPalm: 'camArmEndToPalm', negCamArmEndToArmBase: 'camArmEndToArmBase' }
+const RO_CAM_PAIR_DEFS = { camArmBaseToPalm: ['armBase', 'palmCenter'], camArmEndToPalm: ['armEnd', 'palmCenter'], camArmEndToArmBase: ['armEnd', 'armBase'] }
 // '-' pair modes (2026-10-11): the same test with the verdict reversed (the LOWER former point goes on top).
 const RO_PAIR_NEG = { negPalmToArm: 'palmToArm', negPalmToArmEnd: 'palmToArmEnd', negArmBaseToPalm: 'armBaseToPalm', negArmEndToPalm: 'armEndToPalm', negArmBaseToArmEnd: 'armBaseToArmEnd', negArmEndToArmBase: 'armEndToArmBase' }
 const RO_PAIR_DEFS = { palmToArm: ['palmCenter', 'armBase'], palmToArmEnd: ['palmCenter', 'armEnd'], armBaseToPalm: ['armBase', 'palmCenter'], armEndToPalm: ['armEnd', 'palmCenter'], armBaseToArmEnd: ['armBase', 'armEnd'], armEndToArmBase: ['armEnd', 'armBase'] }
@@ -331,24 +443,41 @@ const RENDER_ORDER_MODE_OPTIONS = [
   { value: 'negArmBaseToPalm', text: '-Arm Base To Palm Center' },
   { value: 'negArmEndToPalm', text: '-Arm End To Palm Center' },
   { value: 'negArmBaseToArmEnd', text: '-Arm Base To Arm End' },
-  { value: 'negArmEndToArmBase', text: '-Arm End To Arm Base' }
+  { value: 'negArmEndToArmBase', text: '-Arm End To Arm Base' },
+  { value: 'camArmBaseToPalm', text: 'Arm Base To Palm Center Closest to Camera (XY)' }, { value: 'negCamArmBaseToPalm', text: '-Arm Base To Palm Center Closest to Camera (XY)' },
+  { value: 'camArmEndToPalm', text: 'Arm End To Palm Center Closest to Camera (XY)' }, { value: 'negCamArmEndToPalm', text: '-Arm End To Palm Center Closest to Camera (XY)' },
+  { value: 'camArmEndToArmBase', text: 'Arm End To Arm Base Closest to Camera (XY)' }, { value: 'negCamArmEndToArmBase', text: '-Arm End To Arm Base Closest to Camera (XY)' },
+  { value: 'camPalmCenter', text: 'Palm Center Closest to Camera (XY)' }, { value: 'negCamPalmCenter', text: '-Palm Center Closest to Camera (XY)' },
+  { value: 'camArmBase', text: 'Arm Base Closest to Camera (XY)' }, { value: 'negCamArmBase', text: '-Arm Base Closest to Camera (XY)' },
+  { value: 'camArmEnd', text: 'Arm End Closest to Camera (XY)' }, { value: 'negCamArmEnd', text: '-Arm End Closest to Camera (XY)' }
 ]
 // Cursor tracking point (2026-10-11): the point on each hand that every cursor-tracking measurement (aim, palm angle, screen-space distances, splay / crop distances) is taken from. Computed at the hand's
 // no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
 const TRACKING_POINT_OPTIONS = [{ value: 'hand', text: 'Hand Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' }]
 const palmCenterPosRaw = new THREE.Vector3(), _trkExt = new THREE.Vector3()
+// HANDO's own two-hand reference points (2026-10-14): its Whole-Hand Rotation / Pose Scale / 2nd-hand pivot is the MIDPOINT of the wrist (rHand) and the middle-finger base (rMid1), not rMid1 alone (palmCenterPosRaw), and its mirror plane passes through the
+// BOUNDING-BOX centre of the main hand at load, not the bounding-sphere centre (handBoundsCenterLocal). Both in the same raw frame as palmCenterPosRaw.
+const handoPivotRaw = new THREE.Vector3(), handBoundsBoxCenterRaw = new THREE.Vector3()
 const pointDirRawModel = new THREE.Vector3(0, 1, 0) // wrist -> fingertip in the model's raw frame (measured at load); the hand's own pointing axis, before any rotation
 const _swingE = new THREE.Vector3(), _trkQinv = new THREE.Quaternion()
 const _armPartialQ = new THREE.Quaternion(), _armOffQx = new THREE.Quaternion(), _armOffQy = new THREE.Quaternion(), _armOffAxis = new THREE.Vector3()
 let trkXYFieldMin = 0, trkXYFieldRange = 0.001, trkXYAllMin = 0, trkXYAllRange = 0.001
 let trackingPointCloud = null
+let fieldCenterPoint = null // Debug > FIELD CENTER POINT: one red dot at the centroid of the hand field
+let loadingPreviewTwoHandActive = false // the selected Loading Tween Sequence is a two-hand one (set by ensureLoadingPreviewHand2())
+let loadingPreviewHand2 = null // second hand of a two-hand loading tween (built lazily, see ensureLoadingPreviewHand2())
 let floorMesh = null // Floor group: one plane behind the hands
 const SPHERE_FN = 'sphereFn' // Field Grid Sphere Sequence: only the shared Speed / Easing / Start Time / Start Distance curve controls and their parsed caches are borrowed from the click functions
 let sphereStage = 2 // 0 = waiting for the first click (floor only, hands hidden), 1 = spheres running / shown, 2 = done or feature off
-let sphereMesh = null, sphereOn = null, sphereStart = null, sphereDur = null, sphereCap = null
+let sphereMesh = null, sphereOn = null, sphereStart = null, sphereDur = null, sphereCap = null, sphereDone = null // sphereDone[i] = 1 once sphere i has reached its target scale and position (Wait For All Spheres)
 const sphereParseCache = new Map()
 const STARTUP_FN = 'startupFn' // Hand Offset On Startup: a built-in, hidden-trigger pose-kind click function (prefix startupFn)
 let startupHandOffsetStage = 0, startupConsumeActive = false, startupConsumeUntil = 0 // 0 = waiting for the first click, 1 = the startup transition has been fired
+let sphereClickCount = 0, sphereKeepForHands = false // Field Grid Sphere Sequence: clicks that triggered spheres so far (Maximum Clicks); true while the spheres stay on screen until their own hand finishes its sequence
+let startupHandClickCount = 0, startupIgnoreStartDistance = false // Hand Offset On Startup: clicks that triggered hands so far (Maximum Clicks); true only while the over-the-limit click triggers every remaining hand
+let camDistFrame = -1, camDistMin = 0, camDistRange = 1 // Retransition Distance Curve: nearest / range of every hand's distance to the camera, cached per frame
+let fbDistFrame = -1, fbDistMin = 0, fbDistRange = 1, fbDist = null // Hand Position Min / Max curves: each hand's starting-point screen distance from the screen centre, cached per frame
+let startupFloorHidden = false // Starting State > Hide Floor After Hand Offset Sequence: set once every hand has finished the startup transition (runtime only, never saved)
 let startupStaticReleased = false // Starting State > Static Pose On Startup: set by the first click function trigger (runtime only, never saved)
 const _cfTmp = new THREE.Vector3() // clickRotatePointInto() scratch
 const _trkV1 = new THREE.Vector3(), _trkV2 = new THREE.Vector3(), _trkWqInv = new THREE.Quaternion() // handTrackingPointInto() scratch
@@ -593,6 +722,11 @@ let modelLoaded = false
 // first synchronous call, throwing "Cannot access before initialization"
 // (confirmed live, 2026-09-16, before moving it here).
 let idleReposeFrameCounter = 0
+// Small Scale Models (2026-10-15): id -> { state: 'loading' | 'ready' | 'failed', fill, outline } geometries loaded from the model files; the parsed, z-sorted level list; and how many hands currently use a small model.
+const smallScaleGeomCache = new Map()
+let smallScaleLevelsStr = null
+let smallScaleLevels = []
+let smallScaleActiveCount = 0
 // ROOT CAUSE of a real, severe startup-lag regression, 2026-09-16 (direct
 // user report: "way way way worse than ever before... its mainly laggy
 // on startup... the hands are getting into position and setting their
@@ -644,6 +778,8 @@ let startupCacheApplied = false
 let fieldBuildAllowed = false
 let fieldBuildStarted = false
 let fieldBuildDone = false
+let fieldBuildFrac = 0 // 0..1 share of the field's hands created so far (feeds the Loading Preview's Progress Crop)
+let loadingProgressShown = 0 // running maximum of the loading progress, so it never goes backwards
 let fieldBuildInProgress = false
 let fieldBuildDirty = false
 let startupValuesApplied = false // static cfg values restored (custom functions may still be building)
@@ -653,6 +789,418 @@ const _identityQuatTrack = new THREE.Quaternion()
 // The loading screen (text + preview hand + blocker) stays up until the field has actually PAINTED, not just until it was built (2026-10-11): fieldStarted flips when the min-time gate passes,
 // fieldRevealed flips a couple of rendered frames later. See finalizeReveal().
 let fieldRevealed = false, fieldRevealFrames = 0, fieldWarmCompiled = false
+// Field warm-up (2026-10-15, direct report: the loading-preview hands froze for ~5 s between the end of the loading sequence and the live field). The cost was the FIRST draw of the whole field -- every shader program
+// finishing its link, every hand's first GPU upload -- all landing in ONE frame right after `fieldStarted`, so the loading preview (rendered in the same animate() call) stopped dead while the main thread was busy.
+// The field is now warmed behind the loading screen while the preview keeps animating: 1 = compiling the programs without blocking (renderer.compileAsync), 2 = the hands are made visible a few per frame so each
+// frame's first-draw cost stays small, 3 = done (tryStartField() may start the field). The 20000 ms cap is an UNMEASURED judgment call: if warming has not finished by then (a stuck compile), the rest is revealed at once.
+let fieldWarmStage = 0, fieldWarmRevealIndex = 0, fieldWarmStartMs = 0, fieldWarmBatch = 1, fieldWarmLastRenderMs = 0, fieldWarmPrevRenderMs = 0
+let fieldWarmPrevStart = 0, fieldWarmBaseMs = Infinity // warm-up: where the previous batch started, and the cheapest field render seen (the near-empty field)
+// Batch size adapts to how much the last batch ADDED to the draw time (not to the absolute draw time, which a slow GPU has even with nothing new): doubled while a batch added under 10 ms, halved (never below 4) when it added over 25 ms -- both thresholds and the floor of 4 are judgment calls, not measurements.
+const FIELD_WARM_CAP_MS = 20000
+// Exclusive click-function triggers (see enforceExclusiveTrigger()); declared up here because Enabled onChange handlers run during the very first settings restore, before the code further down has executed.
+let exclusiveTriggerSuppress = 0
+let exclusiveTriggersReady = false
+// Bulk-apply batching (2026-10-15, direct report: Use / Set Default on a saved setting took a minute or more). A Use applies every control of every click function (about 7,700 with the real settings) and each
+// control's onChange re-ran the SAME per-function UI refresh (row visibility of ~100 rows, trigger config parsing, ...): measured with the real settings, 108.7 s of the 122.7 s in applyStoredValues went to ~4,600
+// onChange calls of 45-135 ms each, almost all of them these refreshes. While a whole state is being applied (isApplyingPanelState()) these refreshes are only recorded, one per function / kind, and run ONCE
+// when the apply is over (onPanelStateApplied). They read the final settings, so the end state is the same; they only stop being repeated.
+const deferredUiUpdates = new Map()
+function deferWhileApplying(key, fn) {
+  if (window.__noDeferUi || !isApplyingPanelState()) return false // window.__noDeferUi: switches the batching off (to compare against the old per-control behaviour)
+  deferredUiUpdates.delete(key) // re-inserted at the END: the refreshes run in the order of their LAST call, as the per-control calls used to leave them
+  deferredUiUpdates.set(key, fn)
+  return true
+}
+function flushDeferredUiUpdates() {
+  // The per-function "Enabled" refresh goes LAST: when a function is built it is the final step (it hides every row of a disabled function and re-runs the sub-refreshes of an enabled one), so a refresh that ran after it would show rows of a disabled function.
+  const entries = Array.from(deferredUiUpdates.entries())
+  deferredUiUpdates.clear()
+  const isLate = (k) => k.startsWith('enabled:') || k.startsWith('typeVis:')
+  const late = entries.filter(([k]) => isLate(k)).sort((x, y) => (x[0].startsWith('typeVis:') ? 1 : 0) - (y[0].startsWith('typeVis:') ? 1 : 0)) // Enabled first, then the Type / Touch-count row visibility
+  const fns = entries.filter(([k]) => !isLate(k)).concat(late).map(([, fn]) => fn)
+  fns.forEach((fn) => { try { fn() } catch (err) { console.warn('deferred UI refresh threw:', err) } })
+}
+{
+  const o = {
+    gate: updateSingleTimingGateVisibility, mode: updateClickTriggerModeVisibility, chain: updateChainModeVisibility, seq: updateSequencePlayModeVisibility,
+    offrot: updateOffsetRotationVisibility, enabled: updateClickFunctionEnabledVisibility, tweenStop: updateTweenStopGateVisibility, loopHold: updateLoopHoldVisibility,
+    parseHold: parseClickHoldConfig, parsePose: parseClickPoseConfig, typeVis: updateCustomFunctionTypeVisibility, conflicts: refreshCustomFunctionConflictWarnings
+  }
+  updateSingleTimingGateVisibility = (p) => { if (!deferWhileApplying('gate:' + p, () => o.gate(p))) o.gate(p) }
+  updateClickTriggerModeVisibility = (p, a, b) => { if (!deferWhileApplying('mode:' + p, () => o.mode(p, a, b))) o.mode(p, a, b) }
+  updateChainModeVisibility = (p) => { if (!deferWhileApplying('chain:' + p, () => o.chain(p))) o.chain(p) }
+  updateSequencePlayModeVisibility = (p) => { if (!deferWhileApplying('seq:' + p, () => o.seq(p))) o.seq(p) }
+  updateOffsetRotationVisibility = (p) => { if (!deferWhileApplying('offrot:' + p, () => o.offrot(p))) o.offrot(p) }
+  updateClickFunctionEnabledVisibility = (p) => { if (!deferWhileApplying('enabled:' + p, () => o.enabled(p))) o.enabled(p) }
+  updateTweenStopGateVisibility = (p) => { if (!deferWhileApplying('tweenStop:' + p, () => o.tweenStop(p))) o.tweenStop(p) }
+  updateLoopHoldVisibility = (p) => { if (!deferWhileApplying('loopHold:' + p, () => o.loopHold(p))) o.loopHold(p) }
+  parseClickHoldConfig = (p) => { if (!deferWhileApplying('parseHold:' + p, () => o.parseHold(p))) o.parseHold(p) }
+  parseClickPoseConfig = (p) => { if (!deferWhileApplying('parsePose:' + p, () => o.parsePose(p))) o.parsePose(p) }
+  updateCustomFunctionTypeVisibility = (id) => { if (!deferWhileApplying('typeVis:' + id, () => o.typeVis(id))) o.typeVis(id) }
+  refreshCustomFunctionConflictWarnings = () => { if (!deferWhileApplying('conflicts', () => o.conflicts())) o.conflicts() }
+  onPanelStateApplied(flushDeferredUiUpdates)
+}
+// Loading Preview > Text (2026-10-15, direct request): free text shown beside the loading animation. Thirty system fonts in two dropdown groups (see below); each has a fallback stack so a machine without the first choice still gets the same kind.
+// Bundled web fonts (fonts/*.woff2, declared in src/fonts.css), grouped in the dropdown (an <optgroup> each): fifteen sans-serif, fifteen serif. They load on demand - only the selected family is ever downloaded, so they add nothing to startup while the loading text is off.
+// Each css value falls back to a system font of the same kind while the file loads (font-display: swap) or for characters outside the Latin subset.
+const LOADING_TEXT_FONTS = [
+  { name: 'Inter', group: 'Sans-serif', css: '"Inter", Arial, Helvetica, sans-serif' },
+  { name: 'Roboto', group: 'Sans-serif', css: '"Roboto", Arial, Helvetica, sans-serif' },
+  { name: 'Open Sans', group: 'Sans-serif', css: '"Open Sans", Arial, Helvetica, sans-serif' },
+  { name: 'Montserrat', group: 'Sans-serif', css: '"Montserrat", Arial, Helvetica, sans-serif' },
+  { name: 'Lato', group: 'Sans-serif', css: '"Lato", Arial, Helvetica, sans-serif' },
+  { name: 'Poppins', group: 'Sans-serif', css: '"Poppins", Arial, Helvetica, sans-serif' },
+  { name: 'Nunito', group: 'Sans-serif', css: '"Nunito", Arial, Helvetica, sans-serif' },
+  { name: 'Raleway', group: 'Sans-serif', css: '"Raleway", Arial, Helvetica, sans-serif' },
+  { name: 'Work Sans', group: 'Sans-serif', css: '"Work Sans", Arial, Helvetica, sans-serif' },
+  { name: 'Source Sans 3', group: 'Sans-serif', css: '"Source Sans 3", Arial, Helvetica, sans-serif' },
+  { name: 'Quicksand', group: 'Sans-serif', css: '"Quicksand", Arial, Helvetica, sans-serif' },
+  { name: 'Josefin Sans', group: 'Sans-serif', css: '"Josefin Sans", Arial, Helvetica, sans-serif' },
+  { name: 'Oswald', group: 'Sans-serif', css: '"Oswald", Arial, Helvetica, sans-serif' },
+  { name: 'DM Sans', group: 'Sans-serif', css: '"DM Sans", Arial, Helvetica, sans-serif' },
+  { name: 'Fira Sans', group: 'Sans-serif', css: '"Fira Sans", Arial, Helvetica, sans-serif' },
+  { name: 'Playfair Display', group: 'Serif', css: '"Playfair Display", Georgia, "Times New Roman", serif' },
+  { name: 'Merriweather', group: 'Serif', css: '"Merriweather", Georgia, "Times New Roman", serif' },
+  { name: 'Lora', group: 'Serif', css: '"Lora", Georgia, "Times New Roman", serif' },
+  { name: 'Cormorant Garamond', group: 'Serif', css: '"Cormorant Garamond", Georgia, "Times New Roman", serif' },
+  { name: 'EB Garamond', group: 'Serif', css: '"EB Garamond", Georgia, "Times New Roman", serif' },
+  { name: 'Libre Baskerville', group: 'Serif', css: '"Libre Baskerville", Georgia, "Times New Roman", serif' },
+  { name: 'Crimson Text', group: 'Serif', css: '"Crimson Text", Georgia, "Times New Roman", serif' },
+  { name: 'PT Serif', group: 'Serif', css: '"PT Serif", Georgia, "Times New Roman", serif' },
+  { name: 'Bitter', group: 'Serif', css: '"Bitter", Georgia, "Times New Roman", serif' },
+  { name: 'Cinzel', group: 'Serif', css: '"Cinzel", Georgia, "Times New Roman", serif' },
+  { name: 'DM Serif Display', group: 'Serif', css: '"DM Serif Display", Georgia, "Times New Roman", serif' },
+  { name: 'Source Serif 4', group: 'Serif', css: '"Source Serif 4", Georgia, "Times New Roman", serif' },
+  { name: 'Spectral', group: 'Serif', css: '"Spectral", Georgia, "Times New Roman", serif' },
+  { name: 'Zilla Slab', group: 'Serif', css: '"Zilla Slab", Georgia, "Times New Roman", serif' },
+  { name: 'Domine', group: 'Serif', css: '"Domine", Georgia, "Times New Roman", serif' }
+]
+// The first version of this dropdown (2026-10-15) listed system fonts; a saved choice from that list is moved to a bundled font of the same kind by setupLoadingPreviewTextGroup().
+const LOADING_TEXT_LEGACY_SERIF = ['Georgia','Times New Roman','Garamond','Palatino Linotype','Book Antiqua','Cambria','Constantia','Baskerville','Didot','Hoefler Text','Bodoni MT','Rockwell','Century Schoolbook','Perpetua','Lucida Bright']
+let loadingPreviewTextEl = null
+function updateLoadingPreviewText() {
+  if (!loadingPreviewTextEl) {
+    loadingPreviewTextEl = document.createElement('div')
+    loadingPreviewTextEl.id = 'loadingPreviewText'
+    // Above the loading-preview canvas (z-index 100000) and the loading blocker, below the dev panel (200000); never takes a click.
+    loadingPreviewTextEl.style.cssText = 'position:fixed;z-index:100002;pointer-events:none;white-space:pre-wrap;text-align:center;line-height:1.2;user-select:none;' // position / size / offsets come from the UI Layout Engine (applyLoadingPreviewTextLayout())
+    document.body.appendChild(loadingPreviewTextEl)
+    const cv0 = document.getElementById('loadingPreviewCanvas')
+    if (cv0 && typeof MutationObserver !== 'undefined') new MutationObserver(() => updateLoadingPreviewText()).observe(cv0, { attributes: true, attributeFilter: ['style'] })
+  }
+  const el = loadingPreviewTextEl
+  const cv = document.getElementById('loadingPreviewCanvas')
+  // Shown while the loading screen is up, and afterwards only while the loading animation itself stays visible (Show Loading Preview live).
+  const animationShown = !cv || cv.style.display !== 'none'
+  el.style.display = (cfg.loadingPreviewTextEnabled && (!fieldRevealed || animationShown)) ? 'block' : 'none'
+  el.textContent = cfg.loadingPreviewTextContent ?? ''
+  el.style.fontSize = lpLen(cfg.loadingPreviewTextFontSize ?? 32)
+  el.style.color = cfg.loadingPreviewTextColor || '#ffffff'
+  el.style.letterSpacing = lpLen(cfg.loadingPreviewTextLetterSpacing ?? 0)
+  el.style.paddingLeft = lpLen(cfg.loadingPreviewTextLetterSpacing ?? 0) // letter-spacing also trails the last letter; this keeps the text centred on its anchor
+  const f = LOADING_TEXT_FONTS.find((x) => x.name === cfg.loadingPreviewTextFont) || LOADING_TEXT_FONTS[0]
+  el.style.fontFamily = f.css
+  // Start fetching the selected family now (a no-op once loaded); the text swaps from the fallback font when it arrives.
+  if (cfg.loadingPreviewTextEnabled && document.fonts && document.fonts.load) document.fonts.load('16px "' + f.name + '"').catch(() => {})
+  applyLoadingPreviewTextLayout(el)
+}
+// ---- Loading Preview: responsive size / placement through the UI Layout Engine (2026-10-15) ----
+// Blended length = the engine's { pxValue, vwValue, blend, vwUnit } (resolves to a native calc() the browser re-evaluates on every resize, no JS needed): the Px value at the reference size, the same share of the
+// browser's shorter side (vmin) at 100%, and a continuous mix between. lpPx() is the same arithmetic in plain numbers, for the few places that need pixels (the WebGL buffer, the blocker's spread).
+function lpRef() { return Math.max(cfg.loadingPreviewScaleRefPx || 1080, 100) }
+function lpBlendFrac() { return THREE.MathUtils.clamp((cfg.loadingPreviewScalePct ?? 100) / 100, 0, 1) }
+function lpBlend(px) { return { pxValue: px, vwValue: px / lpRef() * 100, blend: lpBlendFrac(), vwUnit: 'vmin' } }
+function lpLen(px) { return resolveLengthValue(lpBlend(px), {}) }
+// The canvas's real rendered width when it is on screen (what the engine's CSS made of the blended length), else the same arithmetic in plain numbers.
+function lpPx(px) { const vmin = Math.min(window.innerWidth, window.innerHeight); return px * ((1 - lpBlendFrac()) + lpBlendFrac() * vmin / lpRef()) }
+// The position and size of the animation and of the text are owned by the UI Layout Engine and edited with ITS Inspector (Loading Preview > Layout): any mode (anchored to a browser side, centred, fixed to a corner ...)
+// and any CSS length (px, vw, vh, vmin, %) per axis, plus Mobile Portrait / Mobile Landscape overrides. The engine's layouts are stored as JSON in the hidden cfg.loadingPreviewLayout, so they travel with Save, Reset,
+// Undo and every saved dev setting. Until the Inspector has ever stored a layout, the first one is built from the older Px sliders (so nothing moves).
+function lpSeedLen(px) {
+  const b = lpBlendFrac()
+  if (b >= 0.999) return Math.round(px / lpRef() * 100000) / 1000 + 'vmin'
+  if (b <= 0.001) return px + 'px'
+  return 'calc(' + (1 - b) * px + 'px + ' + Math.round(b * px / lpRef() * 100000) / 1000 + 'vmin)'
+}
+function lpSeedLayout(id) {
+  const off = id === 'loadingPreviewText' ? [cfg.loadingPreviewTextOffsetX ?? 0, cfg.loadingPreviewTextOffsetY ?? 0] : [cfg.loadingPreviewPosX || 0, cfg.loadingPreviewPosY || 0]
+  const position = { mode: 'anchor', horizontal: { anchor: 'center', offset: lpSeedLen(off[0]) }, vertical: { anchor: 'center', offset: lpSeedLen(off[1]) } }
+  if (id === 'loadingPreviewText') return { position, size: { width: { mode: 'content' }, height: { mode: 'content' } } }
+  const s = lpSeedLen(Math.max(20, cfg.loadingPreviewSize || 160))
+  return { position, size: { width: { mode: 'fixed', value: s }, height: { mode: 'fixed', value: s } } }
+}
+const lpRegistered = {}
+let lpBackendReady = false, lpPersisting = false, lpLoadingStored = false
+let lpRestoreDone = false // until the settings restore has landed in cfg, layouts are only shown, never stored (the seed would come from code defaults)
+function lpPreviewBuilt() { try { return !!(loadingPreviewCanvas && loadingPreviewRenderer) } catch (e) { return false } } // loadingPreviewCanvas is declared far below: this can run before it exists
+const LP_ENGINE_IDS = ['loadingPreviewCanvas', 'loadingPreviewText']
+function lpEnsureBackend() {
+  if (lpBackendReady) return
+  lpBackendReady = true
+  registerStorageBackend({
+    save: (state) => lpWriteLayoutCfg(state),
+    load: () => { try { return cfg.loadingPreviewLayout ? JSON.parse(cfg.loadingPreviewLayout) : null } catch (e) { return null } }
+  })
+}
+function lpOwnState() { const all = captureAllLayoutConfigs(); const out = {}; LP_ENGINE_IDS.forEach((id) => { if (all[id]) out[id] = all[id] }); return out }
+function lpWriteLayoutCfg(state) {
+  const own = {}
+  LP_ENGINE_IDS.forEach((id) => { if (state && state[id]) own[id] = state[id] })
+  const json = JSON.stringify(own)
+  if (json === cfg.loadingPreviewLayout) return
+  lpPersisting = true
+  try { cfg.loadingPreviewLayout = json; try { syncValue('loadingPreviewLayout', json) } catch (e) { /* no panel */ } } finally { lpPersisting = false }
+}
+// Engine -> cfg after the Inspector (or anything) changed a layout.
+function lpPersistLayoutIfChanged() { try { lpWriteLayoutCfg(lpOwnState()) } catch (e) { /* engine not ready */ } }
+// cfg -> engine (a restore, Use, Undo, Reset): loads the stored layouts into every registered element, then re-measures.
+function lpLoadStoredLayout() {
+  if (lpPersisting || lpLoadingStored) return
+  lpEnsureBackend()
+  lpLoadingStored = true
+  try {
+    if (cfg.loadingPreviewLayout) loadLayoutConfig()
+    try { refreshInspector() } catch (e) { /* not mounted */ }
+    if (lpPreviewBuilt()) resizeLoadingPreview()
+  } catch (e) { console.error('Loading Preview layout (UI engine) restore failed', e) } finally { lpLoadingStored = false }
+}
+function lpEngineContext() { const d = realDeviceClass(); return d === 'mobile' ? 'mobilePortrait' : (d === 'landscape' ? 'mobileLandscape' : 'base') }
+function lpSyncEngineContext() { try { setActiveContextOverride(lpEngineContext()) } catch (e) { /* engine not ready */ } }
+function lpEnsureEngineElement(id, node) {
+  if (!node || lpRegistered[id]) return
+  lpEnsureBackend()
+  try {
+    node.classList.add('ui-element')
+    createUIElement({ id, role: 'decoration', layout: lpSeedLayout(id), domNode: node, group: 'Loading Preview', propertyLabel: id === 'loadingPreviewText' ? 'Text' : 'Animation' })
+    lpRegistered[id] = true
+    lpLoadStoredLayout() // a layout stored by the Inspector wins over the seed
+    if (lpRestoreDone) lpPersistLayoutIfChanged() // keeps every seed (an element the stored layout does not know yet) part of every save
+    lpSyncEngineContext()
+  } catch (e) { console.error('Loading Preview layout (UI engine) failed for ' + id, e) }
+}
+function applyLoadingPreviewLayout() { lpEnsureEngineElement('loadingPreviewCanvas', document.getElementById('loadingPreviewCanvas')) }
+function applyLoadingPreviewTextLayout(el) { lpEnsureEngineElement('loadingPreviewText', el) }
+let lpCanvasObserver = null
+function lpObserveCanvas() {
+  if (lpCanvasObserver || typeof ResizeObserver === 'undefined') return
+  const cv = document.getElementById('loadingPreviewCanvas')
+  if (cv) { lpCanvasObserver = new ResizeObserver(() => { if (loadingPreviewRenderer && cv.offsetWidth > 0) resizeLoadingPreview() }); lpCanvasObserver.observe(cv) }
+}
+// The canvas's real rendered box (what the engine's CSS made of its layout), else the legacy size slider.
+// A canvas has no natural size: with the Inspector's size mode 'content' its CSS box IS its drawing buffer, so measuring the box to size the buffer made them chase each other (about x1.25 a cycle, to 26 million px - the animation
+// vanished, 2026-10-15). In content mode the older size value is used and applied as the box size; every size is also capped.
+const LP_MAX_CSS_PX = 4096
+function lpContentMode(axis) { try { const el = getEngineElement('loadingPreviewCanvas'); const m = el && el.layout && el.layout.size && el.layout.size[axis] && el.layout.size[axis].mode; return m === 'content' } catch (e) { return false } }
+function lpFallbackPx() { return Math.max(20, Math.round(cfg.loadingPreviewSize || 160)) } // unscaled: the animation scale below applies to whatever size the box ends up with
+// Animation Scale With Browser: 1 at the reference browser size, growing / shrinking with the shorter side by the chosen share. Applied as the CSS scale property (it composes with the engine's own centring transform) around the
+// corner / edge the Layout anchors the animation to, so the gap to that side is unchanged.
+function lpAnimFactor() { const b = THREE.MathUtils.clamp((cfg.loadingPreviewAnimScalePct ?? 100) / 100, 0, 1); const vmin = Math.min(window.innerWidth, window.innerHeight); return (1 - b) + b * vmin / lpRef() }
+function lpApplyAnimScale(cv, f) {
+  let h = 'center', v = 'center'
+  const va = cv.getAttribute('data-viewport-anchor')
+  if (va) { if (va !== 'center') va.split('-').forEach((p) => { if (p === 'left' || p === 'right') h = p; else if (p === 'top' || p === 'bottom') v = p }) }
+  else { h = cv.getAttribute('data-anchor-h') || 'center'; v = cv.getAttribute('data-anchor-v') || 'center' }
+  // The engine centres with transform: translate(-50%, -50%), which is applied BEFORE the scale property: the box's top-left then still sits on the centre point, so a centred axis scales about 0% (the centre point itself); the
+  // origin in the middle of the box would slide it off-centre by (1 - scale) x half its size.
+  cv.style.transformOrigin = (h === 'center' ? '0%' : h) + ' ' + (v === 'center' ? '0%' : v)
+  cv.style.scale = String(Math.round(f * 10000) / 10000)
+}
+function lpCanvasW() { const w = (loadingPreviewCanvas && !lpContentMode('width')) ? loadingPreviewCanvas.offsetWidth : 0; return Math.min(w > 0 ? w : lpFallbackPx(), LP_MAX_CSS_PX) }
+function lpCanvasH() { const h = (loadingPreviewCanvas && !lpContentMode('height')) ? loadingPreviewCanvas.offsetHeight : 0; return Math.min(h > 0 ? h : lpFallbackPx(), LP_MAX_CSS_PX) }
+const LP_LAYOUT_GROUP_KEY = 'Loading Preview > Layout'
+// The Mobile and Landscape tabs show a group only while it has per-device rows; the Layout group's content is the Inspector, so it is flagged always-visible there while Show Layout In Mobile / Landscape is on.
+function lpUpdateLayoutGroupDeviceVisibility() {
+  const g = document.querySelector('.dp-group[data-key="' + LP_LAYOUT_GROUP_KEY + '"]')
+  if (!g) return
+  if (cfg.loadingPreviewLayoutOnMobile === false) { delete g.dataset.alwaysVisible; g.dataset.hideOnDevices = '1' } else { delete g.dataset.hideOnDevices; g.dataset.alwaysVisible = '1' }
+  try { refreshRowDisplaysForEditingTab() } catch (e) { /* panel not ready */ }
+}
+const LP_LEGACY_LAYOUT_ROWS = ['loadingPreviewSize', 'loadingPreviewPosX', 'loadingPreviewPosY', 'loadingPreviewTextOffsetX', 'loadingPreviewTextOffsetY', 'loadingPreviewLayout']
+// Builds (or finds again after a saved layout restored it) the Layout subgroup of Loading Preview and mounts the UI engine's Inspector in it: element picker (Animation / Text), Base / Mobile Portrait / Mobile Landscape tabs,
+// position mode (anchor / fixed / absolute ...), alignment to a browser side, offsets and size in any CSS unit. Idempotent.
+function setupLoadingPreviewLayoutGroup() {
+  applyLoadingPreviewLayout()
+  const textEl = document.getElementById('loadingPreviewText')
+  if (textEl) applyLoadingPreviewTextLayout(textEl)
+  // The settings are restored now. With no stored layout yet, the layouts built from code defaults are rebuilt from the restored Px values (so nothing moves); a stored one is loaded.
+  lpRestoreDone = true
+  if (cfg.loadingPreviewLayout) lpLoadStoredLayout()
+  else { LP_ENGINE_IDS.forEach((id) => { if (lpRegistered[id]) { const seed = lpSeedLayout(id); try { replaceLayoutNode(id, ['position'], seed.position); replaceLayoutNode(id, ['size'], seed.size) } catch (e) { console.error(e) } } }); lpPersistLayoutIfChanged() }
+  lpSyncEngineContext()
+  const lpGroup = document.querySelector('.dp-group[data-key="Loading Preview"]')
+  if (!lpGroup) return
+  // The older Px sliders for the same things are replaced by the Inspector (their values only seeded the first layout): hidden.
+  LP_LEGACY_LAYOUT_ROWS.forEach((k) => { const r = document.querySelector('.dp-row[data-key="' + k + '"]'); if (r) r.style.display = 'none' })
+  let g = document.querySelector('.dp-group[data-key="' + LP_LAYOUT_GROUP_KEY + '"]')
+  if (!g) {
+    g = createGroupElement('Layout (UI Engine Inspector)')
+    g.dataset.key = LP_LAYOUT_GROUP_KEY
+    lpGroup.querySelector(':scope > .dp-group-body').appendChild(g)
+  }
+  const title = g.querySelector(':scope > .dp-group-header .dp-group-title-text')
+  if (title && title.textContent === LP_LAYOUT_GROUP_KEY) title.textContent = 'Layout (UI Engine Inspector)'
+  const body = g.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  body.querySelectorAll(':scope > .dp-ui-inspector').forEach((x) => x.remove())
+  // The Show In Mobile / Landscape checkbox sits at the top of the group, and the group's own whole-group device checkboxes (which cover rows, and this group's content is the Inspector) are not needed.
+  const mobRow = document.querySelector('.dp-row[data-key="loadingPreviewLayoutOnMobile"]')
+  if (mobRow && mobRow.parentElement !== body) body.insertBefore(mobRow, body.firstChild)
+  g.querySelectorAll(':scope > .dp-group-header .dp-group-cascade-checkbox').forEach((x) => { x.style.display = 'none' })
+  lpUpdateLayoutGroupDeviceVisibility()
+  const mount = document.createElement('div')
+  mount.className = 'dp-ui-inspector'
+  body.appendChild(mount)
+  try { mountInspector(mount) } catch (e) { console.error('UI engine Inspector failed to mount', e); return }
+  let t = null
+  const persistSoon = () => { clearTimeout(t); t = setTimeout(() => { lpPersistLayoutIfChanged(); resizeLoadingPreview(); updateLoadingPreviewText() }, 120) }
+  ;['input', 'change', 'click'].forEach((ev) => mount.addEventListener(ev, persistSoon))
+}
+function refreshLoadingPreviewLayout() {
+  try { resizeLoadingPreview() } catch (e) { /* preview not built yet */ }
+  updateLoadingPreviewText()
+}
+window.addEventListener('resize', () => { lpSyncEngineContext(); if (lpPreviewBuilt()) resizeLoadingPreview(); updateLoadingPreviewText() })
+
+const LOADING_TEXT_ROW_KEYS = ['loadingPreviewTextContent', 'loadingPreviewTextFontSize', 'loadingPreviewTextLetterSpacing', 'loadingPreviewTextColor', 'loadingPreviewTextFont', 'loadingPreviewTextOffsetX', 'loadingPreviewTextOffsetY']
+const LOADING_TEXT_GROUP_KEY = 'Loading Preview > Text'
+function updateLoadingPreviewTextGroupVisibility() {
+  const g = document.querySelector('.dp-group[data-key="' + LOADING_TEXT_GROUP_KEY + '"]')
+  const body = g && g.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  if (!document.getElementById('dpStartupStyle')) { const st = document.createElement('style'); st.id = 'dpStartupStyle'; st.textContent = '.dp-startup-off > * { display: none !important }'; document.head.appendChild(st) }
+  body.classList.toggle('dp-startup-off', !cfg.loadingPreviewTextEnabled)
+}
+// Builds (or finds again, after a saved layout restored it) the nested "Text" subgroup of Loading Preview, with the On/Off checkbox in its header. Idempotent; rows are only moved from the Loading Preview group's own body, so a layout the user arranged is left alone.
+function setupLoadingPreviewTextGroup() {
+  updateLoadingPreviewText()
+  const lpGroup = document.querySelector('.dp-group[data-key="Loading Preview"]')
+  if (!lpGroup) return
+  let g = document.querySelector('.dp-group[data-key="' + LOADING_TEXT_GROUP_KEY + '"]')
+  if (!g) {
+    g = createGroupElement('Text')
+    g.dataset.key = LOADING_TEXT_GROUP_KEY // a bare "Text" key could be adopted by an unrelated group of the same title
+    lpGroup.querySelector(':scope > .dp-group-body').appendChild(g)
+  }
+  const lpBody = lpGroup.querySelector(':scope > .dp-group-body')
+  const gb = g.querySelector(':scope > .dp-group-body')
+  LOADING_TEXT_ROW_KEYS.forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row && row.parentElement === lpBody) gb.appendChild(row) })
+  gateGroupHeader(LOADING_TEXT_GROUP_KEY, 'loadingPreviewTextEnabled')
+  if (!LOADING_TEXT_FONTS.some((x) => x.name === cfg.loadingPreviewTextFont)) setControlValue('loadingPreviewTextFont', LOADING_TEXT_LEGACY_SERIF.includes(cfg.loadingPreviewTextFont) ? 'Lora' : 'Inter') // a system font saved from the first version of this list
+  safeRefreshSelectOptions('loadingPreviewTextFont')
+  updateLoadingPreviewTextGroupVisibility()
+  updateLoadingPreviewText()
+}
+// ---- Loading Preview: Progress Crop (2026-10-15) ----
+const LOADING_CROP_ROW_KEYS = ['loadingPreviewProgressCropRealtime', 'loadingPreviewProgressCropFlip', 'loadingPreviewProgressCropRange', 'loadingPreviewProgressCropCurve']
+const LOADING_CROP_GROUP_KEY = 'Loading Preview > Progress Crop'
+function updateLoadingPreviewProgressCropGroupVisibility() {
+  const g = document.querySelector('.dp-group[data-key="' + LOADING_CROP_GROUP_KEY + '"]')
+  const body = g && g.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  if (!document.getElementById('dpStartupStyle')) { const st = document.createElement('style'); st.id = 'dpStartupStyle'; st.textContent = '.dp-startup-off > * { display: none !important }'; document.head.appendChild(st) }
+  body.classList.toggle('dp-startup-off', !cfg.loadingPreviewProgressCropEnabled)
+}
+function setupLoadingPreviewProgressCropGroup() {
+  const lpGroup = document.querySelector('.dp-group[data-key="Loading Preview"]')
+  if (!lpGroup) return
+  let g = document.querySelector('.dp-group[data-key="' + LOADING_CROP_GROUP_KEY + '"]')
+  if (!g) {
+    g = createGroupElement('Progress Crop')
+    g.dataset.key = LOADING_CROP_GROUP_KEY // unique internal key (a bare title could be adopted by an unrelated group by the saved layout)
+    lpGroup.querySelector(':scope > .dp-group-body').appendChild(g)
+  }
+  const lpBody = lpGroup.querySelector(':scope > .dp-group-body')
+  const gb = g.querySelector(':scope > .dp-group-body')
+  LOADING_CROP_ROW_KEYS.forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row && row.parentElement === lpBody) gb.appendChild(row) })
+  const curveRow = document.querySelector('.dp-row[data-key="loadingPreviewProgressCropCurve"]'), rangeRow = document.querySelector('.dp-row[data-key="loadingPreviewProgressCropRange"]')
+  if (curveRow && !curveRow.querySelector('svg')) buildGenericCurveWidget(curveRow, { caption: 'X: Loading Progress (0 = Just Started, 100% = Loading Done)  ·  Y: Crop (0 = Min Crop, 1 = Max Crop)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 0 }] })
+  if (rangeRow && !rangeRow.dataset.pcBuilt) { rangeRow.dataset.pcBuilt = '1'; buildGenericRangeBarWidget(rangeRow, { trackMin: 0, trackMax: 100, unit: '%', defaultValue: { min: 0, max: 100 } }) }
+  gateGroupHeader(LOADING_CROP_GROUP_KEY, 'loadingPreviewProgressCropEnabled')
+  updateLoadingPreviewProgressCropGroupVisibility()
+}
+// The loading progress, 0..1. There is no single measured progress value in this app, so it is built from the real startup stages: model (10%), settings applied (10%), the hands built in slices (45%), the shader warm-up and
+// hand reveal (35%) - and never ahead of the elapsed share of Min Loading Time (the reveal is held back until both are done, so the two reach 100% together). With "Use Real-Time Loading Progress" off it is the Min Loading Time share alone. Those weights are a judgment call, not a measurement.
+// Once the loading screen is gone (the live preview), it loops 0 -> 100% over Min Loading Time (at least 1.5 s) so the curve can be tuned by eye.
+function loadingProgressNow() {
+  const now = performance.now()
+  if (fieldRevealed) { const period = Math.max(cfg.loadingMinTimeMs || 0, 1500); return (now % period) / period }
+  if (fieldStarted) return 1
+  const warm = fieldWarmStage >= 3 ? 1 : fieldWarmStage >= 1 ? 0.3 * (fieldWarmStage >= 2 ? 1 : Math.min(1, (now - fieldWarmStartMs) / FIELD_WARM_CAP_MS)) + 0.7 * (hands.length ? fieldWarmRevealIndex / hands.length : 0) : 0
+  const work = 0.1 * (modelMeasurementsReady ? 1 : 0) + 0.1 * (startupSettingsReady ? 1 : 0) + 0.45 * (fieldBuildDone ? 1 : fieldBuildFrac) + 0.35 * warm
+  const timeFrac = Math.min(1, (now - pageLoadStartMs) / Math.max(cfg.loadingMinTimeMs || 0, 1))
+  loadingProgressShown = Math.max(loadingProgressShown, cfg.loadingPreviewProgressCropRealtime === false ? timeFrac : Math.min(work, timeFrac))
+  return loadingProgressShown
+}
+// Per loading hand: a fragment-shader clip against ONE plane in the hand's own frame (injected through onBeforeCompile on top of the toon shader, so it is independent per hand - the optional second hand has its own orientation -
+// and does not collide with the Clipping Block planes, which are an intersection set). The plane is {normal = the hand's local Y axis}; the model's extent along Y comes from its bind-pose bounding box.
+let lpProgressCropBox = null
+const _pcCorner = new THREE.Vector3(), _pcTip = new THREE.Vector3(), _pcWrist = new THREE.Vector3()
+function lpSetupProgressCrop(h) {
+  if (!h || !h.skinnedMesh || !h.skinnedMesh.material) return
+  try {
+    const mesh = h.skinnedMesh, clone = h.clone
+    clone.updateMatrixWorld(true)
+    // The skinned bounding box (the vertices as posed by the skeleton, mesh space) - the geometry's own box is the unskinned one and does not match the rig's scale here. It walks every vertex, so it is done once per model.
+    if (!lpProgressCropBox || lpProgressCropBox.root !== lpSourceRoot()) { const t0 = performance.now(); mesh.computeBoundingBox(); lpProgressCropBox = { root: lpSourceRoot(), box: mesh.boundingBox.clone(), ms: Math.round(performance.now() - t0) } }
+    const bb = lpProgressCropBox.box
+    const cloneInv = new THREE.Matrix4().copy(clone.matrixWorld).invert()
+    const toClone = new THREE.Matrix4().multiplyMatrices(cloneInv, mesh.matrixWorld)
+    let yMin = Infinity, yMax = -Infinity
+    const ext = { x: [Infinity, -Infinity], z: [Infinity, -Infinity] } // other axes, kept for the debug read-out
+    for (let i = 0; i < 8; i++) {
+      _pcCorner.set(i & 1 ? bb.max.x : bb.min.x, i & 2 ? bb.max.y : bb.min.y, i & 4 ? bb.max.z : bb.min.z).applyMatrix4(toClone)
+      yMin = Math.min(yMin, _pcCorner.y); yMax = Math.max(yMax, _pcCorner.y)
+      ext.x = [Math.min(ext.x[0], _pcCorner.x), Math.max(ext.x[1], _pcCorner.x)]; ext.z = [Math.min(ext.z[0], _pcCorner.z), Math.max(ext.z[1], _pcCorner.z)]
+    }
+    // which way along Y the fingers lie (wrist -> middle fingertip, in the hand's own frame)
+    let sgn = 1
+    const wb = mesh.skeleton.getBoneByName('rHand'), tb = mesh.skeleton.getBoneByName('rMid3')
+    if (wb && tb) { wb.getWorldPosition(_pcWrist).applyMatrix4(cloneInv); tb.getWorldPosition(_pcTip).applyMatrix4(cloneInv); if (_pcTip.y < _pcWrist.y) sgn = -1 }
+    const uni = { value: new THREE.Vector4(0, 1, 0, 1e9) } // everything kept
+    const base = mesh.material.onBeforeCompile
+    mesh.material.onBeforeCompile = function (shader, r) {
+      if (base) base.call(this, shader, r)
+      shader.uniforms.uProgressCropPlane = uni
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vPcPos;')
+        .replace('#include <project_vertex>', '#include <project_vertex>\nvPcPos = transformed;')
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vPcPos;\nuniform vec4 uProgressCropPlane;')
+        .replace('void main() {', 'void main() {\nif (dot(vPcPos, uProgressCropPlane.xyz) + uProgressCropPlane.w < 0.0) discard;')
+    }
+    mesh.material.needsUpdate = true
+    h.progressCrop = { uni, yMin, yMax, ext, wrist: _pcWrist.toArray(), tip: _pcTip.toArray(), sgn, fromClone: new THREE.Matrix4().copy(toClone).invert(), plane: new THREE.Plane() }
+  } catch (e) { console.error('Progress Crop setup failed', e) }
+}
+function lpApplyProgressCrop(h, crop, flip) {
+  const pc = h && h.progressCrop
+  if (!pc) return
+  if (!(crop > 0)) { pc.uni.value.set(0, 1, 0, 1e9); return } // nothing cropped
+  if (crop >= 1) { pc.uni.value.set(0, 0, 0, -1); return } // everything cropped
+  const sg = flip ? -pc.sgn : pc.sgn // s = sg * y grows toward the end that is cropped last
+  const sMin = sg > 0 ? pc.yMin : -pc.yMax, sMax = sg > 0 ? pc.yMax : -pc.yMin
+  const m = (sMax - sMin) * 0.05 // a little margin: the posed fingers can reach slightly past the bind-pose box
+  const thr = THREE.MathUtils.lerp(sMin - m, sMax + m, crop)
+  pc.plane.set(_pcCorner.set(0, sg, 0), -thr).applyMatrix4(pc.fromClone) // the plane in the clone's frame -> the mesh's frame, where the vertex shader works
+  pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
+}
+let lpCropLast = { progress: 0, crop: 0 }
+window.__lpCropDbg = { get cfg() { return cfg }, frame: (dt, now) => animate(dt, now), visibleHands: () => hands.filter((h) => h.wrapper.visible).length, poseSig: (i) => { const sk = hands[i].skinnedMesh.skeleton; return sk.bones.map((b) => b.quaternion.toArray().map((v) => +v.toFixed(5)).join(',')).join('|') }, reposeAll: () => applyAllFingerPoses(), warm: () => ({ stage: fieldWarmStage, idx: fieldWarmRevealIndex, batch: fieldWarmBatch, hands: hands.length }), update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
+window.__lpCrop = () => ({ ...lpCropLast, boxMs: lpProgressCropBox && lpProgressCropBox.ms, hand1: loadingPreviewHand && loadingPreviewHand.progressCrop ? { ext: loadingPreviewHand.progressCrop.ext, wrist: loadingPreviewHand.progressCrop.wrist, tip: loadingPreviewHand.progressCrop.tip, yMin: loadingPreviewHand.progressCrop.yMin, yMax: loadingPreviewHand.progressCrop.yMax, sgn: loadingPreviewHand.progressCrop.sgn, plane: loadingPreviewHand.progressCrop.uni.value.toArray() } : null, hand2: !!loadingPreviewHand2 }) // debug read-out for tests
+function updateLoadingPreviewProgressCrop() {
+  let crop = 0, progress = 0
+  if (cfg.loadingPreviewProgressCropEnabled) {
+    progress = loadingProgressNow()
+    const pts = sphereParse(cfg.loadingPreviewProgressCropCurve, [{ x: 0, y: 1 }, { x: 1, y: 0 }])
+    const range = sphereParse(cfg.loadingPreviewProgressCropRange, { min: 0, max: 100 })
+    const t = THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, progress), 0, 1)
+    crop = THREE.MathUtils.clamp((range.min + (range.max - range.min) * t) / 100, 0, 1)
+  }
+  lpCropLast = { progress, crop }
+  const flip = !!cfg.loadingPreviewProgressCropFlip
+  lpApplyProgressCrop(loadingPreviewHand, crop, flip)
+  lpApplyProgressCrop(loadingPreviewHand2, crop, flip)
+}
 // Loading Preview's own "Min Loading Time" (direct request) -- captured
 // here, at the earliest point this module runs, so the min-time window
 // starts from the true page-load moment, not from whenever tryStartField()
@@ -718,7 +1266,7 @@ function maybeBuildStartupLoadingPreview() {
   if (startupPreviewBuilt || !modelMeasurementsReady || !(startupSettingsReady || startupCacheApplied)) return
   startupPreviewBuilt = true
   logLoadingPreview(`startup preview building from ${startupSettingsReady ? 'restored settings' : 'the startup cache (restore still pending)'}`)
-  buildLoadingPreview(!!cfg.loadingPreviewShowLive)
+  lpWhenPreviewModelReady(() => buildLoadingPreview(!!cfg.loadingPreviewShowLive)) // waits for a chosen (non-Hand) preview model to load first
 }
 function applyStartupCache() {
   try {
@@ -773,6 +1321,32 @@ function startFieldBuild() {
     tryStartField()
   })
 }
+// Called every frame by animate() while fieldWarmStage is 1 or 2.
+function advanceFieldWarmup() {
+  const capped = performance.now() - fieldWarmStartMs > FIELD_WARM_CAP_MS
+  if (fieldWarmStage === 1 && !capped) return // programs still linking (non-blocking); the loading preview keeps animating
+  if (fieldWarmRevealIndex > 0) {
+    // Each batch is drawn ONCE and then hidden again (below), so the last field render drew only that batch: what it cost over the cheapest render so far is what the batch cost. (It used to keep every revealed hand
+    // visible, so the field render - and with it every frame of the loading preview - kept getting longer through the last stretch of loading, up to the full field's draw time.)
+    fieldWarmBaseMs = Math.min(fieldWarmBaseMs, fieldWarmLastRenderMs)
+    const added = fieldWarmLastRenderMs - fieldWarmBaseMs
+    if (added < 10) fieldWarmBatch = Math.min(hands.length, Math.max(4, fieldWarmBatch * 2)); else if (added > 25) fieldWarmBatch = Math.max(4, Math.floor(fieldWarmBatch / 2))
+  }
+  fieldWarmPrevRenderMs = fieldWarmLastRenderMs
+  // The previous batch has been drawn once (its program, buffers and uniforms are on the GPU): hide it again so the next frames stay cheap. Everything is shown together at the end.
+  for (let i = fieldWarmPrevStart; i < fieldWarmRevealIndex; i++) hands[i]._warmHidden = true
+  fieldWarmPrevStart = fieldWarmRevealIndex
+  const batch = capped ? hands.length : fieldWarmBatch // starts at 1: the first hand alone carries the one-time geometry upload
+  let shown = 0
+  while (fieldWarmRevealIndex < hands.length && shown < batch) { hands[fieldWarmRevealIndex++]._warmHidden = false; shown++ }
+  updateHandsVisibility()
+  if (fieldWarmRevealIndex >= hands.length) {
+    hands.forEach((h) => { h._warmHidden = false })
+    fieldWarmStage = 3
+    logStartupTiming('field warm-up finished (' + hands.length + ' hands shown over ' + Math.round(performance.now() - fieldWarmStartMs) + 'ms)' + (capped ? ' -- CAPPED' : ''))
+    tryStartField()
+  }
+}
 function tryStartField() {
   logStartupTiming(`tryStartField() called (fieldStarted=${fieldStarted} modelReady=${modelMeasurementsReady} settingsReady=${startupSettingsReady})`)
   if (fieldStarted || !modelMeasurementsReady || !startupSettingsReady) return
@@ -786,7 +1360,16 @@ function tryStartField() {
   if (!fieldBuildDone) return
   // Compile the field's shader programs NOW, behind the loading screen, while the min-time wait runs, instead of inside the reveal itself (2026-10-11): with thousands of per-hand materials
   // that compile is a long synchronous block, and doing it at the reveal froze the loading hand and then showed an empty screen until the field's first frames came out.
-  if (!fieldWarmCompiled) { fieldWarmCompiled = true; try { renderer.compile(scene, camera) } catch (err) { /* the reveal compiles again */ } }
+  if (fieldWarmStage === 0) {
+    fieldWarmStage = 1; fieldWarmCompiled = true; fieldWarmStartMs = performance.now()
+    const t0 = performance.now()
+    const done = () => { logStartupTiming('renderer.compileAsync() ready after ' + Math.round(performance.now() - t0) + 'ms (' + hands.length + ' hands)'); if (fieldWarmStage === 1) fieldWarmStage = 2 }
+    // Only a sample of hands (2026-10-16): every hand has the same shader program (same code and parameters), so compiling all 3,025 materials only repeated the same cache lookup (about 390 ms in one block, measured);
+    // the rest are looked up by their first draw during the warm-up reveal. compileAsync(object, camera, scene) compiles just that object's materials, with the scene's lights.
+    try { Promise.all(hands.slice(0, 2).map((h) => renderer.compileAsync(h.wrapper, camera, scene))).then(done, done) } catch (err) { done() }
+    setTimeout(() => { if (fieldWarmStage < 3) advanceFieldWarmup() }, FIELD_WARM_CAP_MS + 100) // animate() may not be ticking (hidden tab): finish regardless
+  }
+  if (fieldWarmStage !== 3) return // advanceFieldWarmup() (animate) calls tryStartField() again when the hands are warmed
   if (cfg.loadingPreviewEnabled) {
     const minMs = Math.max(0, cfg.loadingMinTimeMs || 0)
     const elapsed = performance.now() - pageLoadStartMs
@@ -830,7 +1413,7 @@ function tryStartField() {
   logStartupTiming('fieldStarted = true')
   logLoadingPreview(`field starting -- loading screen hides; preview ${cfg.loadingPreviewShowLive ? 'stays visible (Show Loading Preview is on)' : 'is hidden'}`)
   // (the field itself was built in slices earlier -- see rebuildFieldChunked())
-  buildPosePreview()
+  { const __t = performance.now(); buildPosePreview(); logStartupTiming('buildPosePreview() took ' + Math.round(performance.now() - __t) + 'ms') }
   // ROOT CAUSE of the REAL startup jank, found 2026-09-16 after the
   // settings-restore-race fix above turned out NOT to be it (direct user
   // report: same issue persisted after that fix; further direct report --
@@ -871,7 +1454,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, previewHand, previewScene, previewCamera, get previewControls() { return previewControls }, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, get rigLocalAxisPosing() { return RIG_LOCAL_AXIS_POSING }, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -881,6 +1464,8 @@ function finalizeReveal() {
   logStartupTiming('reveal finalized (field painted)')
   syncLoadingPreviewBackground() // drops the loading-screen blocker
   loadingEl.classList.add('hidden')
+  updateLoadingPreviewText()
+  document.body.classList.add('hd-revealed') // shows the Pause / Reset / Color Presets buttons (style.css hides them until now)
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
   // to disappear too) -- hide it UNLESS the live-preview toggle wants it
@@ -898,7 +1483,7 @@ function finalizeReveal() {
     loadingPreviewCanvas.style.display = 'none'
   }
 }
-setTimeout(() => { logStartupTiming('startupSettingsReady = true (6000ms fallback timeout)'); startupSettingsReady = true; startupValuesApplied = true; maybeBuildStartupLoadingPreview(); startFieldBuild(); tryStartField() }, 6000)
+setTimeout(() => { logStartupTiming('startupSettingsReady = true (6000ms fallback timeout)'); startupSettingsReady = true; exclusiveTriggersReady = true; startupValuesApplied = true; maybeBuildStartupLoadingPreview(); startFieldBuild(); tryStartField() }, 6000)
 let framedOnce = false // camera/lighting/target-plane are framed ONCE, on first build -- Field Layout changes must never re-trigger this (direct request)
 const hands = [] // { wrapper: Group, clone: Object3D, skinnedMesh: SkinnedMesh|null, outlineMesh: Mesh|null, emissionMesh: SkinnedMesh|null }
 const sceneState = { fieldRadius: 10 }
@@ -1116,7 +1701,9 @@ function roExplain(lv, r, lo, hi, loAbove) {
     const nm = (n) => (n === 'armBase' ? 'arm base' : n === 'armEnd' ? 'arm end' : 'palm center')
     const fa = hands[up]._xyCursorDist ?? 0, fd = hands[down]._xyCursorDist ?? 0
     const F = (fa < fd || (fa === fd && up < down)) ? up : down, Lh = F === up ? down : up
-    cond = 'Hand ' + (F + 1) + ' (the closer to the cursor, the former) ' + nm(ev.fromNode) + ' Z ' + ev.fromZ[F].toFixed(2) + ((F === up) === !ev.neg ? ' is higher than ' : ' is lower than ') + 'Hand ' + (Lh + 1) + ' ' + nm(ev.toNode) + ' Z ' + ev.toZ[Lh].toFixed(2)
+    cond = ev.cam
+      ? 'Hand ' + (F + 1) + ' (the closer to the cursor, the former) ' + nm(ev.fromNode) + ' XY distance to the camera ' + (-ev.fromZ[F]).toFixed(2) + ((F === up) === !ev.neg ? ' is nearer than ' : ' is farther than ') + 'Hand ' + (Lh + 1) + ' ' + nm(ev.toNode) + ' ' + (-ev.toZ[Lh]).toFixed(2)
+      : 'Hand ' + (F + 1) + ' (the closer to the cursor, the former) ' + nm(ev.fromNode) + ' Z ' + ev.fromZ[F].toFixed(2) + ((F === up) === !ev.neg ? ' is higher than ' : ' is lower than ') + 'Hand ' + (Lh + 1) + ' ' + nm(ev.toNode) + ' Z ' + ev.toZ[Lh].toFixed(2)
   } else {
     const neg = ev.mode === 'closest' || ev.mode === 'closestZ' // their key is minus the distance
     const show = (i) => ((neg ? -1 : 1) * ev.k[i] * 0.01).toFixed(2)
@@ -1166,8 +1753,16 @@ function computeRenderOrderRanks() {
     if (!mode || mode === 'none') return null
     if (evs.has(mode)) return evs.get(mode)
     let ev
+    const camPairBase = RO_CAM_PAIR_NEG[mode] || mode
     const pairBase = RO_PAIR_NEG[mode] || mode
-    if (RO_PAIR_DEFS[pairBase]) {
+    if (RO_CAM_PAIR_DEFS[camPairBase]) {
+      // Camera-XY pair modes: the same former-hand rule and tolerance as the Z pair modes below; the compared number is minus the point's XY distance to the camera (larger = nearer the camera = on top).
+      const fromNode = RO_CAM_PAIR_DEFS[camPairBase][0], toNode = RO_CAM_PAIR_DEFS[camPairBase][1]
+      let arr = roA2A[mode]
+      if (!arr || arr.fromZ.length !== n) arr = roA2A[mode] = { fromZ: new Float64Array(n), toZ: new Float64Array(n) }
+      for (let i = 0; i < n; i++) { arr.fromZ[i] = -cameraDistXYOfNode(hands[i], fromNode); arr.toZ[i] = -cameraDistXYOfNode(hands[i], toNode) }
+      ev = { pair: true, a2a: true, cam: true, fromZ: arr.fromZ, toZ: arr.toZ, fromNode, toNode, mode, neg: !!RO_CAM_PAIR_NEG[mode] }
+    } else if (RO_PAIR_DEFS[pairBase]) {
       // Pair modes (2026-10-11): the hand CLOSER to the cursor in screen XY is always the FORMER hand (ties: the lower index); its FIRST-named point is compared with the other hand's SECOND-named point. Former point higher in Z by
       // more than the tolerance = the former hand is on top; lower = the other hand is on top; within the tolerance = no decision (the next level decides).
       const fromNode = RO_PAIR_DEFS[pairBase][0], toNode = RO_PAIR_DEFS[pairBase][1]
@@ -1385,6 +1980,65 @@ function renestRenderOrderRows() {
   const w = document.getElementById('dpSnapshotWidget')
   if (gb && w && w.parentElement !== gb) gb.appendChild(w)
 }
+// Toon Shade Color Gradient editor (2026-10-12): a gradient bar with a handle per colour stop. Click the bar to ADD a stop (it takes the
+// colour already there), click a handle to pick its colour, double-click a handle to DELETE it (at least 2 stay), drag a handle to move it.
+// The leftmost stop colours the Shadow Floor shade, the rightmost the Light Ceiling shade (see makeGradientTexture()).
+function buildToonGradientWidget() {
+  const row = document.querySelector('.dp-row[data-key="toonGradient"]')
+  const input = row && row.querySelector('.dp-text-input')
+  if (!input || row.dataset.tgWidget) return
+  row.dataset.tgWidget = '1'
+  input.style.display = 'none'
+  row.style.flexDirection = 'column'; row.style.alignItems = 'stretch'
+  const wrap = elLocal('div', { flex: '1', padding: '6px 8px 4px' })
+  const bar = elLocal('div', { position: 'relative', height: '24px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.3)', cursor: 'copy', touchAction: 'none' })
+  const track = elLocal('div', { position: 'relative', height: '20px', marginTop: '3px' })
+  const picker = document.createElement('input')
+  picker.type = 'color'
+  picker.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;left:8px;top:0'
+  wrap.appendChild(bar); wrap.appendChild(track); wrap.appendChild(picker); row.appendChild(wrap)
+  let stops = parseToonGradient(input.value).map((x) => ({ ...x })), lastSeen = input.value, editing = null, openTimer = 0, lastTap = { st: null, t: 0 }
+  const commit = () => { lastSeen = JSON.stringify(stops.map((x) => ({ p: +x.p.toFixed(4), c: x.c }))); commitTextControl(input, lastSeen) }
+  const paintBar = () => { bar.style.background = 'linear-gradient(to right, ' + stops.slice().sort((a, b) => a.p - b.p).map((x) => x.c + ' ' + (x.p * 100).toFixed(1) + '%').join(', ') + ')' }
+  const frac = (cx) => { const r = bar.getBoundingClientRect(); return THREE.MathUtils.clamp((cx - r.left) / Math.max(r.width, 1), 0, 1) }
+  const redraw = () => {
+    stops.sort((a, b) => a.p - b.p)
+    paintBar()
+    track.textContent = ''
+    stops.forEach((st) => {
+      const h = elLocal('div', { position: 'absolute', top: '0', left: (st.p * 100) + '%', width: '14px', height: '20px', marginLeft: '-7px', background: st.c, border: '2px solid #fff', borderRadius: '3px', boxSizing: 'border-box', cursor: 'pointer', touchAction: 'none', boxShadow: '0 0 0 1px rgba(0,0,0,0.6)' })
+      h.addEventListener('pointerdown', (e) => {
+        e.preventDefault(); e.stopPropagation()
+        try { h.setPointerCapture(e.pointerId) } catch (err) { /* synthetic / inactive pointer: the listeners below still work */ }
+        const x0 = e.clientX; let moved = false
+        const mv = (ev) => { if (Math.abs(ev.clientX - x0) > 3) moved = true; if (moved) { st.p = frac(ev.clientX); h.style.left = (st.p * 100) + '%'; paintBar() } }
+        const up = () => {
+          h.removeEventListener('pointermove', mv); h.removeEventListener('pointerup', up); h.removeEventListener('pointercancel', up)
+          if (moved) { redraw(); commit(); return }
+          const now = performance.now()
+          if (lastTap.st === st && now - lastTap.t < 350) { // double click: delete (a gradient keeps at least 2 stops)
+            clearTimeout(openTimer); lastTap = { st: null, t: 0 }
+            if (stops.length > 2) { stops.splice(stops.indexOf(st), 1); redraw(); commit() }
+            return
+          }
+          lastTap = { st, t: now }
+          clearTimeout(openTimer)
+          openTimer = setTimeout(() => { editing = st; picker.value = st.c; picker.click() }, 360) // single click: pick this stop's colour
+        }
+        h.addEventListener('pointermove', mv); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up)
+      })
+      track.appendChild(h)
+    })
+  }
+  bar.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); e.stopPropagation()
+    if (input.value !== lastSeen) { lastSeen = input.value; stops = parseToonGradient(input.value).map((x) => ({ ...x })) } // never edit a stale copy (Reset / Undo / Load may have changed the value since the last poll)
+    const p = frac(e.clientX); stops.push({ p, c: toonGradientHexAt(stops.slice().sort((a, b) => a.p - b.p), p) }); redraw(); commit()
+  })
+  picker.addEventListener('input', () => { if (!editing) return; editing.c = picker.value.toLowerCase(); redraw(); commit() })
+  redraw()
+  armLengthWidgetResyncs.push(() => { if (input.value === lastSeen) return; lastSeen = input.value; stops = parseToonGradient(input.value).map((x) => ({ ...x })); redraw() })
+}
 function buildRenderOrderWidgets() {
   const fillSel = (sel, value, allowNone) => {
     RENDER_ORDER_MODE_OPTIONS.forEach((o) => { if (!allowNone && o.value === 'none') return; const op = document.createElement('option'); op.value = o.value; op.textContent = o.text; sel.appendChild(op) })
@@ -1503,6 +2157,7 @@ function renderOrderPriority(hand, mode) {
     case 'farthest': return hand._xyCursorDist ?? 0
     case 'closestZ': return -hand.effectiveRenderOrder
     case 'farthestZ': return hand.effectiveRenderOrder
+    case 'camPalmCenter': case 'camArmBase': case 'camArmEnd': return -cameraDistXYOfNode(hand, RO_CAM_NODES[mode]) // nearer the camera's XY = higher = on top
     default: return renderOrderModeZ(hand, mode) * (camera.position.z >= 0 ? 1 : -1)
   }
 }
@@ -1553,6 +2208,25 @@ function clickRotatePointInto(hand, out) {
 }
 // Cursor tracking (arm / palm rotation, reactive wrist splay, reactive arm length) is live only while Tracking Enabled is on AND, with Starting State > Static Pose On Startup on, a click function has been triggered since the
 // page loaded (or since that box was ticked): until then the hands stay in their default pose.
+// Per-feature cursor tracking (direct request 2026-10-14): Hand Offset On Startup has one checkbox each for Arm Rotation / Palm Rotation / Wrist Splay / Wrist Cropping that switches that tracking on from the very start of the
+// startup, instead of waiting for the startup hold to be released. Static Pose On Startup is the OVERRIDE: with it on, nothing tracks (whatever those boxes say) until the hold is released; with it off, a ticked feature tracks.
+// The click that ends the startup hold used to switch tracking on at full strength: Wrist Cropping and Wrist Splay (damping default 1 = instant), and Arm / Palm Rotation on a damping-1 device, jumped from their static
+// startup values to the live cursor-driven ones in a single frame (direct report 2026-10-14: "on the next click the pose seems to jump"). Releasing now starts a short ease-in window on every hand (_startupEase frames) during
+// which those four dampings are capped (Arm / Palm through the existing handoff-settle window), so tracking blends in instead.
+const STARTUP_EASE_FRAMES = 90, STARTUP_EASE_DAMPING = 0.06 // ~1.5 s at 60 fps / a gentle fraction per frame: unmeasured judgment calls, not derived from any measurement
+function releaseStartupHold() {
+  if (startupStaticReleased) return
+  startupStaticReleased = true
+  if (!(cfg.staticPoseOnStartup || cfg.handOffsetOnStartupEnabled || cfg.sphereSeqEnabled)) return // no startup hold was active: nothing to ease in from
+  for (let i = 0; i < hands.length; i++) { hands[i]._startupEase = STARTUP_EASE_FRAMES; hands[i]._handoffSettleFrames = Math.max(hands[i]._handoffSettleFrames || 0, STARTUP_EASE_FRAMES) }
+}
+function startupHoldReleased() { return !(cfg.staticPoseOnStartup || cfg.handOffsetOnStartupEnabled || cfg.sphereSeqEnabled) || startupStaticReleased }
+function trackingActiveFor(kind) { // kind: 'Arm' | 'Palm' | 'Splay' | 'Crop'
+  if (!cfg.trackingEnabled) return false
+  if (startupHoldReleased()) return true
+  if (cfg.staticPoseOnStartup) return false
+  return !!cfg.handOffsetOnStartupEnabled && !!cfg['startupTrack' + kind]
+}
 function trackingActive() { return !!cfg.trackingEnabled && (!(cfg.staticPoseOnStartup || cfg.handOffsetOnStartupEnabled || cfg.sphereSeqEnabled) || startupStaticReleased) }
 function handPoint(hand) { return hand._trk || hand.wrapper.position }
 function handRestPoint(hand) { return hand._trkRest || hand.basePosition || hand.wrapper.position }
@@ -1594,6 +2268,27 @@ function armOffsetQuatInto(hand, xDeg, yDeg, out) {
   _armOffAxis.set(0, 1, 0).applyQuaternion(modelBaseFrameQ).applyQuaternion(hand.currentBaseQuat)
   _armOffQy.setFromAxisAngle(_armOffAxis, THREE.MathUtils.degToRad(yDeg))
   return out.copy(_armOffQx).multiply(_armOffQy)
+}
+// Debug > FIELD CENTER POINT: a red dot at the centroid of the hand field (the average of every hand's starting grid point).
+const _fcSum = new THREE.Vector3()
+function updateFieldCenterMarker() {
+  if (!cfg.showFieldCenterPoint || !hands.length) { if (fieldCenterPoint) fieldCenterPoint.visible = false; return }
+  if (!fieldCenterPoint) {
+    const g = new THREE.BufferGeometry()
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3), 3))
+    fieldCenterPoint = new THREE.Points(g, new THREE.PointsMaterial({ color: 0xff0000, size: 14, sizeAttenuation: false, depthTest: false, depthWrite: false }))
+    fieldCenterPoint.frustumCulled = false
+    fieldCenterPoint.renderOrder = 1e15
+    scene.add(fieldCenterPoint)
+  }
+  _fcSum.set(0, 0, 0)
+  let n = 0
+  for (let i = 0; i < hands.length; i++) { const b = hands[i].basePosition; if (b) { _fcSum.add(b); n++ } }
+  if (n) _fcSum.multiplyScalar(1 / n)
+  fieldCenterPoint.geometry.attributes.position.setXYZ(0, _fcSum.x, _fcSum.y, _fcSum.z)
+  fieldCenterPoint.geometry.attributes.position.needsUpdate = true
+  fieldCenterPoint.visible = true
+  sceneNeedsRedraw = true
 }
 // Debug > Show Hand Tracking Points: one dot per hand at its tracking point.
 function updateTrackingPointMarkers() {
@@ -1665,6 +2360,11 @@ function armBasePivotInto(hand, out) {
 // -----------------------------------------------------------------------
 // Dev panel groups (CLAUDE.md Section 12)
 // -----------------------------------------------------------------------
+// Colour Presets (2026-10-13): the built-in presets of the on-page Color Preset selector (button right of Pause / Reset). Each: g = toon gradient JSON, bg = background / floor colour, s / t / f / c = toon steps / step threshold /
+// shadow floor / light ceiling, w = optional button swatch override (BW / WB: their real gradient is all white, which would draw a blank white square). Gradients and toon values come from the user's Saved Toon Shading items of the same names.
+// The live list is the JSON control 'colorPresets' (saved with the dev-panel settings); this is only its default.
+const COLOR_PRESET_SEED = [{"id":"seed1","g":"[{\"p\":0,\"c\":\"#0040ff\"},{\"p\":1,\"c\":\"#ff5900\"}]","bg":"#00308f","s":2,"t":3.2,"f":9,"c":99},{"id":"seed2","g":"[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#000000","s":2,"t":2.5,"f":0,"c":99,"w":["#000000","#ffffff"]},{"id":"seed3","g":"[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#ffffff","s":2,"t":2.5,"f":0,"c":99,"w":["#ffffff","#000000"]},{"id":"seed4","g":"[{\"p\":0,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#00b32d\"}]","bg":"#a80000","s":2,"t":2.3,"f":40,"c":82},{"id":"seed5","g":"[{\"p\":0,\"c\":\"#7a005a\"},{\"p\":1,\"c\":\"#ff6600\"}]","bg":"#80003e","s":2,"t":2.3,"f":39,"c":90},{"id":"seed6","g":"[{\"p\":0,\"c\":\"#ff6600\"},{\"p\":1,\"c\":\"#7a005a\"}]","bg":"#e65c00","s":2,"t":4.5,"f":90,"c":80},{"id":"seed7","g":"[{\"p\":0,\"c\":\"#ff6600\"},{\"p\":1,\"c\":\"#7a005a\"}]","bg":"#003c8a","s":2,"t":4.5,"f":90,"c":80},{"id":"seed8","g":"[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ff0000\"}]","bg":"#e20000","s":2,"t":2.95,"f":40,"c":40},{"id":"seed9","g":"[{\"p\":0,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#e20000","s":2,"t":2.95,"f":40,"c":40},{"id":"seed10","g":"[{\"p\":0,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#11008f","s":2,"t":2.95,"f":40,"c":40},{"id":"seed11","g":"[{\"p\":0,\"c\":\"#000cad\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#db0000","s":2,"t":2.95,"f":40,"c":40},{"id":"seed12","g":"[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#c20000\"}]","bg":"#00076b","s":2,"t":2.95,"f":40,"c":40},{"id":"seed13","g":"[{\"p\":0,\"c\":\"#0300cc\"},{\"p\":0.6731,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#ffffff","s":3,"t":5,"f":63,"c":100},{"id":"seed14","g":"[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":0.5192,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#0300cc\"}]","bg":"#000657","s":3,"t":5,"f":63,"c":100},{"id":"seed15","g":"[{\"p\":0,\"c\":\"#ff0000\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#e40c0c","s":5,"t":1.45,"f":90,"c":83},{"id":"seed16","g":"[{\"p\":0,\"c\":\"#054d00\"},{\"p\":1,\"c\":\"#42e0ff\"}]","bg":"#002f4d","s":4,"t":5,"f":7,"c":82},{"id":"seed17","g":"[{\"p\":0.6529,\"c\":\"#000000\"},{\"p\":1,\"c\":\"#ffffff\"}]","bg":"#292e3d","s":3,"t":3.8,"f":0,"c":100}]
+const COLOR_PRESET_NEW_DEFAULTS = { s: 2, t: 2.5, f: 50, c: 80 } // a preset added with "+" (direct request)
 const DEV_GROUPS = [
   // Global Pause button (direct request: "add a small pause button icon.
   // Users can click it at any time to pause the entire animation and
@@ -1738,6 +2438,29 @@ const DEV_GROUPS = [
       // Extra Fallback levels beyond Fallback 2, added with the Add Fallback button.
       { key: 'renderOrderExtraFallbacks', label: 'Render Order: Extra Fallbacks', type: 'text', placeAfter: 'renderOrderFallback2Except', def: '[]' },
       { key: 'renderOrderFlipLock', label: 'Render Order: Flip Once Per Sequence', type: 'checkbox', def: true },
+      // Hand Model (2026-10-14): which hand model is loaded, and the list to choose from. Moved into the group titled Hands (any capitalisation) after the restore, see placeHandModelRows().
+      { key: 'handModelId', label: 'Hand Model (Internal, Auto-Managed)', type: 'text', def: HAND_MODEL_DEFAULT_ID },
+      {
+        key: 'handModels',
+        label: 'Hand Models',
+        type: 'list-picker',
+        def: [],
+        hostManaged: true,
+        buttons: ['use', 'delete', 'import'],
+        itemLabel: 'Hand Model',
+        itemBadge: (item) => (item.id === activeHandModelId ? '  (in use)' : (item.source === 'local' && localHandModelPresent[item.id] === false ? '  (not on this device)' : '')),
+        onUse: (item) => useHandModel(item),
+        onBeforeDelete: (item, btn) => {
+          if (item.source !== 'local') { flashModelButton(btn, 'Built-in'); return false }
+          if (item.id === activeHandModelId) { flashModelButton(btn, 'In use'); return false }
+          return true
+        },
+        onDeleted: (item) => { if (item.source === 'local') handModelIdbDelete(item.id).catch(() => {}) },
+        onImportClick: (btn) => importHandModelFile(btn)
+      },
+      // Small Scale Models (2026-10-15): swap a hand's mesh for a lower-resolution model of the same rig once its world Z reaches a level's Z. The levels are a JSON list edited by the widget (buildSmallScaleModelWidget()).
+      { key: 'smallScaleModelsEnabled', label: 'Small Scale Models', type: 'checkbox', def: false, perDevice: true, onChange: () => updateSmallScaleModelsGroupVisibility() },
+      { key: 'smallScaleModelLevels', label: 'Small Scale Model Levels', type: 'text', def: '[]' },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -1762,6 +2485,32 @@ const DEV_GROUPS = [
       { key: 'fieldOffsetX', label: 'Field Offset X (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, perDevice: true, onChange: () => relayoutField() },
       { key: 'fieldOffsetY', label: 'Field Offset Y (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, perDevice: true, onChange: () => relayoutField() },
       { key: 'fieldOffsetZ', label: 'Field Offset Z (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, perDevice: true, onChange: () => relayoutField() },
+      // Hand Position Min / Max (2026-10-13, direct request): per axis a single-number Min and Max plus a curve editor for EACH (6 in all). Curve: X = screen-space (XY) distance of the hand's starting field point from the screen
+      // centre (all points of the field, nearest..farthest = 0..1); Y = the Min / Max value itself (-300..300 world units = 0..1). The three old range-bar rows below stay as hidden storage for old saved values.
+      { key: 'fieldBoundsXMin', label: 'Hand Position Min X (World Units)', type: 'text', def: '-300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMinCurveEnabled', label: 'Hand Position Min X Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMinCurve', label: 'Hand Position Min X Curve (Screen Distance -> Min X)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":0}]', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMinCurveRange', label: 'Hand Position Min X Curve Min / Max (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMax', label: 'Hand Position Max X (World Units)', type: 'text', def: '300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMaxCurveEnabled', label: 'Hand Position Max X Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMaxCurve', label: 'Hand Position Max X Curve (Screen Distance -> Max X)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsXMaxCurveRange', label: 'Hand Position Max X Curve Min / Max (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMin', label: 'Hand Position Min Y (World Units)', type: 'text', def: '-300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMinCurveEnabled', label: 'Hand Position Min Y Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMinCurve', label: 'Hand Position Min Y Curve (Screen Distance -> Min Y)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":0}]', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMinCurveRange', label: 'Hand Position Min Y Curve Min / Max (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMax', label: 'Hand Position Max Y (World Units)', type: 'text', def: '300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMaxCurveEnabled', label: 'Hand Position Max Y Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMaxCurve', label: 'Hand Position Max Y Curve (Screen Distance -> Max Y)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsYMaxCurveRange', label: 'Hand Position Max Y Curve Min / Max (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMin', label: 'Hand Position Min Z (World Units)', type: 'text', def: '-300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMinCurveEnabled', label: 'Hand Position Min Z Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMinCurve', label: 'Hand Position Min Z Curve (Screen Distance -> Min Z)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":0}]', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMinCurveRange', label: 'Hand Position Min Z Curve Min / Max (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMax', label: 'Hand Position Max Z (World Units)', type: 'text', def: '300', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMaxCurveEnabled', label: 'Hand Position Max Z Curve On/Off', type: 'checkbox', def: false, onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMaxCurve', label: 'Hand Position Max Z Curve (Screen Distance -> Max Z)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => onFieldBoundsChanged() },
+      { key: 'fieldBoundsZMaxCurveRange', label: 'Hand Position Max Z Curve Min / Max (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
       { key: 'fieldBoundsX', label: 'Hand Position Min / Max X (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
       { key: 'fieldBoundsY', label: 'Hand Position Min / Max Y (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
       { key: 'fieldBoundsZ', label: 'Hand Position Min / Max Z (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() }
@@ -1894,6 +2643,9 @@ const DEV_GROUPS = [
     title: 'Loading Preview',
     controls: [
       { key: 'loadingPreviewEnabled', label: 'Show Hand Loading Animation', type: 'checkbox', def: true },
+      // Loading Preview model (2026-10-16, direct request: "allow me to select the model to use for Preview Loading. provide a dropdown"). Same As Hand Model (default) = the model the field uses. Any other choice is loaded separately
+      // just for the preview; its measurements (alignment, bounds, bone rest poses) still come from the Hand model, so a model with a different rest pose / proportions will not pose exactly like the saved poses (accepted for now).
+      { key: 'loadingPreviewModelId', label: 'Loading Preview Model', type: 'select', def: '', placeAfter: 'loadingPreviewEnabled', options: () => loadingPreviewModelOptions(), onChange: () => onLoadingPreviewModelChanged() },
       // Direct request, following up on the Offset X/Y sliders below
       // ("so i can position the loading hand preview" implies actually
       // being able to SEE it while tuning, not just during the real
@@ -1912,6 +2664,9 @@ const DEV_GROUPS = [
       // nothing to show for it isn't what was asked for.
       { key: 'loadingMinTimeMs', label: 'Min Loading Time (Ms)', type: 'slider', min: 0, max: 5000, step: 100, def: 1200 },
       { key: 'loadingPreviewTweenSelector', label: 'Loading Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      // Two-hand tween (2026-10-13): reads a HANDO "hando-two-hand-tween" export from the clipboard, adds its poses / second-hand poses / sequence, and selects the sequence as the loading animation. A sequence flagged twoHand
+      // makes the preview render the second hand by itself (see updateLoadingPreviewHand2()).
+      { key: 'loadingPreviewImportTwoHandBtn', label: 'Import Two-Hand Tween From Clipboard (HANDO)', type: 'button', onClick: (btn) => importTwoHandTween(btn) },
       // Camera/Lighting selection for the loading preview's own SEPARATE
       // scene -- direct follow-up request ("allow selecting a Camera
       // setting and a Lighting setting for the chosen loading-preview
@@ -1950,12 +2705,16 @@ const DEV_GROUPS = [
       // select dropdown's own live-apply made it redundant; asked back).
       {
         key: 'loadingPreviewSavedCameras',
+        isInUse: (item) => !!cfg.loadingPreviewCameraSelector && cfg.loadingPreviewCameraSelector === item.name,
         label: 'Loading Preview Saved Cameras',
         type: 'list-picker',
         def: [],
         itemLabel: 'Loading Preview Camera',
+        exportable: true,
         importable: true,
-        importTransform: (item) => convertHandoCameraPreset(item),
+        // An exported item is already in this project's own frame (tagged hdFrame); only a HANDO-authored one still needs converting on import.
+        exportTransform: (item) => ({ ...item, hdFrame: true }),
+        importTransform: (item) => importFrameAware(item, convertHandoCameraPreset),
         captureCurrent: () => captureLoadingPreviewCameraPreset(),
         onUse: (item) => applyLoadingPreviewCameraPreset(item),
         // Direct report 2026-09-19 ("those options arent immediatly
@@ -1984,14 +2743,17 @@ const DEV_GROUPS = [
       // an equivalent of), so it stays separate and untouched.
       {
         key: 'loadingPreviewSavedLighting',
+        isInUse: (item) => !!cfg.loadingPreviewLightingSelector && cfg.loadingPreviewLightingSelector === item.name,
         label: 'Loading Preview Saved Lighting',
         type: 'list-picker',
         def: [],
         itemLabel: 'Loading Preview Lighting',
+        exportable: true,
         importable: true,
-        importTransform: (item) => convertHandoLightingPreset(item),
+        exportTransform: (item) => ({ ...item, hdFrame: true }),
+        importTransform: (item) => importFrameAware(item, convertHandoLightingPreset),
         captureCurrent: () => captureLoadingPreviewLightingPreset(),
-        onUse: (item) => { if (loadingPreviewKeyLightRef && loadingPreviewHemiLightRef) applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item) },
+        onUse: (item) => { if (loadingPreviewKeyLightRef && loadingPreviewHemiLightRef) { applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item); syncLoadingPreviewLightSliders() } },
         onChange: () => safeRefreshSelectOptions('loadingPreviewLightingSelector')
       },
       // Same fix as loadingPreviewCameraSelector above -- was missing an
@@ -2000,13 +2762,33 @@ const DEV_GROUPS = [
       // lights when the selection is cleared, matching what
       // buildLoadingPreview() itself does at build time for "no preset
       // selected."
-      { key: 'loadingPreviewLightingSelector', label: 'Loading Preview Lighting', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedLighting || []).map((l) => ({ value: l.name, group: l.group || null })), onChange: () => { if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return; const item = (cfg.loadingPreviewSavedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector); if (item) applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item); else applyLoadingPreviewLightingDefault() } },
+      { key: 'loadingPreviewLightingSelector', label: 'Loading Preview Lighting', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedLighting || []).map((l) => ({ value: l.name, group: l.group || null })), onChange: () => { if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return; const item = (cfg.loadingPreviewSavedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector); if (item) applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item); else applyLoadingPreviewLightingDefault(); syncLoadingPreviewLightSliders() } },
+      // Direct request 2026-10-14 (lighting sliders for the Loading Preview): live editors for the preview's own key / ambient lights. They show whatever the preview is lit with (the selected Saved Lighting, or the main scene's lights
+      // when none is selected) and Save / Overwrite above captures them. Saved slider values are NOT re-applied on reload -- the build re-reads the selected preset and re-syncs them.
+      { key: 'loadingPreviewKeyAzimuth', label: 'Preview Key Light Azimuth (Deg)', type: 'slider', min: 0, max: 360, step: 1, def: 209, onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewKeyElevation', label: 'Preview Key Light Elevation (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 56, onChange: () => applyLoadingPreviewLightSliders() },
+      // Light Type (2026-10-15, direct request: "the light moving closer or further away"): Directional (the default, the look every saved lighting has) has no position that matters, only a direction, so a distance cannot change
+      // it. Point is a real positional light: Distance puts it that many hand radii from the hand along the same Azimuth / Elevation direction, with the usual inverse-square falloff (closer = brighter and more local, further = dimmer
+      // and more even). Intensity is scaled so that a Point light at the default Distance of 3 lights the hand as strongly as the Directional one at the same Intensity.
+      { key: 'loadingPreviewKeyLightType', label: 'Preview Key Light Type', type: 'select', def: 'Directional', options: [{ value: 'Directional', text: 'Directional (Sun-Like, No Distance)' }, { value: 'Point', text: 'Point (Has Distance + Falloff)' }], onChange: () => { applyLoadingPreviewLightSliders(); updateLoadingPreviewLightTypeRows() } },
+      { key: 'loadingPreviewKeyDistance', label: 'Preview Key Light Distance (x Hand Radius, Point Only)', type: 'slider', min: 0.5, max: 20, step: 0.1, def: 3, onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewKeyTargetHeight', label: 'Preview Key Light Aim Height (%)', type: 'slider', min: -100, max: 100, step: 1, def: 2, onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewKeyIntensity', label: 'Preview Key Light Intensity (x)', type: 'slider', min: 0, max: 6, step: 0.1, def: 6, onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewKeyColor', label: 'Preview Key Light Color', type: 'color', def: '#ffffff', onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewAmbientIntensity', label: 'Preview Ambient Intensity (x)', type: 'slider', min: 0, max: 3, step: 0.05, def: 0, onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewAmbientSkyColor', label: 'Preview Ambient Sky Color', type: 'color', def: '#cfe8ff', onChange: () => applyLoadingPreviewLightSliders() },
+      { key: 'loadingPreviewAmbientGroundColor', label: 'Preview Ambient Ground Color', type: 'color', def: '#000000', onChange: () => applyLoadingPreviewLightSliders() },
       { key: 'loadingPreviewSpeedMs', label: 'Loading Preview Speed (Ms / Cycle)', type: 'slider', min: 200, max: 5000, step: 50, def: 900 },
       // Easing Curve (2026-10-12) -- the same speed-profile control the click
       // functions use (see getEasingProfile()). Gated by its own on/off
       // checkbox inside an "Easing" subgroup (setupLoadingPreviewEasingGroup()).
       { key: 'loadingPreviewEasingCurveEnabled', label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: (v) => updateLoadingPreviewEasingCurveVisibility(v) },
       { key: 'loadingPreviewEasingCurve', label: 'Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseLoadingPreviewEasingConfig() },
+      // 2nd Hand Extra Offset X / Y / Z (2026-10-14, direct request: the two-hand loading tween still looked too far apart): added on top of the imported 2nd-hand placement (HANDO's Offset X / Y / Z, in HANDO's own world units, applied before the
+      // mirror). With the usual mirror on X an imported Offset X is negative, so a POSITIVE extra X pulls the 2nd hand toward the main hand. 0 = exactly HANDO's placement (checked bone-for-bone against HANDO: <= 0.3 units).
+      { key: 'loadingPreviewHand2ExtraX', label: 'Loading Preview 2nd Hand Extra Offset X (Units, + = Toward Main Hand)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0 },
+      { key: 'loadingPreviewHand2ExtraY', label: 'Loading Preview 2nd Hand Extra Offset Y (Units)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0 },
+      { key: 'loadingPreviewHand2ExtraZ', label: 'Loading Preview 2nd Hand Extra Offset Z (Units)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0 },
       // Sequence Mode - Count/Loop/Oscillate -- direct spec item, the
       // SAME control shape just added to every click function (see
       // makeClickPoseGroup()'s own matching comment for the full
@@ -2023,6 +2805,19 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewSequenceLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
       { key: 'loadingPreviewSequenceHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: 'loadingPreviewSize', label: 'Loading Preview Size (Px)', type: 'slider', min: 80, max: 400, step: 10, def: 160, onChange: () => resizeLoadingPreview() },
+      // Responsive to the browser (2026-10-15, direct request: "font and animation size and placement to be responsive to the browser"), through the UI Layout Engine's blended-length values (lib/ui-engine, see
+      // applyLoadingPreviewLayout()). Every Px value of the Loading Preview (animation size, its position, the text's size, letter spacing and offsets) is the value AT the reference browser size; Scale With Browser blends it
+      // from fixed pixels (0%) to growing / shrinking with the browser's shorter side (100%), so the whole composition keeps its proportions on a phone, a tablet and a big desktop.
+      { key: 'loadingPreviewLayout', label: 'Loading Preview Layout (internal, edited in the Layout group)', type: 'text', def: '', onChange: () => lpLoadStoredLayout() },
+      // Show In Mobile / Landscape (2026-10-15, direct request, so the Layout - anchor, gaps, sizes, with the Inspector's own Mobile Portrait / Mobile Landscape overrides - can be edited on the Mobile and Landscape tabs): lives in the
+      // Layout group; see lpUpdateLayoutGroupDeviceVisibility().
+      { key: 'loadingPreviewLayoutOnMobile', label: 'Show Layout In Mobile / Landscape', type: 'checkbox', def: true, onChange: () => lpUpdateLayoutGroupDeviceVisibility() },
+      { key: 'loadingPreviewScalePct', label: 'Font Scale With Browser (%)', type: 'slider', min: 0, max: 100, step: 1, def: 100, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
+      // The animation scales the same way (2026-10-15, direct request: "i also want the animation to scale with browser"): the Layout's size is read as the size AT the reference browser size and is scaled by the browser's shorter side / reference, kept pinned to the edge / corner it is anchored to.
+      { key: 'loadingPreviewAnimScalePct', label: 'Animation Scale With Browser (%)', type: 'slider', min: 0, max: 100, step: 1, def: 100, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
+      { key: 'loadingPreviewScaleRefPx', label: 'Reference Browser Size (Px, Shorter Side) (Font + Animation)', type: 'slider', min: 300, max: 3000, step: 10, def: 1080, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
+      { key: 'loadingPreviewPosX', label: 'Loading Preview Position X (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
+      { key: 'loadingPreviewPosY', label: 'Loading Preview Position Y (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => refreshLoadingPreviewLayout() },
       // CORRECTED 2026-09-19, direct request+follow-up ("Loading Preview
       // Rotation X Y Z and XY offset should reflect the camera settings"
       // -> confirmed via AskUserQuestion: repurpose, don't keep the old
@@ -2096,6 +2891,23 @@ const DEV_GROUPS = [
       // just `.enabled` on the controls object itself (which alone would
       // silently do nothing -- the canvas would never even receive the
       // events for OrbitControls to ignore-or-not).
+      // Text shown alongside the loading animation (2026-10-15, direct request). The rows below are moved into a nested, toggleable "Text" subgroup by setupLoadingPreviewTextGroup(); the on-screen element is #loadingPreviewText (updateLoadingPreviewText()).
+      { key: 'loadingPreviewTextEnabled', label: 'Text On/Off', type: 'checkbox', def: false, onChange: () => { updateLoadingPreviewText(); updateLoadingPreviewTextGroupVisibility() } },
+      { key: 'loadingPreviewTextContent', label: 'Text', type: 'text', def: 'Loading...', onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextFontSize', label: 'Font Size (Px)', type: 'slider', min: 8, max: 200, step: 1, def: 32, perDevice: true, onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextLetterSpacing', label: 'Letter Spacing (Px)', type: 'slider', min: -10, max: 100, step: 0.5, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextColor', label: 'Font Color', type: 'color', def: '#ffffff', onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextFont', label: 'Font', type: 'select', def: 'Inter', options: () => LOADING_TEXT_FONTS.map((f) => ({ value: f.name, group: f.group })), onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextOffsetX', label: 'Text Offset X (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
+      { key: 'loadingPreviewTextOffsetY', label: 'Text Offset Y (Px)', type: 'slider', min: -1500, max: 1500, step: 1, def: 0, perDevice: true, onChange: () => updateLoadingPreviewText() },
+      // Progress Crop (2026-10-15, direct request): a flat clip plane across each loading hand, normal = the hand's own Y axis, driven by the loading progress. The rows are moved into a nested, toggleable "Progress Crop" subgroup by
+      // setupLoadingPreviewProgressCropGroup(). 100% crop hides the whole model, 0% hides nothing.
+      { key: 'loadingPreviewProgressCropEnabled', label: 'Progress Crop On/Off', type: 'checkbox', def: false, onChange: () => { updateLoadingPreviewProgressCropGroupVisibility(); sceneNeedsRedraw = true } },
+      // On (default): the curve's X is the REAL loading progress, held back to the Min Loading Time clock - if real loading is slower than the minimum time, the real pace governs. Off: X follows only the Min Loading Time clock.
+      { key: 'loadingPreviewProgressCropRealtime', label: 'Use Real-Time Loading Progress', type: 'checkbox', def: true },
+      { key: 'loadingPreviewProgressCropFlip', label: 'Crop From The Fingertip End (Off = From The Arm End)', type: 'checkbox', def: false },
+      { key: 'loadingPreviewProgressCropRange', label: 'Min / Max Crop (%)', type: 'text', def: '{"min":0,"max":100}' },
+      { key: 'loadingPreviewProgressCropCurve', label: 'Crop Curve (Loading Progress -> Crop Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]' },
       { key: 'loadingPreviewCameraEditMode', label: 'Loading Preview Camera Edit Mode', type: 'checkbox', def: false, onChange: (v) => { if (loadingPreviewOrbitControls) loadingPreviewOrbitControls.enabled = v; if (loadingPreviewCanvas) loadingPreviewCanvas.style.pointerEvents = v ? 'auto' : 'none' } }
     ]
   },
@@ -2248,6 +3060,25 @@ const DEV_GROUPS = [
       // other row-visibility function in this file already uses (devPanel.js
       // itself has no native "hidden" control type).
       { key: 'customClickFunctionIds', label: 'Custom Function IDs (Internal, Auto-Managed)', type: 'text', def: '[]' },
+      // Custom Click Function Selector (2026-10-14, direct request): an item selector over the custom click functions - group them, order them, switch them on / off from one place, Duplicate one. It only organizes THIS list: the functions' own
+      // groups below keep their own order and nesting, whatever is done here. The checkbox on each item mirrors that function's own Enabled checkbox both ways; a group's checkbox switches every function in it. Its value is just the layout
+      // ({ name, fnId, group }), rebuilt against the real function list by refreshCustomFunctionSelector().
+      {
+        key: 'customFunctionSelector',
+        label: 'Custom Click Function Selector',
+        type: 'list-picker',
+        def: [],
+        hostManaged: true,
+        itemLabel: 'Click Function',
+        itemToggle: {
+          isOn: (item) => !!cfg[`${item.fnId}Enabled`],
+          setOn: (item, on) => setCustomFunctionEnabled(item.fnId, on)
+        },
+        itemWarn: (item) => { const o = customFunctionOverlapNames(item.fnId); return o.length ? `Overlaps with: ${o.join(', ')} -- same trigger, both enabled. Turning one on switches the others off.` : '' },
+        buttons: ['duplicate', 'rename', 'group'],
+        onDuplicate: (item, opts) => duplicateCustomClickFunction(item.fnId, opts), // returns the promise: a group's functions are duplicated one after another
+        onRename: (item, name) => renameCustomFunction(item.fnId, name)
+      },
       // MOVED to the top of this group 2026-09-28 (direct request) -- both
       // were previously elsewhere (Hold Confirm Delay lower in this same
       // group; Rolling Click Window in the Debug group, see
@@ -2310,6 +3141,9 @@ const DEV_GROUPS = [
       { key: 'midOnlyCurlThumb', label: 'Thumb 2nd Segment Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
       { key: 'tipOnlyCurlThumb', label: 'Thumb Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
       { key: 'tipTwistThumb', label: 'Thumb Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 4, onChange: () => applyCurl('thumb') },
+      { key: 'thumbBaseSplay', label: 'Thumb Base Splay (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      { key: 'midTwistThumb', label: 'Thumb 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('thumb') },
+      { key: 'baseTwistThumb', label: 'Thumb Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('thumb') },
       { key: 'curlIndex', label: 'Index Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 96, lockRange: true, onChange: () => applyCurl('index') },
       { key: 'splayIndex', label: 'Index Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 15, onChange: () => applyCurl('index') },
       { key: 'splayIndex2', label: 'Index 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 72, onChange: () => applyCurl('index') },
@@ -2318,6 +3152,8 @@ const DEV_GROUPS = [
       { key: 'midOnlyCurlIndex', label: 'Index Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'tipOnlyCurlIndex', label: 'Index Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'tipTwistIndex', label: 'Index Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 1, onChange: () => applyCurl('index') },
+      { key: 'midTwistIndex', label: 'Index 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('index') },
+      { key: 'baseTwistIndex', label: 'Index Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('index') },
       { key: 'curlMiddle', label: 'Middle Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -89, lockRange: true, onChange: () => applyCurl('middle') },
       { key: 'splayMiddle', label: 'Middle Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -14, onChange: () => applyCurl('middle') },
       { key: 'splayMiddle2', label: 'Middle 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -13, onChange: () => applyCurl('middle') },
@@ -2326,6 +3162,8 @@ const DEV_GROUPS = [
       { key: 'midOnlyCurlMiddle', label: 'Middle Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'tipOnlyCurlMiddle', label: 'Middle Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'tipTwistMiddle', label: 'Middle Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -5, onChange: () => applyCurl('middle') },
+      { key: 'midTwistMiddle', label: 'Middle 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('middle') },
+      { key: 'baseTwistMiddle', label: 'Middle Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('middle') },
       { key: 'curlRing', label: 'Ring Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: -95, lockRange: true, onChange: () => applyCurl('ring') },
       { key: 'splayRing', label: 'Ring Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 37, onChange: () => applyCurl('ring') },
       { key: 'splayRing2', label: 'Ring 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -32, onChange: () => applyCurl('ring') },
@@ -2334,6 +3172,8 @@ const DEV_GROUPS = [
       { key: 'midOnlyCurlRing', label: 'Ring Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'tipOnlyCurlRing', label: 'Ring Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'tipTwistRing', label: 'Ring Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -5, onChange: () => applyCurl('ring') },
+      { key: 'midTwistRing', label: 'Ring 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('ring') },
+      { key: 'baseTwistRing', label: 'Ring Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('ring') },
       { key: 'curlPinky', label: 'Pinky Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 89, lockRange: true, onChange: () => applyCurl('pinky') },
       { key: 'splayPinky', label: 'Pinky Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: -82, onChange: () => applyCurl('pinky') },
       { key: 'splayPinky2', label: 'Pinky 2nd Segment Splay (%)', type: 'slider', min: -200, max: 200, step: 1, def: 33, onChange: () => applyCurl('pinky') },
@@ -2342,6 +3182,8 @@ const DEV_GROUPS = [
       { key: 'midOnlyCurlPinky', label: 'Pinky Mid-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'tipOnlyCurlPinky', label: 'Pinky Tip-Only Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'tipTwistPinky', label: 'Pinky Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -3, onChange: () => applyCurl('pinky') },
+      { key: 'midTwistPinky', label: 'Pinky 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
+      { key: 'baseTwistPinky', label: 'Pinky Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'wristBend', label: 'Wrist Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
       { key: 'wristSplay', label: 'Wrist Splay (Deg)', type: 'slider', min: -30, max: 30, step: 1, def: -1, onChange: () => applyWristPose() },
       // Ported from HANDO (direct request: "check Hando. I added a wrist
@@ -2360,6 +3202,10 @@ const DEV_GROUPS = [
       // rotation isn't affected by the alignQuat difference between the 2
       // projects).
       { key: 'wristRotation', label: 'Wrist Rotation (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0, lockRange: true, onChange: () => applyWristPose() },
+      // IK rig only (see IK RIG above): HANDO's forearm joints. The sliders exist for every model so poses carry the values, but only the IK rig reads them.
+      { key: 'elbowBend', label: 'Elbow Bend (Deg)', type: 'slider', min: -10, max: 150, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'elbowSideBend', label: 'Elbow Side Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'forearmTwist', label: 'Forearm Twist (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
       { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
@@ -2399,6 +3245,7 @@ const DEV_GROUPS = [
       // (where Hide Wrist is a plain static crop with no reactive mode).
       {
         key: 'savedPoses',
+        isDefault: (item) => poseItemMatchesDefault(item),
         label: 'Saved Poses',
         type: 'list-picker',
         def: [
@@ -2607,7 +3454,7 @@ const DEV_GROUPS = [
         // group's own Tween Selector dropdown reads this same list via
         // options(), which devPanel.js only rebuilds on an explicit
         // refreshSelectOptions() call.
-        onChange: () => { safeRefreshSelectOptions('dcHoldTweenSelector'); safeRefreshSelectOptions('rcTweenSelector'); safeRefreshSelectOptions('chpTweenSelector'); safeRefreshSelectOptions('rchpTweenSelector'); safeRefreshSelectOptions('clickTweenSelector'); safeRefreshSelectOptions('dblclickTweenSelector'); CLICK_HOLD_KEYS.forEach((p) => safeRefreshMultiSelectOptions(`${p}TweenChain`)) }
+        onChange: () => refreshAllTweenSequenceSelectors()
       }
     ])
   },
@@ -2646,6 +3493,8 @@ const DEV_GROUPS = [
       { key: 'cameraYaw', label: 'Camera Yaw (Deg)', type: 'slider', min: -180, max: 180, step: 0.5, def: 1.464, perDevice: true, onChange: () => applyCameraOrientation() },
       { key: 'cameraPitch', label: 'Camera Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 0.5, def: -2.946, perDevice: true, onChange: () => applyCameraOrientation() },
       { key: 'cameraRoll', label: 'Camera Roll (Deg)', type: 'slider', min: -180, max: 180, step: 0.5, def: 0, perDevice: true, onChange: () => applyCameraOrientation() },
+      // The Default camera of this set of settings (2026-10-15): Default on a Saved Camera stores the full view here (position, field of view, zoom, roll AND the pan target), so it is saved with every dev setting, comes back on load and on Use, and marks the right item. Hidden bookkeeping row.
+      { key: 'cameraDefaultPreset', label: 'Default Camera (internal)', type: 'text', def: '', perDevice: true }, // per device (2026-10-16): the Default set on the Mobile tab is Mobile's own and never replaces Desktop's
       // Direct 2-way binding with scroll/pinch zoom, same pattern as the
       // X/Y/Z sliders above: this slider both SETS the camera's distance
       // to its own pan target (setCameraDistance(), below) and is kept in
@@ -2673,8 +3522,11 @@ const DEV_GROUPS = [
       // Pose Preview exists for hand poses.
       {
         key: 'savedCameras',
+        isDefault: (item) => cameraItemMatchesDefault(item),
+        isInUse: (item) => cameraItemMatchesLive(item),
         label: 'Saved Cameras',
         type: 'list-picker',
+        exportable: true,
         def: [],
         itemLabel: 'Camera',
         importable: true,
@@ -2737,8 +3589,10 @@ const DEV_GROUPS = [
       // either). See captureLightingPreset()/applyLightingPreset() below.
       {
         key: 'savedLighting',
+        isInUse: (item) => lightingItemMatchesLive(item),
         label: 'Saved Lighting',
         type: 'list-picker',
+        exportable: true,
         def: [],
         itemLabel: 'Lighting',
         importable: true,
@@ -2758,6 +3612,7 @@ const DEV_GROUPS = [
       { key: 'toonShadowFloorPick', label: 'Pick Shadow Floor From Screen Color (Eyedropper)', type: 'button', onClick: (btn) => pickToonValueFromScreen('floor', btn) },
       { key: 'toonLightCeiling', label: 'Toon Light Ceiling (%)', type: 'slider', min: 10, max: 100, step: 1, def: 100, onChange: () => rebuildGradientMap() },
       { key: 'toonLightCeilingPick', label: 'Pick Light Ceiling From Screen Color (Eyedropper)', type: 'button', onClick: (btn) => pickToonValueFromScreen('ceiling', btn) },
+      { key: 'toonGradient', label: 'Toon Shade Color Gradient', type: 'text', def: '[{"p":0,"c":"#ffffff"},{"p":1,"c":"#ffffff"}]', placeAfter: 'toonLightCeilingPick', onChange: () => rebuildGradientMap() },
       { key: 'toonBaseTint', label: 'Toon Base Tint', type: 'color', def: '#ffffff', onChange: (v) => forEachToonMaterial((m) => m.color.set(v)) },
       { key: 'textureInfluence', label: 'Texture Influence (%)', type: 'slider', min: 0, max: 100, step: 1, def: 0, onChange: (v) => setToonUniform('textureInfluence', v / 100) },
       { key: 'toonTint', label: 'Toon Texture Tint', type: 'color', def: '#ffffff', onChange: (v) => setToonUniform('toonTint', new THREE.Color(v)) },
@@ -2823,15 +3678,18 @@ const DEV_GROUPS = [
   {
     title: 'Background',
     controls: [
-      { key: 'bgColor', label: 'Background Color', type: 'color', def: '#ffffff', onChange: (v) => { scene.background = new THREE.Color(v); syncLoadingPreviewBackground() } }
+      // While the Floor is on, the Background Color simply follows the Floor Color (its row is hidden then, see updateFloorRowVisibility()); only with the Floor off does it have its own input.
+      { key: 'bgColor', label: 'Background Color', type: 'color', def: '#ffffff', onChange: (v) => { scene.background = new THREE.Color(v); syncLoadingPreviewBackground() } },
+      // Colour presets of the on-page selector (JSON text; the row is hidden, the selector button edits it).
+      { key: 'colorPresets', label: 'Color Presets (JSON)', type: 'text', def: JSON.stringify(COLOR_PRESET_SEED) }
     ]
   },
   // Floor (2026-10-11, direct request): ONE plane at world Z 0 (+ Z Offset) that spans the whole screen, drawn behind the hands. The group has its own on/off checkbox in its header. Default color = the Background Color default.
   {
     title: 'Floor',
     controls: [
-      { key: 'floorEnabled', label: 'Floor On/Off', type: 'checkbox', def: false, onChange: () => { updateFloorRowVisibility(); updateFloor() } },
-      { key: 'floorColor', label: 'Floor Color', type: 'color', def: '#ffffff', onChange: () => updateFloor() },
+      { key: 'floorEnabled', label: 'Floor On/Off', type: 'checkbox', def: false, onChange: () => { startupFloorHidden = false; syncBackgroundToFloor(); updateFloorRowVisibility(); updateFloor() } },
+      { key: 'floorColor', label: 'Floor Color', type: 'color', def: '#ffffff', onChange: () => { syncBackgroundToFloor(); updateFloor() } },
       { key: 'floorZOffset', label: 'Floor Z Offset (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, onChange: () => updateFloor() },
       { key: 'floorXYScale', label: 'Floor XY Scale (x)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1, onChange: () => updateFloor() }
     ]
@@ -2855,7 +3713,9 @@ const DEV_GROUPS = [
         qualityState.pixelRatio = preset.pixelRatio
         qualityState.resolutionScale = preset.resolutionScale / 100
         applyQualityState()
-      } }
+      } },
+      // Off-screen finger-curl skip (2026-10-15, direct request): a hand outside every camera's view (plus a margin) keeps updating all its pose numbers but does not write its finger bones until it is back in view.
+      { key: 'skipOffScreenFingerCurls', label: 'Skip Finger Curls For Off-Screen Hands', type: 'checkbox', def: true, perDevice: true }
     ]
   },
   // Starting State (2026-10-11, direct request): with Static Pose On Startup on, the hands stay in their default pose - no cursor tracking (arm / palm rotation, reactive wrist splay, reactive arm length) - until the first
@@ -2863,7 +3723,11 @@ const DEV_GROUPS = [
   {
     title: 'Starting State',
     controls: [
-      { key: 'staticPoseOnStartup', label: 'Static Pose On Startup', type: 'checkbox', def: false, onChange: (v) => { if (v) startupStaticReleased = false } }
+      { key: 'staticPoseOnStartup', label: 'Static Pose On Startup', type: 'checkbox', def: false, onChange: (v) => { if (v) startupStaticReleased = false } },
+      // On (default): the Floor is hidden (and stops cropping the hands) once EVERY hand has reached the end of its own Hand Offset On Startup sequence. Direct request 2026-10-13.
+      // Test button (direct request 2026-10-13): runs the whole Starting State again without a page refresh.
+      { key: 'runStartingStateBtn', label: 'Run Starting State', type: 'button', placeAfter: 'staticPoseOnStartup', onClick: () => restartStartingState() },
+      { key: 'hideFloorAfterHandOffset', label: 'Hide Floor After Hand Offset Sequence', type: 'checkbox', def: true, placeAfter: 'staticPoseOnStartup', onChange: () => { if (!cfg.hideFloorAfterHandOffset) { startupFloorHidden = false; updateFloor() } else checkStartupFloorHide() } }
     ]
   },
   // Hand Offset On Startup (2026-10-12, direct request), nested into Starting State by nestGroupInto(): with it on, the hands are drawn at startup in the default pose displaced by Offset X / Y / Z; the FIRST click
@@ -2873,9 +3737,26 @@ const DEV_GROUPS = [
     title: 'Hand Offset On Startup',
     controls: [
       { key: 'handOffsetOnStartupEnabled', label: 'Hand Offset On Startup On/Off', type: 'checkbox', def: false, onChange: () => onHandOffsetOnStartupToggled() },
-      { key: 'startupHandOffsetX', label: 'Offset X (World Units)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0, onChange: () => applyStartupHandOffset() },
-      { key: 'startupHandOffsetY', label: 'Offset Y (World Units)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0, onChange: () => applyStartupHandOffset() },
+      // Clicks that may trigger hands under the Start Distance Curve; the click after the last one triggers every remaining hand with the Start Distance Curve ignored.
+      { key: 'startupHandMaxClicks', label: 'Maximum Clicks', type: 'slider', min: 1, max: 20, step: 1, def: 3 },
       { key: 'startupHandOffsetZ', label: 'Offset Z (World Units, + Toward Camera)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0, onChange: () => applyStartupHandOffset() },
+      // Wait For All Hands: while any VISIBLE hand has not finished its own startup sequence, every click only (re)triggers hands and is consumed - the normal click functions stay out until all visible hands are done.
+      { key: 'startupHandWaitForAll', label: 'Wait For All Hands', type: 'checkbox', def: false },
+      // Cursor tracking from the start of the startup (direct request 2026-10-14): each ticked feature is on from the beginning instead of after the startup hold. Static Pose On Startup overrides all four.
+      { key: 'startupTrackArm', label: 'Arm Rotation Tracking From Start', type: 'checkbox', def: false },
+      { key: 'startupTrackPalm', label: 'Palm Rotation Tracking From Start', type: 'checkbox', def: false },
+      { key: 'startupTrackSplay', label: 'Wrist Splay Tracking From Start', type: 'checkbox', def: false },
+      { key: 'startupTrackCrop', label: 'Wrist Cropping Tracking From Start', type: 'checkbox', def: false },
+      // Hand Z Offset Curve (same UI as the sphere's Z Offset Curve): ON, the Z offset (camera forward, + toward the camera) of each hand follows this curve over its own sequence progress, between Min and Max; the hands wait at the
+      // curve's value at progress 0 and end at its value at progress 1. OFF, the Offset Z slider is the start displacement that tweens back to the grid position.
+      { key: 'startupHandZCurveEnabled', label: 'Hand Z Offset Curve On/Off', type: 'checkbox', def: false, onChange: () => applyStartupHandOffset() },
+      { key: 'startupHandZCurve', label: 'Hand Z Offset Curve (Progress -> Z)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => applyStartupHandOffset() },
+      { key: 'startupHandZRange', label: 'Min / Max Hand Z Offset (World Units)', type: 'text', def: '{"min":-30,"max":0}', onChange: () => applyStartupHandOffset() },
+      // Hand Scale Curve (2026-10-13, direct request; same UI as the sphere Radius Curve, but the hand's scale): ON, each hand's scale (a multiple of its normal scale, 1 = normal) follows this curve over its own sequence progress
+      // between Min and Max; before it is triggered it waits at the value at progress 0, and once its sequence is finished it is back at its normal scale (end the curve at 1 for a seamless handoff).
+      { key: 'startupHandScaleCurveEnabled', label: 'Hand Scale Curve On/Off', type: 'checkbox', def: false, onChange: () => { sceneNeedsRedraw = true } },
+      { key: 'startupHandScaleCurve', label: 'Hand Scale Curve (Progress -> Scale)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]' },
+      { key: 'startupHandScaleRange', label: 'Min / Max Hand Scale (x)', type: 'text', def: '{"min":0,"max":1}' },
       { key: 'startupHandTweenEnabled', label: 'Animation Tween On/Off', type: 'checkbox', def: false },
       ...startupFnControls()
     ]
@@ -2891,6 +3772,8 @@ const DEV_GROUPS = [
       { key: 'sphereStartRadius', label: 'Sphere Starting Radius (World Units)', type: 'slider', min: 0.1, max: 40, step: 0.1, def: 4 },
       { key: 'sphereSeqDurationMs', label: 'Sphere Sequence Duration (Ms)', type: 'slider', min: 0, max: 10000, step: 10, def: 1000 },
       { key: 'sphereWaitForAll', label: 'Wait For All Spheres', type: 'checkbox', def: false },
+      // Clicks that may trigger spheres under the Start Distance Curve; the click after the last one triggers every remaining (visible) sphere with the Start Distance Curve ignored.
+      { key: 'sphereMaxClicks', label: 'Maximum Clicks', type: 'slider', min: 1, max: 20, step: 1, def: 3 },
       { key: 'sphereColor', label: 'Sphere Color', type: 'color', def: '#d9a98f', onChange: () => { if (sphereMesh) sphereMesh.material.color.set(cfg.sphereColor) } },
       ...sphereFnControls(),
       { key: 'sphereRadiusCurveEnabled', label: 'Sphere Radius Curve On/Off', type: 'checkbox', def: false },
@@ -2905,6 +3788,7 @@ const DEV_GROUPS = [
     title: 'Debug',
     controls: [
       { key: 'showTrackingPoints', label: 'Show Hand Tracking Points', type: 'checkbox', def: false },
+      { key: 'showFieldCenterPoint', label: 'FIELD CENTER POINT', type: 'checkbox', def: false, placeAfter: 'showTrackingPoints' },
       { key: 'showRenderOrderPoints', label: 'Show Hand Render Order Points (Arm Base / Arm End / Palm Center)', type: 'checkbox', def: false, placeAfter: 'showTrackingPoints' },
       { key: 'showGridHelper', label: 'Show Grid Helper', type: 'checkbox', def: false, onChange: (v) => { if (gridHelper) gridHelper.visible = v } },
       { key: 'showWireframe', label: 'Show Wireframe', type: 'checkbox', def: false, onChange: (v) => forEachToonMaterial((m) => { m.wireframe = v }) },
@@ -3091,13 +3975,13 @@ const SNAPSHOT_SUBGROUP_SPECS = [
   { title: 'Snapshot', collapsed: false, keys: ['snapshotCursor', 'snapshotMouse', 'snapshotHandBehaviour', 'snapshotFrameRate', 'snapshotPoseJumps', 'snapshotRenderOrder', 'snapshotTrackingPoints', 'snapshotTakeBtn'] }
 ]
 const POSE_SUBGROUP_SPECS = [
-  { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb'] },
+  { title: 'Whole-Hand Rotation & Thumb', collapsed: true, keys: ['modelRotX', 'modelRotY', 'modelRotZ', 'thumbCurl', 'thumbSplay', 'thumbSplay2', 'tipTwistThumb', 'curlBiasThumb', 'baseOnlyCurlThumb', 'midOnlyCurlThumb', 'tipOnlyCurlThumb', 'thumbBaseSplay', 'midTwistThumb', 'baseTwistThumb'] },
   { title: 'Whole-Hand Rotation at Base', collapsed: true, keys: ['baseRotationX', 'baseRotationY', 'baseRotationZ'] },
-  { title: 'Wrist', collapsed: true, keys: ['wristBend', 'wristSplay', 'wristRotation'] },
-  { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2', 'baseOnlyCurlIndex', 'midOnlyCurlIndex', 'tipOnlyCurlIndex'] },
-  { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2', 'baseOnlyCurlMiddle', 'midOnlyCurlMiddle', 'tipOnlyCurlMiddle'] },
-  { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2', 'baseOnlyCurlRing', 'midOnlyCurlRing', 'tipOnlyCurlRing'] },
-  { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2', 'baseOnlyCurlPinky', 'midOnlyCurlPinky', 'tipOnlyCurlPinky'] },
+  { title: 'Wrist', collapsed: true, keys: ['wristBend', 'wristSplay', 'wristRotation', 'elbowBend', 'elbowSideBend', 'forearmTwist'] },
+  { title: 'Index', collapsed: true, keys: ['curlIndex', 'tipTwistIndex', 'splayIndex', 'curlBiasIndex', 'splayIndex2', 'baseOnlyCurlIndex', 'midOnlyCurlIndex', 'tipOnlyCurlIndex', 'midTwistIndex', 'baseTwistIndex'] },
+  { title: 'Middle', collapsed: true, keys: ['curlMiddle', 'tipTwistMiddle', 'splayMiddle', 'curlBiasMiddle', 'splayMiddle2', 'baseOnlyCurlMiddle', 'midOnlyCurlMiddle', 'tipOnlyCurlMiddle', 'midTwistMiddle', 'baseTwistMiddle'] },
+  { title: 'Ring', collapsed: true, keys: ['curlRing', 'tipTwistRing', 'splayRing', 'curlBiasRing', 'splayRing2', 'baseOnlyCurlRing', 'midOnlyCurlRing', 'tipOnlyCurlRing', 'midTwistRing', 'baseTwistRing'] },
+  { title: 'Pinky', collapsed: true, keys: ['curlPinky', 'tipTwistPinky', 'curlBiasPinky', 'splayPinky', 'splayPinky2', 'baseOnlyCurlPinky', 'midOnlyCurlPinky', 'tipOnlyCurlPinky', 'midTwistPinky', 'baseTwistPinky'] },
 ]
 // Shared anti-abuse token for /api/save-settings (CLAUDE.md §12l) -- NOT a
 // real secret (it ships in this page's own source, same as every other
@@ -3110,6 +3994,8 @@ const POSE_SUBGROUP_SPECS = [
 // workspace-wide shared secret, not a per-project one.
 const DEV_PANEL_SAVE_SECRET = 'PkrbMti03M6xm3FEThYXa8gGW_08BOGj'
 const SAVE_SETTINGS_ENDPOINT = '/api/save-settings'
+// Camera group (direct request 2026-10-14): its sliders are perDevice, which has no Show in Mobile/Landscape checkbox of its own; opt them into the visibility-only one so the group has it like every other group.
+;(DEV_GROUPS.find((g) => g.title === 'Camera') || { controls: [] }).controls.forEach((c) => { if (c.perDevice && c.type === 'slider') c.visibilityToggle = true })
 const cfg = initDevPanel(DEV_GROUPS, {
   storageKeyPrefix: 'handyDandies',
   organizeSubgroups: (groupsEl) => { organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Debug', SNAPSHOT_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Camera', CAMERA_SUBGROUP_SPECS) },
@@ -3149,12 +4035,15 @@ const cfg = initDevPanel(DEV_GROUPS, {
     logStartupTiming('onRestore fired -> startupSettingsReady = true')
     // A saved panel order that predates the Render Order group puts its rows straight back into Field Layout when it is applied; re-nest them (idempotent, only moves the listed keys).
     try { renestRenderOrderRows() } catch (e) { /* panel not built */ }
+    try { migrateLegacyFieldBounds(); ;['X', 'Y', 'Z'].forEach((A) => { const r = document.querySelector('.dp-row[data-key="fieldBounds' + A + '"]'); if (r) r.style.display = 'none' }) } catch (e) { /* panel not built */ }
     try {
       // Default Floor Color = the Background Color (direct request): while Floor Color still holds its code default (white) and the restored Background Color is something else, start from the Background Color. Once a
       // different color is saved it is left alone (a deliberately white floor on a non-white background needs a slightly different white, e.g. #fefefe).
       if ((cfg.floorColor || '#ffffff').toLowerCase() === '#ffffff' && cfg.bgColor && cfg.bgColor.toLowerCase() !== '#ffffff') syncValue('floorColor', cfg.bgColor)
+      syncBackgroundToFloor()
       gateGroupHeader('Floor', 'floorEnabled'); nestFloorIntoThreeJs(); updateFloorRowVisibility(); updateFloor()
-      gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled'); nestGroupInto('Hand Offset On Startup', 'Starting State'); updateHandOffsetGroupVisibility(); applyStartupHandOffset()
+      renderColorPresetPanel()
+      placeStartupRetransitionGroup(); gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled'); nestGroupInto('Hand Offset On Startup', 'Starting State'); updateHandOffsetGroupVisibility(); applyStartupHandOffset()
       gateGroupHeader('Field Grid Sphere Sequence', 'sphereSeqEnabled'); nestGroupInto('Field Grid Sphere Sequence', 'Starting State'); updateGroupContentsVisibility('Field Grid Sphere Sequence', !!cfg.sphereSeqEnabled)
       if (cfg.sphereSeqEnabled && sphereStage === 2 && !startupConsumeActive) { sphereStage = 0; updateHandsVisibility() } // a saved-on sequence starts waiting for its first click
     } catch (e) { /* panel not built */ }
@@ -3174,6 +4063,22 @@ const cfg = initDevPanel(DEV_GROUPS, {
     if (DEBUG_TIMING) (window.__dpProfile = window.__dpProfile || []).push({ label: 'restoreCustomClickFunctions (wall, sliced)', atMs: Math.round(tCcf), ms: Math.round(performance.now() - tCcf) })
     prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
+    prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
+    safeRefreshSelectOptions('loadingPreviewModelId')
+    updateLoadingPreviewLightTypeRows()
+    safeRefreshSelectOptions('loadingPreviewKeyLightType')
+    prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
+    prof('setupLoadingPreviewProgressCropGroup', setupLoadingPreviewProgressCropGroup)
+    prof('setupLoadingPreviewLayoutGroup', setupLoadingPreviewLayoutGroup)
+    try { await setupResponsiveVelocity() } catch (e) { console.error('Responsive Velocity setup failed', e) }
+    exclusiveTriggersReady = true // from here on a user turning a click function on / changing its trigger switches an overlapping one off
+    refreshCustomFunctionConflictWarnings()
+    prof('placeHandModelRows', placeHandModelRows)
+    prof('placeSmallScaleModelRows', placeSmallScaleModelRows)
+    prof('loadCameraDefaultFromCfg', loadCameraDefaultFromCfg)
+    try { const dr = document.querySelector('.dp-row[data-key="cameraDefaultPreset"]'); if (dr) dr.style.display = 'none' } catch (e) { /* no panel */ }
+    prof('refreshItemSelectorMarks', refreshAllItemSelectorMarks)
+    prof('syncHandModelWithSettings', syncHandModelWithSettings)
     startupSettingsReady = true
     prof('refreshStartupPreviewAfterRestore', refreshStartupPreviewAfterRestore)
     prof('writeStartupCache', writeStartupCache)
@@ -3210,7 +4115,10 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // configured. disableDeletedStaticClickTrigger() (below) closes this
   // specific gap; both cleanup functions run for every deletion and are
   // each a no-op for the case the other one handles.
-  onGroupDeleted: (target) => { cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target) },
+  // RULE: any group the host builds at runtime and keeps its own bookkeeping for (a list in cfg, registered keys / trigger state, saved values) must be torn down here when the delete tool removes it - the tool only
+  // removes the DOM node, so without a cleanup the group comes back on the next load (a Multi Trigger did, 2026-10-16). If Undo must rebuild it, also list it in deleteUsesSnapshot below and reconcile it in undoApplyExtra.
+  onGroupDeleted: (target) => { cleanupDeletedMultiTriggerGroups(target); cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target); cleanupDeletedVelocityGroup(target) },
+  deleteUsesSnapshot: (target) => !!(target && target.querySelector && (target.dataset.multiTriggerPrefix || target.querySelector('.dp-group[data-multi-trigger-prefix]')) && !target.dataset.customFunctionFamily), // Multi Trigger groups: Undo rebuilds them through undoApplyExtra
   // Real bug found live 2026-09-24: Custom Click Functions' own tab-
   // dependent visibility (Touch Point Count hidden on Desktop, a
   // function's own group shown/hidden by family, the Zoom/Scroll
@@ -3228,7 +4136,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // devPanel.js `onDeviceTabChanged` hook (called from both a real click
   // AND the self-heal correction) re-runs the exact same sweep the
   // click listener already does, so either path now stays correct.
-  onDeviceTabChanged: () => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() },
+  onDeviceTabChanged: () => { try { refreshAllItemSelectorMarks() } catch (e) { /* lists not built yet */ } refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() },
   // A desktop-family custom function's own "also active on Mobile/
   // Landscape" state is now read directly from `${id}Enabled`'s own
   // devVisibility (see customFunctionActiveForDeviceFamily()'s own
@@ -3248,12 +4156,18 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // (normally) not redrawing at all while nothing has actually changed.
   onAnyValueChange: () => { sceneNeedsRedraw = true },
   // Undo/Redo leaves the live camera sliders alone unless the step was itself a camera-slider edit (2026-10-06).
+  onSavedStateApplied: (state) => applySavedStateDefaults(state),
+  sanitizeOrder: (order) => sanitizeVelocitySavedOrder(order),
   undoLiveKeys: ['cameraX', 'cameraY', 'cameraZ', 'cameraFov', 'cameraZoom', 'cameraYaw', 'cameraPitch', 'cameraRoll'],
   // Keep the startup cache in step with what was just saved.
+  onBeforeSave: () => persistCustomClickFunctionIds(),
+  undoCaptureExtra: () => captureCustomFunctionsForUndo(),
+  undoApplyExtra: (extra) => reconcileCustomFunctions(extra),
   onSave: () => writeStartupCache()
 })
 onChangeByCtrl.forEach((fn, c) => { c.onChange = fn })
 applyStartupCache()
+updateLoadingPreviewText() // the loading text shows from the first paint when the cache has it (the panel may not exist at all for a normal visitor)
 setupCustomFunctionTabVisibilitySync()
 updateCustomFunctionsAnchorRowVisibility()
 // Internal bookkeeping row, never meant for direct editing -- permanently
@@ -3722,6 +4636,13 @@ composer.addPass(outlinePass)
 // still needs to run last for correct color-space output) so the
 // inversion applies to the fully composited scene, not a pre-tonemap
 // buffer.
+//
+// CORRECTED 2026-10-12 (direct report: with a Toon Shadow Floor above 0 the darkest shade still inverted to pure
+// white-ish / "read as black by the invert"): the pass sat BEFORE OutputPass, i.e. it inverted the LINEAR light
+// values. A dark display shade of 7% is only ~0.006 in linear light, so 1 - 0.006 = 0.994 linear = ~99.7% on screen:
+// the shadow floor vanished into white instead of becoming 93%. It now runs AFTER OutputPass, on the final
+// sRGB-encoded picture (the canvas only - the dev panel and other HTML are separate and untouched), so every pixel
+// becomes exactly 1 - its displayed value.
 const InvertColorsShader = {
   uniforms: { tDiffuse: { value: null } },
   vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
@@ -3729,8 +4650,8 @@ const InvertColorsShader = {
 }
 const invertColorsPass = new ShaderPass(InvertColorsShader)
 invertColorsPass.enabled = !!cfg.invertColorsEnabled
-composer.addPass(invertColorsPass)
 composer.addPass(new OutputPass())
+composer.addPass(invertColorsPass) // after OutputPass on purpose: inverts the displayed (sRGB) image, see the note above
 
 const hemiLight = new THREE.HemisphereLight(cfg.ambientSkyColor, cfg.ambientGroundColor, cfg.ambientIntensity)
 scene.add(hemiLight)
@@ -3759,7 +4680,7 @@ const FLOOR_BASE_SIZE = 2000
 // XY extent), and floor Z + a hair so the floor mesh itself is never clipped.
 const floorClipPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)
 function updateFloor() {
-  if (!cfg.floorEnabled) { if (floorMesh) floorMesh.visible = false; if (renderer.clippingPlanes.length) renderer.clippingPlanes = []; sceneNeedsRedraw = true; return }
+  if (!cfg.floorEnabled || startupFloorHidden) { if (floorMesh) floorMesh.visible = false; if (renderer.clippingPlanes.length) renderer.clippingPlanes = []; sceneNeedsRedraw = true; return }
   if (!floorMesh) {
     floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(FLOOR_BASE_SIZE, FLOOR_BASE_SIZE), new THREE.MeshBasicMaterial({ color: cfg.floorColor, side: THREE.DoubleSide, depthTest: false, depthWrite: false, toneMapped: false }))
     floorMesh.renderOrder = -1000000
@@ -3780,7 +4701,7 @@ function updateFloor() {
 // The startup function's controls: the pose-kind click function's own battery (built by makeClickPoseGroup, so they match the click functions exactly) minus the rows that make no sense here - Enabled (forced on in code),
 // Skip If Same Pose, and the function's own Offset / Offset To Camera / Rotation (the transition drives its own offset from the three sliders above).
 function startupFnControls() {
-  const drop = /^(Enabled|SkipIfSamePose|OffsetEnabled|OffsetMode|OffsetX|OffsetY|OffsetZ|CursorOffset|CameraOffset|Rotation)/
+  const drop = /^(Enabled|SkipIfSamePose|PauseDurationMs|OffsetEnabled|OffsetMode|OffsetX|OffsetY|OffsetZ|CursorOffset|CameraOffset|Rotation)/
   return makeClickPoseGroup(STARTUP_FN, 'Hand Offset On Startup', { transitionSpeedMs: 1000 }).controls.filter((c) => !drop.test(c.key.slice(STARTUP_FN.length)))
 }
 // The sphere sequence's borrowed click-function controls: Animation Speed Curve, Easing, Start Time Curve and Start Distance Curve (the pose-kind factory's own rows, so they match the click functions exactly). The Start
@@ -3811,12 +4732,15 @@ function ensureSphereMesh() {
   sphereMesh.visible = false
   scene.add(sphereMesh)
   const n = hands.length
-  sphereOn = new Uint8Array(n); sphereStart = new Float64Array(n); sphereDur = new Float64Array(n); sphereCap = new Float64Array(n)
+  sphereOn = new Uint8Array(n); sphereStart = new Float64Array(n); sphereDur = new Float64Array(n); sphereCap = new Float64Array(n); sphereDone = new Uint8Array(n)
 }
 // First click: every sphere gets its own start time (Start Time Curve), duration (Animation Speed Curve or the Duration slider) and eligibility / reach (Start Distance Curve), all from its distance to the cursor
 // on screen (measured at the field grid point, the hands being hidden), then they run (updateSphereSequence()).
-function startSphereSequence() {
+// retrigger = true (Wait For All Spheres, a later click): spheres that already reached their target are left alone, every other sphere gets a fresh start time / duration / eligibility from the NEW cursor position.
+// ignoreStartDistance = true (the click after Maximum Clicks): every remaining visible sphere is triggered with the Start Distance Curve turned off. Only spheres at VISIBLE (on-screen) grid points are ever triggered.
+function startSphereSequence(retrigger, ignoreStartDistance) {
   ensureSphereMesh()
+  if (!retrigger) sphereDone.fill(0)
   parseClickPoseConfig(SPHERE_FN)
   const trig = clickPoseTriggers[SPHERE_FN]
   const n = hands.length, now = nowVirtual()
@@ -3833,9 +4757,14 @@ function startSphereSequence() {
   const dom = (flag) => (cfg[SPHERE_FN + flag] !== false ? [vMin, Math.max(vMax - vMin, 0.001)] : [aMin, Math.max(aMax - aMin, 0.001)])
   const [stMin, stRange] = dom('StartTimeCurveVisibleOnly'), [spMin, spRange] = dom('SpeedCurveVisibleOnly')
   for (let i = 0; i < n; i++) {
+    // A later click only triggers spheres that are NOT triggered yet: one that is still running (or already finished its full sequence) is never restarted or interrupted. Excluded spheres and spheres that finished capped
+    // short of the target (Start Distance Curve) can be triggered again from the new cursor position.
+    // A later click only triggers spheres that are NOT triggered yet: a triggered sphere (running or finished, capped or not) is never restarted, moved or changed until its hand has finished its sequence.
+    if (retrigger && sphereOn[i]) continue
     sphereOn[i] = 0
+    if (!isOnScreen(hands[i].basePosition)) continue // only visible sphere points take part
     let cap = 1
-    if (cfg[SPHERE_FN + 'StartDistanceCurveEnabled']) {
+    if (cfg[SPHERE_FN + 'StartDistanceCurveEnabled'] && !ignoreStartDistance) {
       const c = computeTweenFractionCap(dist[i], cfg[SPHERE_FN + 'StartDistanceMin'], cfg[SPHERE_FN + 'StartDistanceMax'], trig.startDistanceCurveParsed)
       if (c === null) continue // outside the eligible range: this sphere never spawns
       cap = c
@@ -3850,7 +4779,10 @@ function startSphereSequence() {
 const _sphM = new THREE.Matrix4(), _sphP = new THREE.Vector3(), _sphQ = new THREE.Quaternion(), _sphS = new THREE.Vector3()
 function updateSphereSequence() {
   if (!sphereMesh) return
-  if (sphereStage !== 1) { sphereMesh.visible = false; return }
+  const keep = sphereStage === 2 && sphereKeepForHands // after the sphere phase the spheres stay until THEIR hand has finished its own startup sequence
+  if (sphereStage !== 1 && !keep) { sphereMesh.visible = false; return }
+  sphereMesh.visible = true
+  let remaining = 0
   const trig = clickPoseTriggers[SPHERE_FN], now = nowVirtual(), n = Math.min(hands.length, sphereMesh.count)
   const easing = cfg[SPHERE_FN + 'EasingCurveEnabled'] ? getEasingProfile(SPHERE_FN, false, trig) : null
   const rOn = !!cfg.sphereRadiusCurveEnabled, zOn = !!cfg.sphereZCurveEnabled
@@ -3862,9 +4794,12 @@ function updateSphereSequence() {
   _sphQ.identity()
   for (let i = 0; i < n; i++) {
     const base = hands[i].basePosition
-    if (!sphereOn[i] || now < sphereStart[i] || !base) { _sphS.set(0, 0, 0); _sphP.set(0, 0, 0) } else {
+    const handDone = keep && !!hands[i]._startupSeqDone
+    if (sphereOn[i] && !handDone) remaining++
+    if (!sphereOn[i] || now < sphereStart[i] || !base || handDone) { _sphS.set(0, 0, 0); _sphP.set(0, 0, 0) } else {
       const raw = THREE.MathUtils.clamp((now - sphereStart[i]) / sphereDur[i], 0, 1)
       const fr = (easing ? easingProfilePAt(easing, raw) : raw) * sphereCap[i]
+      if (raw >= 1 && sphereCap[i] >= 1) sphereDone[i] = 1 // full sequence finished with no Start Distance cap: target scale and position reached
       const r = rOn ? rRange.min + (rRange.max - rRange.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(rPts, fr), 0, 1) : startR
       const z = zOn ? zRange.min + (zRange.max - zRange.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(zPts, fr), 0, 1) : base.z + startZ * (1 - fr)
       _sphP.set(base.x, base.y, z)
@@ -3874,18 +4809,25 @@ function updateSphereSequence() {
     sphereMesh.setMatrixAt(i, _sphM)
   }
   sphereMesh.instanceMatrix.needsUpdate = true
+  if (keep && remaining === 0) { sphereKeepForHands = false; sphereMesh.visible = false } // every hand has finished: the spheres are gone
   sceneNeedsRedraw = true
 }
 function sphereSeqActive() { return !!cfg.sphereSeqEnabled && sphereStage < 2 }
 // Click 1 spawns the spheres, click 2 removes them and shows the hands; Hand Offset On Startup (if on) then waits for ITS first click as before.
-// Wait For All Spheres: true once every sphere that would be visible on screen has reached the end of its own sequence (spheres the Start Distance Curve excluded never spawn and are skipped).
-function allVisibleSpheresDone() {
+// Visible sphere points = grid points on screen. Wait For All Spheres and Maximum Clicks count only these, never the whole field.
+function untriggeredVisibleSpheres() {
+  const n = Math.min(hands.length, sphereOn ? sphereOn.length : 0)
+  let c = 0
+  for (let i = 0; i < n; i++) if (!sphereOn[i] && hands[i].basePosition && isOnScreen(hands[i].basePosition)) c++
+  return c
+}
+// True once every visible sphere has been triggered and has finished its own sequence.
+function allVisibleSpheresFinished() {
   const now = nowVirtual(), n = Math.min(hands.length, sphereOn ? sphereOn.length : 0)
   for (let i = 0; i < n; i++) {
-    if (!sphereOn[i]) continue
     const b = hands[i].basePosition
     if (!b || !isOnScreen(b)) continue
-    if (now < sphereStart[i] + sphereDur[i]) return false
+    if (!sphereOn[i] || now < sphereStart[i] + sphereDur[i]) return false
   }
   return true
 }
@@ -3895,18 +4837,24 @@ function anySphereRunning() {
   for (let i = 0; i < n; i++) if (sphereOn[i] && now < sphereStart[i] + sphereDur[i]) return true
   return false
 }
+// Click 1 triggers the spheres. Every later click triggers the visible spheres that are still untriggered (new cursor position, Start Distance Curve as set) - up to Maximum Clicks; the click after that triggers every
+// remaining visible sphere with the Start Distance Curve ignored. Triggered spheres are never interrupted or changed. Once all visible spheres are triggered (and, with Wait For All Spheres, finished) the next click ends
+// the sphere phase: with Hand Offset On Startup on the spheres STAY until their own hand finishes its sequence (sphereKeepForHands, see updateSphereSequence()), otherwise they go away.
 function advanceSphereSequence() {
-  if (sphereStage === 0) { sphereStage = 1; startSphereSequence(); return }
-  if (anySphereRunning()) return // clicks do not register while sphere sequences are running
-  if (cfg.sphereWaitForAll && !allVisibleSpheresDone()) return // the click is consumed, nothing after the sphere sequence starts yet
+  const maxClicks = Math.max(1, Math.round(cfg.sphereMaxClicks ?? 3))
+  if (sphereStage === 0) { sphereStage = 1; sphereClickCount = 1; startSphereSequence(false, false); return }
+  if (untriggeredVisibleSpheres() > 0) { sphereClickCount++; startSphereSequence(true, sphereClickCount > maxClicks); return }
+  if (cfg.sphereWaitForAll && !allVisibleSpheresFinished()) return // the click is consumed; the hands wait until every visible sphere has finished
   sphereStage = 2
-  if (sphereMesh) sphereMesh.visible = false
+  sphereKeepForHands = !!cfg.handOffsetOnStartupEnabled
+  if (!sphereKeepForHands && sphereMesh) sphereMesh.visible = false
   updateHandsVisibility()
   applyStartupHandOffset()
   sceneNeedsRedraw = true
 }
 function onSphereSeqToggled() {
   startupConsumeActive = false; startupConsumeUntil = 0
+  sphereClickCount = 0; sphereKeepForHands = false
   if (cfg.sphereSeqEnabled) { sphereStage = 0; startupStaticReleased = false; startupHandOffsetStage = 0; if (sphereMesh) sphereMesh.visible = false }
   else { sphereStage = 2; if (sphereMesh) sphereMesh.visible = false }
   updateHandsVisibility()
@@ -3915,25 +4863,71 @@ function onSphereSeqToggled() {
   sceneNeedsRedraw = true
 }
 // While Hand Offset On Startup is on and the first click has not happened (and for a moment after it, so the same click is not also read as a real click function), the real click functions do nothing.
+// True while the Hand Offset On Startup sequence is under way and some visible hand has not finished it. Cursor tracking stays off and the normal click functions stay out for that whole time (direct request 2026-10-13).
+function startupHandPhaseUnfinished() {
+  return !!cfg.handOffsetOnStartupEnabled && startupHandOffsetStage === 1 && hands.some(startupHandVisible) && !allVisibleHandsFinished()
+}
 function startupBlocksClickFunctions() {
+  if (startupHandPhaseUnfinished()) return true
   if (startupConsumeActive || performance.now() < startupConsumeUntil) return !!(cfg.handOffsetOnStartupEnabled || cfg.sphereSeqEnabled)
   if (cfg.sphereSeqEnabled && sphereStage < 2) return true
   return !!cfg.handOffsetOnStartupEnabled && startupHandOffsetStage === 0
 }
 // Puts every hand's camera-relative displacement accumulator (the same store the click functions' Offset bakes into) at the Offset sliders, and drops it again when the feature is switched off before the first click.
+// Hand Z Offset Curve: Z offset (world units, + toward the camera) at sequence progress x (0..1) = Min + (Max - Min) * curve(x).
+function startupHandZ(x) {
+  const pts = sphereParse(cfg.startupHandZCurve, [{ x: 0, y: 0 }, { x: 1, y: 1 }]), rg = sphereParse(cfg.startupHandZRange, { min: -30, max: 0 })
+  return rg.min + (rg.max - rg.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, x), 0, 1)
+}
+// Hand Scale Curve: scale multiple (1 = the hand's normal scale) at sequence progress x (0..1) = Min + (Max - Min) * curve(x); never below 0.001 so the hand's maths never sees a zero scale.
+function startupHandScale(x) {
+  const pts = sphereParse(cfg.startupHandScaleCurve, [{ x: 0, y: 0 }, { x: 1, y: 1 }]), rg = sphereParse(cfg.startupHandScaleRange, { min: 0, max: 1 })
+  return Math.max(rg.min + (rg.max - rg.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, x), 0, 1), 0.001)
+}
+// True from the start until this hand has finished its own startup sequence.
+function startupHandScaleActive(hand) { return !!cfg.handOffsetOnStartupEnabled && !!cfg.startupHandScaleCurveEnabled && !hand._startupSeqDone }
+function startupHandZStart() { return cfg.startupHandZCurveEnabled ? startupHandZ(0) : (cfg.startupHandOffsetZ || 0) }
+function startupHandZEnd() { return cfg.startupHandZCurveEnabled ? startupHandZ(1) : 0 }
+// Hands at VISIBLE (on-screen) grid points: Wait For All Hands and Hide Floor After Hand Offset Sequence only look at these, never at the whole field.
+function startupHandVisible(h) { return !!h.basePosition && isOnScreen(h.basePosition) }
+function allVisibleHandsFinished() {
+  let any = false
+  for (let i = 0; i < hands.length; i++) { if (!startupHandVisible(hands[i])) continue; any = true; if (!hands[i]._startupSeqDone) return false }
+  return any
+}
 function applyStartupHandOffset() {
   const on = !!cfg.handOffsetOnStartupEnabled && startupHandOffsetStage === 0
   for (let i = 0; i < hands.length; i++) {
     const h = hands[i]
     if (!h._customOffsetAccum) h._customOffsetAccum = { x: 0, y: 0, z: 0 }
     const a = h._customOffsetAccum
-    if (on) { a.x = cfg.startupHandOffsetX || 0; a.y = cfg.startupHandOffsetY || 0; a.z = cfg.startupHandOffsetZ || 0; h._startupAccum = true }
+    if (on) { a.x = 0; a.y = 0; a.z = startupHandZStart(); h._startupAccum = true }
     else if (h._startupAccum && startupHandOffsetStage === 0) { a.x = 0; a.y = 0; a.z = 0; h._startupAccum = false }
   }
   sceneNeedsRedraw = true
 }
+// Hide Floor After Hand Offset Sequence: once the startup transition has been fired and every hand has finished it (hand._startupSeqDone: set when its forward ramp completes, or when another function interrupts it),
+// the Floor is switched off (updateFloor() treats startupFloorHidden like Floor Off, which also stops the clipping plane cropping the hands). Called once per frame; cheap until the transition is under way.
+function checkStartupFloorHide() {
+  if (startupFloorHidden || startupHandOffsetStage !== 1 || !cfg.hideFloorAfterHandOffset || !cfg.floorEnabled || !hands.length) return
+  if (!allVisibleHandsFinished()) return // only hands at visible grid points count
+  startupFloorHidden = true
+  updateFloor()
+}
+// Re-arms the whole Starting State as if the page had just loaded (direct request 2026-10-13, for test runs): every hand back to its grid position and default pose, the startup flags cleared, the floor back, the
+// Field Grid Sphere Sequence waiting for its first click (or done, when off), the Hand Offset On Startup displacement re-applied, cursor tracking held again for Static Pose / Hand Offset / Sphere Sequence.
+function restartStartingState() {
+  resetAllHands()
+  startupConsumeActive = false; startupConsumeUntil = 0
+  startupStaticReleased = false
+  onHandOffsetOnStartupToggled() // stage 0, startupFloorHidden off, per-hand startup flags cleared, offset displacement re-applied
+  onSphereSeqToggled() // sphereStage back to 0 (or 2 when the sequence is off), spheres hidden, hands shown, offset re-applied
+  updateFloor()
+  sceneNeedsRedraw = true
+}
 function onHandOffsetOnStartupToggled() {
   startupHandOffsetStage = 0; startupConsumeActive = false; startupConsumeUntil = 0
+  startupFloorHidden = false; startupHandClickCount = 0; hands.forEach((h) => { delete h._startupSeqDone; delete h._startupTriggered; delete h._startupClick }); try { updateFloor() } catch (e) { /* scene not built yet */ }
   if (cfg.handOffsetOnStartupEnabled) startupStaticReleased = false
   applyStartupHandOffset()
   updateHandOffsetGroupVisibility()
@@ -3949,23 +4943,59 @@ function applyStartupDisplacementToIdleHand(hand) {
 }
 // The first click (left button, on the scene - not the dev panel or the Pause / Reset buttons) while the feature is on: fire the startup transition. The transition is a pose-kind click function whose Offset is the
 // NEGATIVE of the three sliders, so the accumulator (= the sliders) ends at 0 when its forward phase completes.
-function fireStartupHandOffset() {
+// A hand whose Hand Offset On Startup sequence has been triggered (or is waiting for its own start time) and has not reached the end of it yet cannot be interrupted by any other click function (direct request 2026-10-13).
+function handStartupLocked(hand) {
+  const cp = hand._cp && hand._cp[STARTUP_FN]
+  return !!cp && !hand._startupSeqDone && !!(cp.pendingClaimAt || cp.phase !== 'idle')
+}
+function countStartupTriggeredHands() { let n = 0; for (let i = 0; i < hands.length; i++) if (hands[i]._startupTriggered) n++; return n }
+// Returns how many hands this click newly triggered (hands already triggered are skipped by triggerClickPose()).
+// ignoreStartDistance = true (the click after Maximum Clicks): every remaining hand is triggered with the Start Distance Curve turned off.
+function fireStartupHandOffset(ignoreStartDistance) {
+  const before = countStartupTriggeredHands()
+  startupIgnoreStartDistance = !!ignoreStartDistance
   startupHandOffsetStage = 1
   cfg.startupFnOffsetEnabled = true
   cfg.startupFnOffsetMode = 'XYZ Offset'
-  cfg.startupFnOffsetX = -(cfg.startupHandOffsetX || 0)
-  cfg.startupFnOffsetY = -(cfg.startupHandOffsetY || 0)
-  cfg.startupFnOffsetZ = -(cfg.startupHandOffsetZ || 0)
+  cfg.startupFnOffsetX = 0
+  cfg.startupFnOffsetY = 0
+  cfg.startupFnOffsetZ = startupHandZEnd() - startupHandZStart() // the accumulator starts at the start value; the transition adds the difference
   triggerClickPose(STARTUP_FN)
+  startupIgnoreStartDistance = false
+  return countStartupTriggeredHands() - before
 }
+// A touch (phone) sends pointerdown WITHOUT a pointermove first, so cursorNDC still held the position of the PREVIOUS touch and every click-position-dependent startup step (sphere eligibility / start times, hand
+// eligibility / delays) was measured from the wrong place (looked offset / mirrored). Take the cursor from the pointerdown itself, first in line (this listener is registered before every other pointerdown listener).
+window.addEventListener('pointerdown', (e) => {
+  if (window.VisibilityTickLoop && window.VisibilityTickLoop.isPaused()) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  cursorNDC.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1)
+  lastPointerClientX = e.clientX
+  lastPointerClientY = e.clientY
+  try { updateCursorTarget() } catch (err) { /* scene not built yet */ }
+}, true)
 window.addEventListener('pointerdown', (e) => {
   if (e.button !== 0) return
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   if (!hands.length || !fieldRevealed) return
-  if (sphereSeqActive()) { startupConsumeActive = true; advanceSphereSequence(); return } // Field Grid Sphere Sequence comes first
-  if (!cfg.handOffsetOnStartupEnabled || startupHandOffsetStage !== 0) return
-  startupConsumeActive = true
-  fireStartupHandOffset()
+  if (sphereSeqActive()) {
+    startupConsumeActive = true
+    advanceSphereSequence() // Field Grid Sphere Sequence comes first
+    // The click that ends the sphere phase also triggers the hands (the spheres no longer vanish first, so there is no separate click for that).
+    if (!sphereSeqActive() && cfg.handOffsetOnStartupEnabled && startupHandOffsetStage === 0) { startupHandClickCount = 1; fireStartupHandOffset(false) }
+    return
+  }
+  if (!cfg.handOffsetOnStartupEnabled) return
+  if (startupHandOffsetStage === 0) { startupConsumeActive = true; startupHandClickCount = 1; fireStartupHandOffset(false); return }
+  // The sequence is under way: a later click still triggers any hand the first click did not reach (Start Distance Curve) from the new cursor position, and is then consumed; hands already triggered carry on untouched.
+  // A click that triggers no new hand falls through to the normal click functions, which cannot touch a hand that is still in its startup sequence (handStartupLocked()).
+  if (hands.some((h) => !h._startupTriggered)) {
+    // Maximum Clicks: the click after the last allowed one triggers every remaining hand with the Start Distance Curve ignored.
+    const force = startupHandClickCount + 1 > Math.max(1, Math.round(cfg.startupHandMaxClicks ?? 3))
+    if (fireStartupHandOffset(force) > 0) { startupHandClickCount++; startupConsumeActive = true }
+  }
+  // Wait For All Hands: the click is consumed until every visible hand has finished its own startup sequence.
+  if (cfg.startupHandWaitForAll && !allVisibleHandsFinished()) startupConsumeActive = true
 }, true)
 window.addEventListener('pointerup', () => {
   if (!startupConsumeActive) return
@@ -3991,17 +5021,37 @@ function updateHandOffsetGroupVisibility() {
 function setupHandOffsetStartupGroup() {
   const tweenMembers = ['Mode', 'TargetPose', 'TweenSelector', 'ReverseSequence', 'GlideToFirstPose', 'FirstGlideTimeScale', 'SequencePlayMode', 'SequenceCount', 'SequenceCountMode', 'SequenceLoopTransition', 'SequenceHoldMs', 'TweenChain'].map((k) => STARTUP_FN + k)
   const tg = wrapGatedSubgroup('startupHandTweenEnabled', tweenMembers, 'Animation Tween')
+  const hzCurveRow = document.querySelector('.dp-row[data-key="startupHandZCurve"]'), hzRangeRow = document.querySelector('.dp-row[data-key="startupHandZRange"]')
+  if (hzCurveRow) buildGenericCurveWidget(hzCurveRow, { caption: 'X: Hand Sequence Progress (0 = Not Started, 100% = Sequence End)  ·  Y: Z (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (hzRangeRow) buildGenericRangeBarWidget(hzRangeRow, { trackMin: -200, trackMax: 200, unit: 'wu', defaultValue: { min: -30, max: 0 } })
+  wrapGatedSubgroup('startupHandZCurveEnabled', ['startupHandZCurve', 'startupHandZRange'], 'Hand Z Offset Curve')
+  const hsCurveRow = document.querySelector('.dp-row[data-key="startupHandScaleCurve"]'), hsRangeRow = document.querySelector('.dp-row[data-key="startupHandScaleRange"]')
+  if (hsCurveRow) buildGenericCurveWidget(hsCurveRow, { caption: 'X: Hand Sequence Progress (0 = Not Started, 100% = Sequence End)  ·  Y: Scale (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (hsRangeRow) buildGenericRangeBarWidget(hsRangeRow, { trackMin: 0, trackMax: 4, unit: 'x', decimals: 2, defaultValue: { min: 0, max: 1 } })
+  wrapGatedSubgroup('startupHandScaleCurveEnabled', ['startupHandScaleCurve', 'startupHandScaleRange'], 'Hand Scale Curve')
   const g = document.querySelector('.dp-group[data-key="Hand Offset On Startup"]')
   const body = g && g.querySelector(':scope > .dp-group-body')
   const tgBody = tg && tg.querySelector(':scope > .dp-group-body')
   const retr = body && body.querySelector(':scope > .dp-group[data-key="Retransition"]')
-  if (retr && tgBody) tgBody.appendChild(retr)
+  // (The Retransition group used to be moved INTO Animation Tween, so it was hidden whenever Animation Tween was off; it now stays a group of its own, see placeStartupRetransitionGroup().)
   // The nested groups made here share their titles (Easing, Retransition, Start Time Curve ...) with the same groups of every click function, and a saved layout (and the custom-function rebuild) matches groups by that
   // internal key: it adopted THESE groups for a click function and then deleted them. Give them keys of their own; the visible titles are unchanged.
   if (body) body.querySelectorAll('.dp-group').forEach((sg) => { if (!sg.dataset.key.startsWith('Startup > ')) sg.dataset.key = 'Startup > ' + sg.dataset.key })
+  placeStartupRetransitionGroup()
   gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled')
   nestGroupInto('Hand Offset On Startup', 'Starting State')
   updateHandOffsetGroupVisibility()
+}
+// Hand Offset On Startup > Retransition (direct request 2026-10-14): a group of its own, directly under Hand Offset On Startup right after Animation Tween, visible whether or not Animation Tween is on. A saved panel layout
+// from before this change still has it nested inside Animation Tween and applyOrder() restores that, so this is re-run after every restore; the next Save writes the new arrangement.
+function placeStartupRetransitionGroup() {
+  const g = document.querySelector('.dp-group[data-key="Hand Offset On Startup"]')
+  const body = g && g.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  const retr = body.querySelector('.dp-group[data-key="Startup > Retransition"], .dp-group[data-key="Retransition"]')
+  if (!retr || retr.parentElement === body) return
+  const tw = body.querySelector(':scope > .dp-group[data-key="Startup > Animation Tween"], :scope > .dp-group[data-key="Animation Tween"]')
+  if (tw && tw.nextSibling) body.insertBefore(retr, tw.nextSibling); else body.appendChild(retr)
 }
 function setupSphereSequenceGroup() {
   clickPoseTriggers[SPHERE_FN] = clickPoseTriggers[SPHERE_FN] || {
@@ -4014,6 +5064,7 @@ function setupSphereSequenceGroup() {
     cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }
   }
   cfg[SPHERE_FN + 'Enabled'] = true
+  cfg[SPHERE_FN + 'Mode'] = 'Single Pose' // updateSingleTimingGateVisibility() shows the Start Time Curve rows by Mode; this borrowed function has no Mode row, so without this both rows stayed hidden (the group looked empty)
   parseClickPoseConfig(SPHERE_FN)
   buildClickPoseWidgets(SPHERE_FN) // curve + range widgets of the borrowed rows
   updateSingleTimingGateVisibility(SPHERE_FN)
@@ -4045,6 +5096,19 @@ function setupSphereSequenceGroup() {
 function updateFloorRowVisibility() {
   const on = !!cfg.floorEnabled
   ;['floorColor', 'floorZOffset', 'floorXYScale'].forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row) row.style.display = on ? '' : 'none' })
+  // Background Color follows the Floor Color while the Floor is on, so it only has its own input when the Floor is off.
+  const bgRow = document.querySelector('.dp-row[data-key="bgColor"]'); if (bgRow) bgRow.style.display = on ? 'none' : ''
+  const cpRow = document.querySelector('.dp-row[data-key="colorPresets"]'); if (cpRow) cpRow.style.display = 'none'
+}
+// Background Color = Floor Color while the Floor is on (direct request 2026-10-13). Writes the background through syncValue() (cfg + row, no onChange) and applies it to the scene and the loading-screen blocker.
+function syncBackgroundToFloor() {
+  try {
+    if (!cfg.floorEnabled) return
+    const c = cfg.floorColor || '#ffffff'
+    if ((cfg.bgColor || '').toLowerCase() !== c.toLowerCase()) { cfg.bgColor = c; syncValue('bgColor', c) }
+    scene.background = new THREE.Color(c)
+    syncLoadingPreviewBackground()
+  } catch (err) { /* scene not built yet */ }
 }
 // Puts a group's own on/off row into the group HEADER (same placement wrapGatedSubgroup() gives a nested gated subgroup). Idempotent: a saved order applied later can move the row back into the body, so it is also
 // re-run after the settings restore.
@@ -4774,6 +5838,11 @@ function detectPoseJumps() {
       h._jp = h.wrapper.position.clone()
       continue
     }
+    if (h._curlSkip || h._curlResumed) { // finger curl skipped / just caught up off screen: re-seat the baseline instead of reporting a jump nobody can see
+      for (let b = 0; b < h._jb.length; b++) h._jq[b].copy(h._jb[b].quaternion)
+      h._jp.copy(h.wrapper.position)
+      continue
+    }
     let worst = 0, wi = -1
     for (let b = 0; b < h._jb.length; b++) {
       const a = h._jb[b].quaternion.angleTo(h._jq[b])
@@ -4940,7 +6009,9 @@ function buildSnapshotText() {
   const f1 = (v) => (typeof v === 'number' && isFinite(v) ? v.toFixed(2) : String(v))
   const v3 = (v) => (v ? '(' + f1(v.x) + ', ' + f1(v.y) + ', ' + f1(v.z) + ')' : 'n/a')
   const last = (arr, n) => (arr.length ? arr.slice(-n).join('\n') : '(none buffered)')
-  const nearest = (n) => hands.map((h, i) => ({ h, i })).filter((o) => o.h._trkXY !== undefined).sort((a, b) => a.h._trkXY - b.h._trkXY).slice(0, n)
+  // Distances are measured NOW from the current cursor (cursorNDC keeps following the mouse), not read from hand._trkXY: that is only refreshed by updateRenderOrder(), which does not run while the app is paused,
+  // so while paused the 'nearest' list used to be stuck on the cursor position from the moment of the pause.
+  const nearest = (n) => hands.map((h, i) => ({ h, i, d: cursorDistXY(handPoint(h)) })).sort((a, b) => a.d - b.d).slice(0, n)
   const NEAR = 15
   L.push('=== SNAPSHOT ' + new Date().toISOString() + ' (+' + Math.round(performance.now() - pageLoadStartMs) + 'ms) ===')
   let any = false
@@ -4962,8 +6033,17 @@ function buildSnapshotText() {
   }
   if (cfg.snapshotHandBehaviour) {
     any = true
-    const counts = {}, active = []
+    // Every hand, in numeric order, idle or not, with the exact numbers the ordering and the pose are built from (direct request 2026-10-13): field / tracking / rest position, the arm base / arm end /
+    // palm center rig points (current world positions), every rotation and the wrist crop. Bone positions are computed now (getWorldPosition refreshes the bone's parents), so they are exact even while paused.
+    const f3 = (v) => (typeof v === 'number' && isFinite(v) ? v.toFixed(3) : 'n/a')
+    const p3 = (v) => (v ? '(' + f3(v.x) + ', ' + f3(v.y) + ', ' + f3(v.z) + ')' : 'n/a')
+    const _se = new THREE.Euler(), _sv = new THREE.Vector3(), R2D = 180 / Math.PI
+    const eul = (q) => (q ? (_se.setFromQuaternion(q, 'XYZ'), '(' + f3(_se.x * R2D) + ', ' + f3(_se.y * R2D) + ', ' + f3(_se.z * R2D) + ')') : 'n/a')
+    const bonePos = (hd, key) => { const b = renderOrderBone(hd, key); return b ? p3(b.getWorldPosition(_sv)) : 'n/a' }
+    const counts = {}, active = [], perHand = []
+    const everyHand = true
     hands.forEach((hd, i) => {
+      const own = []
       ;[hd._cp, hd._chp].forEach((store) => {
         if (!store) return
         Object.keys(store).forEach((k) => {
@@ -4971,14 +6051,22 @@ function buildSnapshotText() {
           if (!ph || ph === 'idle') return
           const name = handLogTriggerLabel(k)
           counts[name + ' : ' + ph] = (counts[name + ' : ' + ph] || 0) + 1
-          if (active.length < 24) active.push('Hand ' + (i + 1) + ' ' + name + ' ' + ph)
+          own.push(name + ' ' + ph)
+          if (!everyHand && active.length < 24) active.push('Hand ' + (i + 1) + ' ' + name + ' ' + ph)
         })
       })
+      const wristBone = hd.skinnedMesh && hd.skinnedMesh.skeleton.getBoneByName('rHand')
+      perHand.push('Hand ' + (i + 1) + ': ' + (own.length ? own.join(', ') : 'idle') + '\n' +
+        '  position: field ' + p3(hd.wrapper.position) + ' | tracking point ' + p3(handPoint(hd)) + ' | rest ' + p3(handRestPoint(hd)) + '\n' +
+        '  rig points (world): Arm Base ' + bonePos(hd, 'armBase') + ' | Arm End ' + bonePos(hd, 'armEnd') + ' | Palm Center ' + bonePos(hd, 'palmCenter') + '\n' +
+        '  rotation (deg XYZ): wrapper ' + eul(hd.wrapper.quaternion) + ' | model ' + eul(hd.clone.quaternion) + ' | arm rotation ' + eul(hd.currentArmRotationQuat) + ' | wrist bone local ' + eul(wristBone && wristBone.quaternion) +
+        ' | palm roll ' + f3(hd.currentPalmRollDeg) + ' | wrist splay ' + f3(hd.currentSplayDeg) + ' | click-function rotation ' + eul(hd._customRotationAccum) + ' | click-function offset ' + p3(hd._customOffsetAccum) + '\n' +
+        '  wrist crop: ' + (typeof hd.currentArmLengthT === 'number' ? f3(hd.currentArmLengthT * 100) + '%' : 'n/a') + ' | clone scale ' + f3(hd.clone.scale.x) + ' | render order rank ' + f3(hd._roRank) + ' | XY distance to cursor ' + f3(cursorDistXY(handPoint(hd))))
     })
     L.push('', '--- Hand Behaviour ---')
     const keys = Object.keys(counts)
     L.push(keys.length ? 'hands not idle, by function and phase:\n' + keys.map((k) => '  ' + k + ' x' + counts[k]).join('\n') : 'every hand is idle')
-    if (active.length) L.push('first ' + active.length + ' active:', active.join('\n'))
+    L.push('every hand (' + hands.length + '), in numeric order:', perHand.join('\n'))
     L.push('last Hand Behaviour Log lines:', last(handBehaviourLogEntries, 20))
   }
   if (cfg.snapshotFrameRate) {
@@ -5006,7 +6094,7 @@ function buildSnapshotText() {
     L.push('the ' + NEAR + ' hands nearest the cursor (screen XY), rank = drawn order (higher = on top):')
     nearest(NEAR).forEach((o) => {
       const zOf = (n) => { const b = renderOrderBone(o.h, n); return b ? f1(b.matrixWorld.elements[14]) : 'n/a' }
-      L.push('  Hand ' + (o.i + 1) + ' rank ' + (o.h._roRank === undefined ? 'n/a' : o.h._roRank) + ' | dist ' + f1(o.h._trkXY) + ' | Z: arm base ' + zOf('armBase') + ', arm end ' + zOf('armEnd') + ', palm ' + zOf('palmCenter'))
+      L.push('  Hand ' + (o.i + 1) + ' rank ' + (o.h._roRank === undefined ? 'n/a' : o.h._roRank) + ' | dist ' + f1(o.d) + ' | Z: arm base ' + zOf('armBase') + ', arm end ' + zOf('armEnd') + ', palm ' + zOf('palmCenter'))
     })
     L.push('last Render Reordering Log lines:', last(renderReorderLogEntries, 15))
   }
@@ -5015,7 +6103,7 @@ function buildSnapshotText() {
     L.push('', '--- Tracking Points ---')
     L.push('Tracking Point mode: ' + cfg.trackingPoint)
     L.push('the ' + NEAR + ' hands nearest the cursor:')
-    nearest(NEAR).forEach((o) => L.push('  Hand ' + (o.i + 1) + ' tracking ' + v3(o.h._trk) + ' | rest ' + v3(o.h._trkRest) + ' | field position ' + v3(o.h.wrapper.position) + ' | screen dist ' + f1(o.h._trkXY)))
+    nearest(NEAR).forEach((o) => L.push('  Hand ' + (o.i + 1) + ' tracking ' + v3(o.h._trk) + ' | rest ' + v3(o.h._trkRest) + ' | field position ' + v3(o.h.wrapper.position) + ' | screen dist ' + f1(o.d)))
   }
   if (!any) L.push('', '(no Snapshot categories are ticked)')
   return L.join('\n')
@@ -5182,14 +6270,45 @@ function forEachEmissionMaterial(fn) {
   if (emissionMaterial) fn(emissionMaterial)
   hands.forEach((h) => { if (h.emissionMesh && h.emissionMesh.material !== emissionMaterial) fn(h.emissionMesh.material) })
 }
+// Toon Shade Color Gradient (2026-10-12): sorted colour stops [{p: 0..1, c: '#rrggbb'}]. The LEFT end tints the darkest toon step (the
+// Shadow Floor shade), the RIGHT end the brightest (the Light Ceiling shade); the steps in between sample the gradient at their own
+// position. A step's brightness is still the Shadow Floor -> Light Ceiling ramp; the gradient colour multiplies it (white = no tint).
+const TOON_GRADIENT_DEFAULT = [{ p: 0, c: '#ffffff' }, { p: 1, c: '#ffffff' }]
+const toonGradientCache = new Map()
+function parseToonGradient(str) {
+  let v = toonGradientCache.get(str)
+  if (v) return v
+  try {
+    const a = JSON.parse(str)
+    if (Array.isArray(a)) v = a.filter((x) => x && typeof x.c === 'string' && /^#[0-9a-f]{6}$/i.test(x.c) && Number.isFinite(+x.p)).map((x) => ({ p: THREE.MathUtils.clamp(+x.p, 0, 1), c: x.c.toLowerCase() })).sort((x, y) => x.p - y.p)
+  } catch (e) { /* default */ }
+  if (!v || v.length < 2) v = TOON_GRADIENT_DEFAULT
+  if (toonGradientCache.size > 64) toonGradientCache.clear()
+  toonGradientCache.set(str, v)
+  return v
+}
+function toonGradientHexAt(stops, t) {
+  if (t <= stops[0].p) return stops[0].c
+  const last = stops[stops.length - 1]
+  if (t >= last.p) return last.c
+  let a = stops[0], b = last
+  for (let k = 0; k < stops.length - 1; k++) if (t >= stops[k].p && t <= stops[k + 1].p) { a = stops[k]; b = stops[k + 1]; break }
+  const u = (t - a.p) / Math.max(b.p - a.p, 1e-6)
+  const ch = (hex, o) => parseInt(hex.slice(o, o + 2), 16)
+  const mix = (o) => Math.round(ch(a.c, o) + (ch(b.c, o) - ch(a.c, o)) * u).toString(16).padStart(2, '0')
+  return '#' + mix(1) + mix(3) + mix(5)
+}
 function makeGradientTexture(steps, shadowFloor, lightCeiling, threshold) {
   const size = Math.max(2, Math.round(steps))
   const data = new Uint8Array(size * 4)
+  const grad = parseToonGradient(cfg.toonGradient || '')
+  const tc = new THREE.Color()
   for (let i = 0; i < size; i++) {
     const t = size <= 1 ? 1 : i / (size - 1)
     const biased = Math.pow(t, threshold)
-    const v = Math.round(THREE.MathUtils.clamp(THREE.MathUtils.lerp(shadowFloor, lightCeiling, biased), 0, 100) / 100 * 255)
-    data[i * 4] = v; data[i * 4 + 1] = v; data[i * 4 + 2] = v; data[i * 4 + 3] = 255
+    const vf = THREE.MathUtils.clamp(THREE.MathUtils.lerp(shadowFloor, lightCeiling, biased), 0, 100) / 100
+    tc.set(toonGradientHexAt(grad, t)) // sRGB hex -> linear working colour
+    data[i * 4] = Math.round(vf * tc.r * 255); data[i * 4 + 1] = Math.round(vf * tc.g * 255); data[i * 4 + 2] = Math.round(vf * tc.b * 255); data[i * 4 + 3] = 255
   }
   const tex = new THREE.DataTexture(data, size, 1, THREE.RGBAFormat)
   tex.magFilter = THREE.NearestFilter
@@ -5291,7 +6410,7 @@ function rebuildGradientMap() {
 // same as HANDO's own version does.
 const TOON_PRESET_KEYS = [
   'toonSteps', 'toonStepThreshold', 'toonShadowFloor', 'toonLightCeiling',
-  'toonBaseTint', 'textureInfluence', 'toonTint', 'rimIntensity', 'rimPower', 'rimColor'
+  'toonBaseTint', 'textureInfluence', 'toonTint', 'rimIntensity', 'rimPower', 'rimColor', 'toonGradient'
 ]
 function captureToonPreset() {
   const item = {}
@@ -5503,8 +6622,10 @@ function updateOutlineVisibility() {
 // hiding the fill/outline meshes separately (which would leave the
 // outline visible on its own if `outlineEnabled` happens to be on).
 function updateHandsVisibility() {
-  const hide = !!cfg.hideHands || (!!cfg.sphereSeqEnabled && sphereStage < 2) // Field Grid Sphere Sequence: the hands stay hidden until the second click
-  hands.forEach((h) => { h.wrapper.visible = !hide })
+  // CORRECTED 2026-10-13 (direct request: "all hand models should be loaded on startup, so they will be visible on startup if not being covered by the floor object"): the Field Grid Sphere Sequence no longer hides the hands
+  // until its second click; they are always built and shown, and the Floor's clipping plane is what covers them.
+  const hide = !!cfg.hideHands
+  hands.forEach((h) => { h.wrapper.visible = !hide && !h._warmHidden })
 }
 
 // -----------------------------------------------------------------------
@@ -5569,6 +6690,135 @@ const FINGER_SPLAY2_KEY = { thumb: 'thumbSplay2', index: 'splayIndex2', middle: 
 const FINGER_CURL_KEY = { thumb: 'thumbCurl', index: 'curlIndex', middle: 'curlMiddle', ring: 'curlRing', pinky: 'curlPinky' }
 const FINGER_SPLAY_KEY = { thumb: 'thumbSplay', index: 'splayIndex', middle: 'splayMiddle', ring: 'splayRing', pinky: 'splayPinky' }
 const FINGER_CURL_BIAS_KEY = { thumb: 'curlBiasThumb', index: 'curlBiasIndex', middle: 'curlBiasMiddle', ring: 'curlBiasRing', pinky: 'curlBiasPinky' }
+// =======================================================================================================
+// IK RIG ("FixedBones", ported from HANDO's RIG_PROFILES.hand021FixedBones, 2026-10-16). Direct report: the poses and sequences re-exported from HANDO with the user's IK model
+// ("HandiBonesB-IK", HD_IK_*.glb here) "still don't look right ... it looks like a rotational axis thing". Cause (MEASURED): the IK model is a DIFFERENT RIG from the one every pose maths
+// here was built for -- same 23 bone names, but bone rest rotations differ hugely from this project's earlier model (rHand 89.2 deg, rThumb1 106.4 deg, rForearmBend 90.0 deg, six
+// more by 3-13 deg), while the IK glb matches HANDO's HandiBonesB-IK to within 0.05 deg on every bone. HANDO poses that rig with its own profile: every curl-family rotation is about the
+// joint's own LOCAL Z, splay about local X, segment twists about local Y, with FINGER_SIGN / FINGER_SPLAY_SIGN / FINGER_SPLAY2_SIGN all -1 and the thumb's 2nd splay pivoting at its tip
+// joint; this project posed it with the old rig's WORLD-axis maths, so every joint turned about the wrong axis. The old maths stays EXACTLY as it was for every other model
+// (RIG_LOCAL_AXIS_POSING is false for them); only a model detected as this rig (detectLocalAxisRig(), called once its rest pose is measured) takes the local-axis path below.
+// Also new: the pose keys that rig's poses carry and this project never had -- thumbBaseSplay, midTwist* / baseTwist* (per finger) and the forearm joints elbowBend / elbowSideBend /
+// forearmTwist (HANDO's armAxes for this rig: rForearmBend local Z / X, rForearmTwist local Y; the rig has no shoulder bone, so HANDO's shoulder* keys do nothing and are not ported).
+// =======================================================================================================
+const FINGER_MID_TWIST_KEY = { thumb: 'midTwistThumb', index: 'midTwistIndex', middle: 'midTwistMiddle', ring: 'midTwistRing', pinky: 'midTwistPinky' }
+const FINGER_BASE_TWIST_KEY = { thumb: 'baseTwistThumb', index: 'baseTwistIndex', middle: 'baseTwistMiddle', ring: 'baseTwistRing', pinky: 'baseTwistPinky' }
+const THUMB_BASE_SPLAY_KEY = 'thumbBaseSplay'
+const IK_RIG_SIGN = { thumb: -1, index: -1, middle: -1, ring: -1, pinky: -1 } // HANDO: FINGER_SIGN, FINGER_SPLAY_SIGN and FINGER_SPLAY2_SIGN are all -1 for this rig
+const IK_RIG_SPLAY2_JOINT_INDEX = { thumb: 2, index: 1, middle: 1, ring: 1, pinky: 1 } // HANDO: the thumb's tip splay pivots at its LAST joint (rThumb3); the other fingers keep joint 1
+// The IK rig's bind-pose rest rotations (read from HandiBonesB-IK.glb / HD_IK_*.glb node rotations): a loaded model whose rHand and rThumb1 rest rotations are both within IK_RIG_TOLERANCE_DEG of
+// these is this rig. The earlier model differs by 89.2 / 106.4 deg, the IK LOD files by <= 0.05 deg, so the separation is not a close call.
+const IK_RIG_REST_REF = { rHand: [-0.11599858850240707, 0.9928736090660095, -0.00641510309651494, 0.026555685326457024], rThumb1: [0.04745800793170929, 0.7883297801017761, 0.4728289842605591, 0.3907897472381592] }
+const IK_RIG_TOLERANCE_DEG = 3
+let RIG_LOCAL_AXIS_POSING = false
+const _ikRigRefQ = new THREE.Quaternion()
+function detectLocalAxisRig() {
+  const diffs = Object.keys(IK_RIG_REST_REF).map((name) => {
+    const rest = boneRestQuat[name]
+    if (!rest) return Infinity
+    _ikRigRefQ.fromArray(IK_RIG_REST_REF[name])
+    return THREE.MathUtils.radToDeg(rest.angleTo(_ikRigRefQ))
+  })
+  RIG_LOCAL_AXIS_POSING = diffs.every((d) => d <= IK_RIG_TOLERANCE_DEG)
+  console.info('[rig] local-axis (IK rig) posing ' + (RIG_LOCAL_AXIS_POSING ? 'ON' : 'off') + ' -- rest-rotation difference from the IK rig, deg: ' + diffs.map((d, i) => Object.keys(IK_RIG_REST_REF)[i] + ' ' + (Number.isFinite(d) ? d.toFixed(2) : 'missing')).join(', '))
+}
+const _lcChainQ = new THREE.Quaternion()
+const _lcParentPos = new THREE.Vector3()
+const _lcParentScale = new THREE.Vector3()
+// The IK rig's finger posing (HANDO's applyCurlToSkeletonLocalAxis(), reading a values object like this project's other pose functions): reset each joint to its rest rotation, then
+// rotate about its OWN local axes in HANDO's order -- thumb base splay (joint 0, X), splay (X), 2nd splay (X), curl weighted by Curl Bias (Z), Base-/Mid-/Tip-Only curl (Z on joint 0 / 1 / last),
+// Tip Twist (about the segment direction, unchanged from the world-axis path), then 2nd-segment twist (joint 1, Y) and base-segment twist (joint 0, Y). The chain / matrix bookkeeping
+// (a running parent world quaternion, one refreshed matrixWorld per joint) is the same as applyCurlToSkeleton()'s, so it costs the same per hand.
+function applyCurlToSkeletonLocal(fingerName, skeleton, values, parentFresh) {
+  const joints = FINGER_JOINTS[fingerName]
+  const maxDegs = FINGER_MAX_DEG[fingerName]
+  const sign = IK_RIG_SIGN[fingerName]
+  const rad = THREE.MathUtils.degToRad
+  const val = (key) => (key ? (values[key] || 0) : 0)
+  const curlT = val(FINGER_CURL_KEY[fingerName]) / 100
+  const splayT = val(FINGER_SPLAY_KEY[fingerName]) / 100
+  const curlBias = val(FINGER_CURL_BIAS_KEY[fingerName]) / 100
+  const tipTwistT = val(FINGER_TIP_TWIST_KEY[fingerName]) / 100
+  const baseOnlyCurlT = val(FINGER_BASE_ONLY_CURL_KEY[fingerName]) / 100
+  const tipOnlyCurlT = val(FINGER_TIP_ONLY_CURL_KEY[fingerName]) / 100
+  const midOnlyCurlT = val(FINGER_MID_ONLY_CURL_KEY[fingerName]) / 100
+  const midTwistDeg = val(FINGER_MID_TWIST_KEY[fingerName])
+  const baseTwistDeg = val(FINGER_BASE_TWIST_KEY[fingerName])
+  const splayDeg = sign * FINGER_SPLAY_MAX_DEG[fingerName] * splayT
+  const splay2Deg = sign * FINGER_SPLAY2_MAX_DEG[fingerName] * (val(FINGER_SPLAY2_KEY[fingerName]) / 100)
+  const thumbBaseSplayDeg = fingerName === 'thumb' ? val(THUMB_BASE_SPLAY_KEY) : 0
+  const splayJointIndex = FINGER_SPLAY_JOINT_INDEX[fingerName]
+  const splay2JointIndex = IK_RIG_SPLAY2_JOINT_INDEX[fingerName]
+  const wristBone = skeletonBone(skeleton, 'rHand')
+  const bones = []
+  const chainWorldQ = _lcChainQ // world quaternion of the CURRENT joint's parent, advanced joint to joint
+  let chainReady = false
+  let prevBone = null
+  joints.forEach((boneName, i) => {
+    const bone = skeletonBone(skeleton, boneName)
+    const rest = boneRestQuat[boneName]
+    if (!bone || !rest) return
+    bones[i] = bone
+    if (!chainReady || bone.parent !== prevBone) {
+      const par = bone.parent
+      if (parentFresh && wristBone && (par === wristBone || par.parent === wristBone)) {
+        if (par !== wristBone) { par.updateMatrix(); par.matrixWorld.multiplyMatrices(wristBone.matrixWorld, par.matrix) }
+        par.matrixWorld.decompose(_lcParentPos, chainWorldQ, _lcParentScale)
+      } else {
+        par.getWorldQuaternion(chainWorldQ)
+      }
+      chainReady = true
+    }
+    bone.quaternion.copy(rest)
+    if (i === 0 && thumbBaseSplayDeg) bone.rotateX(rad(thumbBaseSplayDeg))
+    if (i === splayJointIndex) bone.rotateX(rad(splayDeg))
+    if (i === splay2JointIndex) bone.rotateX(rad(splay2Deg))
+    const weight = curlBiasWeight(i, joints.length, curlBias)
+    bone.rotateZ(rad(sign * maxDegs[i] * curlT * weight))
+    if (i === 0) bone.rotateZ(rad(sign * maxDegs[0] * baseOnlyCurlT))
+    if (i === 1) bone.rotateZ(rad(sign * maxDegs[1] * midOnlyCurlT))
+    if (i === joints.length - 1) bone.rotateZ(rad(sign * maxDegs[i] * tipOnlyCurlT))
+    if (i === joints.length - 1 && i > 0) {
+      let twistAxis
+      if (bone.parent === bones[i - 1]) {
+        _segFromPos.setFromMatrixPosition(bones[i - 1].matrixWorld)
+        _segToPos.copy(bone.position).applyMatrix4(bones[i - 1].matrixWorld)
+        twistAxis = _segDir.subVectors(_segToPos, _segFromPos).normalize()
+      } else {
+        twistAxis = segmentDirection(bones[i - 1], bone)
+      }
+      rotateOnTrueWorldAxisFast(bone, chainWorldQ, twistAxis, rad(FINGER_TIP_TWIST_MAX_DEG * tipTwistT))
+    }
+    if (i === 1) bone.rotateY(rad(midTwistDeg))
+    if (i === 0) bone.rotateY(rad(baseTwistDeg))
+    chainWorldQ.multiply(bone.quaternion) // this joint's world quaternion = the next joint's parent
+    if (parentFresh || bone.parent === prevBone) {
+      bone.updateMatrix()
+      bone.matrixWorld.multiplyMatrices(bone.parent.matrixWorld, bone.matrix)
+    } else {
+      bone.updateMatrixWorld(true)
+    }
+    prevBone = bone
+  })
+}
+// The IK rig's forearm joints (HANDO's applyArmPoseToSkeleton() with its armAxes for this rig): reset to rest, then rotate about the bone's own local axes in HANDO's order --
+// rForearmBend: Elbow Bend about Z, Elbow Side Bend about X; rForearmTwist: Forearm Twist about Y. Called from applyWristPoseToSkeleton(), i.e. at every site that poses a hand, before
+// the fingers (so applyAllFingerCurls()'s wrist.updateWorldMatrix(true, false) already carries the new forearm into the finger chain). A no-op for every other model.
+function applyIkRigForearmToSkeleton(skeleton, values) {
+  const elbow = skeletonBone(skeleton, 'rForearmBend')
+  const elbowRest = boneRestQuat.rForearmBend
+  if (elbow && elbowRest) {
+    elbow.quaternion.copy(elbowRest)
+    elbow.rotateZ(THREE.MathUtils.degToRad(values.elbowBend || 0))
+    elbow.rotateX(THREE.MathUtils.degToRad(values.elbowSideBend || 0))
+  }
+  const twist = skeletonBone(skeleton, 'rForearmTwist')
+  const twistRest = boneRestQuat.rForearmTwist
+  if (twist && twistRest) {
+    twist.quaternion.copy(twistRest)
+    twist.rotateY(THREE.MathUtils.degToRad(values.forearmTwist || 0))
+  }
+}
 // Ported from HANDO (direct user request, "maybe check hando for pose
 // settings. maybe there is an extra setting you dont have" -- this WAS
 // exactly that: this project's own Pose group port deliberately omitted
@@ -5772,6 +7022,7 @@ const _curlWristRestInvScratch = new THREE.Quaternion()
 // world matrix (its ancestors included), so joint 0's parent chain only needs the one carpal level recomputed
 // instead of re-walking all 8 ancestors for every finger. Default false = the original behaviour.
 function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values = cfg, parentFresh = false) {
+  if (RIG_LOCAL_AXIS_POSING) return applyCurlToSkeletonLocal(fingerName, skeleton, values, parentFresh) // the IK rig (see IK RIG, above); every other model keeps the world-axis maths below untouched
   const joints = FINGER_JOINTS[fingerName]
   const maxDegs = FINGER_MAX_DEG[fingerName]
   const sign = FINGER_SIGN[fingerName]
@@ -6144,6 +7395,7 @@ function applyWristPoseToSkeleton(skeleton, values = cfg, extraSplayDeg = 0) {
   bone.rotateX(THREE.MathUtils.degToRad(values.wristBend))
   bone.rotateZ(THREE.MathUtils.degToRad(values.wristSplay + extraSplayDeg))
   bone.rotateY(THREE.MathUtils.degToRad(values.wristRotation || 0))
+  if (RIG_LOCAL_AXIS_POSING) applyIkRigForearmToSkeleton(skeleton, values) // IK rig only: Elbow Bend / Elbow Side Bend / Forearm Twist
 }
 function applyWristPose() {
   if (!modelLoaded) return
@@ -6197,7 +7449,10 @@ const POSE_PRESET_KEYS = [
   // applied). `|| 0`/`?? 1` fallbacks throughout cover a pose saved
   // before these keys existed, or imported from a HANDO version that
   // predates them -- same convention as baseOnlyCurl*'s own comment.
-  'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseScale'
+  'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseScale',
+  // IK rig (2026-10-16, ported from HANDO's pose set; see IK RIG above): a 0 default is a no-op for every other model, which never reads them.
+  'thumbBaseSplay', 'midTwistThumb', 'baseTwistThumb', 'midTwistIndex', 'baseTwistIndex', 'midTwistMiddle', 'baseTwistMiddle', 'midTwistRing', 'baseTwistRing', 'midTwistPinky', 'baseTwistPinky',
+  'elbowBend', 'elbowSideBend', 'forearmTwist'
 ]
 // Pose Preview live-sync -- direct follow-up report ("in my pose
 // settings group, the Offset and Scale sliders dont seem to do
@@ -6372,6 +7627,17 @@ function offsetExtraControls(p, parseFn) {
     rows.push({ key: `${p}CameraOffset${ax}Curve`, label: `Camera Offset ${ax} Curve (Distance From Cursor -> Offset)`, type: 'text', def: linear, onChange: () => parseFn(p) })
     rows.push({ key: `${p}CameraOffset${ax}Range`, label: `Camera Offset ${ax} Min / Max (World Units)`, type: 'text', def: '{"min":0,"max":10}', onChange: () => parseFn(p) })
   })
+  // Rotation Curve X / Y / Z (2026-10-14, direct request): per axis, the Rotation amount follows the hand's distance from the cursor - curve X = distance, curve Y = 0..1 between this axis' Min and Max (degrees). With an axis' curve off,
+  // that axis keeps its plain Rotation slider.
+  rows.push({ key: `${p}RotationCurveVisibleOnly`, label: 'Rotation Curves: Visible Hands Only', type: 'checkbox', def: true })
+  ;['X', 'Y', 'Z'].forEach((ax) => {
+    rows.push({ key: `${p}Rotation${ax}CurveEnabled`, label: `Rotation Curve ${ax} On/Off`, type: 'checkbox', def: false })
+    rows.push({ key: `${p}Rotation${ax}Curve`, label: `Rotation ${ax} Curve (Distance From Cursor -> Rotation)`, type: 'text', def: linear, onChange: () => parseFn(p) })
+    rows.push({ key: `${p}Rotation${ax}CurveRange`, label: `Rotation ${ax} Min / Max (Deg)`, type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
+  })
+  // Retransition Between Loops (2026-10-14): see loopLapProgress(). One checkbox per group so each can be set on its own.
+  rows.push({ key: `${p}OffsetLoopRetransition`, label: 'Offset: Retransition Between Loops', type: 'checkbox', def: false })
+  rows.push({ key: `${p}CameraOffsetLoopRetransition`, label: 'Offset To Camera: Retransition Between Loops', type: 'checkbox', def: false })
   return rows
 }
 function makeClickHoldPoseGroup(p, title, defaults = {}) {
@@ -6385,7 +7651,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // corrected 2026-09-19 after re-reading the verbatim spec text --
       // this was previously unbuilt) -- see updateClickFunctionEnabledVisibility()'s
       // own comment.
-      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false, onChange: () => updateClickFunctionEnabledVisibility(p) },
+      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false, onChange: () => { updateClickFunctionEnabledVisibility(p); enforceExclusiveTrigger(p) } },
       // Mode + the Tween Sequence select right below it, added 2026-09-15
       // (direct follow-up request, "implement it to all click functions
       // in the dev panel," porting Right Click's own Mode dropdown here)
@@ -6398,7 +7664,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // should only show when Single Pose is selected") -- Enabled, Mode,
       // and Hold Confirm Delay stay visible regardless of mode.
       {
-        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence', 'Chain'],
+        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence', 'Chain', 'None'],
         onChange: () => { updateClickTriggerModeVisibility(p, [], ['LoopMode']); updateLoopHoldVisibility(p); updateSingleTimingGateVisibility(p); updateTweenStopGateVisibility(p); updateChainModeVisibility(p) }
       },
       // Offset/Rotation -- direct request 2026-09-17 ("Offset On and Off,
@@ -6452,6 +7718,12 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationLoopRetransition`, label: 'Rotation: Retransition Between Loops', type: 'checkbox', def: false },
+      // Rotation Mode (2026-10-14, direct request - replaces the separate Rotation at Base group): where the Rotation turns the hand about.
+      //  Rotation at Base - the arm base, in the model's own X / Y / Z (like a pose's Whole-Hand Rotation at Base).
+      //  Rotation at Crop - the crop point = the first arm bone crossing the wrist-crop surface, in the model's own X / Y / Z.
+      //  Rotation Around Cursor - the cursor (where it was when the function fired), in WORLD X / Y / Z.
+      { key: `${p}RotationMode`, label: 'Rotation Mode', type: 'select', def: 'Rotation at Crop', options: () => ['Rotation at Base', 'Rotation at Crop', 'Rotation Around Cursor'] },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       // Skip If Same Pose (2026-10-06, direct request). Single Pose mode only: when on, a hand that is
       // ALREADY in this function's target pose is left alone by this trigger; with Multi Trigger it moves
@@ -6655,6 +7927,17 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}RetransitionSpeedCurveVisibleOnly`, label: 'Retransition Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":25000}', onChange: () => parseClickHoldConfig(p) },
+      // Retransition Distance Curve (2026-10-13, direct request): the retransition TIME follows the hand model's actual distance from the camera position (X: nearest -> farthest hand = 0..1, Y: Min..Max time). When on it
+      // replaces the Retransition Speed / Speed Curve duration.
+      { key: `${p}RetransitionDistCurveEnabled`, label: 'Retransition Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}RetransitionDistCurve`, label: 'Retransition Distance Curve (Camera Distance -> Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]' },
+      { key: `${p}RetransitionDistRange`, label: 'Retransition Distance Curve Min / Max Time (Ms)', type: 'text', def: '{"min":50,"max":2000}' },
+      // Retransition Distance Scaler (2026-10-13, direct request): scales each hand's retransition SPEED (the single slider or the speed curve / distance curve result) by how far the hand is from its own field starting point
+      // (its retransition target). X: that distance, Min..Max slider = 0..1 (hands farther away are extrapolated by the curve); Y: speed multiplier, Min..Max slider. Duration = base time / multiplier.
+      { key: `${p}RetransitionScalerEnabled`, label: 'Retransition Distance Scaler On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}RetransitionScalerCurve`, label: 'Retransition Distance Scaler Curve (Distance -> Speed Multiplier)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]' },
+      { key: `${p}RetransitionScalerMulRange`, label: 'Retransition Distance Scaler Min / Max Speed Multiplier (x)', type: 'text', def: '{"min":0.5,"max":2}' },
+      { key: `${p}RetransitionScalerDistRange`, label: 'Retransition Distance Scaler Min / Max Distance (World Units)', type: 'text', def: '{"min":0,"max":50}' },
       // Retransition Start Time Curve On/Off -- direct spec item
       // (2026-09-27), same reasoning as makeClickPoseGroup()'s own
       // matching control comment.
@@ -6774,7 +8057,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
     controls: withDynamicDevice([
       // "If Off, hide all settings for this function" -- see
       // makeClickHoldPoseGroup()'s own matching comment.
-      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false, onChange: () => updateClickFunctionEnabledVisibility(p) },
+      { key: `${p}Enabled`, label: `${title} (Master On/Off)`, type: 'checkbox', def: defaults.enabled ?? false, onChange: () => { updateClickFunctionEnabledVisibility(p); enforceExclusiveTrigger(p) } },
       // Mode + Tween Sequence -- added 2026-09-15, originally built only
       // for Right Click, then generalized here so Click Pose/Double-Click
       // Pose get it "the same as the others" (direct follow-up request).
@@ -6797,7 +8080,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // Mode of "Sequence" shows the selector correctly on first load too,
       // not just after manually re-touching the dropdown.
       {
-        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence'],
+        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence', 'None'],
         onChange: () => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p); updateChainModeVisibility(p) }
       },
       // Offset/Rotation -- see makeClickHoldPoseGroup()'s own matching
@@ -6838,6 +8121,12 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationLoopRetransition`, label: 'Rotation: Retransition Between Loops', type: 'checkbox', def: false },
+      // Rotation Mode (2026-10-14, direct request - replaces the separate Rotation at Base group): where the Rotation turns the hand about.
+      //  Rotation at Base - the arm base, in the model's own X / Y / Z (like a pose's Whole-Hand Rotation at Base).
+      //  Rotation at Crop - the crop point = the first arm bone crossing the wrist-crop surface, in the model's own X / Y / Z.
+      //  Rotation Around Cursor - the cursor (where it was when the function fired), in WORLD X / Y / Z.
+      { key: `${p}RotationMode`, label: 'Rotation Mode', type: 'select', def: 'Rotation at Crop', options: () => ['Rotation at Base', 'Rotation at Crop', 'Rotation Around Cursor'] },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       // Skip If Same Pose (2026-10-06, direct request). Single Pose mode only: when on, a hand that is
       // ALREADY in this function's target pose is left alone by this trigger; with Multi Trigger it moves
@@ -6961,6 +8250,16 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}RetransitionSpeedCurveVisibleOnly`, label: 'Retransition Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":25000}', onChange: () => parseClickPoseConfig(p) },
+      // Retransition Distance Curve: see the hold-kind factory's matching comment.
+      { key: `${p}RetransitionDistCurveEnabled`, label: 'Retransition Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}RetransitionDistCurve`, label: 'Retransition Distance Curve (Camera Distance -> Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]' },
+      { key: `${p}RetransitionDistRange`, label: 'Retransition Distance Curve Min / Max Time (Ms)', type: 'text', def: '{"min":50,"max":2000}' },
+      // Retransition Distance Scaler (2026-10-13, direct request): scales each hand's retransition SPEED (the single slider or the speed curve / distance curve result) by how far the hand is from its own field starting point
+      // (its retransition target). X: that distance, Min..Max slider = 0..1 (hands farther away are extrapolated by the curve); Y: speed multiplier, Min..Max slider. Duration = base time / multiplier.
+      { key: `${p}RetransitionScalerEnabled`, label: 'Retransition Distance Scaler On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}RetransitionScalerCurve`, label: 'Retransition Distance Scaler Curve (Distance -> Speed Multiplier)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]' },
+      { key: `${p}RetransitionScalerMulRange`, label: 'Retransition Distance Scaler Min / Max Speed Multiplier (x)', type: 'text', def: '{"min":0.5,"max":2}' },
+      { key: `${p}RetransitionScalerDistRange`, label: 'Retransition Distance Scaler Min / Max Distance (World Units)', type: 'text', def: '{"min":0,"max":50}' },
       // Retransition Start Time Curve On/Off -- direct spec item
       // (2026-09-27): "place the Retransition start time slider and curve
       // in their own subgroup that can be turned on and off." Previously
@@ -7025,6 +8324,7 @@ function setSelectedPoseAsDefault() {
   POSE_PRESET_KEYS.forEach((key) => { poseDefaultValues[key] = next[key] })
   syncPoseSlidersTo(next)
   saveCurrentSettings()
+  refreshListPickerMarksByKey('savedPoses')
 }
 // Injects the "Default" button directly into the Saved Poses list-
 // picker's own button row (next to Save/Overwrite/Use/Rename/Delete),
@@ -7148,21 +8448,150 @@ function getSelectedSavedCameraItem() {
   const selectedRow = document.querySelector('.dp-row[data-key="savedCameras"] .dp-list-picker-row-selected')
   return selectedRow ? selectedRow.__item : null
 }
+// ---- Item selector marks (2026-10-15): which Saved Pose / Camera is the Default, which Camera / Lighting matches what is live ----
+// An item is the default when its values equal the stored default values (the Default buttons copy an item's values, not its name), and "in use" when its values equal the live camera / lighting. Reading these while the panel is
+// first built can hit a not-yet-initialised module value; devPanel.js treats a throw as false and the marks are refreshed once setup has finished.
+const nearNum = (a, b, eps) => (typeof a === 'number' && typeof b === 'number') ? Math.abs(a - b) <= eps : a === b
+function poseItemMatchesDefault(item) {
+  return POSE_PRESET_KEYS.every((k) => nearNum(item[k] !== undefined ? item[k] : POSE_KEY_DEFAULTS[k], poseDefaultValues[k], 1e-6))
+}
+// The Default camera of a device's own settings (2026-10-16: per device). The real device's is the live cameraDefaultValues; another device's tab (viewed from here) is read from that device's stored slot, or - when it
+// never had one stored - from its own camera sliders, exactly like loadCameraDefaultFromCfg() does for the real device.
+function cameraDefaultStateFor(dev) {
+  if (dev === realDeviceClass()) return { vals: cameraDefaultValues, known: cameraDefaultTargetKnown, dir: cameraDefaultDir }
+  let p = null
+  try { const raw = getDeviceValue(dev, 'cameraDefaultPreset'); p = raw ? JSON.parse(raw) : null } catch (e) { p = null }
+  const vals = {}
+  if (p && typeof p === 'object' && typeof p.cameraX === 'number') {
+    CAMERA_PRESET_KEYS.forEach((k) => { vals[k] = p[k] !== undefined ? p[k] : CAMERA_KEY_DEFAULTS[k] })
+    vals.targetX = p.targetX || 0; vals.targetY = p.targetY || 0; vals.targetZ = p.targetZ || 0
+    return { vals, known: true, dir: null }
+  }
+  CAMERA_PRESET_KEYS.forEach((k) => { const sv = getDeviceValue(dev, k); vals[k] = sv !== undefined ? sv : CAMERA_KEY_DEFAULTS[k] })
+  vals.targetX = 0; vals.targetY = 0; vals.targetZ = 0
+  _camEuler.set(THREE.MathUtils.degToRad(getDeviceValue(dev, 'cameraPitch') || 0), THREE.MathUtils.degToRad(getDeviceValue(dev, 'cameraYaw') || 0), 0, 'YXZ')
+  _camQ.setFromEuler(_camEuler)
+  return { vals, known: false, dir: new THREE.Vector3(0, 0, -1).applyQuaternion(_camQ) }
+}
+function cameraItemMatchesDefault(rawItem) {
+  const item = normalizeCameraPresetItem(rawItem)
+  const D = cameraDefaultStateFor(getEditingDevice()) // the default of the tab being shown
+  const v = (k) => (item[k] !== undefined ? item[k] : CAMERA_KEY_DEFAULTS[k])
+  if (!(nearNum(v('cameraX'), D.vals.cameraX, 0.01) && nearNum(v('cameraY'), D.vals.cameraY, 0.01) && nearNum(v('cameraZ'), D.vals.cameraZ, 0.01) && nearNum(v('cameraFov'), D.vals.cameraFov, 0.01))) return false
+  if (D.known) {
+    return nearNum(item.targetX !== undefined ? item.targetX : 0, D.vals.targetX, 0.01) && nearNum(item.targetY !== undefined ? item.targetY : 0, D.vals.targetY, 0.01) && nearNum(item.targetZ !== undefined ? item.targetZ : 0, D.vals.targetZ, 0.01)
+  }
+  // The pan target of an older default was never kept: same place and field of view, looking the same way (yaw / pitch of the stored default).
+  if (item.targetX === undefined || !D.dir) return true
+  _camMatchDir.set(item.targetX - v('cameraX'), item.targetY - v('cameraY'), item.targetZ - v('cameraZ'))
+  return _camMatchDir.lengthSq() < 1e-12 || _camMatchDir.normalize().dot(D.dir) >= 0.9995
+}
+const _camMatchDir = new THREE.Vector3()
+let cameraDefaultTargetKnown = false, cameraDefaultDir = null
+function cameraDirFromCfg() {
+  _camEuler.set(THREE.MathUtils.degToRad(cfg.cameraPitch || 0), THREE.MathUtils.degToRad(cfg.cameraYaw || 0), 0, 'YXZ')
+  _camQ.setFromEuler(_camEuler)
+  return new THREE.Vector3(0, 0, -1).applyQuaternion(_camQ)
+}
+// The Default camera of the settings now in cfg: the stored full view when there is one, else the camera sliders (an older setting, which never stored it).
+function loadCameraDefaultFromCfg() {
+  let p = null
+  try { p = cfg.cameraDefaultPreset ? JSON.parse(cfg.cameraDefaultPreset) : null } catch (e) { p = null }
+  if (p && typeof p === 'object' && typeof p.cameraX === 'number') {
+    CAMERA_PRESET_KEYS.forEach((k) => { cameraDefaultValues[k] = p[k] !== undefined ? p[k] : CAMERA_KEY_DEFAULTS[k] })
+    cameraDefaultValues.targetX = p.targetX || 0; cameraDefaultValues.targetY = p.targetY || 0; cameraDefaultValues.targetZ = p.targetZ || 0
+    cameraDefaultTargetKnown = true
+    cameraDefaultDir = null
+  } else {
+    CAMERA_PRESET_KEYS.forEach((k) => { cameraDefaultValues[k] = cfg[k] !== undefined ? cfg[k] : CAMERA_KEY_DEFAULTS[k] })
+    cameraDefaultValues.targetX = 0; cameraDefaultValues.targetY = 0; cameraDefaultValues.targetZ = 0
+    cameraDefaultTargetKnown = false
+    cameraDefaultDir = cameraDirFromCfg()
+  }
+  updateCameraMaxExtentsBound()
+}
+// After a whole saved dev setting was applied (Use / Set Default; direct request 2026-10-15: "when I click Use ... make sure the camera uses the default camera for that dev setting set", "it should indicate
+// [the default] regardless"): re-derive every default from the settings now in cfg, put the live camera on the set's default camera, and refresh all item selector marks.
+function applySavedStateDefaults(state) {
+  // The default camera belongs to ONE dev setting (2026-10-15, direct request): a setting saved before it was stored has no such value, so it must not inherit the previous setting's default.
+  const sv = state && state.values ? (state.values[realDeviceClass()] || state.values.desktop) : null
+  if (!sv || sv.cameraDefaultPreset === undefined) { cfg.cameraDefaultPreset = ''; try { syncValue('cameraDefaultPreset', '') } catch (e) { /* no panel */ } }
+  resyncPoseDefaultValues()
+  loadCameraDefaultFromCfg()
+  if (cameraDefaultTargetKnown) {
+    applyCameraPreset({ ...cameraDefaultValues })
+  } else {
+    camera.position.set(cfg.cameraX ?? CAMERA_KEY_DEFAULTS.cameraX, cfg.cameraY ?? CAMERA_KEY_DEFAULTS.cameraY, cfg.cameraZ ?? CAMERA_KEY_DEFAULTS.cameraZ)
+    camera.fov = cfg.cameraFov ?? CAMERA_KEY_DEFAULTS.cameraFov
+    camera.updateProjectionMatrix()
+    controls.target.set(camera.position.x, camera.position.y, camera.position.z - Math.max(cfg.cameraZoom || 1, 1e-3))
+    applyCameraOrientation() // yaw / pitch / roll of the set
+    syncCameraPanelFromLive()
+  }
+  refreshAllItemSelectorMarks()
+  sceneNeedsRedraw = true
+}
+function cameraItemMatchesLive(rawItem) {
+  const item = normalizeCameraPresetItem(rawItem)
+  const t = controls.target
+  return nearNum(item.cameraX !== undefined ? item.cameraX : CAMERA_KEY_DEFAULTS.cameraX, camera.position.x, 0.01)
+    && nearNum(item.cameraY !== undefined ? item.cameraY : CAMERA_KEY_DEFAULTS.cameraY, camera.position.y, 0.01)
+    && nearNum(item.cameraZ !== undefined ? item.cameraZ : CAMERA_KEY_DEFAULTS.cameraZ, camera.position.z, 0.01)
+    && nearNum(item.cameraFov !== undefined ? item.cameraFov : CAMERA_KEY_DEFAULTS.cameraFov, camera.fov, 0.01)
+    && nearNum(item.cameraRoll !== undefined ? item.cameraRoll : 0, cfg.cameraRoll || 0, 0.05)
+    && nearNum(item.targetX !== undefined ? item.targetX : 0, t.x, 0.01)
+    && nearNum(item.targetY !== undefined ? item.targetY : 0, t.y, 0.01)
+    && nearNum(item.targetZ !== undefined ? item.targetZ : 0, t.z, 0.01)
+}
+function lightingItemMatchesLive(item) {
+  return LIGHTING_PRESET_KEYS.every((k) => {
+    const a = item[k] !== undefined ? item[k] : LIGHTING_KEY_DEFAULTS[k]
+    const b = cfg[k]
+    return typeof a === 'string' && typeof b === 'string' ? a.toLowerCase() === b.toLowerCase() : nearNum(a, b, 1e-3)
+  })
+}
+function refreshAllItemSelectorMarks() {
+  ;['savedPoses', 'savedCameras', 'savedLighting', 'loadingPreviewSavedCameras', 'loadingPreviewSavedLighting'].forEach(refreshListPickerMarksByKey)
+}
+// Default is PER DEVICE (2026-10-16, direct request: a Default set on the Mobile tab is Mobile's own and does not override Desktop's). It goes to the device whose tab is showing: on the real device's own tab it also puts the
+// live camera there (as before); on another device's tab nothing live moves - that device's stored default is set and its camera sliders (what it starts from) are put on the same view.
+function setCameraSlidersForDevice(dev, vals) {
+  const c = new THREE.PerspectiveCamera()
+  c.position.set(vals.cameraX, vals.cameraY, vals.cameraZ)
+  c.up.set(0, 1, 0)
+  _camFwd.set(vals.targetX, vals.targetY, vals.targetZ)
+  c.lookAt(_camFwd)
+  _camQ.copy(c.quaternion).multiply(_camQ2.setFromAxisAngle(_camAxisZ, THREE.MathUtils.degToRad(vals.cameraRoll || 0)))
+  _camEuler.setFromQuaternion(_camQ, 'YXZ')
+  const r3 = (n) => Math.round(THREE.MathUtils.radToDeg(n) * 1000) / 1000
+  setDeviceValue(dev, 'cameraX', vals.cameraX); setDeviceValue(dev, 'cameraY', vals.cameraY); setDeviceValue(dev, 'cameraZ', vals.cameraZ)
+  setDeviceValue(dev, 'cameraFov', vals.cameraFov)
+  setDeviceValue(dev, 'cameraZoom', c.position.distanceTo(_camFwd))
+  setDeviceValue(dev, 'cameraYaw', r3(_camEuler.y)); setDeviceValue(dev, 'cameraPitch', r3(_camEuler.x)); setDeviceValue(dev, 'cameraRoll', r3(_camEuler.z))
+}
 function setSelectedCameraAsDefault() {
   const rawItem = getSelectedSavedCameraItem()
   if (!rawItem) return
-  applyCameraPreset(rawItem)
-  // Normalized independently here too -- applyCameraPreset() above
-  // normalizes its OWN internal copy, but never exposes it, and this
-  // function's own direct item[key]/item.targetX reads below need the
-  // same short-name fallback to correctly seed cameraDefaultValues.
+  // Normalized here (applyCameraPreset() normalizes its own copy and never exposes it).
   const item = normalizeCameraPresetItem(rawItem)
-  CAMERA_PRESET_KEYS.forEach((key) => { cameraDefaultValues[key] = item[key] !== undefined ? item[key] : CAMERA_KEY_DEFAULTS[key] })
-  cameraDefaultValues.targetX = item.targetX !== undefined ? item.targetX : 0
-  cameraDefaultValues.targetY = item.targetY !== undefined ? item.targetY : 0
-  cameraDefaultValues.targetZ = item.targetZ !== undefined ? item.targetZ : 0
-  updateCameraMaxExtentsBound()
+  const vals = {}
+  CAMERA_PRESET_KEYS.forEach((key) => { vals[key] = item[key] !== undefined ? item[key] : CAMERA_KEY_DEFAULTS[key] })
+  vals.targetX = item.targetX !== undefined ? item.targetX : 0
+  vals.targetY = item.targetY !== undefined ? item.targetY : 0
+  vals.targetZ = item.targetZ !== undefined ? item.targetZ : 0
+  const dev = getEditingDevice()
+  if (dev === realDeviceClass()) {
+    applyCameraPreset(rawItem)
+    Object.assign(cameraDefaultValues, vals)
+    cameraDefaultTargetKnown = true
+    cameraDefaultDir = null
+    updateCameraMaxExtentsBound()
+  } else {
+    setCameraSlidersForDevice(dev, vals)
+  }
+  setDeviceValue(dev, 'cameraDefaultPreset', JSON.stringify(vals)) // that device's slot of this set of dev settings (saved with it), so the Default mark survives a reload and a Use
   saveCurrentSettings()
+  refreshListPickerMarksByKey('savedCameras')
 }
 // Max Extents (direct request, refined over several corrections in the
 // same message thread down to this exact model): a standard bounding
@@ -7390,6 +8819,194 @@ const loadingPreviewBaseQuat = new THREE.Quaternion()
 // (modelRotX/Y/Z), applied in applyLoadingPreviewPose() -- same role as
 // Pose Preview's own `_previewWholeHandRotEuler`.
 const _loadingPreviewWholeHandRotEuler = new THREE.Euler()
+// ===== Two-hand loading tween (2026-10-13, direct request) =====
+// A HANDO "hando-two-hand-tween" export carries a main-hand pose list, a second-hand pose list (keys prefixed hand2..., e.g. hand2ThumbCurl) and the second hand's placement (mirror, offset, rotation, scale). Importing it
+// stores the main poses and the second-hand poses (renamed to the normal pose keys, group "2ND HAND") in Saved Poses, and a sequence flagged twoHand (with tweenPosesHand2 and the placement) in Saved Tween Sequences.
+// Selecting that sequence as the Loading Tween Sequence is all it takes: the preview then builds a second hand from the same model.
+// The second hand is placed the way HANDO does it: world = Mirror(about the main hand's centre) * Translate(offset) * MainHand * (rotate / scale about the palm centre). HANDO's world axes map onto this preview's by
+// alignQuat (the same mapping the camera / lighting imports use), the offset is in HANDO units (scaled with the preview hand), and the skeleton is posed UN-mirrored (its base orientation = the main hand's times the
+// rotation) with the reflection applied only to the final matrix - a mirrored copy of a posed hand, not a mirrored pose.
+const HAND2_CONFIG_KEYS = ['mirrorMainHandPose', 'hand2MirrorX', 'hand2MirrorY', 'hand2MirrorZ', 'hand2OffsetX', 'hand2OffsetY', 'hand2OffsetZ', 'hand2RotX', 'hand2RotY', 'hand2RotZ', 'hand2Scale', 'hand2HideWrist']
+function hand2PoseToMainItem(p) {
+  const out = { name: p.name, hand2Pose: true }
+  Object.keys(p).forEach((k) => { if (k.length > 5 && k.startsWith('hand2')) out[k[5].toLowerCase() + k.slice(6)] = p[k] }) // hand2ThumbCurl -> thumbCurl
+  return out
+}
+async function importTwoHandTween(btn) {
+  const flash = (msg) => { if (!btn) return; const orig = btn.dataset.origText || btn.textContent; btn.dataset.origText = orig; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1600) }
+  let text
+  try { text = await navigator.clipboard.readText() } catch (e) {
+    text = prompt('Paste the exported two-hand tween JSON:', '')
+    if (!text) return
+  }
+  let data
+  try { data = JSON.parse(text) } catch (e) { flash('Invalid JSON'); return }
+  if (!data || data.format !== 'hando-two-hand-tween') { flash('Not a two-hand tween export'); return }
+  const mergeByName = (list, incoming) => {
+    const out = list.slice()
+    incoming.forEach((item) => {
+      if (!item || typeof item.name !== 'string') return
+      const i = out.findIndex((x) => x.name === item.name)
+      if (i >= 0) out[i] = { ...item, ...(out[i].group ? { group: out[i].group } : {}) }
+      else out.push(item)
+    })
+    return out
+  }
+  const mainPoses = Array.isArray(data.poses) ? data.poses : []
+  const hand2Poses = (Array.isArray(data.hand2Poses) ? data.hand2Poses : []).filter((p) => p && typeof p.name === 'string').map((p) => ({ ...hand2PoseToMainItem(p), group: '2ND HAND' }))
+  const poses = mergeByName(cfg.savedPoses || [], [...mainPoses, ...hand2Poses])
+  cfg.savedPoses = poses
+  syncValue('savedPoses', poses)
+  const h2 = data.hand2 || {}
+  const placement = {}
+  HAND2_CONFIG_KEYS.forEach((k) => { if (h2[k] !== undefined) placement[k] = h2[k] })
+  // HANDO world units per raw model unit (2026-10-14): HANDO multiplies the model by its scaleCorrection (388.436 for this hand), so its offsets (-43 ...) are in a world where the hand is ~3.9x bigger than the raw model; the
+  // preview has to turn them into ITS units with that factor, not with this app's own bounds. A HANDO export carries scene.palmPivot (the wrist / middle-base midpoint in HANDO's model space = the raw one * that factor), and the
+  // same point is handoPivotRaw here, so the factor is their length ratio - exact, with no bounding-box assumption (HANDO's and this app's boxes are not measured alike: radius 75.477 / 388.436 = 0.1943 there, 0.2295 here).
+  // Missing (an export from before scene existed): left undefined and updateLoadingPreviewHand2() keeps its previous scaling.
+  let handoScale
+  const pp = data.scene && data.scene.palmPivot
+  if (pp && typeof pp.x === 'number' && handoPivotRaw.length() > 1e-9) {
+    const sc = Math.hypot(pp.x, pp.y, pp.z) / handoPivotRaw.length()
+    if (isFinite(sc) && sc >= 1 && sc <= 5000) handoScale = sc
+  }
+  // HANDO's exact mirror anchor (scene.mirrorAnchor, its world) back in raw model units: this app's own box centre is not HANDO's (the boxes are measured differently), and the 2nd hand's X is 2 * anchor.x - ..., so a 1.5-unit
+  // difference in the anchor moved the pair 3 units. Same formula in updateLoadingPreviewHand2(), only the point it is given.
+  let handoAnchorRaw
+  const ma = data.scene && data.scene.mirrorAnchor
+  if (handoScale && ma && typeof ma.x === 'number') handoAnchorRaw = { x: ma.x / handoScale, y: ma.y / handoScale, z: ma.z / handoScale }
+  const incomingSeqs = (Array.isArray(data.tweenSequences) && data.tweenSequences.length ? data.tweenSequences : [{ name: data.name || 'Two-Hand Tween', tweenPoses: data.tweenPoses, tweenPosesHand2: data.tweenPosesHand2 }])
+    .filter((q) => q && typeof q.name === 'string')
+    .map((q) => ({ name: q.name, tweenPoses: Array.isArray(q.tweenPoses) ? q.tweenPoses : (data.tweenPoses || []), tweenPosesHand2: Array.isArray(q.tweenPosesHand2) ? q.tweenPosesHand2 : (data.tweenPosesHand2 || []), twoHand: h2.show2ndHand !== false, hand2: placement, ...(handoScale ? { handoScale } : {}), ...(handoAnchorRaw ? { handoAnchorRaw } : {}) }))
+  if (!incomingSeqs.length) { flash('No sequence found'); return }
+  const sequences = mergeByName(cfg.savedTweenSequences || [], incomingSeqs)
+  cfg.savedTweenSequences = sequences
+  syncValue('savedTweenSequences', sequences)
+  refreshAllTweenSequenceSelectors()
+  const pick = incomingSeqs[incomingSeqs.length - 1].name
+  cfg.loadingPreviewTweenSelector = pick
+  syncValue('loadingPreviewTweenSelector', pick)
+  // restart the preview animation on the new sequence
+  loadingPreviewLapIndex = 1; loadingPreviewLapStartMs = performance.now(); loadingPreviewHoldEndMs = 0; loadingPreviewDirection = 1; loadingPreviewSequenceDone = false; loadingPreviewNoSequenceLogged = false
+  logLoadingPreview('imported two-hand tween "' + pick + '": ' + mainPoses.length + ' poses + ' + hand2Poses.length + ' second-hand poses; selected as the loading animation')
+  flash('Imported + selected "' + pick + '"')
+}
+function ensureLoadingPreviewHand2(seq) {
+  const need = !!(seq && seq.twoHand && loadingPreviewScene && loadingPreviewHand && lpSourceRoot())
+  loadingPreviewTwoHandActive = need
+  if (!need) {
+    if (loadingPreviewHand2) {
+      if (loadingPreviewScene) loadingPreviewScene.remove(loadingPreviewHand2.clone)
+      loadingPreviewHand2 = null
+    }
+    return
+  }
+  if (loadingPreviewHand2) return
+  const clone = cloneSkeletal(lpSourceRoot())
+  const skinnedMesh = findSkinnedMesh(clone)
+  const plane = new THREE.Plane()
+  const rig = makeClipRig(clone)
+  if (skinnedMesh && toonMaterial) {
+    skinnedMesh.material = toonMaterial.clone()
+    applyClipRigToMaterial(skinnedMesh.material, rig, plane)
+    skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
+  }
+  clone.matrixAutoUpdate = false // its matrix is composed by hand each frame (it can be a reflection)
+  loadingPreviewScene.add(clone)
+  loadingPreviewHand2 = { clone, skinnedMesh, wristClipPlane: plane, clipRig: rig }
+  lpSetupProgressCrop(loadingPreviewHand2)
+}
+const _lp2U = new THREE.Matrix4(), _lp2Pivot = new THREE.Matrix4(), _lp2Tmp = new THREE.Matrix4(), _lp2A = new THREE.Matrix4(), _lp2Ai = new THREE.Matrix4(), _lp2Mir = new THREE.Matrix4(), _lp2Final = new THREE.Matrix4()
+const _lp2Rh = new THREE.Quaternion(), _lp2Anchor = new THREE.Vector3()
+const _lp2Q = new THREE.Quaternion(), _lp2Base = new THREE.Quaternion(), _lp2V = new THREE.Vector3(), _lp2V2 = new THREE.Vector3(), _lp2S = new THREE.Vector3(), _lp2Eul = new THREE.Euler()
+function updateLoadingPreviewHand2(seq, lapStyle, t) {
+  const hand2 = loadingPreviewHand2
+  if (!hand2 || !hand2.skinnedMesh || !loadingPreviewHand || !seq) return
+  const cfg2 = seq.hand2 || {}
+  // the second hand's own pose list (or the main list when it is told to mirror the main hand's pose)
+  const entries2 = (cfg2.mirrorMainHandPose || !(seq.tweenPosesHand2 && seq.tweenPosesHand2.length)) ? (seq.tweenPoses || []) : seq.tweenPosesHand2
+  const aIdx = entries2.findIndex((e) => typeof e === 'string' && e)
+  const found = aIdx >= 0 ? (cfg.savedPoses || []).filter((p) => p.name === entries2[aIdx]) : []
+  const anchor2 = found[found.length - 1]
+  if (!anchor2) return
+  const segs2 = resolveTweenSegmentsWithAnchor(anchor2, entries2.slice(aIdx + 1))
+  const last2 = segs2.length > 0 ? segs2[segs2.length - 1].poseB : anchor2
+  let values
+  if (segs2.length === 0) values = anchor2
+  else if (lapStyle === 'Oscillate') values = lerpTweenSegments(segs2, loadingPreviewDirection === 1 ? t : 1 - t)
+  else if (cfg.loadingPreviewSequenceLoopTransition === false) values = lerpTweenSegments(segs2, t)
+  else {
+    const ring = segs2.concat([{ poseA: last2, poseB: anchor2, weight: 1 }])
+    const totalW = ring.reduce((sum, sg) => sum + sg.weight, 0)
+    values = lerpLoopSegments(ring, (loadingPreviewLapIndex - 1 + t) * totalW)
+  }
+  const V = {}
+  POSE_PRESET_KEYS.forEach((k) => { V[k] = values[k] !== undefined ? values[k] : POSE_KEY_DEFAULTS[k] })
+  // --- placement ---
+  const c1 = loadingPreviewHand.clone
+  c1.updateMatrix()
+  const rad = THREE.MathUtils.degToRad
+  _lp2Eul.set(rad(cfg2.hand2RotX || 0), rad(cfg2.hand2RotY || 0), rad(cfg2.hand2RotZ || 0), 'XYZ')
+  _lp2Q.setFromEuler(_lp2Eul)
+  const s2 = typeof cfg2.hand2Scale === 'number' && cfg2.hand2Scale > 0 ? cfg2.hand2Scale : 1
+  // T(P) R S T(-P): rotate / scale about the palm centre
+  _lp2Pivot.compose(handoPivotRaw, _lp2Q, _lp2S.set(s2, s2, s2))
+  _lp2Pivot.multiply(_lp2Tmp.makeTranslation(-handoPivotRaw.x, -handoPivotRaw.y, -handoPivotRaw.z))
+  // offset: HANDO units -> this preview's frame (alignQuat), scaled with the preview hand (the hand is sized to HANDO's units when a camera preset is in use)
+  // preview units per HANDO unit: the preview hand's scale over HANDO's own raw->world factor (seq.handoScale, from the export); an import without it keeps the old assumption (HANDO scale = the reference-radius ratio)
+  const unit = seq.handoScale ? c1.scale.x / seq.handoScale : c1.scale.x / (LOADING_PREVIEW_REFERENCE_RADIUS / handBoundsRadiusLocal)
+  _lp2V.set((cfg2.hand2OffsetX || 0) + (cfg.loadingPreviewHand2ExtraX || 0), (cfg2.hand2OffsetY || 0) + (cfg.loadingPreviewHand2ExtraY || 0), (cfg2.hand2OffsetZ || 0) + (cfg.loadingPreviewHand2ExtraZ || 0)).applyQuaternion(alignQuat).multiplyScalar(unit)
+  _lp2U.copy(c1.matrix).multiply(_lp2Pivot)
+  _lp2U.premultiply(_lp2Tmp.makeTranslation(_lp2V.x, _lp2V.y, _lp2V.z)) // un-mirrored placement
+  // pose the skeleton UN-mirrored (matrices are rebuilt from the un-mirrored matrix first, so the curl axis maths never sees a reflection)
+  hand2.clone.matrix.copy(_lp2U)
+  hand2.clone.matrixWorldNeedsUpdate = true
+  hand2.clone.updateMatrixWorld(true)
+  _lp2Base.copy(c1.quaternion).multiply(_lp2Q)
+  applyWristPoseToSkeleton(hand2.skinnedMesh.skeleton, V)
+  FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand2.skinnedMesh.skeleton, _lp2Base, null, V))
+  // --- reflection about the plane through the main hand's centre (HANDO world axes -> alignQuat) ---
+  const mx = cfg2.hand2MirrorX ? -1 : 1, my = cfg2.hand2MirrorY ? -1 : 1, mz = cfg2.hand2MirrorZ ? -1 : 1
+  if (mx < 0 || my < 0 || mz < 0) {
+    _lp2A.makeRotationFromQuaternion(alignQuat)
+    _lp2Ai.copy(_lp2A).invert()
+    _lp2Mir.makeScale(mx, my, mz).premultiply(_lp2A).multiply(_lp2Ai) // A * diag * A^-1
+    // CORRECTED 2026-10-14 (direct report: with a two-hand tween the hands were too far apart). HANDO reflects about a FIXED world plane through sceneState.center = the bounding-box centre of the main hand AT LOAD (neutral,
+    // un-rotated, scale 1) - NOT about the main hand's current centre. The main hand there turns about its PALM, so with a Whole-Hand Rotation its centre swings away from that fixed point and the mirrored hand lands
+    // farther (or nearer) than the plain offset; this preview turns the main hand about its own bounds centre instead, so its current centre was the wrong plane. The same fixed point expressed in this preview: HANDO's
+    // main hand maps raw x -> Pn + s*Rh*(x - Pn) (Pn = palm centre, s = Pose Scale, Rh = its whole-hand rotation, alignQuat^-1 * the preview hand's quaternion), the preview is that times (alignQuat, modelScale, a translation
+    // t) and has the main hand at c1.position, which puts the anchor Cn (the neutral bounds centre) at c1.position + alignQuat * modelScale * ((Cn - Pn) + s*Rh*Pn). With no rotation / scale 1 it is the old point.
+    // (A non-zero Pose Offset on the main hand moves HANDO's hand but not its anchor; the preview adds it to the position, so that case is left as it was.)
+    const sMain = loadingPreviewModelScale > 0 ? c1.scale.x / loadingPreviewModelScale : 1
+    _lp2Rh.copy(alignQuat).invert().multiply(c1.quaternion)
+    _lp2V2.copy(handoPivotRaw).applyQuaternion(_lp2Rh).multiplyScalar(sMain).add(seq.handoAnchorRaw ? _lp2Anchor.set(seq.handoAnchorRaw.x, seq.handoAnchorRaw.y, seq.handoAnchorRaw.z) : handBoundsBoxCenterRaw).sub(handoPivotRaw).applyQuaternion(alignQuat).multiplyScalar(loadingPreviewModelScale).add(c1.position)
+    _lp2Final.makeTranslation(_lp2V2.x, _lp2V2.y, _lp2V2.z).multiply(_lp2Mir).multiply(_lp2Tmp.makeTranslation(-_lp2V2.x, -_lp2V2.y, -_lp2V2.z)).multiply(_lp2U)
+  } else {
+    _lp2Final.copy(_lp2U)
+  }
+  hand2.clone.matrix.copy(_lp2Final)
+  hand2.clone.matrixWorldNeedsUpdate = true
+  hand2.clone.updateMatrixWorld(true)
+  updateHand2WristClip(typeof cfg2.hand2HideWrist === 'number' ? cfg2.hand2HideWrist : 100)
+}
+// Same crop as updateLoadingPreviewWristClip(), for the second hand.
+function updateHand2WristClip(percent) {
+  const h = loadingPreviewHand2
+  if (!h || !h.skinnedMesh) return
+  if (h.clipRig) {
+    setClipRigT(h.clipRig, percent / 100)
+    updateClipRigPlanes(h.clipRig)
+    return
+  }
+  const farBone = h.skinnedMesh.skeleton.getBoneByName('rForearmBend')
+  const nearBone = h.skinnedMesh.skeleton.getBoneByName('rHand')
+  if (!farBone || !nearBone) return
+  const far = new THREE.Vector3(), near = new THREE.Vector3()
+  farBone.getWorldPosition(far)
+  nearBone.getWorldPosition(near)
+  const dir = near.clone().sub(far).normalize()
+  h.wristClipPlane.setFromNormalAndCoplanarPoint(dir, far.clone().addScaledVector(dir, far.distanceTo(near) * percent / 100))
+}
 // CORRECTED 2026-09-19 -- the Loading Preview's own camera DOES have
 // interactive OrbitControls now (loadingPreviewCameraEditMode, below),
 // but this tracker is still needed: it's the single source of truth
@@ -7404,6 +9021,11 @@ const loadingPreviewCameraTarget = new THREE.Vector3()
 // so its list-picker's "Use" button can live-apply a saved lighting item
 // without needing a full buildLoadingPreview() rebuild.
 let loadingPreviewKeyLightRef = null
+let loadingPreviewPointLightRef = null // the Point alternative of the key light (visible only when Preview Key Light Type is Point)
+let lpKeyLightType = 'Directional', lpKeyDistance = 3 // what the preview's key light is set to right now
+const lpKeyDir = new THREE.Vector3(0, 1, 0) // the Azimuth / Elevation direction the Point light is placed along
+let lpKeyBaseIntensity = 1 // the Intensity slider value the Point light's intensity is scaled from
+const _lpPlCenter = new THREE.Vector3()
 let loadingPreviewHemiLightRef = null
 // See loadingPreviewCameraEditMode's own DEV_GROUPS comment -- the
 // Loading Preview's own interactive orbit/pan/zoom camera, built once
@@ -7498,10 +9120,16 @@ function buildLoadingPreview(bypassEnabledGate) {
   loadingPreviewScene.add(key, key.target, hemi)
   loadingPreviewKeyLightRef = key
   loadingPreviewHemiLightRef = hemi
+  const pointKey = new THREE.PointLight(0xffffff, 0, 0, 2) // decay 2 = physical inverse-square
+  pointKey.visible = false
+  loadingPreviewScene.add(pointKey)
+  loadingPreviewPointLightRef = pointKey
+  lpKeyLightType = 'Directional'; lpKeyDistance = 3
   const lightingPreset = (cfg.loadingPreviewSavedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector)
   if (lightingPreset) applyLoadingPreviewLighting(key, hemi, lightingPreset)
+  syncLoadingPreviewLightSliders()
 
-  const clone = cloneSkeletal(modelRoot)
+  const clone = cloneSkeletal(lpSourceRoot())
   clone.quaternion.copy(alignQuat)
   const skinnedMesh = findSkinnedMesh(clone)
   // Own cloned material + own Plane, mirroring rebuildField()'s per-field-
@@ -7526,6 +9154,8 @@ function buildLoadingPreview(bypassEnabledGate) {
   }
   loadingPreviewScene.add(clone)
   loadingPreviewHand = { clone, skinnedMesh, wristClipPlane: loadingPreviewWristClipPlane, clipRig: loadingPreviewClipRig }
+  lpSetupProgressCrop(loadingPreviewHand)
+  loadingPreviewHand2 = null // belonged to the previous scene; rebuilt on demand
 
   // A selected Camera preset (direct follow-up request) overrides the
   // existing auto-framed default, applied to this preview's own SEPARATE
@@ -7855,9 +9485,11 @@ function captureLoadingPreviewLightingPreset() {
   return {
     keyAzimuth: azimuth,
     keyElevation: elevation,
-    keyTargetHeight: LIGHTING_KEY_DEFAULTS.keyTargetHeight,
+    keyTargetHeight: handBoundsRadiusLocal > 0 ? (loadingPreviewKeyLightRef.target.position.y / handBoundsRadiusLocal) * 100 : LIGHTING_KEY_DEFAULTS.keyTargetHeight,
     keyIntensity: loadingPreviewKeyLightRef.intensity,
     keyColor: '#' + loadingPreviewKeyLightRef.color.getHexString(),
+    keyLightType: lpKeyLightType,
+    keyDistance: lpKeyDistance,
     ambientIntensity: loadingPreviewHemiLightRef.intensity,
     ambientSkyColor: '#' + loadingPreviewHemiLightRef.color.getHexString(),
     ambientGroundColor: '#' + loadingPreviewHemiLightRef.groundColor.getHexString()
@@ -7892,6 +9524,46 @@ function captureLoadingPreviewLightingPreset() {
 // `savedCameras`/`savedLighting` frame the WHOLE FIELD at a completely
 // different (field-radius) scale HANDO has no equivalent of, so this
 // same conversion wouldn't be meaningful there.
+// Items exported from this project's own Loading Preview lists carry hdFrame (already in this frame); anything else is HANDO-authored and gets converted.
+function importFrameAware(item, convert) {
+  if (item && item.hdFrame) { const { hdFrame, ...rest } = item; return rest }
+  return convert(item)
+}
+const LP_LIGHT_SLIDER_KEYS = { keyAzimuth: 'loadingPreviewKeyAzimuth', keyElevation: 'loadingPreviewKeyElevation', keyLightType: 'loadingPreviewKeyLightType', keyDistance: 'loadingPreviewKeyDistance', keyTargetHeight: 'loadingPreviewKeyTargetHeight', keyIntensity: 'loadingPreviewKeyIntensity', keyColor: 'loadingPreviewKeyColor', ambientIntensity: 'loadingPreviewAmbientIntensity', ambientSkyColor: 'loadingPreviewAmbientSkyColor', ambientGroundColor: 'loadingPreviewAmbientGroundColor' }
+// Places the Point light around the hand AS DRAWN (every frame: the hand's size and centre depend on the camera preset in use): the hand's world radius is its local bounds radius times the preview model scale (22.97 under
+// a saved camera, the local radius for the auto-framed default), its centre is the camera preset's anchor (or the auto-frame bounds centre). Distance is in those radii. Intensity is scaled by d^2 so that, with
+// inverse-square falloff, Distance 3 gives the same brightness as the Directional light at that Intensity.
+function updateLoadingPreviewPointLight() {
+  const pl = loadingPreviewPointLightRef
+  if (!pl || !pl.visible || !(handBoundsRadiusLocal > 0)) return
+  const rw = handBoundsRadiusLocal * (loadingPreviewModelScale || 1)
+  if (loadingPreviewAnchorActive) _lpPlCenter.copy(loadingPreviewAnchor); else _lpPlCenter.copy(handBoundsCenterLocal).applyQuaternion(alignQuat)
+  pl.position.copy(_lpPlCenter).addScaledVector(lpKeyDir, rw * lpKeyDistance)
+  pl.intensity = lpKeyBaseIntensity * (rw * 3) * (rw * 3)
+}
+// The Distance row only means something for a Point light.
+function updateLoadingPreviewLightTypeRows() {
+  const row = document.querySelector('.dp-row[data-key="loadingPreviewKeyDistance"]')
+  if (row) row.style.display = cfg.loadingPreviewKeyLightType === 'Point' ? '' : 'none'
+}
+// Sliders -> the preview's lights (live).
+function applyLoadingPreviewLightSliders() {
+  if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return
+  const preset = {}
+  Object.keys(LP_LIGHT_SLIDER_KEYS).forEach((k) => { preset[k] = cfg[LP_LIGHT_SLIDER_KEYS[k]] })
+  applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, preset)
+}
+// The preview's lights -> sliders (after a build, a Use, or a selector change).
+function syncLoadingPreviewLightSliders() {
+  if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return
+  const cur = captureLoadingPreviewLightingPreset()
+  Object.keys(LP_LIGHT_SLIDER_KEYS).forEach((k) => {
+    if (cur[k] === undefined) return
+    const ck = LP_LIGHT_SLIDER_KEYS[k]
+    cfg[ck] = cur[k]
+    try { syncValue(ck, cur[k]) } catch (e) { /* panel not built yet */ }
+  })
+}
 function convertHandoCameraPreset(rawItem) {
   const item = normalizeCameraPresetItem(rawItem)
   const pos = new THREE.Vector3(
@@ -7969,6 +9641,8 @@ function startLoadingPreviewLiveLoop() {
     }
     try {
       updateLoadingPreviewAnimation()
+      updateLoadingPreviewPointLight()
+      updateLoadingPreviewProgressCrop()
       syncLoadingPreviewCameraFromOrbit()
       loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
     } catch (err) {
@@ -8005,7 +9679,7 @@ function syncLoadingPreviewBackground() {
   // screen is up: afterwards the preview background is transparent (Show Loading Preview Live), so no blocker then.
   try {
     if (loadingPreviewCanvas) {
-      const size = Math.max(20, cfg.loadingPreviewSize || 160)
+      const size = Math.max(lpCanvasW(), lpCanvasH())
       loadingPreviewCanvas.style.boxShadow = fieldRevealed ? 'none' : `0 0 0 ${Math.round(size / 2)}px ${cfg.bgColor}`
     }
   } catch (err) { /* not built yet */ }
@@ -8030,11 +9704,13 @@ function setLoadingPreviewLiveVisible(show) {
     return
   }
   logLoadingPreview('Show Loading Preview: ON -- rebuilding')
-  buildLoadingPreview(true)
-  // Pre-fieldStarted, the main animate() loop's own existing branch is
-  // already animating this renderer every frame -- only start the
-  // separate loop once that branch has permanently stopped.
-  if (fieldRevealed) startLoadingPreviewLiveLoop()
+  lpWhenPreviewModelReady(() => {
+    buildLoadingPreview(true)
+    // Pre-fieldStarted, the main animate() loop's own existing branch is
+    // already animating this renderer every frame -- only start the
+    // separate loop once that branch has permanently stopped.
+    if (fieldRevealed) startLoadingPreviewLiveLoop()
+  })
 }
 // Applies a Lighting preset's own values to the loading preview's own
 // cloned key/hemi lights -- a bespoke version of the main scene's
@@ -8052,6 +9728,19 @@ function applyLoadingPreviewLighting(key, hemi, preset) {
   key.target.updateMatrixWorld()
   key.intensity = preset.keyIntensity ?? LIGHTING_KEY_DEFAULTS.keyIntensity
   key.color.set(preset.keyColor ?? LIGHTING_KEY_DEFAULTS.keyColor)
+  // Light Type: Directional shows 'key' (above); Point shows the point light instead, at Distance hand radii along the same direction (a preset saved before this existed has neither field = Directional).
+  lpKeyLightType = preset.keyLightType === 'Point' ? 'Point' : 'Directional'
+  lpKeyDistance = Math.max(0.1, preset.keyDistance ?? 3)
+  const pl = loadingPreviewPointLightRef
+  if (pl && key === loadingPreviewKeyLightRef) {
+    const isPoint = lpKeyLightType === 'Point'
+    key.visible = !isPoint
+    pl.visible = isPoint
+    lpKeyDir.set(Math.cos(el) * Math.cos(az), Math.sin(el), Math.cos(el) * Math.sin(az))
+    lpKeyBaseIntensity = key.intensity
+    pl.color.copy(key.color)
+    updateLoadingPreviewPointLight()
+  }
   hemi.intensity = preset.ambientIntensity ?? LIGHTING_KEY_DEFAULTS.ambientIntensity
   hemi.color.set(preset.ambientSkyColor ?? LIGHTING_KEY_DEFAULTS.ambientSkyColor)
   hemi.groundColor.set(preset.ambientGroundColor ?? LIGHTING_KEY_DEFAULTS.ambientGroundColor)
@@ -8068,6 +9757,9 @@ function applyLoadingPreviewLightingDefault() {
   loadingPreviewKeyLightRef.target.updateMatrixWorld()
   loadingPreviewKeyLightRef.intensity = keyLight.intensity
   loadingPreviewKeyLightRef.color.copy(keyLight.color)
+  loadingPreviewKeyLightRef.visible = true // the main scene's key light is Directional: back to that
+  if (loadingPreviewPointLightRef) loadingPreviewPointLightRef.visible = false
+  lpKeyLightType = 'Directional'; lpKeyDistance = 3
   loadingPreviewHemiLightRef.intensity = hemiLight.intensity
   loadingPreviewHemiLightRef.color.copy(hemiLight.color)
   loadingPreviewHemiLightRef.groundColor.copy(hemiLight.groundColor)
@@ -8082,12 +9774,18 @@ function applyLoadingPreviewLightingDefault() {
 // otherwise never take effect until next reload).
 function resizeLoadingPreview() {
   if (!loadingPreviewCanvas || !loadingPreviewRenderer) return
-  const size = Math.max(20, cfg.loadingPreviewSize || 160)
-  loadingPreviewCanvas.style.width = size + 'px'
-  loadingPreviewCanvas.style.height = size + 'px'
-  loadingPreviewCamera.aspect = 1
+  applyLoadingPreviewLayout() // the canvas's CSS size / position come from the UI Layout Engine (edited in its Inspector); only the WebGL buffer size is set here
+  lpObserveCanvas()
+  const w = lpCanvasW(), h = lpCanvasH()
+  // Content mode (or a runaway size): the box follows the buffer's CSS size instead of the other way round.
+  loadingPreviewCanvas.style.width = lpContentMode('width') ? w + 'px' : ''
+  loadingPreviewCanvas.style.height = lpContentMode('height') ? h + 'px' : ''
+  const af = lpAnimFactor()
+  lpApplyAnimScale(loadingPreviewCanvas, af)
+  loadingPreviewCamera.aspect = w / h
   loadingPreviewCamera.updateProjectionMatrix()
-  loadingPreviewRenderer.setSize(size, size, false)
+  // a bigger-than-reference display gets a bigger buffer, so it stays sharp
+  loadingPreviewRenderer.setSize(Math.min(Math.ceil(w * Math.max(1, af)), LP_MAX_CSS_PX), Math.min(Math.ceil(h * Math.max(1, af)), LP_MAX_CSS_PX), false)
   syncLoadingPreviewBackground() // the blocker's spread follows the size
 }
 // Loading Preview Offset X/Y (Px) -- same "called once at build time and
@@ -8112,7 +9810,7 @@ function resizeLoadingPreview() {
 // grow independent options again later.
 function repositionLoadingPreview() {
   if (!loadingPreviewCanvas) return
-  loadingPreviewCanvas.style.transform = 'translate(-50%, -50%)'
+  applyLoadingPreviewLayout() // centring is the engine's anchor layout now (a hand-set transform here would override it)
 }
 // Applies one pose-shaped values object to ONLY the loading-preview hand's
 // skeleton -- deliberately a 3rd near-duplicate of previewPosePreset()
@@ -8182,7 +9880,16 @@ function applyLoadingPreviewPose(item) {
   // offsets are then added on top as before.
   const previewScale = (values.poseScale ?? 1) * loadingPreviewModelScale
   let previewBase = _poseOffsetZeroVec
-  if (loadingPreviewAnchorActive) {
+  if (loadingPreviewAnchorActive && loadingPreviewTwoHandActive) {
+    // Two-hand tween (2026-10-14, direct report: the two hands were too far apart). convertHandoCameraPreset() maps HANDO's camera AND target by a pure rotation (alignQuat, no translation), so for this preview to look like
+    // HANDO under that camera the main hand must sit exactly where HANDO puts it, not be re-centred on the target: HANDO turns / scales the main hand about its PALM centre Pn (x -> Pn + s*R*(x - Pn)), which in this
+    // preview (raw -> alignQuat * modelScale) is a base position of modelScale * (alignQuat*Pn - s * baseQuat*Pn). Pinning the bounds centre to the target (the single-hand behaviour) moves the pair off HANDO's framing - a preset
+    // such as "2 HAND TWIDDLING" deliberately aims between the hands - and so moved hand 2, whose mirror plane is HANDO's fixed one (see updateLoadingPreviewHand2()), relative to the frame.
+    _loadingPreviewBase.copy(handoPivotRaw).applyQuaternion(alignQuat)
+    _loadingPreviewBase.addScaledVector(_loadingPreviewV2.copy(handoPivotRaw).applyQuaternion(loadingPreviewHand.clone.quaternion), -(values.poseScale ?? 1))
+    _loadingPreviewBase.multiplyScalar(loadingPreviewModelScale)
+    previewBase = _loadingPreviewBase
+  } else if (loadingPreviewAnchorActive) {
     _loadingPreviewBase.copy(handBoundsCenterLocal).multiplyScalar(previewScale).applyQuaternion(loadingPreviewHand.clone.quaternion)
     _loadingPreviewBase.copy(loadingPreviewAnchor).sub(_loadingPreviewBase)
     previewBase = _loadingPreviewBase
@@ -8319,6 +10026,7 @@ function setupLoadingPreviewEasingGroup() {
 // anchor at either end.
 function updateLoadingPreviewAnimation() {
   const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewTweenSelector)
+  ensureLoadingPreviewHand2(seq) // adds / removes the second hand according to the selected sequence
   const rawEntries = seq ? (seq.tweenPoses || []) : []
   // CORRECTED 2026-09-20, direct report ("the imported tweens still dont
   // seem to read the Hold data") -- this used to call
@@ -8408,6 +10116,7 @@ function updateLoadingPreviewAnimation() {
     values = lerpLoopSegments(ringSegments, tCyclic)
   }
   applyLoadingPreviewPose(values)
+  updateLoadingPreviewHand2(seq, lapStyle, typeof easedT !== 'undefined' ? easedT : lapT) // same timeline position, second hand's own poses
   if (lapT >= 1) {
     logLoadingPreview(`lap ${loadingPreviewLapIndex} complete (${playMode}${playMode === 'Count' ? ' of ' + totalLaps : ''})`)
     loadingPreviewLapIndex++
@@ -9049,7 +10758,7 @@ function computeArmLengthT(hand, distanceToCursor, minLiveDist, liveDistRange) {
   // Default Arm Length exactly as if Reactive Arm Length itself were off,
   // same as every other Responsive-* feature this same round gates the
   // same way (Wrist Splay, the new Responsive Arm Rotation).
-  if (!trackingActive() || !cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
+  if (!trackingActiveFor('Crop') || !cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
   const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(armLengthCurveParsed, normDist), 0, 1)
   const minT = armLengthRangeParsed.min / 100, maxT = armLengthRangeParsed.max / 100
@@ -9106,11 +10815,598 @@ function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistR
   // CORRECTED 2026-09-28 -- see computeArmLengthT()'s own matching
   // comment; same "Responsive-* falls back to its static default while
   // Tracking Enabled is off" treatment.
-  if (!trackingActive() || !cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
+  if (!trackingActiveFor('Splay') || !cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
   const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(wristSplayCurveParsed, normDist), 0, 1)
   const { min, max } = wristSplayRangeParsed
   return min + (max - min) * curveY
+}
+
+// ---- Responsive Velocity (2026-10-15, direct request) ----
+// "When turned on, the velocity of the moving cursor will cause a displacement or arm rotation or something." Hands near a FAST-moving cursor are pushed (and optionally tilted, splayed, cropped,
+// curled) by an amount that follows the cursor's speed. Everything is built as ONE dynamic panel group nested in Cursor Tracking (shared settings + one or more "Displacement Angle to Velocity"
+// sets, each with its own trigger angle / direction / arm / splay / crop / curl effects); the runtime only ever reads cfg. Effects are stacked on top of what the hand is already doing:
+//  - displacement: added to the model's local position AFTER the frame's pose, so it never accumulates and never feeds back into the trigger geometry (measured from the hand's grid position);
+//  - arm tilt: a world-space rotation of the wrapper after cursor tracking, about the same cut-point pivot as every other wrapper rotation;
+//  - wrist splay / finger curl: added at the three places the skeleton is posed (applyPoseValuesToHand(), the idle repose); wrist crop: added to the target arm length.
+const RV_LIN = JSON.stringify([{ x: 0, y: 0 }, { x: 1, y: 1 }])
+const RV_FLAT1 = JSON.stringify([{ x: 0, y: 1 }, { x: 1, y: 1 }])
+const RV_FLAT_HALF = JSON.stringify([{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]) // an Easing curve is a SPEED profile (constant speed by default), like the click functions' Easing
+const RV_CURVE_X_VELOCITY = 'X: Cursor Velocity (Min -> Max Tracked)'
+const RV_CURVE_X_DIST = 'X: Hand Distance From The Cursor Path (the line the cursor has travelled since it started moving fast enough; see Distance Measured From; 0 = Min Trigger Distance, 1 = Max Trigger Distance)'
+let rvSetList = [] // [{ prefix, title }] in panel order
+let rvNextSetN = 1
+let rvHasState = false // some hand holds velocity-effect state (cleared when the feature is switched off)
+let rvLastMs = 0, rvLastPx = 0, rvLastPy = 0, rvVx = 0, rvVy = 0, rvDirX = 1, rvDirY = 0, rvSpeed = 0
+let rvReconcileBusy = false, rvUiQueued = false
+let rvTrail = [] // the cursor's track since the trigger point (screen px), the Path Line the distance curves measure from
+let rvTrigPx = 0, rvTrigPy = 0, rvTrigWas = false // the Trigger Cursor: where the cursor was (screen px) the moment its speed first reached the Min Velocity
+const rvJsonCache = new Map()
+const _rvR = new THREE.Vector3(), _rvU = new THREE.Vector3(), _rvP = new THREE.Vector3(), _rvD = new THREE.Vector3(), _rvAxis = new THREE.Vector3(), _rvQ = new THREE.Quaternion(), _rvQi = new THREE.Quaternion(), _rvLocal = new THREE.Vector3(), _rvHP = new THREE.Vector3()
+function rvJson(raw, fallback) {
+  if (typeof raw !== 'string') return fallback
+  let hit = rvJsonCache.get(raw)
+  if (hit === undefined) {
+    try { hit = JSON.parse(raw) } catch (e) { hit = null }
+    if (Array.isArray(hit)) hit.sort((a, b) => a.x - b.x)
+    if (rvJsonCache.size > 600) rvJsonCache.clear()
+    rvJsonCache.set(raw, hit)
+  }
+  return hit === null ? fallback : hit
+}
+function rvNum(key, fb) { const v = cfg[key]; return typeof v === 'number' && isFinite(v) ? v : fb }
+function rvRange(key, fbMin, fbMax) { const r = rvJson(cfg[key], null); return r && typeof r.min === 'number' && typeof r.max === 'number' ? r : { min: fbMin, max: fbMax } }
+function rvCurveY(key, x) { // curve height 0..1 at x (0..1); an unreadable curve counts as the identity line
+  const pts = rvJson(cfg[key], null)
+  const xc = THREE.MathUtils.clamp(x, 0, 1)
+  if (!Array.isArray(pts) || !pts.length) return xc
+  return THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, xc), 0, 1)
+}
+// An Easing curve is a SPEED profile (2026-10-15, direct correction: the Y axis is the retransition / displacement speed, not the amount): y is the relative speed at that progress, so the eased progress is the share
+// of the whole distance covered by then = the running integral of the speed, normalised to 1. A flat curve is constant speed (no easing); the total time stays the duration. A zero speed is floored so the
+// integral always reaches the end. Built once per curve string (64 steps).
+const rvProfileCache = new Map()
+function rvProfile(key, x) {
+  const raw = cfg[key]
+  let tab = rvProfileCache.get(raw)
+  if (!tab) {
+    const N = 64, pts = rvJson(raw, null)
+    tab = new Float32Array(N + 1)
+    for (let i = 0; i < N; i++) {
+      const u = (i + 0.5) / N
+      const y = Array.isArray(pts) && pts.length ? THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, u), 0, 1) : 0.5
+      tab[i + 1] = tab[i] + Math.max(y, 0.02)
+    }
+    for (let i = 1; i <= N; i++) tab[i] /= tab[N]
+    if (rvProfileCache.size > 100) rvProfileCache.clear()
+    rvProfileCache.set(raw, tab)
+  }
+  const f = THREE.MathUtils.clamp(x, 0, 1) * (tab.length - 1), i = Math.min(Math.floor(f), tab.length - 2)
+  return tab[i] + (tab[i + 1] - tab[i]) * (f - i)
+}
+function rvLerp(range, t) { return range.min + (range.max - range.min) * t }
+
+function rvSharedControls() {
+  const pd = { perDevice: true, onChange: () => rvQueueUi() }
+  return [
+    { key: 'rvEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: 'rvHoldOnly', label: 'On Hold Only', type: 'checkbox', def: false, ...pd },
+    { key: 'rvVelocityRange', label: 'Min / Max Velocity Tracked (Px/S)', type: 'text', def: '{"min":300,"max":3000}', ...pd },
+    // Not requested, but a raw frame-to-frame cursor speed is far too noisy to drive anything with: this is the per-frame fraction of the newest measurement that is blended into the tracked velocity (1 = no smoothing).
+    { key: 'rvVelocitySmoothing', label: 'Velocity Smoothing (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 0.35, ...pd },
+    { key: 'rvTriggerDistanceRange', label: 'Min / Max Trigger Distance (World Units)', type: 'text', def: '{"min":15,"max":90}', ...pd },
+    { key: 'rvTriggerDistanceCurve', label: 'Trigger Distance Curve (Velocity -> Max Distance)', type: 'text', def: RV_LIN, ...pd },
+    // What every distance curve measures (2026-10-15): Path Line = the hand's perpendicular distance from the line the cursor has travelled (a wake: hands beside the track move most, hands further out least / later), fixed when
+    // the cursor passes the hand; Trigger Point = the straight distance from where the cursor started moving; Live Cursor = the distance from the cursor as it is now.
+    { key: 'rvDistanceFrom', label: 'Distance Measured From', type: 'select', def: 'Path Line', options: () => ['Path Line', 'Trigger Point', 'Live Cursor'], ...pd },
+    // Displacement Start Time Curve
+    { key: 'rvStartTimeEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
+    { key: 'rvStartTimeRange', label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', ...pd },
+    { key: 'rvStartTimeCurve', label: 'Displacement Start Time Curve (Distance -> Start Time)', type: 'text', def: RV_LIN, ...pd },
+    // Displacement Speed Curve
+    { key: 'rvSpeedEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
+    { key: 'rvSpeedRange', label: 'Min / Max Displacement Speed (Ms)', type: 'text', def: '{"min":150,"max":600}', ...pd },
+    { key: 'rvSpeedCurve', label: 'Displacement Speed Curve (Distance -> Duration)', type: 'text', def: RV_LIN, ...pd },
+    // Retransition
+    { key: 'rvRetransitionEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
+    { key: 'rvRetransitionSpeedMs', label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 3000, step: 10, def: 400, ...pd },
+    { key: 'rvRetransitionSpeedCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: 'rvRetransitionSpeedRange', label: 'Min / Max Retransition Speed (Ms)', type: 'text', def: '{"min":100,"max":1000}', ...pd },
+    { key: 'rvRetransitionSpeedCurve', label: 'Retransition Speed Curve (Distance -> Duration)', type: 'text', def: RV_LIN, ...pd },
+    { key: 'rvRetransitionStartTimeCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: 'rvRetransitionStartTimeRange', label: 'Min / Max Retransition Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', ...pd },
+    { key: 'rvRetransitionStartTimeCurve', label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: RV_LIN, ...pd },
+    { key: 'rvRetransitionEasingCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: 'rvRetransitionEasingCurve', label: 'Retransition Easing Curve (Progress -> Retransition Speed)', type: 'text', def: RV_FLAT_HALF, ...pd },
+    // Easing
+    { key: 'rvEasingCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: 'rvEasingCurve', label: 'Easing Curve (Progress -> Displacement Speed)', type: 'text', def: RV_FLAT_HALF, ...pd },
+    // The list of Displacement Angle sets (bookkeeping; the set groups and their Add button are inserted at this row, i.e. BELOW Retransition and Easing - 2026-10-15, direct request).
+    { key: 'rvSets', label: 'Displacement Angle Sets (internal)', type: 'text', def: '[]', onChange: () => rvReconcileSets() }
+  ]
+}
+function rvSetControls(S) {
+  const pd = { perDevice: true, onChange: () => rvQueueUi() }
+  const effect = (name, defRange, label, unit) => [
+    { key: `${S}${name}Enabled`, label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: `${S}${name}Range`, label: `Min / Max ${label} (${unit})`, type: 'text', def: defRange, ...pd },
+    { key: `${S}${name}Curve`, label: `${label} Curve (Velocity -> ${label})`, type: 'text', def: RV_LIN, ...pd },
+    { key: `${S}${name}DistCurve`, label: `${label} Distance Curve (Distance -> Scaler)`, type: 'text', def: RV_FLAT1, ...pd }
+  ]
+  return [
+    { key: `${S}Enabled`, label: 'On/Off', type: 'checkbox', def: true, ...pd },
+    { key: `${S}Angle`, label: 'Displacement Angle (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0, ...pd },
+    { key: `${S}DisplacementRange`, label: 'Min / Max Displacement (World Units)', type: 'text', def: '{"min":0,"max":5}', ...pd },
+    { key: `${S}DisplacementCurve`, label: 'Displacement Curve (Velocity -> Displacement)', type: 'text', def: RV_LIN, ...pd },
+    { key: `${S}DisplacementDistCurve`, label: 'Displacement Distance Curve (Distance -> Scaler)', type: 'text', def: RV_FLAT1, ...pd },
+    { key: `${S}TriggerAngleRange`, label: 'Min / Max Trigger Angle (Deg)', type: 'text', def: '{"min":0,"max":0}', ...pd },
+    { key: `${S}AngleCurveEnabled`, label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: `${S}AngleCurveRange`, label: 'Min / Max Displacement Angle (Deg)', type: 'text', def: '{"min":0,"max":180}', ...pd },
+    { key: `${S}AngleCurve`, label: 'Displacement Angle Curve (Trigger Angle -> Displacement Angle)', type: 'text', def: RV_LIN, ...pd },
+    ...effect('Arm', '{"min":0,"max":12}', 'Rotation', 'Deg'),
+    ...effect('Splay', '{"min":0,"max":25}', 'Splay', 'Deg'),
+    ...effect('Crop', '{"min":0,"max":0.4}', 'Crop', '0-1'),
+    ...effect('Curl', '{"min":0,"max":40}', 'Finger Curl', '%'),
+    { key: `${S}CurlMax`, label: 'Max Finger Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 100, ...pd }
+  ]
+}
+function rvQueueUi() {
+  if (rvUiQueued) return
+  rvUiQueued = true
+  Promise.resolve().then(() => { rvUiQueued = false; rvRefreshUi() })
+}
+function rvListFromCfg() {
+  let l = []
+  try { l = JSON.parse(cfg.rvSets || '[]') } catch (e) { l = [] }
+  return Array.isArray(l) ? l.filter((e) => e && typeof e.prefix === 'string') : []
+}
+function rvPersistSets() {
+  const json = JSON.stringify(rvSetList)
+  cfg.rvSets = json
+  rvReconcileBusy = true
+  try { syncValue('rvSets', json) } catch (e) { /* no panel: cfg already holds it */ } finally { rvReconcileBusy = false }
+}
+function rvGateHeader(g, enabledKey) {
+  const enabledRow = g.querySelector(`.dp-row[data-key="${enabledKey}"]`)
+  const header = g.querySelector(':scope > .dp-group-header')
+  const t = header && header.querySelector(':scope > .dp-group-title-text')
+  if (!enabledRow || !t || header.contains(enabledRow)) return
+  enabledRow.classList.add('dp-group-gate-row')
+  enabledRow.querySelectorAll('.dp-dynamic-device-checkbox, .dp-row-handle').forEach((el) => el.remove())
+  t.insertAdjacentElement('afterend', enabledRow)
+}
+function rvCurveRow(key, caption, defaultPoints) { const r = document.querySelector(`.dp-row[data-key="${key}"]`); if (r) buildGenericCurveWidget(r, { caption, defaultPoints }) }
+function rvRangeRow(key, opts) { const r = document.querySelector(`.dp-row[data-key="${key}"]`); if (r) buildGenericRangeBarWidget(r, opts) }
+// Builds one Displacement Angle set group (runtime state is just cfg; a set is nothing but its controls).
+function rvRegisterSet(prefix, title, mainBody, beforeEl) {
+  const g = renderDynamicGroup({ title, controls: rvSetControls(prefix) }) // seeds cfg regardless of a panel; null without one
+  if (!g || !mainBody) return null
+  g.dataset.rvSetPrefix = prefix
+  mainBody.insertBefore(g, beforeEl || null)
+  const S = prefix
+  const gb = g.querySelector(':scope > .dp-group-body')
+  rvRangeRow(`${S}DisplacementRange`, { trackMin: 0, trackMax: 60, unit: 'wu', decimals: 1, defaultValue: { min: 0, max: 5 } })
+  rvCurveRow(`${S}DisplacementCurve`, RV_CURVE_X_VELOCITY + '  ·  Y: Displacement (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvCurveRow(`${S}DisplacementDistCurve`, RV_CURVE_X_DIST + '  ·  Y: Displacement Scaler (0 - 1)', [{ x: 0, y: 1 }, { x: 1, y: 1 }])
+  rvRangeRow(`${S}TriggerAngleRange`, { trackMin: 0, trackMax: 180, unit: 'deg', defaultValue: { min: 0, max: 0 } })
+  rvRangeRow(`${S}AngleCurveRange`, { trackMin: -360, trackMax: 360, unit: 'deg', defaultValue: { min: 0, max: 180 } })
+  rvCurveRow(`${S}AngleCurve`, 'X: Hand Angle To The Cursor Path (Min -> Max Trigger Angle)  ·  Y: Displacement Angle (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  const effects = [['Arm', 'Velocity Arm Rotation', 'Rotation', 60, 'deg', 1, { min: 0, max: 12 }], ['Splay', 'Velocity Wrist Splay', 'Splay', 90, 'deg', 1, { min: 0, max: 25 }], ['Crop', 'Velocity Wrist Crop', 'Crop', 1, '', 2, { min: 0, max: 0.4 }], ['Curl', 'Velocity Finger Curl', 'Finger Curl', 200, '%', 0, { min: 0, max: 40 }]]
+  effects.forEach(([name, , label, trackMax, unit, decimals, defVal]) => {
+    rvRangeRow(`${S}${name}Range`, { trackMin: name === 'Curl' ? -200 : (name === 'Arm' || name === 'Splay' ? -trackMax : 0), trackMax, unit: unit || 'x', decimals, defaultValue: defVal })
+    rvCurveRow(`${S}${name}Curve`, RV_CURVE_X_VELOCITY + `  ·  Y: ${label} (0 = Min, 1 = Max)`, [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+    rvCurveRow(`${S}${name}DistCurve`, RV_CURVE_X_DIST + `  ·  Y: ${label} Scaler (0 - 1)`, [{ x: 0, y: 1 }, { x: 1, y: 1 }])
+  })
+  wrapGatedSubgroup(`${S}AngleCurveEnabled`, [`${S}AngleCurveRange`, `${S}AngleCurve`], 'Displacement Angle Curve')
+  effects.forEach(([name, subTitle]) => wrapGatedSubgroup(`${S}${name}Enabled`, [`${S}${name}Range`, `${S}${name}Curve`, `${S}${name}DistCurve`, ...(name === 'Curl' ? [`${S}CurlMax`] : [])], subTitle))
+  rvGateHeader(g, `${S}Enabled`)
+  g.classList.add('collapsed')
+  g.querySelectorAll('.dp-group').forEach((sg) => sg.classList.add('collapsed'))
+  return g
+}
+// The whole feature's group, nested at the end of Cursor Tracking. Called once from onRestore (after the settings landed in cfg); safe with no panel (it then only seeds cfg).
+async function setupResponsiveVelocity() {
+  // The list control does not exist yet (this builds it), so the restored value is read straight from the restored settings.
+  const savedSets = peekRestoredValue('rvSets')
+  if (typeof savedSets === 'string' && cfg.rvSets === undefined) cfg.rvSets = savedSets
+  rvSetList = rvListFromCfg()
+  if (!rvSetList.length) rvSetList = [{ prefix: 'rvSet1', title: 'Displacement Angle to Velocity 1' }]
+  rvNextSetN = Math.max(1, ...rvSetList.map((e) => { const m = /^rvSet(\d+)$/.exec(e.prefix); return m ? parseInt(m[1], 10) + 1 : 1 }))
+  const hostGroup = document.querySelector('.dp-group[data-key="Cursor Tracking"]')
+  const hostBody = hostGroup && hostGroup.querySelector(':scope > .dp-group-body')
+  // A leftover placeholder of this group from the saved layout (applyOrder() runs before this) is removed: the group is rebuilt from cfg every load.
+  if (hostBody) hostBody.querySelectorAll('.dp-group[data-key="Responsive Velocity"]').forEach((g) => g.remove())
+  const g = renderDynamicGroup({ title: 'Responsive Velocity', controls: rvSharedControls() })
+  const sets = rvSetList.slice()
+  if (!g || !hostBody) { sets.forEach((s) => renderDynamicGroup({ title: s.title, controls: rvSetControls(s.prefix) })); rvPersistSets(); return }
+  hostBody.appendChild(g)
+  g.dataset.rvMain = '1'
+  const body = g.querySelector(':scope > .dp-group-body')
+  const anchorRow = g.querySelector('.dp-row[data-key="rvSets"]')
+  if (anchorRow) anchorRow.style.display = 'none'
+  rvRangeRow('rvVelocityRange', { trackMin: 0, trackMax: 8000, unit: 'px/s', defaultValue: { min: 300, max: 3000 } })
+  rvRangeRow('rvTriggerDistanceRange', { trackMin: 0, trackMax: 400, unit: 'wu', defaultValue: { min: 15, max: 90 } })
+  rvCurveRow('rvTriggerDistanceCurve', RV_CURVE_X_VELOCITY + '  ·  Y: Max Trigger Distance (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvRangeRow('rvStartTimeRange', { trackMin: 0, trackMax: 2000, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+  rvCurveRow('rvStartTimeCurve', RV_CURVE_X_DIST + '  ·  Y: Start Time (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvRangeRow('rvSpeedRange', { trackMin: 0, trackMax: 3000, unit: 'ms', defaultValue: { min: 150, max: 600 } })
+  rvCurveRow('rvSpeedCurve', RV_CURVE_X_DIST + '  ·  Y: Displacement Duration (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvRangeRow('rvRetransitionSpeedRange', { trackMin: 0, trackMax: 3000, unit: 'ms', defaultValue: { min: 100, max: 1000 } })
+  rvCurveRow('rvRetransitionSpeedCurve', RV_CURVE_X_DIST + '  ·  Y: Retransition Duration (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvRangeRow('rvRetransitionStartTimeRange', { trackMin: 0, trackMax: 2000, unit: 'ms', defaultValue: { min: 0, max: 300 } })
+  rvCurveRow('rvRetransitionStartTimeCurve', RV_CURVE_X_DIST + '  ·  Y: Retransition Start Time (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  rvCurveRow('rvRetransitionEasingCurve', 'X: Retransition Progress  ·  Y: Retransition Speed (0 = slowest, 1 = fastest; the total time stays the Retransition Speed)', [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }])
+  rvCurveRow('rvEasingCurve', 'X: Displacement Progress  ·  Y: Displacement Speed (0 = slowest, 1 = fastest; the total time stays the Displacement Speed)', [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }])
+  wrapGatedSubgroup('rvStartTimeEnabled', ['rvStartTimeRange', 'rvStartTimeCurve'], 'Displacement Start Time Curve')
+  wrapGatedSubgroup('rvSpeedEnabled', ['rvSpeedRange', 'rvSpeedCurve'], 'Displacement Speed Curve')
+  wrapGatedSubgroup('rvRetransitionEnabled', ['rvRetransitionSpeedMs', 'rvRetransitionSpeedCurveEnabled', 'rvRetransitionSpeedRange', 'rvRetransitionSpeedCurve', 'rvRetransitionStartTimeCurveEnabled', 'rvRetransitionStartTimeRange', 'rvRetransitionStartTimeCurve', 'rvRetransitionEasingCurveEnabled', 'rvRetransitionEasingCurve'], 'Retransition')
+  wrapGatedSubgroup('rvRetransitionSpeedCurveEnabled', ['rvRetransitionSpeedRange', 'rvRetransitionSpeedCurve'], 'Retransition Speed Curve')
+  wrapGatedSubgroup('rvRetransitionStartTimeCurveEnabled', ['rvRetransitionStartTimeRange', 'rvRetransitionStartTimeCurve'], 'Retransition Start Time Curve')
+  wrapGatedSubgroup('rvRetransitionEasingCurveEnabled', ['rvRetransitionEasingCurve'], 'Retransition Easing Curve')
+  wrapGatedSubgroup('rvEasingCurveEnabled', ['rvEasingCurve'], 'Easing')
+  rvGateHeader(g, 'rvEnabled')
+  // The set groups and their Add button go where the hidden bookkeeping row is (between the timing groups and Retransition / Easing).
+  const addRow = document.createElement('div')
+  addRow.className = 'dp-row dp-rv-add-row'
+  const btn = document.createElement('button')
+  btn.type = 'button'
+  btn.textContent = '+ Add Displacement Angle Set'
+  btn.addEventListener('click', () => rvAddSet())
+  addRow.appendChild(btn)
+  body.insertBefore(addRow, anchorRow ? anchorRow.nextSibling : null)
+  body.querySelectorAll(':scope > .dp-group[data-rv-set-prefix]').forEach((x) => x.remove())
+  sets.forEach((s) => rvRegisterSet(s.prefix, s.title, body, addRow))
+  g.classList.add('collapsed')
+  g.querySelectorAll('.dp-group').forEach((sg) => sg.classList.add('collapsed'))
+  rvPersistSets()
+  applyTextOverrides()
+  rvRefreshUi()
+}
+// A saved layout cannot place anything inside Responsive Velocity or a Displacement Angle set (2026-10-15, direct report: duplicate empty Retransition / Easing groups). Those groups are rebuilt from code on every load, but
+// their subgroups carry the same titles as a Custom Click Function's own (Retransition, Easing, ...), and applyOrder() finds a saved group by title anywhere in the panel: it pulled a function's real groups and rows
+// (custom29...) into this group, and left empty placeholders behind for the duplicates. Dropping what a saved layout says about their insides (the group itself keeps its place and open / closed state) stops both,
+// for the live settings and for every named saved setting alike.
+function sanitizeVelocitySavedOrder(order) {
+  if (!Array.isArray(order)) return order
+  let copy = null
+  const clean = (nodes) => nodes.forEach((n) => {
+    if (!n || typeof n !== 'object') return
+    const k = typeof n.key === 'string' ? n.key : ''
+    if (k === 'Responsive Velocity' || k.startsWith('Displacement Angle to Velocity')) {
+      if ((n.items && n.items.length) || (n.settings && n.settings.length) || (n.subgroups && n.subgroups.length)) { n.items = []; n.settings = []; n.subgroups = [] }
+      return
+    }
+    ;(n.items || []).forEach((it) => { if (it && it.type === 'group' && it.group) clean([it.group]) })
+    if (Array.isArray(n.subgroups)) clean(n.subgroups)
+  })
+  const needs = (nodes) => nodes.some((n) => n && typeof n === 'object' && (n.key === 'Responsive Velocity' || (typeof n.key === 'string' && n.key.startsWith('Displacement Angle to Velocity')) || needs((n.items || []).filter((it) => it && it.group).map((it) => it.group)) || (Array.isArray(n.subgroups) && needs(n.subgroups))))
+  if (!needs(order)) return order
+  copy = JSON.parse(JSON.stringify(order))
+  clean(copy)
+  return copy
+}
+function rvMainBody() { const g = document.querySelector('.dp-group[data-rv-main]'); return g ? g.querySelector(':scope > .dp-group-body') : null }
+function rvAddSet() {
+  const n = rvNextSetN++
+  const prefix = `rvSet${n}`
+  const entry = { prefix, title: `Displacement Angle to Velocity ${n}` }
+  rvSetList.push(entry)
+  const body = rvMainBody()
+  const addRow = body && body.querySelector(':scope > .dp-rv-add-row')
+  rvRegisterSet(prefix, entry.title, body, addRow)
+  rvPersistSets()
+  rvRefreshUi()
+  saveCurrentSettings()
+}
+// A named saved state / Undo can change the list of sets: bring the panel groups in line with it.
+function rvReconcileSets() {
+  if (rvReconcileBusy) return
+  const want = rvListFromCfg()
+  const body = rvMainBody()
+  if (!body) return
+  const have = new Set(rvSetList.map((e) => e.prefix))
+  const wantSet = new Set(want.map((e) => e.prefix))
+  rvSetList.filter((e) => !wantSet.has(e.prefix)).forEach((e) => {
+    const g = body.querySelector(`:scope > .dp-group[data-rv-set-prefix="${e.prefix}"]`)
+    if (g) g.remove()
+    forgetControlsWithPrefix(e.prefix)
+  })
+  const addRow = body.querySelector(':scope > .dp-rv-add-row')
+  want.filter((e) => !have.has(e.prefix)).forEach((e) => rvRegisterSet(e.prefix, e.title || e.prefix, body, addRow))
+  rvSetList = want
+  rvNextSetN = Math.max(rvNextSetN, ...want.map((e) => { const m = /^rvSet(\d+)$/.exec(e.prefix); return m ? parseInt(m[1], 10) + 1 : 1 }))
+  rvRefreshUi()
+}
+// The panel's own Delete button removed a group: keep the set list (and the stored values) in line.
+function cleanupDeletedVelocityGroup(target) {
+  if (!target || !target.dataset) return
+  if (target.dataset.rvSetPrefix) {
+    const prefix = target.dataset.rvSetPrefix
+    rvSetList = rvSetList.filter((e) => e.prefix !== prefix)
+    forgetControlsWithPrefix(prefix)
+    rvPersistSets()
+    hands.forEach((h) => { if (h._rv && h._rv.s) delete h._rv.s[prefix] })
+    rvRefreshUi()
+  } else if (target.dataset.rvMain) {
+    cfg.rvEnabled = false
+    rvSetList = []
+    forgetControlsWithPrefix('rv')
+    rvResetAll()
+  }
+}
+// Show / hide the contents of every switched-off group, and flag conflicting sets in red.
+function rvToggleBody(g, on) { const b = g && g.querySelector(':scope > .dp-group-body'); if (b) b.classList.toggle('dp-startup-off', !on) }
+function rvConflicts() {
+  const out = { sets: new Set(), rows: new Set(), main: new Set() }
+  if (!document.getElementById('dpStartupStyle')) { const st = document.createElement('style'); st.id = 'dpStartupStyle'; st.textContent = '.dp-startup-off > * { display: none !important }'; document.head.appendChild(st) }
+  const vr = rvRange('rvVelocityRange', 300, 3000)
+  if (!(vr.min < vr.max)) out.main.add('rvVelocityRange')
+  const dr = rvRange('rvTriggerDistanceRange', 15, 90)
+  if (dr.min > dr.max) out.main.add('rvTriggerDistanceRange')
+  const on = rvSetList.filter((e) => cfg[`${e.prefix}Enabled`] !== false)
+  on.forEach((e) => {
+    const tr = rvRange(`${e.prefix}TriggerAngleRange`, 0, 0)
+    if (tr.min > tr.max) { out.sets.add(e.prefix); out.rows.add(`${e.prefix}TriggerAngleRange`) }
+  })
+  // Two sets that act on the same hands (overlapping trigger angles) with exactly opposite directions and the same amounts cancel each other out: that is the one case where stacking gives nothing.
+  for (let i = 0; i < on.length; i++) for (let j = i + 1; j < on.length; j++) {
+    const a = on[i].prefix, b = on[j].prefix
+    const ta = rvRange(`${a}TriggerAngleRange`, 0, 0), tb = rvRange(`${b}TriggerAngleRange`, 0, 0)
+    const allA = ta.min === 0 && ta.max === 0, allB = tb.min === 0 && tb.max === 0
+    const overlap = allA || allB || (ta.min <= tb.max && tb.min <= ta.max)
+    const da = rvRange(`${a}DisplacementRange`, 0, 5), db = rvRange(`${b}DisplacementRange`, 0, 5)
+    const opposite = Math.abs((((rvNum(`${a}Angle`, 0) - rvNum(`${b}Angle`, 0)) % 360) + 360) % 360 - 180) < 0.5
+    if (overlap && opposite && !cfg[`${a}AngleCurveEnabled`] && !cfg[`${b}AngleCurveEnabled`] && Math.abs(da.min - db.min) < 1e-6 && Math.abs(da.max - db.max) < 1e-6 && (da.min !== 0 || da.max !== 0)) {
+      out.sets.add(a); out.sets.add(b); out.rows.add(`${a}Angle`); out.rows.add(`${b}Angle`)
+    }
+  }
+  return out
+}
+function rvRefreshUi() {
+  const mainG = document.querySelector('.dp-group[data-rv-main]')
+  if (!mainG) return
+  const c = rvConflicts()
+  rvToggleBody(mainG, !!cfg.rvEnabled)
+  ;[['Displacement Start Time Curve', 'rvStartTimeEnabled'], ['Displacement Speed Curve', 'rvSpeedEnabled'], ['Retransition', 'rvRetransitionEnabled'], ['Retransition Speed Curve', 'rvRetransitionSpeedCurveEnabled'], ['Retransition Start Time Curve', 'rvRetransitionStartTimeCurveEnabled'], ['Retransition Easing Curve', 'rvRetransitionEasingCurveEnabled'], ['Easing', 'rvEasingCurveEnabled']].forEach(([title, key]) => {
+    const row = mainG.querySelector(`.dp-row[data-key="${key}"]`)
+    const sg = row && row.closest('.dp-group')
+    if (sg && sg !== mainG) rvToggleBody(sg, !!cfg[key])
+  })
+  mainG.querySelectorAll('.dp-row').forEach((r) => r.classList.remove('dp-rv-conflict-row'))
+  c.main.forEach((k) => { const r = mainG.querySelector(`.dp-row[data-key="${k}"]`); if (r) r.classList.add('dp-rv-conflict-row') })
+  mainG.querySelectorAll(':scope > .dp-group-body > .dp-group[data-rv-set-prefix]').forEach((sg) => {
+    const p = sg.dataset.rvSetPrefix
+    rvToggleBody(sg, cfg[`${p}Enabled`] !== false)
+    const bad = c.sets.has(p)
+    sg.classList.toggle('dp-rv-conflict', bad)
+    const header = sg.querySelector(':scope > .dp-group-header')
+    if (header) header.title = bad ? 'Conflict: this set cancels another set exactly, or has a Min Trigger Angle above its Max.' : ''
+    ;['Arm', 'Splay', 'Crop', 'Curl', 'AngleCurve'].forEach((n) => {
+      const row = sg.querySelector(`.dp-row[data-key="${p}${n}Enabled"]`)
+      const sub = row && row.closest('.dp-group')
+      if (sub && sub !== sg) rvToggleBody(sub, !!cfg[`${p}${n}Enabled`])
+    })
+    sg.querySelectorAll('.dp-row').forEach((r) => r.classList.toggle('dp-rv-conflict-row', c.rows.has(r.dataset.key)))
+  })
+}
+
+// ---- runtime ----
+function rvResetAll() {
+  hands.forEach((h) => {
+    if (!h._rv && !h._rvSplay && !h._rvCurl && !h._rvCrop) return
+    h._rv = null
+    if (h._rvSplay || h._rvCurl) h._rvRepose = true
+    h._rvSplay = 0; h._rvCurl = 0; h._rvCrop = 0
+    if (h._rvDisp) h._rvDisp.set(0, 0, 0)
+    if (h._rvTilt) h._rvTilt.set(0, 0, 0)
+  })
+  rvHasState = false
+  rvTrigWas = false
+  rvTrail = []
+}
+// Shortest distance (screen px) from a point to the cursor's path: the recorded track (points joined in order, ending at the cursor's current position (px, py)) plus the straight line ahead of the cursor along its direction of travel.
+function rvPathDistPx(hx, hy, px, py) {
+  const t = rvTrail
+  let best = Infinity
+  for (let i = 0; i < t.length; i++) {
+    const ax = t[i][0], ay = t[i][1]
+    const bx = i + 1 < t.length ? t[i + 1][0] : px, by = i + 1 < t.length ? t[i + 1][1] : py
+    const vx = bx - ax, vy = by - ay, L2 = vx * vx + vy * vy
+    const u = L2 > 1e-9 ? THREE.MathUtils.clamp(((hx - ax) * vx + (hy - ay) * vy) / L2, 0, 1) : 0
+    const d = Math.hypot(hx - (ax + vx * u), hy - (ay + vy * u))
+    if (d < best) best = d
+  }
+  // ...and the line the cursor is heading along, ahead of it: a hand the cursor has not reached yet is at its sideways distance from that line (otherwise it would read its distance to the cursor itself, which is far).
+  const ft = Math.max(0, (hx - px) * rvDirX + (hy - py) * rvDirY)
+  best = Math.min(best, Math.hypot(hx - (px + rvDirX * ft), hy - (py + rvDirY * ft)))
+  return best === Infinity ? Math.hypot(hx - px, hy - py) : best
+}
+function updateResponsiveVelocity(nowMs) {
+  if (!cfg.rvEnabled || !rvSetList.length) { if (rvHasState) rvResetAll(); rvLastMs = 0; rvVx = rvVy = rvSpeed = 0; return }
+  const W = window.innerWidth, H = window.innerHeight
+  if (!(W > 0 && H > 0)) return
+  const px = (cursorNDC.x + 1) * 0.5 * W, py = (1 - cursorNDC.y) * 0.5 * H
+  const dt = rvLastMs ? THREE.MathUtils.clamp(nowMs - rvLastMs, 1, 100) : 16
+  if (rvLastMs) {
+    const sm = THREE.MathUtils.clamp(rvNum('rvVelocitySmoothing', 0.35), 0.02, 1)
+    rvVx += ((px - rvLastPx) / dt * 1000 - rvVx) * sm
+    rvVy += ((py - rvLastPy) / dt * 1000 - rvVy) * sm
+  }
+  rvLastMs = nowMs; rvLastPx = px; rvLastPy = py
+  rvSpeed = Math.hypot(rvVx, rvVy)
+  if (rvSpeed > 1e-3) { rvDirX = rvVx / rvSpeed; rvDirY = rvVy / rvSpeed }
+  const vr = rvRange('rvVelocityRange', 300, 3000)
+  const trigActive = rvSpeed >= vr.min && rvSpeed > 0 && (!cfg.rvHoldOnly || leftPointerDown)
+  // Every distance curve measures from the Trigger Cursor, not the live cursor (2026-10-15, direct request): the cursor keeps moving during a sweep and a live distance changed the animation / retransition speed (and the
+  // amount scalers) under the hands' feet. The point is fixed when the speed first reaches the minimum and stays until it drops below it again.
+  if (trigActive && !rvTrigWas) { rvTrigPx = px; rvTrigPy = py; rvTrail = [[px, py]] }
+  else if (trigActive) { const l = rvTrail[rvTrail.length - 1]; if (!l || Math.hypot(px - l[0], py - l[1]) >= 3) { rvTrail.push([px, py]); if (rvTrail.length > 600) rvTrail.shift() } }
+  const rvm = cfg.rvDistanceFrom, distMode = rvm === 'Trigger Point' ? 1 : (rvm === 'Live Cursor' ? 2 : 0)
+  rvTrigWas = trigActive
+  const vn = THREE.MathUtils.clamp((rvSpeed - vr.min) / Math.max(vr.max - vr.min, 1e-6), 0, 1)
+  const dr = rvRange('rvTriggerDistanceRange', 15, 90)
+  const D = trigActive ? Math.max(rvLerp(dr, rvCurveY('rvTriggerDistanceCurve', vn)), 0) : 0
+  const unitsPerPx = screenUnitsPerPx
+  if (!(unitsPerPx > 0)) return
+  const startOn = cfg.rvStartTimeEnabled !== false, speedOn = cfg.rvSpeedEnabled !== false
+  const startR = rvRange('rvStartTimeRange', 0, 300), speedR = rvRange('rvSpeedRange', 150, 600)
+  const retOn = cfg.rvRetransitionEnabled !== false
+  const retSpeedCurveOn = !!cfg.rvRetransitionSpeedCurveEnabled, retStartCurveOn = !!cfg.rvRetransitionStartTimeCurveEnabled
+  const retSpeedR = rvRange('rvRetransitionSpeedRange', 100, 1000), retStartR = rvRange('rvRetransitionStartTimeRange', 0, 300)
+  const retFlatMs = rvNum('rvRetransitionSpeedMs', 400)
+  const easeOn = !!cfg.rvEasingCurveEnabled, retEaseOn = !!cfg.rvRetransitionEasingCurveEnabled
+  _rvR.setFromMatrixColumn(camera.matrixWorld, 0)
+  _rvU.setFromMatrixColumn(camera.matrixWorld, 1)
+  const sets = rvSetList.map((e) => {
+    const S = e.prefix
+    return {
+      S, on: cfg[`${S}Enabled`] !== false, angle: rvNum(`${S}Angle`, 0), disp: rvRange(`${S}DisplacementRange`, 0, 5), trig: rvRange(`${S}TriggerAngleRange`, 0, 0),
+      angleCurve: !!cfg[`${S}AngleCurveEnabled`], angleR: rvRange(`${S}AngleCurveRange`, 0, 180),
+      arm: !!cfg[`${S}ArmEnabled`] && rvRange(`${S}ArmRange`, 0, 12), splay: !!cfg[`${S}SplayEnabled`] && rvRange(`${S}SplayRange`, 0, 25),
+      crop: !!cfg[`${S}CropEnabled`] && rvRange(`${S}CropRange`, 0, 0.4), curl: !!cfg[`${S}CurlEnabled`] && rvRange(`${S}CurlRange`, 0, 40), curlMax: rvNum(`${S}CurlMax`, 100),
+      kAng: `${S}AngleCurve`, kDD: `${S}DisplacementDistCurve`, kD: `${S}DisplacementCurve`, kA: `${S}ArmCurve`, kAD: `${S}ArmDistCurve`, kS: `${S}SplayCurve`, kSD: `${S}SplayDistCurve`, kC: `${S}CropCurve`, kCD: `${S}CropDistCurve`, kL: `${S}CurlCurve`, kLD: `${S}CurlDistCurve`
+    }
+  })
+  let any = false
+  for (let hi = 0; hi < hands.length; hi++) {
+    const hand = hands[hi]
+    let rv = hand._rv
+    if (!trigActive && !(rv && rv.live)) continue
+    if (!rv) { rv = hand._rv = { s: {}, live: false }; if (!hand._rvDisp) { hand._rvDisp = new THREE.Vector3(); hand._rvTilt = new THREE.Vector3() } }
+    // Geometry, measured from the hand's grid position so the hand's own displacement never feeds back into it.
+    const bp = hand.basePosition || hand.wrapper.position
+    _rvHP.copy(bp).project(camera)
+    const rx = (_rvHP.x + 1) * 0.5 * W - px, ry = (1 - _rvHP.y) * 0.5 * H - py
+    const dist = Math.hypot(rx, ry) * unitsPerPx
+    const cross = rvDirX * ry - rvDirY * rx, dot = rvDirX * rx + rvDirY * ry
+    const angAbs = Math.abs(Math.atan2(cross, dot)) * 180 / Math.PI
+    const side = cross >= 0 ? 1 : -1
+    // x of every distance curve: the hand's distance from the TRIGGER cursor, Min Trigger Distance -> 0, Max Trigger Distance -> 1 (constant for the whole sweep).
+    const distT = Math.hypot((_rvHP.x + 1) * 0.5 * W - rvTrigPx, (1 - _rvHP.y) * 0.5 * H - rvTrigPy) * unitsPerPx
+    const nd = dr.max > dr.min ? THREE.MathUtils.clamp((distT - dr.min) / (dr.max - dr.min), 0, 1) : 0
+    const ndLive = dr.max > dr.min ? THREE.MathUtils.clamp((dist - dr.min) / (dr.max - dr.min), 0, 1) : 0
+    let ndPath = -1 // this hand's distance from the cursor path, worked out once, at its onset
+    const dispSum = hand._rvDisp.set(0, 0, 0), tiltSum = hand._rvTilt.set(0, 0, 0)
+    let splay = 0, crop = 0, curl = 0, ceil = Infinity, live = false
+    for (let si = 0; si < sets.length; si++) {
+      const c = sets[si]
+      let st = rv.s[c.S]
+      if (!st) st = rv.s[c.S] = { p: 0, wasTrig: false, onAt: 0, delay: 0, dur: 0, offAt: 0, rdelay: 0, rdur: 0, phase: 0, armed: true, nd: 0, disp: 0, arm: 0, splay: 0, crop: 0, curl: 0, ceil: 100, wx: 0, wy: 0, wz: 0 }
+      const angleOk = (c.trig.min === 0 && c.trig.max === 0) || (angAbs >= c.trig.min && angAbs <= c.trig.max)
+      const trig = trigActive && c.on && dist <= D && angleOk
+      // x of every distance curve for this set (see Distance Measured From). Path Line is fixed when the cursor passes the hand, so the speeds, start times and scalers stay put as the cursor moves on.
+      const startOnset = trig && st.armed !== false // a (new) trigger: the hand is triggered after having stopped being triggered since its last one
+      let ndU
+      if (distMode === 1) ndU = nd
+      else if (distMode === 2) ndU = ndLive
+      else {
+        if (startOnset) {
+          if (ndPath < 0) { const dpx = rvPathDistPx((_rvHP.x + 1) * 0.5 * W, (1 - _rvHP.y) * 0.5 * H, px, py); ndPath = dr.max > dr.min ? THREE.MathUtils.clamp((dpx * unitsPerPx - dr.min) / (dr.max - dr.min), 0, 1) : 0 }
+          st.ndPath = ndPath
+        }
+        ndU = st.ndPath !== undefined ? st.ndPath : nd
+      }
+      if (startOnset) {
+        // Everything about the effect - direction, amounts, distance x, speeds - is fixed at the moment the hand is triggered (direct request: "its speed and etc is determined fully by the moment it gets triggered"). The cursor moving on, or staying inside the
+        // trigger distance, changes nothing; only a NEW trigger (the cursor coming back around the hand) captures new values and pushes it further, from where it is.
+        let theta = c.angle
+        if (c.angleCurve) {
+          const span = c.trig.max - c.trig.min
+          theta = rvLerp(c.angleR, rvCurveY(c.kAng, span > 1e-6 ? (angAbs - c.trig.min) / span : 0))
+        }
+        const th = theta * Math.PI / 180, ct = Math.cos(th), sn = Math.sin(th)
+        const ax = -rvDirY * side, ay = rvDirX * side // unit vector away from the path (screen px, y down)
+        const dx = ax * ct + rvDirX * sn, dy = ay * ct + rvDirY * sn
+        st.wx = _rvR.x * dx - _rvU.x * dy; st.wy = _rvR.y * dx - _rvU.y * dy; st.wz = _rvR.z * dx - _rvU.z * dy
+        const dsc = rvCurveY(c.kDD, ndU)
+        st.disp = rvLerp(c.disp, rvCurveY(c.kD, vn)) * dsc
+        st.arm = c.arm ? rvLerp(c.arm, rvCurveY(c.kA, vn)) * rvCurveY(c.kAD, ndU) : 0
+        st.splay = c.splay ? rvLerp(c.splay, rvCurveY(c.kS, vn)) * rvCurveY(c.kSD, ndU) : 0
+        st.crop = c.crop ? rvLerp(c.crop, rvCurveY(c.kC, vn)) * rvCurveY(c.kCD, ndU) : 0
+        st.curl = c.curl ? rvLerp(c.curl, rvCurveY(c.kL, vn)) * rvCurveY(c.kLD, ndU) : 0
+        st.ceil = c.curlMax
+        st.nd = ndU
+      }
+      // Sequence (2026-10-15, direct request: hands already triggered finish their sequence even when the cursor has moved away). A hand that is triggered starts an onset: its start delay, then progress 0 -> 1 over
+      // the Displacement Speed (phase 1), which nothing the cursor does afterwards can interrupt. When the progress reaches 1 it turns into the retransition by itself (phase 2: its start delay, then 1 -> 0 over the
+      // Retransition Speed). The live test (distance / angle / velocity) only decides WHETHER a hand is triggered; a hand has to stop being triggered once before it can be triggered again, and a new trigger starts a new onset from the current progress.
+      if (startOnset) { st.phase = 1; st.armed = false; st.onAt = nowMs; st.delay = startOn ? rvLerp(startR, rvCurveY('rvStartTimeCurve', ndU)) : 0; st.dur = speedOn ? rvLerp(speedR, rvCurveY('rvSpeedCurve', ndU)) : 0 }
+      if (!trig) st.armed = true
+      if (st.phase === 1) {
+        if (nowMs - st.onAt >= st.delay) st.p = st.dur > 0 ? Math.min(1, st.p + dt / st.dur) : 1
+        if (st.p >= 1) {
+          st.p = 1; st.phase = 2; st.offAt = nowMs
+          st.rdelay = retOn && retStartCurveOn ? rvLerp(retStartR, rvCurveY('rvRetransitionStartTimeCurve', st.nd)) : 0
+          st.rdur = retSpeedCurveOn ? rvLerp(retSpeedR, rvCurveY('rvRetransitionSpeedCurve', st.nd)) : retFlatMs
+          if (!retOn) { st.p = 0; st.phase = 0 }
+        }
+      } else if (st.phase === 2) {
+        if (nowMs - st.offAt >= st.rdelay) st.p = st.rdur > 0 ? Math.max(0, st.p - dt / st.rdur) : 0
+        if (st.p <= 0) { st.p = 0; st.phase = 0 }
+      }
+      st.wasTrig = trig
+      if (!st.phase && st.p <= 0) continue
+      live = true
+      const w = st.phase === 1 ? (easeOn ? rvProfile('rvEasingCurve', st.p) : st.p) : (retEaseOn ? 1 - rvProfile('rvRetransitionEasingCurve', 1 - st.p) : st.p)
+      if (st.disp) dispSum.set(dispSum.x + st.wx * st.disp * w, dispSum.y + st.wy * st.disp * w, dispSum.z + st.wz * st.disp * w)
+      if (st.arm) tiltSum.set(tiltSum.x + st.wx * st.arm * w, tiltSum.y + st.wy * st.arm * w, tiltSum.z + st.wz * st.arm * w)
+      splay += st.splay * w; crop += st.crop * w
+      if (st.curl) { curl += st.curl * w; ceil = Math.min(ceil, st.ceil) }
+    }
+    rv.live = live
+    if (live) any = true
+    if (Math.abs(splay - (hand._rvSplay || 0)) > 1e-4 || Math.abs(curl - (hand._rvCurl || 0)) > 1e-4) hand._rvRepose = true
+    hand._rvSplay = splay; hand._rvCrop = crop; hand._rvCurl = curl; hand._rvCurlCeil = ceil
+  }
+  rvHasState = any || rvHasState
+  if (!any && !trigActive) rvHasState = false
+}
+// Arm tilt: a world-space turn of the hand's pointing axis toward the effect direction, after cursor tracking has composed the wrapper rotation.
+function rvApplyArmTilt(trackRan) {
+  if (!rvHasState) return
+  for (let i = 0; i < hands.length; i++) {
+    const hand = hands[i], t = hand._rvTilt
+    if (!t) continue
+    const deg = t.length()
+    if (deg < 1e-4) continue
+    if (!trackRan) hand.wrapper.quaternion.identity()
+    _rvP.copy(pointDirRawModel).applyQuaternion(hand.currentBaseQuat).applyQuaternion(hand.wrapper.quaternion)
+    _rvD.copy(t).divideScalar(deg)
+    _rvD.addScaledVector(_rvP, -_rvD.dot(_rvP))
+    const len = _rvD.length()
+    if (len < 1e-5) continue
+    _rvD.divideScalar(len)
+    _rvAxis.crossVectors(_rvP, _rvD)
+    _rvQ.setFromAxisAngle(_rvAxis.normalize(), deg * Math.PI / 180)
+    hand.wrapper.quaternion.premultiply(_rvQ)
+  }
+}
+// Displacement: added to the clone's local position once the frame's pose is final (applyHandArmLength() rewrites that position every frame, so nothing accumulates).
+function rvApplyDisplacement() {
+  if (!rvHasState) return
+  for (let i = 0; i < hands.length; i++) {
+    const hand = hands[i], d = hand._rvDisp
+    if (!d || d.lengthSq() < 1e-10) continue
+    _rvQi.copy(hand.wrapper.quaternion).invert()
+    _rvLocal.copy(d).applyQuaternion(_rvQi)
+    hand.clone.position.add(_rvLocal)
+  }
+}
+function rvCropTarget(hand, target) { return hand._rvCrop ? THREE.MathUtils.clamp(target + hand._rvCrop, 0, 1) : target }
+function rvSplayOf(hand) { return hand._rvSplay || 0 }
+function rvCurlKey(hand) { return hand._rvCurl ? '|c' + hand._rvCurl.toFixed(3) : '' }
+// The pose values the fingers are curled with: the hand's own values plus the velocity curl (clamped to the Max Finger Curl ceiling, never pulling a finger below where it already is).
+function rvCurlValues(hand, values) {
+  const d = hand._rvCurl
+  if (!d) return values
+  const v = Object.create(values)
+  const ceil = hand._rvCurlCeil ?? 100
+  FINGER_NAMES.forEach((n) => {
+    const key = FINGER_CURL_KEY[n], base = values[key]
+    if (typeof base !== 'number') return
+    v[key] = d > 0 ? Math.min(base + d, Math.max(base, ceil)) : base + d
+  })
+  return v
 }
 
 // Small local DOM helper -- devPanel.js's own `el()` isn't exported, and
@@ -9491,6 +11787,7 @@ function buildArmLengthCurveWidget(row) {
   }
   const CURVE_SAMPLES = 48
   let handleEls = []
+  let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
   // Same bezier-handle mechanism as buildGenericCurveWidget() -- see that
   // function's own comment for the full gesture/data-format account.
   const HANDLE_REMOVE_THRESHOLD_PX = 6
@@ -9531,6 +11828,7 @@ function buildArmLengthCurveWidget(row) {
     curvePath.setAttribute('d', d.trim())
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
+    handleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -9552,6 +11850,7 @@ function buildArmLengthCurveWidget(row) {
         marker.setAttribute('fill-opacity', isReal ? '1' : '0.35')
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
+        if (isReal) handleHits.push({ marker, p, i, kind })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -9564,6 +11863,21 @@ function buildArmLengthCurveWidget(row) {
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
         if (downEv.shiftKey) { startHandleDrag(p, i, 'h2', downEv); return }
+        // A bezier handle that sits on (or very near) a curve point is grabbed instead of the point (2026-10-15, direct report: a handle made too short could not be dragged again, the point moved instead). The point's
+        // hit circle is drawn on top of the handle marker, so without this the circle always wins when they overlap. The 7 / 12 px reach is a judgment call, not a measurement.
+        {
+          // The handle wins when the click is nearer to it than to the point, or within 7 px (12 px for touch) of it -- so a handle lying on its point is picked, while a point whose handle is a few pixels away can still be grabbed by its centre.
+          const hr = hit.getBoundingClientRect()
+          const pointD = Math.hypot(downEv.clientX - (hr.left + hr.width / 2), downEv.clientY - (hr.top + hr.height / 2))
+          const grabPx = downEv.pointerType === 'touch' ? 12 : 7
+          let best = null, bestD = Infinity
+          handleHits.forEach((h) => {
+            const r = h.marker.getBoundingClientRect()
+            const d = Math.hypot(downEv.clientX - (r.left + r.width / 2), downEv.clientY - (r.top + r.height / 2))
+            if (d <= Math.max(grabPx, pointD) && d < bestD) { bestD = d; best = h }
+          })
+          if (best) { startHandleDrag(best.p, best.i, best.kind, downEv); return }
+        }
         downEv.stopPropagation()
         dragged = false
         const isEndpoint = i === 0 || i === points.length - 1
@@ -9801,6 +12115,7 @@ function buildWristSplayCurveWidget(row) {
   }
   const CURVE_SAMPLES = 48
   let handleEls = []
+  let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
   const HANDLE_REMOVE_THRESHOLD_PX = 6
   const CURVE_HIT_RADIUS_PX = 16
   function startHandleDrag(p, i, kind, downEv) {
@@ -9839,6 +12154,7 @@ function buildWristSplayCurveWidget(row) {
     curvePath.setAttribute('d', d.trim())
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
+    handleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -9860,6 +12176,7 @@ function buildWristSplayCurveWidget(row) {
         marker.setAttribute('fill-opacity', isReal ? '1' : '0.35')
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
+        if (isReal) handleHits.push({ marker, p, i, kind })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -9872,6 +12189,21 @@ function buildWristSplayCurveWidget(row) {
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
         if (downEv.shiftKey) { startHandleDrag(p, i, 'h2', downEv); return }
+        // A bezier handle that sits on (or very near) a curve point is grabbed instead of the point (2026-10-15, direct report: a handle made too short could not be dragged again, the point moved instead). The point's
+        // hit circle is drawn on top of the handle marker, so without this the circle always wins when they overlap. The 7 / 12 px reach is a judgment call, not a measurement.
+        {
+          // The handle wins when the click is nearer to it than to the point, or within 7 px (12 px for touch) of it -- so a handle lying on its point is picked, while a point whose handle is a few pixels away can still be grabbed by its centre.
+          const hr = hit.getBoundingClientRect()
+          const pointD = Math.hypot(downEv.clientX - (hr.left + hr.width / 2), downEv.clientY - (hr.top + hr.height / 2))
+          const grabPx = downEv.pointerType === 'touch' ? 12 : 7
+          let best = null, bestD = Infinity
+          handleHits.forEach((h) => {
+            const r = h.marker.getBoundingClientRect()
+            const d = Math.hypot(downEv.clientX - (r.left + r.width / 2), downEv.clientY - (r.top + r.height / 2))
+            if (d <= Math.max(grabPx, pointD) && d < bestD) { bestD = d; best = h }
+          })
+          if (best) { startHandleDrag(best.p, best.i, best.kind, downEv); return }
+        }
         downEv.stopPropagation()
         dragged = false
         const isEndpoint = i === 0 || i === points.length - 1
@@ -10033,7 +12365,7 @@ const CLICK_HOLD_KEYS = []
 const LEGACY_REMOVED_HOLD_KEYS = ['chp', 'rchp', 'dcHold', 'tripleClickHold', 'quadClickHold']
 const LEGACY_REMOVED_POSE_KEYS = ['click', 'dblclick', 'rc', 'tripleClick', 'quadClick']
 const clickHoldPoseTriggers = Object.fromEntries([...CLICK_HOLD_KEYS, ...LEGACY_REMOVED_HOLD_KEYS].map((p) => [p, {
-  active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopSegmentMs: 1,
+  active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopRing: null, loopRingW: 0, loopFwd: null, loopFwdW: 0, loopSegmentMs: 1,
   startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
   speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
   tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
@@ -10058,6 +12390,12 @@ function parseOffsetAxisCurves(t, p) {
       try { slot.curve = JSON.parse(cfg[`${p}${prefix}${ax}Curve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
       try { slot.range = JSON.parse(cfg[`${p}${prefix}${ax}Range`]) } catch (e) { /* keep last-good value */ }
     })
+  })
+  if (!t.rotationAxis) t.rotationAxis = {}
+  ;['X', 'Y', 'Z'].forEach((ax) => {
+    const slot = t.rotationAxis[ax] || (t.rotationAxis[ax] = { curve: OFFSET_LINEAR_CURVE, range: { min: 0, max: 0 } })
+    try { slot.curve = JSON.parse(cfg[`${p}Rotation${ax}Curve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+    try { slot.range = JSON.parse(cfg[`${p}Rotation${ax}CurveRange`]) } catch (e) { /* keep last-good value */ }
   })
 }
 function parseClickHoldConfig(p) {
@@ -10294,7 +12632,7 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
   hand.currentBaseRb.copy(_poseBaseRb)
   // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment.
-  applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg)
+  applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay (hand.currentSplayDeg below stays the plain value)
   // CORRECTED 2026-09-27 -- direct report: releasing a Click-Hold, waiting
   // a moment, then clicking elsewhere made the wrist visibly SNAP instead
   // of transitioning smoothly. Root cause: `extraSplayDeg` (Responsive
@@ -10312,7 +12650,7 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   // handoff between the two is never a discontinuity, matching this
   // project's own standing "no interaction ever jumps" rule.
   hand.currentSplayDeg = extraSplayDeg
-  applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, poseValues)
+  if (!hand._curlSkip) applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, rvCurlValues(hand, poseValues)) // + Responsive Velocity > Velocity Finger Curl; off-screen skip: see updateFingerCurlSkip()
   // An ABSOLUTE position/scale set from this hand's own stored grid
   // `basePosition`, not an additive nudge -- recomputed fresh from
   // `poseValues` every call, so it can never compound across frames the
@@ -10397,6 +12735,40 @@ function updateScreenUnitsPerPx() {
 // On-screen test (2026-10-11): every distance curve / Min-Max range normalises against the NEAREST and FARTHEST hand
 // that is actually on screen; hands off screen keep their effect, extrapolated past x = 1 (see evaluateArmLengthCurve()).
 // `_onScr` is read as `!== false`, so an unset flag counts as on screen; if no hand is on screen at all every hand counts.
+// Off-screen finger-curl skip (2026-10-15). The finger curl (applyAllFingerCurls) is the dominant per-hand cost and is a pure function of values that are cheap to keep current (the pose numbers, the wrist bone, the base
+// rotation): each joint is reset to its rest rotation and rotated from those inputs, nothing accumulates frame to frame. So a hand nobody can see can skip it and compute it once when it returns. Everything else
+// (pose / tween / damping state, wrist, position, scale, arm length) keeps running for every hand. Tracking points and render order read bone HEADS (rForearmBend / rHand / rMid1), which do not depend on finger rotation.
+// The test is a bounding sphere around the hand's position, 3x its own size, against every camera that draws this scene (the main camera plus any Camera Preview panels). If the projection is unusable (NaN) the
+// frustum test cannot reject, so every hand counts as visible.
+const _cullMat = new THREE.Matrix4()
+const _cullSphere = new THREE.Sphere()
+const _cullFrustums = []
+function updateFingerCurlSkip() {
+  if (cfg.skipOffScreenFingerCurls === false || !(handBoundsRadiusLocal > 0)) {
+    for (let i = 0; i < hands.length; i++) { hands[i]._curlResumed = !!hands[i]._curlSkip; hands[i]._curlSkip = false }
+    return
+  }
+  const cams = [camera]
+  if (typeof cameraPreviews !== 'undefined' && cameraPreviews && cameraPreviews.length) for (const pc of cameraPreviews) if (pc && pc.camera) cams.push(pc.camera)
+  for (let k = 0; k < cams.length; k++) {
+    cams[k].updateMatrixWorld()
+    _cullMat.multiplyMatrices(cams[k].projectionMatrix, cams[k].matrixWorldInverse)
+    if (!_cullFrustums[k]) _cullFrustums[k] = new THREE.Frustum()
+    _cullFrustums[k].setFromProjectionMatrix(_cullMat)
+  }
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]
+    const wasSkipped = !!h._curlSkip
+    let visible = !h.wrapper
+    if (!visible) {
+      _cullSphere.center.copy(h.wrapper.position)
+      _cullSphere.radius = handBoundsRadiusLocal * (h.clone ? h.clone.scale.x : 1) * 3
+      for (let k = 0; k < cams.length; k++) if (_cullFrustums[k].intersectsSphere(_cullSphere)) { visible = true; break }
+    }
+    h._curlSkip = !visible
+    h._curlResumed = wasSkipped && visible
+  }
+}
 const _onScrV = new THREE.Vector3()
 function isOnScreen(pos) {
   _onScrV.copy(pos).project(camera)
@@ -10431,6 +12803,19 @@ function cursorDistXY(pos) {
     return Math.hypot((_scrV.x - cursorNDC.x) * w / 2, (_scrV.y - cursorNDC.y) * h / 2) * screenUnitsPerPx
   }
   return Math.hypot(pos.x - cursorTarget.x, pos.y - cursorTarget.y)
+}
+// XY distance from the camera to a hand's rig node (arm base / arm end / palm center; last render's world position): how far the point projects from the centre of the view, in world units at the field plane
+// (pixels x screenUnitsPerPx, the same conversion cursorDistXY() uses); before the scale exists, the plain world XY distance to the camera's own X / Y. A hand with no skeleton yet uses its field position.
+const _camXYV = new THREE.Vector3()
+function cameraDistXYOfNode(hand, nodeKey) {
+  const bone = renderOrderBone(hand, nodeKey)
+  if (bone) { const e = bone.matrixWorld.elements; _camXYV.set(e[12], e[13], e[14]) } else _camXYV.copy(hand.wrapper.position)
+  if (screenUnitsPerPx > 0) {
+    const w = window.innerWidth, h = window.innerHeight
+    _camXYV.project(camera)
+    return Math.hypot(_camXYV.x * w / 2, _camXYV.y * h / 2) * screenUnitsPerPx
+  }
+  return Math.hypot(_camXYV.x - camera.position.x, _camXYV.y - camera.position.y)
 }
 // 2026-10-04: world-XY distance (see xyFieldMinDist's comment).
 function handRestDist(hand) {
@@ -10560,6 +12945,29 @@ function captureCameraOffsetNorm(hand, p) {
   const vis = cfg[`${p}CameraOffsetVisibleOnly`] !== false // Visible Hands Only: on = visible-hands domain, off = all hands
   return Math.max((handXYDist(hand) - (vis ? xyFieldMinDist : xyAllMinDist)) / (vis ? xyFieldDistRange : xyAllDistRange), 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
 }
+// Rotation Curves: the same normalised distance as Offset To Camera (nearest .. farthest hand), read once per frame by refreshLiveDistanceState() into the hand's state for this function.
+function rotationCurvesOn(p) { return !!(cfg[`${p}RotationXCurveEnabled`] || cfg[`${p}RotationYCurveEnabled`] || cfg[`${p}RotationZCurveEnabled`]) }
+function captureRotationNorm(hand, p) {
+  const vis = cfg[`${p}RotationCurveVisibleOnly`] !== false
+  return Math.max((handXYDist(hand) - (vis ? xyFieldMinDist : xyAllMinDist)) / (vis ? xyFieldDistRange : xyAllDistRange), 0)
+}
+const _rotDeg = { x: 0, y: 0, z: 0 }
+// The Rotation X / Y / Z in degrees for this hand (full amount, before the ramp): an axis with its curve on takes Min..Max by the curve at the hand's distance, otherwise its slider.
+function rotationDegAt(hand, p) {
+  _rotDeg.x = cfg[`${p}RotationX`] || 0
+  _rotDeg.y = cfg[`${p}RotationY`] || 0
+  _rotDeg.z = cfg[`${p}RotationZ`] || 0
+  if (!rotationCurvesOn(p)) return _rotDeg
+  const trig = clickHoldPoseTriggers[p] || clickPoseTriggers[p]
+  const slots = trig && trig.rotationAxis
+  if (!slots) return _rotDeg
+  const st = (hand._cp && hand._cp[p]) || (hand._chp && hand._chp[p])
+  const norm = st && st.rotationNorm !== undefined ? st.rotationNorm : 0
+  if (cfg[`${p}RotationXCurveEnabled`]) _rotDeg.x = cameraSlotValue(slots.X, norm)
+  if (cfg[`${p}RotationYCurveEnabled`]) _rotDeg.y = cameraSlotValue(slots.Y, norm)
+  if (cfg[`${p}RotationZCurveEnabled`]) _rotDeg.z = cameraSlotValue(slots.Z, norm)
+  return _rotDeg
+}
 function cameraSlotValue(slot, norm) {
   if (!slot || !slot.range) return 0
   const y = THREE.MathUtils.clamp(evaluateArmLengthCurve(slot.curve, norm), 0, 1)
@@ -10595,14 +13003,14 @@ function computeCameraOffsetAt(hand, p, progress) {
 // Offset To Camera amount scaled by the same progress (when ITS checkbox is on).
 // One function for all 3 callers so live apply and both bake paths can
 // never disagree.
-function computeCombinedOffsetAt(hand, p, progress) {
+function computeCombinedOffsetAt(hand, p, progress, camProgress = progress) {
   const mainOn = !!cfg[`${p}OffsetEnabled`]
   const camOn = !!cfg[`${p}CameraOffsetEnabled`]
   if (!mainOn && !camOn) return ZERO_OFFSET
   let a = ZERO_OFFSET
   if (mainOn) { const m = computeOffsetXY(hand, p); a = { x: m.x * progress, y: m.y * progress, z: m.z * progress } }
   if (!camOn) return a
-  const b = computeCameraOffsetAt(hand, p, progress)
+  const b = computeCameraOffsetAt(hand, p, camProgress)
   return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }
 }
 // CORRECTED 2026-09-27 -- direct spec, 3 related items:
@@ -10657,7 +13065,25 @@ function mulWrapperRot(hand, q) {
   }
   hand._cfRot.multiply(q)
 }
-function applyOffsetRotationToHand(hand, p, progress) {
+// `progressIn` is a plain number (every group follows it) or { o, c, r, b } = Offset / Offset To Camera / Rotation / Rotation at Base, so each group can follow its own
+// Retransition Between Loops shape (see loopLapProgress()). A negative value is the inverse (Oscillate, every other loop).
+function normOffsetProgress(v) { return typeof v === 'number' ? { o: v, c: v, r: v } : v }
+function applyOffsetRotationToHand(hand, p, progressIn) {
+  const pr = normOffsetProgress(progressIn)
+  const progress = pr.o // plain number for the startup-only curves below
+  // Once per hand per frame (2026-10-15, direct report: "after i trigger it, the hands seem to jump to a new rotation then start their sequence"). Every active function applies its offset / rotation in the same pass,
+  // and click rotations MULTIPLY onto the wrapper's orientation. On the frame a function commits, the function it interrupts can already have applied this frame (it comes earlier in the key order), and its in-flight
+  // part has just been baked into the shared accumulators, so the committing function applied them a SECOND time on top: the hand showed its accumulated rotation twice for one frame (measured 84.6 deg, one frame, at the
+  // commit), then dropped back. Position never doubled (applyPoseValuesToHand() resets it before every apply), only the orientation did. The orientation the first call started from is kept, and a second call
+  // in the same frame starts again from it, so the last function to apply wins, exactly like the pose.
+  if (hand._orFrame === idleReposeFrameCounter) {
+    hand.wrapper.quaternion.copy(hand._orQuat0)
+    hand._cfRot && hand._cfRot.identity()
+  } else {
+    hand._orFrame = idleReposeFrameCounter
+    if (!hand._orQuat0) hand._orQuat0 = new THREE.Quaternion()
+    hand._orQuat0.copy(hand.wrapper.quaternion)
+  }
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   // CORRECTED 2026-09-27 (4th round of this same jump investigation) --
@@ -10667,7 +13093,8 @@ function applyOffsetRotationToHand(hand, p, progress) {
   // reaches its own natural completion (see bakeInFlightOffsetRotation()'s
   // own comment for the full account of the bug this closes).
   if (!hand._lastOffsetRotationProgress) hand._lastOffsetRotationProgress = {}
-  hand._lastOffsetRotationProgress[p] = progress
+  hand._lastOffsetRotationProgress[p] = pr
+  if (p === STARTUP_FN && startupHandScaleActive(hand)) hand.clone.scale.multiplyScalar(startupHandScale(progress)) // Hand Scale Curve (applyPoseValuesToHand() has just set the plain scale this frame)
   _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
   _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
   _offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2)
@@ -10683,12 +13110,12 @@ function applyOffsetRotationToHand(hand, p, progress) {
     hand.wrapper.position.addScaledVector(_offsetUpVec, hand._customOffsetAccum.y)
     hand.wrapper.position.addScaledVector(_offsetForwardVec, hand._customOffsetAccum.z)
   }
-  if (!isIdentityQuat(hand._customRotationAccum)) mulWrapperRot(hand, hand._customRotationAccum)
   if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
-    const o = computeCombinedOffsetAt(hand, p, progress)
+    const o = computeCombinedOffsetAt(hand, p, pr.o, pr.c)
     const ox = o.x
     const oy = o.y
-    const oz = o.z
+    let oz = o.z
+    if (p === STARTUP_FN && cfg.startupHandZCurveEnabled) oz = startupHandZ(progress) - startupHandZ(0) // Hand Z Offset Curve: the accumulator holds the value at progress 0
     if (ox !== 0 || oy !== 0 || oz !== 0) {
       // Camera-relative right/up/forward, not world/local axes -- this
       // project's camera only pans/zooms, never rotates, so these stay
@@ -10699,38 +13126,167 @@ function applyOffsetRotationToHand(hand, p, progress) {
       hand.wrapper.position.addScaledVector(_offsetForwardVec, oz)
     }
   }
+  // Rotations, always in one fixed order - crop point, arm base, cursor - each as "what is accumulated for that mode, then this function's live amount if it is that mode". A baked ramp folds into the same accumulator,
+  // so the moment a ramp is baked (a new function taking over, a release) the hand's state is identical before and after: rotations about different pivots do not commute, so the live one must not jump ahead of the others.
+  // (Offsets are plain translations and are added before all of this.) Each applies on top of the pose's own wrist rotation - right-multiplied, never assigned.
+  let liveMode = null
   if (cfg[`${p}RotationEnabled`]) {
-    const rx = (cfg[`${p}RotationX`] || 0) * progress
-    const ry = (cfg[`${p}RotationY`] || 0) * progress
-    const rz = (cfg[`${p}RotationZ`] || 0) * progress
+    const rd = rotationDegAt(hand, p)
+    const rx = rd.x * pr.r, ry = rd.y * pr.r, rz = rd.z * pr.r
     if (rx !== 0 || ry !== 0 || rz !== 0) {
       _offsetEuler.set(THREE.MathUtils.degToRad(rx), THREE.MathUtils.degToRad(ry), THREE.MathUtils.degToRad(rz), 'XYZ')
-      _offsetQuat.setFromEuler(_offsetEuler)
-      // Composes on top of the pose's OWN wrist rotation, never overwrites
-      // it -- right-multiply, not assignment.
-      mulWrapperRot(hand, _offsetQuat)
+      _liveRotQ.setFromEuler(_offsetEuler)
+      liveMode = rotationModeOf(p)
     }
   }
+  if (!isIdentityQuat(hand._customRotationAccum)) rotateHandAboutCropPoint(hand, hand._customRotationAccum)
+  if (liveMode === 'crop') rotateHandAboutCropPoint(hand, _liveRotQ)
+  if (hand._customBaseRotAccum && !isIdentityQuat(hand._customBaseRotAccum)) rotateHandAboutArmBase(hand, hand._customBaseRotAccum)
+  if (liveMode === 'base') rotateHandAboutArmBase(hand, _liveRotQ)
+  if (hand._customCursorRigid && !isIdentityQuat(hand._customCursorRigid.q)) applyWorldRigid(hand, hand._customCursorRigid.q, hand._customCursorRigid.t)
+  if (liveMode === 'cursor') rotateHandAboutWorldPoint(hand, _liveRotQ, clickCursorPivot(p))
+}
+const _liveRotQ = new THREE.Quaternion()
+// ---- Rotation Mode (2026-10-14, direct request) ----
+function rotationModeOf(p) { const m = cfg[`${p}RotationMode`]; return m === 'Rotation at Base' ? 'base' : (m === 'Rotation Around Cursor' ? 'cursor' : 'crop') }
+// The cursor, as a point on the field's plane (z = 0), where it was when function `p` last fired - so a rotation around it keeps one fixed centre for the whole ramp / every lap.
+const clickCursorPivots = {}
+const _cursorRay = new THREE.Vector3(), _cursorDir = new THREE.Vector3()
+function cursorFieldPoint(out) {
+  _cursorRay.set(cursorNDC.x, cursorNDC.y, 0.5).unproject(camera)
+  _cursorDir.copy(_cursorRay).sub(camera.position)
+  const t = Math.abs(_cursorDir.z) > 1e-9 ? -camera.position.z / _cursorDir.z : 0
+  return out.copy(camera.position).addScaledVector(_cursorDir, t)
+}
+function captureClickCursorPivot(p) { if (rotationModeOf(p) === 'cursor') cursorFieldPoint(clickCursorPivots[p] || (clickCursorPivots[p] = new THREE.Vector3())) }
+const _cursorNow = new THREE.Vector3()
+function clickCursorPivot(p) { return clickCursorPivots[p] || cursorFieldPoint(_cursorNow) }
+function applyRotationByMode(hand, p, q) {
+  const m = rotationModeOf(p)
+  if (m === 'base') rotateHandAboutArmBase(hand, q)
+  else if (m === 'cursor') rotateHandAboutWorldPoint(hand, q, clickCursorPivot(p))
+  else rotateHandAboutCropPoint(hand, q)
+}
+const _wrQ = new THREE.Quaternion(), _wrQi = new THREE.Quaternion(), _wrV = new THREE.Vector3()
+// Rotates the whole hand by `q` (a rotation in WORLD axes) about the world point `c`.
+function rotateHandAboutWorldPoint(hand, q, c) {
+  const wq = hand.wrapper.quaternion
+  _wrQi.copy(wq).invert()
+  _wrQ.copy(_wrQi).multiply(q).multiply(wq) // the same rotation in the wrapper's own frame
+  hand.wrapper.position.sub(c).applyQuaternion(q).add(c)
+  wq.multiply(_wrQ)
+}
+// Applies a baked world rigid motion p' = Q p + T (the accumulated Rotation Around Cursor).
+function applyWorldRigid(hand, Q, T) {
+  const wq = hand.wrapper.quaternion
+  _wrQi.copy(wq).invert()
+  _wrQ.copy(_wrQi).multiply(Q).multiply(wq)
+  hand.wrapper.position.applyQuaternion(Q).add(T)
+  wq.multiply(_wrQ)
+}
+// The crop point in the WRAPPER's frame: the first arm bone (rForearmBend -> rForearmTwist, as last drawn, so it follows an arm / elbow / shoulder pose) crossing the top face of the crop block. The block is fixed in the model's frame while
+// the bones move with the pose, so this drifts away from the static cut point (the wrapper origin) whenever the arm is bent. Falls back to the origin (the static cut point) when there is no crop block or the bone runs parallel to the face.
+const _cropA = new THREE.Vector3(), _cropB = new THREE.Vector3(), _cropI = new THREE.Vector3(), _cropInv = new THREE.Matrix4()
+function cropPointInWrapperFrame(hand, out) {
+  const rig = hand.clipRig
+  const sk = hand.skinnedMesh && hand.skinnedMesh.skeleton
+  if (!rig || !sk) return out.set(0, 0, 0)
+  const boneA = sk.getBoneByName('rForearmBend'), boneB = sk.getBoneByName('rForearmTwist')
+  if (!boneA || !boneB) return out.set(0, 0, 0)
+  const yTop = Math.max(rig.block.position.y + (rig.topY0 - rig.baseY), 0) // top face height in the model's frame (0 when the crop is off)
+  _cropInv.copy(hand.clone.matrixWorld).invert()
+  _cropA.setFromMatrixPosition(boneA.matrixWorld).applyMatrix4(_cropInv)
+  _cropB.setFromMatrixPosition(boneB.matrixWorld).applyMatrix4(_cropInv)
+  const dy = _cropB.y - _cropA.y
+  if (!(Math.abs(dy) > 1e-9)) return out.set(0, 0, 0)
+  _cropI.copy(_cropA).lerp(_cropB, (yTop - _cropA.y) / dy)
+  if (!isFinite(_cropI.x + _cropI.y + _cropI.z)) return out.set(0, 0, 0)
+  return out.copy(_cropI).multiplyScalar(hand.clone.scale.x).applyQuaternion(hand.clone.quaternion).add(hand.clone.position)
+}
+const _cropP = new THREE.Vector3()
+// Click-function Rotation at Crop: the model's own axes (like Rotation at Base), turning about the crop point.
+function rotateHandAboutCropPoint(hand, q) {
+  const cq = hand.clone.quaternion
+  _baseRotQ.copy(cq).multiply(q).multiply(_baseRotInv.copy(cq).invert()) // q in the wrapper's own frame
+  cropPointInWrapperFrame(hand, _cropP)
+  _baseRotT.copy(_cropP).sub(_baseRotV.copy(_cropP).applyQuaternion(_baseRotQ)) // P - q'P
+  hand.wrapper.position.add(_baseRotT.applyQuaternion(hand.wrapper.quaternion))
+  mulWrapperRot(hand, _baseRotQ)
+}
+const _baseRotQ = new THREE.Quaternion(), _baseRotInv = new THREE.Quaternion(), _baseRotB = new THREE.Vector3(), _baseRotT = new THREE.Vector3(), _baseRotV = new THREE.Vector3()
+// Rotation at Base (2026-10-14): turns the whole hand (rigidly, fingers included) about its ARM BASE by `q`, given in the MODEL's own axes - the same rotation a pose's Whole-Hand Rotation at Base makes, but added on top of
+// whatever the pose and cursor tracking are doing. Rotating the wrapper about its own origin (the cut point, mulWrapperRot()) and then moving the wrapper by (B - q'B) puts the pivot at the arm base B instead.
+function rotateHandAboutArmBase(hand, q) {
+  const cq = hand.clone.quaternion
+  _baseRotQ.copy(cq).multiply(q).multiply(_baseRotInv.copy(cq).invert()) // q in the wrapper's own frame
+  _baseRotB.copy(forearmPosRaw).multiplyScalar(hand.clone.scale.x).applyQuaternion(cq).add(hand.clone.position) // arm base in the wrapper's frame
+  _baseRotT.copy(_baseRotB).sub(_baseRotV.copy(_baseRotB).applyQuaternion(_baseRotQ)) // B - q'B
+  hand.wrapper.position.add(_baseRotT.applyQuaternion(hand.wrapper.quaternion))
+  hand.wrapper.quaternion.multiply(_baseRotQ)
+}
+// Retransition Between Loops (2026-10-14, direct request). With a group's checkbox on, what a lap adds is undone again, so looping never accumulates:
+//  - Loop / Count-Loop: the lap's increment rises 0 -> 1 over the lap and falls back to 0 over the loop-to-loop (wrap-back) segment, which is the lap's last 1/n for a pose-kind function (it ends with the wrap) and the
+//    lap's FIRST 1/n for a hold-kind function (it starts on the wrap, after the forward pass), where the fall starts from the previous lap's end value (loopCarry; 0 on the first lap). Nothing is baked at lap end.
+//  - Oscillate: no shaping; every other lap is the inverse (loop 1 normal, loop 2 inverted, ...), so two laps cancel. dir is +1 / -1.
+// n = poses in the lap (the wrap is 1 of n segments). Groups with their checkbox off keep the old behaviour (linear rise, baked in full).
+const LOOP_RETRANSITION_FLAGS = { o: 'OffsetLoopRetransition', c: 'CameraOffsetLoopRetransition', r: 'RotationLoopRetransition' }
+function loopLapProgress(p, kind, lapT, carry, n, oscillate, dir) {
+  const t = Math.min(Math.max(lapT, 0), 1)
+  const w = Math.min(Math.max(1 / Math.max(n, 2), 0.05), 0.95)
+  const out = {}
+  Object.keys(LOOP_RETRANSITION_FLAGS).forEach((k) => {
+    if (!cfg[p + LOOP_RETRANSITION_FLAGS[k]]) { out[k] = t; return }
+    if (oscillate) { out[k] = dir * t; return }
+    if (kind === 'hold') out[k] = t < w ? carry * (1 - t / w) : (t - w) / (1 - w)
+    else out[k] = t < 1 - w ? t / (1 - w) : (1 - t) / w
+  })
+  return out
+}
+// What to bake into the accumulators when a lap completes.
+function loopLapEnd(p, oscillate, dir) {
+  const out = {}
+  Object.keys(LOOP_RETRANSITION_FLAGS).forEach((k) => { out[k] = cfg[p + LOOP_RETRANSITION_FLAGS[k]] ? (oscillate ? dir : 0) : 1 })
+  return out
+}
+// What is still shown while a lap's Hold Duration pause runs (everything is baked, except a hold-kind shaped Loop lap that ends at 1 and is carried into the next lap's wrap).
+function loopPausedProg(p, kind, carry, oscillate) {
+  const out = {}
+  Object.keys(LOOP_RETRANSITION_FLAGS).forEach((k) => { out[k] = (kind === 'hold' && !oscillate && cfg[p + LOOP_RETRANSITION_FLAGS[k]]) ? carry : 0 })
+  return out
 }
 function isIdentityQuat(q) { return q.x === 0 && q.y === 0 && q.z === 0 && q.w === 1 }
 // Folds `p`'s own current full Offset/Rotation contribution permanently
 // into the hand's accumulator -- called exactly once, by the state
 // machine, at the instant a ramp/lap's own progress crosses 1. See
 // applyOffsetRotationToHand()'s own comment for the full model.
-function bakeOffsetRotationIntoAccum(hand, p) {
+function bakeOffsetRotationIntoAccum(hand, p, fracIn = 1) {
+  const f = normOffsetProgress(fracIn) // the full amount by default; a loop's end value (0, or +/-1 for Oscillate) when Retransition Between Loops is on
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
-  if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
-    const base = computeCombinedOffsetAt(hand, p, 1)
+  if (!hand._customBaseRotAccum) hand._customBaseRotAccum = new THREE.Quaternion()
+  if ((cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) && (f.o || f.c)) {
+    const base = computeCombinedOffsetAt(hand, p, f.o, f.c)
     hand._customOffsetAccum.x += base.x
     hand._customOffsetAccum.y += base.y
     hand._customOffsetAccum.z += base.z
   }
-  if (cfg[`${p}RotationEnabled`]) {
-    const rx = cfg[`${p}RotationX`] || 0, ry = cfg[`${p}RotationY`] || 0, rz = cfg[`${p}RotationZ`] || 0
+  if (cfg[`${p}RotationEnabled`] && f.r) {
+    const rd = rotationDegAt(hand, p)
+    const rx = rd.x * f.r, ry = rd.y * f.r, rz = rd.z * f.r
     if (rx || ry || rz) {
       _offsetEuler.set(THREE.MathUtils.degToRad(rx), THREE.MathUtils.degToRad(ry), THREE.MathUtils.degToRad(rz), 'XYZ')
-      hand._customRotationAccum.multiply(_offsetQuat.setFromEuler(_offsetEuler))
+      _offsetQuat.setFromEuler(_offsetEuler)
+      const mode = rotationModeOf(p)
+      if (mode === 'base') hand._customBaseRotAccum.multiply(_offsetQuat)
+      else if (mode === 'crop') hand._customRotationAccum.multiply(_offsetQuat)
+      else {
+        // Around Cursor: fold "rotate by q about the cursor point C" into the accumulated rigid motion, after what is already there: Q' = q Q, T' = q T + C - q C.
+        if (!hand._customCursorRigid) hand._customCursorRigid = { q: new THREE.Quaternion(), t: new THREE.Vector3() }
+        const rg = hand._customCursorRigid
+        const c = clickCursorPivot(p)
+        rg.t.applyQuaternion(_offsetQuat).add(c).sub(_wrV.copy(c).applyQuaternion(_offsetQuat))
+        rg.q.premultiply(_offsetQuat)
+      }
     }
   }
 }
@@ -10756,23 +13312,11 @@ function bakeOffsetRotationIntoAccum(hand, p) {
 // then clears that marker so a 2nd accidental call can't double-credit
 // the same fraction again.
 function bakeInFlightOffsetRotation(hand, p) {
-  const fraction = (hand._lastOffsetRotationProgress && hand._lastOffsetRotationProgress[p]) || 0
-  if (fraction <= 0) return
-  if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
-  if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
-  if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
-    const base = computeCombinedOffsetAt(hand, p, fraction)
-    hand._customOffsetAccum.x += base.x
-    hand._customOffsetAccum.y += base.y
-    hand._customOffsetAccum.z += base.z
-  }
-  if (cfg[`${p}RotationEnabled`]) {
-    const rx = (cfg[`${p}RotationX`] || 0) * fraction, ry = (cfg[`${p}RotationY`] || 0) * fraction, rz = (cfg[`${p}RotationZ`] || 0) * fraction
-    if (rx || ry || rz) {
-      _offsetEuler.set(THREE.MathUtils.degToRad(rx), THREE.MathUtils.degToRad(ry), THREE.MathUtils.degToRad(rz), 'XYZ')
-      hand._customRotationAccum.multiply(_offsetQuat.setFromEuler(_offsetEuler))
-    }
-  }
+  const shown = hand._lastOffsetRotationProgress && hand._lastOffsetRotationProgress[p]
+  if (!shown) return
+  const f = normOffsetProgress(shown) // each group's own fraction, possibly negative (Oscillate inverse) or shaped (Retransition Between Loops)
+  if (!f.o && !f.c && !f.r) return
+  bakeOffsetRotationIntoAccum(hand, p, f)
   hand._lastOffsetRotationProgress[p] = 0
 }
 // Retransition ALWAYS fully clears the accumulated offset/rotation back
@@ -10783,7 +13327,8 @@ function bakeInFlightOffsetRotation(hand, p) {
 // with the pose's own retransition progress, then clears the real
 // accumulator entirely once progress reaches 1 -- a genuinely fresh
 // start for the next trigger, not just a visual reset.
-function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart) {
+const _baseRotDecay = new THREE.Quaternion(), _wrV2 = new THREE.Vector3()
+function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart, baseAccumStart, cursorAccumStart) {
   const remaining = 1 - progress
   const decayedX = offsetAccumStart ? offsetAccumStart.x * remaining : 0
   const decayedY = offsetAccumStart ? offsetAccumStart.y * remaining : 0
@@ -10799,7 +13344,7 @@ function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotat
   const hasRotation = rotationAccumStart && !isIdentityQuat(rotationAccumStart)
   if (hasRotation) {
     _offsetQuat.identity().slerp(rotationAccumStart, remaining)
-    mulWrapperRot(hand, _offsetQuat)
+    rotateHandAboutCropPoint(hand, _offsetQuat)
   }
   // CORRECTED 2026-09-27 (3rd round) -- real bug found via direct
   // simulation: the REAL accumulator (`hand._customOffsetAccum`/
@@ -10817,6 +13362,19 @@ function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotat
   // scratch var reused elsewhere in this file every frame, so the
   // rotation accumulator is written via a fresh identity+slerp rather
   // than aliasing that shared reference.
+  const hasCursor = cursorAccumStart && !isIdentityQuat(cursorAccumStart.q)
+  if (hand._customCursorRigid) {
+    if (hasCursor) { hand._customCursorRigid.q.identity().slerp(cursorAccumStart.q, remaining); hand._customCursorRigid.t.copy(cursorAccumStart.t).multiplyScalar(remaining) }
+    else { hand._customCursorRigid.q.identity(); hand._customCursorRigid.t.set(0, 0, 0) }
+  }
+  const hasBase = baseAccumStart && !isIdentityQuat(baseAccumStart)
+  if (hasBase) rotateHandAboutArmBase(hand, _baseRotDecay.identity().slerp(baseAccumStart, remaining))
+  // same order as applyOffsetRotationToHand(): crop, base, cursor - so a function that takes over mid-retransition continues from exactly what was on screen
+  if (hasCursor) applyWorldRigid(hand, _baseRotDecay.identity().slerp(cursorAccumStart.q, remaining), _wrV2.copy(cursorAccumStart.t).multiplyScalar(remaining))
+  if (hand._customBaseRotAccum) {
+    if (hasBase) hand._customBaseRotAccum.identity().slerp(baseAccumStart, remaining)
+    else hand._customBaseRotAccum.identity()
+  }
   if (hand._customOffsetAccum) { hand._customOffsetAccum.x = decayedX; hand._customOffsetAccum.y = decayedY; hand._customOffsetAccum.z = decayedZ }
   if (hand._customRotationAccum) {
     if (hasRotation) hand._customRotationAccum.identity().slerp(rotationAccumStart, remaining)
@@ -11042,6 +13600,30 @@ function lerpLoopSegments(ringSegments, tCyclic) {
   const last = ringSegments[ringSegments.length - 1]
   return lerpPoseValues(last.poseA, last.poseB, 1)
 }
+// HOLDS IN LOOP / OSCILLATE (2026-10-15, direct report: "i dont see the hold occur ... make sure the hold is applied in all functions that read imported tweens"). Loop Mode used to cycle a flat
+// list of named poses and drop every Hold (resolveTweenSequencePoses() maps entries as pose-name strings). This builds the same two timelines from the RAW entries (Hold objects intact) as WEIGHTED
+// segments, the same weighting the forward pass already uses (a pose-to-pose transition = 1, a Hold = percent / 100 of one transition):
+//   fwd  = first named pose -> ... -> last named pose, Holds included (Oscillate's one-way lap)
+//   ring = fwd + a closing segment last -> first of weight 1 (Loop's full wrap)
+// ringW / fwdW are the total weights (the lap lengths, in weight units). With no Hold every weight is 1, so ringW = number of poses and fwdW = poses - 1: exactly the old segment counts.
+function buildLoopTimelines(entries) {
+  const list = entries || []
+  let firstIdx = -1
+  let firstPose = null
+  for (let i = 0; i < list.length; i++) {
+    const e = list[i]
+    if (typeof e !== 'string' || !e) continue
+    const matches = (cfg.savedPoses || []).filter((sp) => sp.name === e)
+    const found = matches[matches.length - 1]
+    if (found) { firstIdx = i; firstPose = stackOnDefault(found); break }
+  }
+  if (!firstPose) return { ring: null, ringW: 0, fwd: null, fwdW: 0 }
+  const fwd = resolveTweenSegmentsWithAnchor(firstPose, list.slice(firstIdx + 1), true)
+  const last = fwd.length > 0 ? fwd[fwd.length - 1].poseB : firstPose
+  const ring = fwd.concat([{ poseA: last, poseB: firstPose, weight: 1 }])
+  const sumW = (a) => a.reduce((sum, seg) => sum + seg.weight, 0)
+  return { ring, ringW: sumW(ring), fwd, fwdW: sumW(fwd) }
+}
 // Double Click Hold Tween's own Loop mode, and now also Click Hold-Pose/
 // Right-Click Hold-Pose's own Loop Mode dropdown (direct follow-up
 // request): once the initial forward pass finishes, keep cycling
@@ -11074,7 +13656,7 @@ function lerpLoopSequence(poses, tCyclic) {
 // playthrough of the sequence"). Duration of one named-pose segment, in ms.
 function loopSegmentMsFor(p, chp, trig) {
   return (cfg[`${p}SpeedCurveEnabled`] && chp.frozenSpeedMs > 0)
-    ? Math.max(chp.frozenSpeedMs * chainSequenceCount(p) / Math.max(trig.loopPoses.length, 1), 1)
+    ? Math.max(chp.frozenSpeedMs * chainSequenceCount(p) / Math.max(trig.loopRingW || trig.loopPoses.length, 1), 1)
     : trig.loopSegmentMs
 }
 // Pose at `elapsedSegments` segments into a lap that began in direction
@@ -11083,14 +13665,14 @@ function loopSegmentMsFor(p, chp, trig) {
 // each end, so a decelerating hand keeps travelling through the sequence.
 function loopPoseValuesBeyondLap(p, chp, trig, elapsedSegments) {
   if (cfg[`${p}LoopMode`] === 'Oscillate') {
-    const segments = trig.loopPoses.length - 1
+    const segments = trig.loopFwdW || (trig.loopPoses.length - 1)
     const m = ((elapsedSegments / segments) % 2 + 2) % 2
     const lapT = m <= 1 ? m : 2 - m // triangle wave: out, then back
     const position = chp.loopDirection === 1 ? segments * lapT : segments * (1 - lapT)
-    return lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
+    return trig.loopFwd ? lerpTweenSegments(trig.loopFwd, (position / segments) * chp.frozenTweenFractionCap) : lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
   }
-  const segments = trig.loopPoses.length
-  return lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
+  const segments = trig.loopRingW || trig.loopPoses.length
+  return trig.loopRing ? lerpLoopSegments(trig.loopRing, (segments - 1) + elapsedSegments) : lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
 }
 // Same as computeStartDelayMs(), but the nearest-to-farthest domain is chosen by this function's own "Visible Hands Only" checkbox (`${p}${flag}`, default on):
 // on = hands that are on screen, off = all hands. xy = current-position screen distance (every click-function curve).
@@ -11306,6 +13888,8 @@ function animSpeedMs(p, isTween, frozenSpeedMs) {
 function snapshotOffsetRotationAccumForRetransition(hand, chp) {
   chp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0, z: 0 }
   chp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
+  chp.retransitionBaseAccumStart = hand._customBaseRotAccum ? hand._customBaseRotAccum.clone() : new THREE.Quaternion()
+  chp.retransitionCursorAccumStart = hand._customCursorRigid ? { q: hand._customCursorRigid.q.clone(), t: hand._customCursorRigid.t.clone() } : null
   // CORRECTED 2026-09-27 -- same "no jump on handoff" fix as
   // applyPoseValuesToHand()'s own comment, captured here since all 3 real
   // chp retransition-entry points already funnel through this one
@@ -11355,6 +13939,8 @@ function beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, li
 // treats that concatenated list as "the sequence," with zero further
 // code changes needed anywhere else in the forward/looping/retransition
 // machinery.
+// Mode 'None' (2026-10-14, direct request): the function changes no pose at all - the hand keeps the pose it has - but everything else (Offset, Offset To Camera, Rotation, Rotation at Base, timing curves, Retransition ...) runs as in Single Pose.
+function isNoPoseMode(p) { return cfg[`${p}Mode`] === 'None' }
 function isSequenceOrChainMode(p) {
   if (p === STARTUP_FN && !cfg.startupHandTweenEnabled) return false // Animation Tween off: Single Pose with no target = offset only
   const m = cfg[`${p}Mode`]
@@ -11409,6 +13995,7 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
       // without this, whatever fraction of `id`'s own Offset/Rotation had
       // already been visually shown vanishes the instant it's forced idle.
       bakeInFlightOffsetRotation(hand, id)
+      if (id === STARTUP_FN) hand._startupSeqDone = true // interrupted counts as finished for Hide Floor After Hand Offset Sequence
       // Logged BEFORE the phase actually changes, so the entry names the
       // phase this hand was genuinely interrupted OUT OF (2026-09-28,
       // direct request) -- this is precisely the "a different click
@@ -11440,8 +14027,17 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
 // retransition progress is accumulated (retProg) rather than recomputed from elapsed / speed. With a curve off, or the
 // cursor not moving, every number equals the old frozen one. Cursor Offset was already live.
 function liveCurveValue(hand, curveParsed, rangeParsed, p, flag) {
-  return curveByDomain(p, flag, handXYDist(hand), curveParsed, rangeParsed)
+  return curveByDomainFor(hand, p, flag, curveParsed, rangeParsed)
 }
+// The startup hand sequence measures "distance from the cursor" from the CLICK POINT that triggered the hand (direct request 2026-10-14), not from the live cursor: at trigger time triggerClickPose() freezes the hand's
+// distance and the nearest..farthest domain (hand._startupClick); every live evaluation for STARTUP_FN then reads those instead of the moving cursor. Every other function keeps the live behaviour.
+function curveByDomainFor(hand, p, flag, curveParsed, rangeParsed) {
+  const k = p === STARTUP_FN ? hand._startupClick : null
+  if (!k) return curveByDomain(p, flag, handXYDist(hand), curveParsed, rangeParsed)
+  const vis = cfg[`${p}${flag}`] !== false
+  return computeStartDelayMs(k.dist, vis ? k.min : k.minAll, vis ? k.range : k.rangeAll, curveParsed, rangeParsed)
+}
+function handDistFor(hand, p) { return (p === STARTUP_FN && hand._startupClick) ? hand._startupClick.dist : handXYDist(hand) }
 function liveTempo(nominalMs, liveMs) {
   if (!(nominalMs > 0) || !(liveMs > 0)) return 1
   return THREE.MathUtils.clamp(nominalMs / liveMs, 0.02, 50)
@@ -11461,8 +14057,9 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
   st.liveTick = now
   // Values that are plain functions of distance (no rate): Offset To Camera amount, Start Distance tween amount.
   if (cfg[`${p}CameraOffsetEnabled`]) st.frozenOffsetNorm = captureCameraOffsetNorm(hand, p)
+  if (rotationCurvesOn(p)) st.rotationNorm = captureRotationNorm(hand, p)
   if (cfg[`${p}StartDistanceCurveEnabled`]) {
-    const cap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
+    const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
     if (cap !== null) st.frozenTweenFractionCap = cap // out of range keeps the last cap rather than snapping
   }
   // Rates. Animation Speed Curve -> tempo of the forward / loop / lap clocks (nominal speed = the value at commit).
@@ -11489,12 +14086,13 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
     const isTw = kind === 'hold' && !!st.retransitionIsTween
     const delay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
       : (isTw ? liveCurveValue(hand, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed, p, 'RetransitionStartTimeCurveVisibleOnly') : liveCurveValue(hand, trig.retransitionCurveParsed, trig.retransitionRangeParsed, p, 'RetransitionStartTimeCurveVisibleOnly'))
-    const speedMs = Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`]
+    const distMs = retransitionDistanceMs(hand, p) // Retransition Distance Curve (null when off) replaces the Retransition Speed duration
+    const speedMs = distMs !== null ? Math.max(distMs, 1) : Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`]
       ? (isTw ? liveCurveValue(hand, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed, p, 'RetransitionSpeedCurveVisibleOnly') : liveCurveValue(hand, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed, p, 'RetransitionSpeedCurveVisibleOnly'))
       : (isTw ? cfg[`${p}TweenRetransitionSpeedMs`] : cfg[`${p}RetransitionSpeedMs`]), 1)
     st.retransitionDelay = delay
     const eff = Math.min(dt, st.retElapsed - delay)
-    if (eff > 0) st.retProg = Math.min((st.retProg ?? 0) + eff / speedMs, 1)
+    if (eff > 0) st.retProg = Math.min((st.retProg ?? 0) + eff / (speedMs / retransitionScalerMul(hand, p)), 1)
   }
 }
 function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) {
@@ -11583,6 +14181,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       chp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? curveByDomain(p, 'SpeedCurveVisibleOnly', handXYDist(hand), trig.speedCurveParsed, trig.speedRangeParsed) : 0
     }
   }
+  if (chp.pendingClaimAt && p !== STARTUP_FN && handStartupLocked(hand)) chp.pendingClaimAt = 0 // never claims a hand that is still in its startup sequence
   if (chp.pendingClaimAt && now >= chp.pendingClaimAt) {
     // FIX 2026-10-04 (direct report: "when i interrupt a offset to camera
     // sequence, there are jumps. They jump back to their original position
@@ -11696,7 +14295,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       if (progress >= 1 && chp.releasePending) {
         chp.lastAppliedValues = values
         applyPoseValuesToHand(hand, values, splayNow)
-        applyOffsetRotationToHand(hand, p, chp.offsetBaked ? 0 : progress)
+        applyOffsetRotationToHand(hand, p, chp.offsetBaked ? 0 : easedProgress) // Easing Curve shapes the Offset / Rotation ramp like the pose (2026-10-15); 1 at the end either way
         if (!chp.offsetBaked) { bakeOffsetRotationIntoAccum(hand, p); chp.offsetBaked = true }
         beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, liveDistRange, now)
         return
@@ -11710,6 +14309,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       const loopMode = cfg[`${p}LoopMode`]
       if (progress >= 1 && loopMode !== 'Off' && trig.loopPoses && trig.loopPoses.length >= 2) {
         chp.phase = 'looping'
+        chp.loopCarry = 0
         chp.loopStartTime = now
         chp.loopNom = 0
         chp.loopHoldEndTime = 0
@@ -11721,9 +14321,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
         chp.loopDirection = -1
       }
     } else {
-      const targetPose = stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`]))
-      if (!targetPose) return // nothing selected -- leave this hand's pose untouched
-      values = lerpPoseValues(chp.forwardSnapshot, targetPose, cappedT)
+      const targetPose = isNoPoseMode(p) ? null : stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === cfg[`${p}TargetPose`]))
+      if (!targetPose && !isNoPoseMode(p)) return // nothing selected -- leave this hand's pose untouched
+      values = targetPose ? lerpPoseValues(chp.forwardSnapshot, targetPose, cappedT) : chp.forwardSnapshot // None: the pose stays as it is
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, splayNow)
@@ -11737,7 +14337,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // progress=1 once, correctly, before 'looping' phase takes over next
     // frame.
     if (!chp.offsetBaked) {
-      applyOffsetRotationToHand(hand, p, progress)
+      // Easing Curve (2026-10-15, direct request: "easing should also apply to all offset and rotation modifications in the click function"): the ramp follows the SAME eased progress as the pose. It used to run on the raw
+      // 0..1 time ratio (only the pose and splay were reshaped); the phase transitions still test the raw progress, and an eased 1 is the same 1.
+      applyOffsetRotationToHand(hand, p, easedProgress)
       if (progress >= 1) { bakeOffsetRotationIntoAccum(hand, p); chp.offsetBaked = true }
     } else {
       applyOffsetRotationToHand(hand, p, 0)
@@ -11765,7 +14367,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // other config-driven state can still change during a hold, same
       // convention as the 'paused' phase elsewhere in this file).
       applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
-      applyOffsetRotationToHand(hand, p, 0) // this lap's own contribution is already baked into the accumulator (item 5, 2026-09-27)
+      applyOffsetRotationToHand(hand, p, loopPausedProg(p, 'hold', chp.loopCarry || 0, cfg[`${p}LoopMode`] === 'Oscillate')) // this lap's own contribution is already baked into the accumulator (item 5, 2026-09-27)
       return
     }
     if (chp.loopHoldEndTime && now >= chp.loopHoldEndTime) {
@@ -11784,14 +14386,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const elapsedSegments = (chp.loopNom ?? (now - chp.loopStartTime)) / loopSegMs
     let values, lapT
     if (cfg[`${p}LoopMode`] === 'Oscillate') {
-      const segments = trig.loopPoses.length - 1
+      const segments = trig.loopFwdW || (trig.loopPoses.length - 1) // lap length in weight units (a Hold counts), = poses - 1 without Holds
       const startPos = chp.loopDirection === 1 ? 0 : segments
       const endPos = chp.loopDirection === 1 ? segments : 0
       lapT = THREE.MathUtils.clamp(elapsedSegments / segments, 0, 1)
       const position = startPos + (endPos - startPos) * lapT
       // Start Distance Curve (2026-09-27) -- capped the same way the
       // initial forward pass is; see this function's own top comment.
-      values = lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
+      values = trig.loopFwd ? lerpTweenSegments(trig.loopFwd, (position / segments) * chp.frozenTweenFractionCap) : lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
     } else {
       // "Start at the WRAP segment, not segment 0" -- the forward pass
       // just ended exactly at the last pose, so starting the cycle at
@@ -11810,21 +14412,23 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // `tCyclic` accumulates continuously ACROSS laps, same disclosed
       // scoping limitation as updateClickPoseForHand()'s own matching
       // wrap-back branch.
-      const segments = trig.loopPoses.length
+      const segments = trig.loopRingW || trig.loopPoses.length // lap length in weight units (a Hold counts), = number of poses without Holds
       lapT = elapsedSegments / segments
       const tCyclic = (segments - 1) + Math.min(elapsedSegments, segments)
-      values = lerpLoopSequence(trig.loopPoses, tCyclic)
+      values = trig.loopRing ? lerpLoopSegments(trig.loopRing, tCyclic) : lerpLoopSequence(trig.loopPoses, tCyclic)
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, lapT) // item 5 (2026-09-27): THIS lap's own ramp, on top of everything already accumulated
+    const holdOsc = cfg[`${p}LoopMode`] === 'Oscillate'
+    applyOffsetRotationToHand(hand, p, loopLapProgress(p, 'hold', lapT, chp.loopCarry || 0, trig.loopPoses.length, holdOsc, chp.loopDirection)) // item 5 (2026-09-27): THIS lap's own ramp, on top of everything already accumulated
     if (lapT >= 1) {
       // Item 5 (2026-09-27): "everytime the loop starts, the
       // offset/rotation sequence is triggered again" -- lock THIS lap's
       // own contribution in permanently before branching into
       // stop/hold/restart, exactly mirroring the fire-and-forget pose-kind
       // family's own sequencePlaying phase (updateClickPoseForHand()).
-      bakeOffsetRotationIntoAccum(hand, p)
+      bakeOffsetRotationIntoAccum(hand, p, loopLapEnd(p, holdOsc, chp.loopDirection))
+      chp.loopCarry = 1 // a shaped Loop lap ends at 1 (not baked); the next lap's wrap-back falls from it
       // On Release Mode = 'Complete Sequence' -- a release happened
       // while this lap was already looping (see the forward phase's own
       // matching comment). Finish the CURRENT lap (just completed, right
@@ -11850,17 +14454,16 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const dt = Math.max(0, now - chp.stoppingLastFrameTime)
     chp.stoppingLastFrameTime = now
     const elapsedSinceRelease = now - chp.stoppingStartTime
-    if (elapsedSinceRelease < chp.stoppingStartDelay) {
-      // Still waiting for this hand's own Tween Stop Start Time stagger
-      // to begin -- completely frozen at whatever was already showing,
-      // same convention as every other phase's own pre-stagger hold.
-      applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
-      applyOffsetRotationToHand(hand, p, 0) // 'stopping' is a deceleration of the POSE, not a new offset/rotation ramp -- nothing new to add
-      return
-    }
-    const tDecay = THREE.MathUtils.clamp((elapsedSinceRelease - chp.stoppingStartDelay) / chp.stoppingDelayMs, 0, 1)
+    // CORRECTED 2026-10-13 (direct report: "the sequence pauses during that duration. it shouldnt"). Tween Stop Start Time is how long the sequence KEEPS RUNNING AT NORMAL SPEED after release;
+    // only when it has elapsed does Tween Stop Delay start slowing it from normal speed to a full halt. This used to freeze the hand for the whole Start Time (an early return), which is a pause, not a
+    // continuation. Now the start-time window just keeps decayFactor at 1 (the same advance a held sequence makes) and the deceleration clock starts when it ends.
+    const tDecay = THREE.MathUtils.clamp((elapsedSinceRelease - chp.stoppingStartDelay) / chp.stoppingDelayMs, 0, 1) // 0 for the whole Start Time window
     const decayFactor = 1 - tDecay // linear ease-out to 0 -- "progressively slowdown to a stop"
     let values
+    // The Offset / Camera Offset / Rotation ramp keeps going through Tween Stop exactly like the pose (2026-10-15, direct request: "tween stop start time and delay applies to rotation and offset functions within the click
+    // function as well, not just the pose"). It used to be frozen at release (the in-flight part is baked into the accumulator there, and this phase applied progress 0), so only the pose obeyed the Start Time
+    // (keeps running at normal speed) and the Delay (slows to a halt). stopRamp is the progress made SINCE the release, taken from the same virtual-elapsed accumulator that drives the pose; it is baked when the stop ends.
+    let stopRamp = 0
     if (chp.stoppingWasLooping) {
       // CORRECTED 2026-10-04 (was: hold the release-moment pose for the whole
       // delay, so Tween Stop appeared to work only on the first playthrough).
@@ -11872,7 +14475,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // bounces). Falls back to the old hold if the sequence data is gone.
       chp.stoppingVirtualElapsedMs += dt * decayFactor * (chp.liveTempo || 1)
       if (chp.stoppingLoopBaseSegments != null && trig.loopPoses && trig.loopPoses.length >= 2) {
-        values = loopPoseValuesBeyondLap(p, chp, trig, chp.stoppingLoopBaseSegments + chp.stoppingVirtualElapsedMs / loopSegmentMsFor(p, chp, trig))
+        const loopSegNow = chp.stoppingLoopBaseSegments + chp.stoppingVirtualElapsedMs / loopSegmentMsFor(p, chp, trig)
+        values = loopPoseValuesBeyondLap(p, chp, trig, loopSegNow)
+        // The current lap's own ramp carries on from where the release left it, to the lap's end at most (further laps are not added while stopping).
+        const stopOsc = cfg[`${p}LoopMode`] === 'Oscillate'
+        const lapSeg = Math.max(stopOsc ? (trig.loopFwdW || trig.loopPoses.length - 1) : (trig.loopRingW || trig.loopPoses.length), 1e-6)
+        const lapNow = normOffsetProgress(loopLapProgress(p, 'hold', loopSegNow / lapSeg, chp.loopCarry || 0, trig.loopPoses.length, stopOsc, chp.loopDirection))
+        const lapThen = normOffsetProgress(loopLapProgress(p, 'hold', chp.stoppingLoopBaseSegments / lapSeg, chp.loopCarry || 0, trig.loopPoses.length, stopOsc, chp.loopDirection))
+        stopRamp = { o: lapNow.o - lapThen.o, c: lapNow.c - lapThen.c, r: lapNow.r - lapThen.r }
       } else {
         values = chp.lastAppliedValues
       }
@@ -11887,6 +14497,8 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       chp.stoppingVirtualElapsedMs += dt * decayFactor * (chp.liveTempo || 1)
       const progressRaw = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
       const progress = stopEasing ? easingProfilePAt(stopEasing, progressRaw) : progressRaw
+      const progressAtRelease = THREE.MathUtils.clamp(chp.stoppingBaseElapsedMs / speedMs, 0, 1)
+      stopRamp = Math.max(progress - (stopEasing ? easingProfilePAt(stopEasing, progressAtRelease) : progressAtRelease), 0) // the (eased) forward ramp minus the part already baked at release
       // `* frozenTweenFractionCap` (CORRECTED 2026-09-28) -- the forward
       // phase this continues from applies Start Distance Curve's cap
       // (`cappedT`); without it here too, a capped hand would jump from
@@ -11896,8 +14508,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, 0) // 'stopping' is a deceleration of the POSE, not a new offset/rotation ramp -- nothing new to add
+    applyOffsetRotationToHand(hand, p, stopRamp) // continues the ramp the release interrupted (see stopRamp above); 0 when nothing was left to add
     if (tDecay >= 1) {
+      bakeInFlightOffsetRotation(hand, p) // the stop is over: lock in the part of the ramp added while stopping, so a retransition (or a freeze) starts from the real total
       if (chp.stoppingFreezeAtEnd) {
         // "the hand will just stop where it is" -- Retransition off, Tween
         // Stop decay just finished. Logged BEFORE the phase change, same
@@ -11988,14 +14601,15 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // (snapshotted at retransition-start by snapshotOffsetRotationAccumForRetransition())
     // back to zero, not just this function's own last increment -- and
     // clears the real accumulator once progress reaches 1.
-    applyOffsetRotationRetransition(hand, easedProgress, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart)
+    applyOffsetRotationRetransition(hand, easedProgress, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart, chp.retransitionBaseAccumStart, chp.retransitionCursorAccumStart)
     if (progress >= 1) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
 }
 function startClickHoldPose(p) {
   if (!cfg[`${p}Enabled`]) return
+  captureClickCursorPivot(p)
   if (startupBlocksClickFunctions()) return
-  startupStaticReleased = true
+  releaseStartupHold() // (startupBlocksClickFunctions() is true until every visible hand has finished its startup sequence, so this click is the one that starts cursor tracking)
   const trig = clickHoldPoseTriggers[p]
   trig.active = true
   trig.holdStartTime = nowVirtual() // virtual clock (see its own declaration) so Global Pause doesn't shift this trigger's forward-phase elapsed time
@@ -12053,9 +14667,20 @@ function startClickHoldPose(p) {
           return seq ? (seq.tweenPoses || []) : []
         })
       : selectedSequenceEntries(p)
+    // Hold-aware Loop / Oscillate timelines (see buildLoopTimelines()). Each weight unit lasts what one pose-to-pose segment used to, so lap length = total weight x loopSegmentMs.
+    const tl = buildLoopTimelines(trig.rawChainEntries)
+    trig.loopRing = tl.ring
+    trig.loopRingW = tl.ringW
+    trig.loopFwd = tl.fwd
+    trig.loopFwdW = tl.fwdW
+    if (tl.ringW > 0) trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) * chainSequenceCount(p) / tl.ringW, 1)
   } else {
     trig.loopPoses = null
     trig.rawChainEntries = null
+    trig.loopRing = null
+    trig.loopRingW = 0
+    trig.loopFwd = null
+    trig.loopFwdW = 0
   }
   // Direct request: "When a click and hold is occurring, during the
   // hold, moving the cursor should not trigger any panning. Instead, it
@@ -12260,7 +14885,7 @@ function endClickHoldPose(p) {
       // (2026-10-04) instead of freezing it for the whole delay. A hand
       // released during the end-of-lap Hold Duration sits at the lap end.
       if (chp.stoppingWasLooping && trig.loopPoses && trig.loopPoses.length >= 2) {
-        const lapSegments = cfg[`${p}LoopMode`] === 'Oscillate' ? trig.loopPoses.length - 1 : trig.loopPoses.length
+        const lapSegments = cfg[`${p}LoopMode`] === 'Oscillate' ? (trig.loopFwdW || trig.loopPoses.length - 1) : (trig.loopRingW || trig.loopPoses.length)
         chp.stoppingLoopBaseSegments = (chp.loopHoldEndTime && now < chp.loopHoldEndTime)
           ? lapSegments
           : Math.max(chp.loopNom ?? (now - chp.loopStartTime), 0) / loopSegmentMsFor(p, chp, trig)
@@ -12324,7 +14949,7 @@ function endClickHoldPose(p) {
 // triggers, so a hand can never get stuck mid-transition forever with no
 // way to reach it.
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   // CORRECTED 2026-09-30 -- see isClickHoldChainContinuation()'s own
   // comment (declared further below, but a plain function declaration is
   // hoisted, and this callback only ever runs on a real later pointerdown
@@ -12608,6 +15233,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
   const cp = getOrInitHandCP(hand)[p]
   const isTween = isSequenceOrChainMode(p)
   refreshLiveDistanceState(cp, hand, p, clickPoseTriggers[p], now, 'pose')
+  if (cp.pendingClaimAt && p !== STARTUP_FN && handStartupLocked(hand)) cp.pendingClaimAt = 0 // never claims a hand that is still in its startup sequence
   if (cp.pendingClaimAt && now >= cp.pendingClaimAt) {
     // FIX 2026-10-04 (direct report: "when i interrupt a offset to camera
     // sequence, there are jumps. They jump back to their original position
@@ -12633,7 +15259,23 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const startNamed = sequenceStartPoses(p, cp.pendingNamedPoses)
     cp.tweenPoses = (startNamed && startNamed.length >= 1) ? [anchor, ...startNamed] : null
     cp.glideScale = firstGlideScale(p)
-    cp.glideTimeFactor = poseGlideTimeFactor(p, cp.tweenPoses)
+    // HOLDS (2026-10-15, direct report: an imported tween's Hold did not play in the startup sequence or in Click Functions). The sequence used to be a flat pose list played in N-1 EQUAL segments
+    // (lerpTweenSequence), so every Hold was dropped by resolveTweenSequencePoses(). It is now a WEIGHTED timeline from the raw entries, the same resolver the hold-kind functions use
+    // (resolveTweenSegmentsWithAnchor / lerpTweenSegments): a transition weighs 1, a Hold percent / 100. With no Hold every weight is 1 and the result is identical to before.
+    // cp.tweenSegments plays the first pass (First Transition Time Scale is folded into the weights, as the hold-kind functions do); cp.lapSegments is the unscaled copy the later laps use,
+    // because laps never had the first-glide scaling.
+    cp.tweenSegments = null
+    cp.lapSegments = null
+    cp.glideTimeFactor = 1
+    if (cp.tweenPoses && cp.pendingRawEntries) {
+      const segs = resolveTweenSegmentsWithAnchor(anchor, sequenceStartEntries(p, cp.pendingRawEntries), true)
+      if (segs.length > 0) {
+        cp.lapSegments = segs.map((sg) => ({ ...sg }))
+        cp.tweenSegments = segs
+        cp.glideTimeFactor = applyFirstGlideScale(p, cp.tweenSegments)
+      }
+    }
+    if (!cp.tweenSegments) cp.glideTimeFactor = poseGlideTimeFactor(p, cp.tweenPoses)
     cp.phase = 'forward'
     cp.triggerTime = now
     cp.fwdNom = 0; cp.liveTick = now
@@ -12681,7 +15323,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // progress below -- Offset/Rotation is a separate system the spec
     // never asked to couple with this one.
     // First Transition Time Scale: remap so the first segment (current pose -> Pose 1) takes glideScale x its share
-    const poseT = (isTween && cp.glideScale && cp.glideScale !== 1 && cp.tweenPoses) ? remapGlideProgress(easedProgress, cp.tweenPoses.length - 1, cp.glideScale) : easedProgress
+    const poseT = (isTween && !cp.tweenSegments && cp.glideScale && cp.glideScale !== 1 && cp.tweenPoses) ? remapGlideProgress(easedProgress, cp.tweenPoses.length - 1, cp.glideScale) : easedProgress // (with cp.tweenSegments the first-glide scale is already in the weights)
     const cappedT = poseT * cp.frozenTweenFractionCap
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching comment. Ramps splay from wherever it actually was at
@@ -12692,16 +15334,16 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     if (isTween) {
       const noSeq = !cp.tweenPoses || cp.tweenPoses.length < 2
       if (noSeq && p !== STARTUP_FN) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck (the startup transition just moves the hands)
-      values = noSeq ? cp.forwardSnapshot : lerpTweenSequence(cp.tweenPoses, cappedT)
+      values = noSeq ? cp.forwardSnapshot : (cp.tweenSegments ? lerpTweenSegments(cp.tweenSegments, cappedT) : lerpTweenSequence(cp.tweenPoses, cappedT))
     } else {
       const tpName = (p === STARTUP_FN && !cfg.startupHandTweenEnabled) ? '' : cfg[`${p}TargetPose`]
-      const targetPose = stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === tpName))
-      if (!targetPose && p !== STARTUP_FN) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
+      const targetPose = isNoPoseMode(p) ? null : stackOnDefault((cfg.savedPoses || []).find((sp) => sp.name === tpName))
+      if (!targetPose && p !== STARTUP_FN && !isNoPoseMode(p)) { cp.phase = 'idle'; return } // nothing selected -- abandon this hand's sequence rather than get stuck
       values = targetPose ? lerpPoseValues(cp.forwardSnapshot, targetPose, cappedT) : cp.forwardSnapshot
     }
     cp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, splayNow)
-    applyOffsetRotationToHand(hand, p, progress)
+    applyOffsetRotationToHand(hand, p, easedProgress) // eased like the pose (2026-10-15)
     if (progress >= 1) {
       // Item 5/2 (2026-09-27): this ramp just completed -- lock its own
       // Offset/Rotation contribution permanently into the hand's
@@ -12714,6 +15356,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // phase on the very same frame it fires (no lingering), so a single
       // bake call here is exactly once per completed ramp, never repeated.
       bakeOffsetRotationIntoAccum(hand, p)
+      if (p === STARTUP_FN) hand._startupSeqDone = true // Hide Floor After Hand Offset Sequence: this hand has reached the end of its own startup sequence
       // Sequence Mode - Count/Loop/Oscillate (Sequence mode only) -- see
       // makeClickPoseGroup()'s own control comment for the full
       // reasoning. This initial forward pass IS lap 1; a plain 'Count'
@@ -12747,7 +15390,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const holdMs = Math.max(cfg[`${p}SequenceHoldMs`] || 0, 0)
     if (cp.sequenceHoldEndTime && now < cp.sequenceHoldEndTime) {
       applyPoseValuesToHand(hand, cp.lastAppliedValues, cp.frozenSplayDeg)
-      applyOffsetRotationToHand(hand, p, 0) // this lap's own contribution is already baked into the accumulator
+      applyOffsetRotationToHand(hand, p, loopPausedProg(p, 'pose', 0, lapStyle === 'Oscillate')) // this lap's own contribution is already baked into the accumulator
       return
     }
     if (cp.sequenceHoldEndTime && now >= cp.sequenceHoldEndTime) {
@@ -12763,12 +15406,12 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // Start Distance Curve (2026-09-27) -- capped the same way the
       // initial forward pass is (see this phase's own top comment).
       const t = (cp.sequenceDirection === 1 ? lapT : 1 - lapT) * cp.frozenTweenFractionCap
-      values = lerpTweenSequence(cp.tweenPoses, t)
+      values = cp.lapSegments ? lerpTweenSegments(cp.lapSegments, t) : lerpTweenSequence(cp.tweenPoses, t)
     } else if (cfg[`${p}SequenceLoopTransition`] === false) {
       // Instant jump back to frame 1 between laps -- each lap plays the
       // SAME forward pass (no smooth wrap segment), matching the
       // control's own "Off = instant jump back to frame 1" wording.
-      values = lerpTweenSequence(cp.tweenPoses, lapT * cp.frozenTweenFractionCap)
+      values = cp.lapSegments ? lerpTweenSegments(cp.lapSegments, lapT * cp.frozenTweenFractionCap) : lerpTweenSequence(cp.tweenPoses, lapT * cp.frozenTweenFractionCap)
     } else {
       // Smooth wrap-back -- reuses lerpLoopSequence()'s own cyclic
       // segment math (same as Click Hold-Pose's own Loop Mode), an
@@ -12780,13 +15423,20 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // subtly wrong implementation of the trickiest case. Disclosed
       // limitation, not an oversight -- see this session's own final
       // report/CHANGELOG entry.
-      const segments = cp.tweenPoses.length
-      const tCyclic = (cp.sequenceLapIndex - 1) * segments + lapT * segments
-      values = lerpLoopSequence(cp.tweenPoses, tCyclic)
+      if (cp.lapSegments) {
+        // weighted ring: this lap's forward segments (Holds included) + one closing segment last pose -> first pose of weight 1 (same ring the Loading Preview builds)
+        const ring = cp.lapSegments.concat([{ poseA: cp.lapSegments[cp.lapSegments.length - 1].poseB, poseB: cp.lapSegments[0].poseA, weight: 1 }])
+        const totalRingWeight = ring.reduce((sum, sg) => sum + sg.weight, 0)
+        values = lerpLoopSegments(ring, (cp.sequenceLapIndex - 1 + lapT) * totalRingWeight)
+      } else {
+        const segments = cp.tweenPoses.length
+        const tCyclic = (cp.sequenceLapIndex - 1) * segments + lapT * segments
+        values = lerpLoopSequence(cp.tweenPoses, tCyclic)
+      }
     }
     cp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, cp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, lapT) // item 5 (2026-09-27): THIS lap's own ramp, on top of everything already accumulated
+    applyOffsetRotationToHand(hand, p, loopLapProgress(p, 'pose', lapT, 0, cp.tweenPoses.length, lapStyle === 'Oscillate', cp.sequenceDirection)) // item 5 (2026-09-27): THIS lap's own ramp, on top of everything already accumulated
     if (lapT >= 1) {
       // Item 5 (2026-09-27): "everytime the loop starts, the
       // offset/rotation sequence is triggered again" -- lock THIS lap's
@@ -12797,7 +15447,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // `sequenceHoldEndTime` branch above, which correctly renders
       // progress=0 while paused since the bake already happened here),
       // so this fires exactly once per completed lap, never repeated.
-      bakeOffsetRotationIntoAccum(hand, p)
+      bakeOffsetRotationIntoAccum(hand, p, loopLapEnd(p, lapStyle === 'Oscillate', cp.sequenceDirection))
       cp.sequenceLapIndex++
       if (cp.sequenceLapIndex > totalLaps) {
         cp.phase = 'paused'
@@ -12834,7 +15484,8 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // symmetric with the hold family: RetransitionEnabled governs both
     // modes here too.
     if (cfg[`${p}RetransitionEnabled`] === false) return
-    const pauseDurationMs = Math.max(cfg[`${p}PauseDurationMs`], 0)
+    // The startup transition never holds at its end (2026-10-15, direct report: the hands paused before retransitioning). Its Pause Duration row is gone and its saved value (the 500 ms factory default) is ignored.
+    const pauseDurationMs = p === STARTUP_FN ? 0 : Math.max(cfg[`${p}PauseDurationMs`], 0)
     if (now - cp.pauseStartTime >= pauseDurationMs) {
       cp.phase = 'retransition'
       cp.retransitionStart = cp.lastAppliedValues || { ...poseDefaultValues }
@@ -12848,6 +15499,8 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // real total rather than just this function's own last increment.
       cp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0, z: 0 }
       cp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
+      cp.retransitionBaseAccumStart = hand._customBaseRotAccum ? hand._customBaseRotAccum.clone() : new THREE.Quaternion()
+      cp.retransitionCursorAccumStart = hand._customCursorRigid ? { q: hand._customCursorRigid.q.clone(), t: hand._customCursorRigid.t.clone() } : null
       // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
       // matching capture for the full reasoning.
       cp.retransitionFromSplayDeg = hand.currentSplayDeg
@@ -12857,13 +15510,13 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // distance-based stagger for retransition, same convention
       // `${p}StartTimeCurveEnabled` already uses for the forward phase.
       cp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
-        : curveByDomain(p, 'RetransitionStartTimeCurveVisibleOnly', handXYDist(hand), clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
+        : curveByDomainFor(hand, p, 'RetransitionStartTimeCurveVisibleOnly', clickPoseTriggers[p].retransitionCurveParsed, clickPoseTriggers[p].retransitionRangeParsed)
       // Retransition Speed Curve (item 5, 2026-09-24) -- frozen once here,
       // same "frozen at trigger time" philosophy as Animation Speed
       // Curve's own frozenSpeedMs pair -- see makeClickHoldPoseGroup()'s
       // own matching control comment.
       cp.retransitionSpeedMs = cfg[`${p}RetransitionSpeedCurveEnabled`]
-        ? curveByDomain(p, 'RetransitionSpeedCurveVisibleOnly', handXYDist(hand), clickPoseTriggers[p].retransitionSpeedCurveParsed, clickPoseTriggers[p].retransitionSpeedRangeParsed)
+        ? curveByDomainFor(hand, p, 'RetransitionSpeedCurveVisibleOnly', clickPoseTriggers[p].retransitionSpeedCurveParsed, clickPoseTriggers[p].retransitionSpeedRangeParsed)
         : 0
       logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'pause finished -> retransition begins')
     }
@@ -12887,7 +15540,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // (snapshotted above at retransition-start) back to zero, not just
     // this function's own last increment -- and clears the real
     // accumulator once progress reaches 1, a genuinely fresh start.
-    applyOffsetRotationRetransition(hand, easedProgress, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart)
+    applyOffsetRotationRetransition(hand, easedProgress, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart, cp.retransitionBaseAccumStart, cp.retransitionCursorAccumStart)
     if (progress >= 1) cp.phase = 'idle'
   }
 }
@@ -12956,9 +15609,10 @@ function assignHandsToCycle(cycle, startIdx) {
 }
 function triggerClickPose(p, onlyHands = null) {
   if (!cfg[`${p}Enabled`]) return
+  captureClickCursorPivot(p)
   if (p !== STARTUP_FN) {
     if (startupBlocksClickFunctions()) return
-    startupStaticReleased = true
+    releaseStartupHold()
   }
   const trig = clickPoseTriggers[p]
   const now = nowVirtual() // virtual clock -- feeds cp.triggerTime below, an animation-timing field
@@ -12973,8 +15627,10 @@ function triggerClickPose(p, onlyHands = null) {
   POSE_PRESET_KEYS.forEach((key) => { forwardSnapshot[key] = cfg[key] })
   const isTween = isSequenceOrChainMode(p)
   let namedPoses = null
+  let rawEntries = null // the sequence's raw entries, Hold objects intact (2026-10-15: pose-kind functions now play Holds)
   if (isTween) {
-    const resolved = resolveTweenSequencePoses(selectedSequenceEntries(p), true)
+    rawEntries = selectedSequenceEntries(p)
+    const resolved = resolveTweenSequencePoses(rawEntries, true)
     if (resolved.length >= 1) namedPoses = resolved
   }
   let minD = Infinity, maxD = -Infinity
@@ -12993,6 +15649,7 @@ function triggerClickPose(p, onlyHands = null) {
   const splay3dRange = Math.max(splay3dMax - splay3dMin, 0.001)
   hands.forEach((hand, i) => {
     if (onlyHands && !onlyHands.has(hand)) return // Skip If Same Pose / Multi Trigger already chose this trigger for other hands
+    if (p === STARTUP_FN ? hand._startupTriggered : handStartupLocked(hand)) return // startup sequence: already-triggered hands are never retriggered; every other function skips a hand still in its startup sequence
     if (handSkipsTrigger(hand, p)) return // Skip If Same Pose: already in the target pose
     const cp = getOrInitHandCP(hand)[p]
     // Start Distance Curve (direct spec, 2026-09-27) -- "beyond those
@@ -13007,7 +15664,7 @@ function triggerClickPose(p, onlyHands = null) {
     // user-set domain, not the live field's own min/max like every other
     // curve here.
     let tweenFractionCap = 1
-    if (cfg[`${p}StartDistanceCurveEnabled`]) {
+    if (cfg[`${p}StartDistanceCurveEnabled`] && !(p === STARTUP_FN && startupIgnoreStartDistance)) {
       const cap = computeTweenFractionCap(dists[i], cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
       if (cap === null) return // outside the eligible range -- this hand never triggers
       tweenFractionCap = cap
@@ -13026,9 +15683,11 @@ function triggerClickPose(p, onlyHands = null) {
       ? curveByDomain(p, 'StartTimeCurveVisibleOnly', dists[i], trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
       : curveByDomain(p, 'StartTimeCurveVisibleOnly', dists[i], trig.startCurveParsed, trig.startRangeParsed))
     cp.pendingClaimAt = now + delay
+    if (p === STARTUP_FN) { hand._startupTriggered = true; hand._startupClick = { dist: dists[i], min: xyFieldMinDist, range: xyFieldDistRange, minAll: xyAllMinDist, rangeAll: xyAllDistRange } } // frozen click-point distance + domain
     cp.pendingPressAt = now; cp.pendingIsTween = isTween // live Start Time (refreshLiveDistanceState)
     cp.pendingForwardSnapshot = forwardSnapshot
     cp.pendingNamedPoses = namedPoses
+    cp.pendingRawEntries = rawEntries
     cp.pendingTweenFractionCap = tweenFractionCap
     // Frozen for this hand's entire sequence (forward/paused/
     // retransition) -- see updateClickHoldPoseForHand()'s own top
@@ -13114,7 +15773,7 @@ let leftPointerDown = false
 window.addEventListener('pointerdown', (e) => { if (e.button === 0) leftPointerDown = true })
 window.addEventListener('pointerup', (e) => { if (e.button === 0) leftPointerDown = false })
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   if (e.button !== 0) return
   // This exact pointerup was releasing a Click-Hold-Pose hold, not a
   // standalone click -- see lastPointerupWasHoldRelease's own comment
@@ -13216,7 +15875,7 @@ window.addEventListener('pointerup', (e) => {
 let rightClickPoseClickCount = 0
 let rightClickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   if (e.button !== 2) return
   if (lastPointerupWasRchpHoldRelease) return
   triggerClickPose('rc')
@@ -13323,7 +15982,7 @@ function isClickHoldChainContinuation(now) {
   return now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs
 }
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   if (e.button !== 0) return
   const now = performance.now()
   if (isClickHoldChainContinuation(now)) {
@@ -13414,7 +16073,7 @@ function buildGenericRangeBarWidget(row, opts) {
   // click-to-edit bound.
   let trackMin = opts.trackMin, trackMax = opts.trackMax
   const toPct = (v) => THREE.MathUtils.clamp((v - trackMin) / (trackMax - trackMin) * 100, 0, 100)
-  const fromPct = (pct) => Math.round(trackMin + (pct / 100) * (trackMax - trackMin))
+  const fromPct = (pct) => { const m = Math.pow(10, opts.decimals ?? 0); return Math.round((trackMin + (pct / 100) * (trackMax - trackMin)) * m) / m } // opts.decimals (default 0): decimals kept while dragging
   function expandTrackIfNeeded() {
     if (current.min < trackMin) trackMin = current.min - Math.abs(current.min) * 0.2
     if (current.max > trackMax) trackMax = current.max + Math.abs(current.max) * 0.2
@@ -13636,6 +16295,7 @@ function buildGenericCurveWidget(row, opts) {
   }
   const CURVE_SAMPLES = 48
   let handleEls = []
+  let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
   // Bezier curve handles (direct spec item, this widget only -- the
   // project-specific Arm Length/Wrist Splay curve widgets are deliberately
   // separate copies, per their own comments, and are NOT extended here).
@@ -13696,6 +16356,7 @@ function buildGenericCurveWidget(row, opts) {
     curvePath.setAttribute('d', d.trim())
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
+    handleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -13727,6 +16388,7 @@ function buildGenericCurveWidget(row, opts) {
         marker.setAttribute('fill-opacity', isReal ? '1' : '0.35')
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
+        if (isReal) handleHits.push({ marker, p, i, kind })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -13743,6 +16405,21 @@ function buildGenericCurveWidget(row, opts) {
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
         if (downEv.shiftKey) { startHandleDrag(p, i, 'h2', downEv); return }
+        // A bezier handle that sits on (or very near) a curve point is grabbed instead of the point (2026-10-15, direct report: a handle made too short could not be dragged again, the point moved instead). The point's
+        // hit circle is drawn on top of the handle marker, so without this the circle always wins when they overlap. The 7 / 12 px reach is a judgment call, not a measurement.
+        {
+          // The handle wins when the click is nearer to it than to the point, or within 7 px (12 px for touch) of it -- so a handle lying on its point is picked, while a point whose handle is a few pixels away can still be grabbed by its centre.
+          const hr = hit.getBoundingClientRect()
+          const pointD = Math.hypot(downEv.clientX - (hr.left + hr.width / 2), downEv.clientY - (hr.top + hr.height / 2))
+          const grabPx = downEv.pointerType === 'touch' ? 12 : 7
+          let best = null, bestD = Infinity
+          handleHits.forEach((h) => {
+            const r = h.marker.getBoundingClientRect()
+            const d = Math.hypot(downEv.clientX - (r.left + r.width / 2), downEv.clientY - (r.top + r.height / 2))
+            if (d <= Math.max(grabPx, pointD) && d < bestD) { bestD = d; best = h }
+          })
+          if (best) { startHandleDrag(best.p, best.i, best.kind, downEv); return }
+        }
         downEv.stopPropagation()
         dragged = false
         const isEndpoint = i === 0 || i === points.length - 1
@@ -13815,6 +16492,12 @@ const CLICK_HOLD_START_TIME_TRACK_MAX = 3000 // ms -- a deliberately smaller cei
 // Curve + range-bar widgets for the per-axis Cursor Offset and Offset To
 // Camera rows (2026-10-02) -- shared by both widget builders.
 function buildOffsetAxisWidgets(p) {
+  ;['X', 'Y', 'Z'].forEach((ax) => {
+    const curveRow = document.querySelector(`.dp-row[data-key="${p}Rotation${ax}Curve"]`)
+    const rangeRow = document.querySelector(`.dp-row[data-key="${p}Rotation${ax}CurveRange"]`)
+    if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand, Live)  ·  Y: Rotation Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+    if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: -360, trackMax: 360, unit: 'deg', defaultValue: { min: 0, max: 0 } })
+  })
   const cursorCaption = 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Offset Fraction (0=Min, 1=Max)'
   const cameraCaption = 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand, Live)  ·  Y: Offset Fraction (0=Min, 1=Max)  ·  Moves toward (+) / away (-) the camera on this world axis'
   ;['CursorOffset', 'CameraOffset'].forEach((prefix) => {
@@ -13848,6 +16531,13 @@ function buildClickHoldPoseWidgets(p) {
   const retransSpeedRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurveRange"]`)
   if (retransSpeedCurveRow) buildGenericCurveWidget(retransSpeedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (retransSpeedRangeRow) buildGenericRangeBarWidget(retransSpeedRangeRow, { trackMin: 50, trackMax: 25000, unit: 'ms', defaultValue: { min: 50, max: 25000 } })
+  const retransDistCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionDistCurve"]`), retransDistRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionDistRange"]`)
+  if (retransDistCurveRow) buildGenericCurveWidget(retransDistCurveRow, { caption: 'X: Hand Distance From Camera (%, Nearest→Farthest Hand, Live)  ·  Y: Retransition Time (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (retransDistRangeRow) buildGenericRangeBarWidget(retransDistRangeRow, { trackMin: 50, trackMax: 25000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
+  const scalerCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionScalerCurve"]`), scalerMulRow = document.querySelector(`.dp-row[data-key="${p}RetransitionScalerMulRange"]`), scalerDistRow = document.querySelector(`.dp-row[data-key="${p}RetransitionScalerDistRange"]`)
+  if (scalerCurveRow) buildGenericCurveWidget(scalerCurveRow, { caption: 'X: Hand Distance From Its Own Field Starting Point (%, Distance Slider Min→Max, Beyond Is Extrapolated)  ·  Y: Retransition Speed Multiplier (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (scalerMulRow) buildGenericRangeBarWidget(scalerMulRow, { trackMin: 0.1, trackMax: 5, unit: 'x', decimals: 2, defaultValue: { min: 0.5, max: 2 } })
+  if (scalerDistRow) buildGenericRangeBarWidget(scalerDistRow, { trackMin: 0, trackMax: 300, unit: 'wu', defaultValue: { min: 0, max: 50 } })
   // Tween's own dedicated Retransition SPEED curve/range (2026-09-30,
   // direct follow-up: "for retransition speed curve make the ui the
   // sliderr toggle and the curve editor") -- same shape/caption/track
@@ -13947,6 +16637,13 @@ function buildClickPoseWidgets(p) {
   const retransSpeedRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionSpeedCurveRange"]`)
   if (retransSpeedCurveRow) buildGenericCurveWidget(retransSpeedCurveRow, { caption: speedCurveCaption, defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (retransSpeedRangeRow) buildGenericRangeBarWidget(retransSpeedRangeRow, { trackMin: 50, trackMax: 25000, unit: 'ms', defaultValue: { min: 50, max: 25000 } })
+  const retransDistCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionDistCurve"]`), retransDistRangeRow = document.querySelector(`.dp-row[data-key="${p}RetransitionDistRange"]`)
+  if (retransDistCurveRow) buildGenericCurveWidget(retransDistCurveRow, { caption: 'X: Hand Distance From Camera (%, Nearest→Farthest Hand, Live)  ·  Y: Retransition Time (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (retransDistRangeRow) buildGenericRangeBarWidget(retransDistRangeRow, { trackMin: 50, trackMax: 25000, unit: 'ms', defaultValue: { min: 50, max: 2000 } })
+  const scalerCurveRow = document.querySelector(`.dp-row[data-key="${p}RetransitionScalerCurve"]`), scalerMulRow = document.querySelector(`.dp-row[data-key="${p}RetransitionScalerMulRange"]`), scalerDistRow = document.querySelector(`.dp-row[data-key="${p}RetransitionScalerDistRange"]`)
+  if (scalerCurveRow) buildGenericCurveWidget(scalerCurveRow, { caption: 'X: Hand Distance From Its Own Field Starting Point (%, Distance Slider Min→Max, Beyond Is Extrapolated)  ·  Y: Retransition Speed Multiplier (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (scalerMulRow) buildGenericRangeBarWidget(scalerMulRow, { trackMin: 0.1, trackMax: 5, unit: 'x', decimals: 2, defaultValue: { min: 0.5, max: 2 } })
+  if (scalerDistRow) buildGenericRangeBarWidget(scalerDistRow, { trackMin: 0, trackMax: 300, unit: 'wu', defaultValue: { min: 0, max: 50 } })
   const startCurveRow = document.querySelector(`.dp-row[data-key="${p}StartTimeCurve"]`)
   const startRangeRow = document.querySelector(`.dp-row[data-key="${p}StartTimeRange"]`)
   const tweenStartCurveRow = document.querySelector(`.dp-row[data-key="${p}TweenStartTimeCurve"]`)
@@ -14012,23 +16709,227 @@ let nextCustomFunctionN = 1
 // load, which is the correct, unsurprising default (no user-visible
 // concept of "resume mid-cycle across reloads" was ever requested).
 const customFunctionMultiTriggerIndex = {} // { [id]: number }
+let customFunctionCollapseReady = false
+// ---- Custom Click Function Selector (2026-10-14) ----
+function customFunctionDisplayName(e) {
+  const t = document.querySelector(`.dp-group[data-custom-function-id="${e.id}"] > .dp-group-header .dp-group-title-text`)
+  return (t && t.textContent.trim()) || e.title || e.id // the live title, so a rename in the function's own group shows up here
+}
+// Rebuilds the selector's items against the real function list: layout (order + group) from what the selector last held, names from the functions, new functions appended, deleted ones dropped. Only pushes to the panel when something changed.
+function refreshCustomFunctionSelector() {
+  let saved = cfg.customFunctionSelector
+  if (typeof saved === 'string') { try { saved = JSON.parse(saved) } catch (e) { saved = [] } }
+  if (!Array.isArray(saved)) saved = []
+  const byId = new Map(customClickFunctionIds.map((e) => [e.id, e]))
+  const out = []
+  const used = new Set()
+  saved.forEach((it) => {
+    const e = it && byId.get(it.fnId)
+    if (!e || used.has(e.id)) return
+    used.add(e.id)
+    out.push({ name: customFunctionDisplayName(e), fnId: e.id, ...(it.group ? { group: it.group } : {}) })
+  })
+  customClickFunctionIds.forEach((e) => {
+    if (used.has(e.id)) return
+    const grp = customFunctionPendingGroup[e.id]
+    delete customFunctionPendingGroup[e.id]
+    out.push({ name: customFunctionDisplayName(e), fnId: e.id, ...(grp ? { group: grp } : {}) })
+  })
+  if (JSON.stringify(out) === JSON.stringify(saved)) return
+  cfg.customFunctionSelector = out
+  syncValue('customFunctionSelector', out)
+}
+function refreshCustomFunctionSelectorToggles() { try { refreshListPickerTogglesByKey('customFunctionSelector') } catch (e) { /* panel not built yet */ } }
+// The selector's checkbox -> the function's own Enabled checkbox, through the same path a click on it takes (every device rule, onChange, Master On/Off showing / hiding the function's rows).
+function setCustomFunctionEnabled(id, on) {
+  if (!!cfg[`${id}Enabled`] === !!on) return
+  setControlValue(`${id}Enabled`, !!on)
+}
+let customFunctionSelectorObserver = null
+function watchCustomFunctionTitles() {
+  if (customFunctionSelectorObserver) return
+  const anchor = document.querySelector('.dp-group[data-key="Custom Click Functions"]')
+  if (!anchor || typeof MutationObserver === 'undefined') return
+  let timer = 0
+  customFunctionSelectorObserver = new MutationObserver(() => { clearTimeout(timer); timer = setTimeout(refreshCustomFunctionSelector, 400) })
+  customFunctionSelectorObserver.observe(anchor, { subtree: true, characterData: true, childList: true })
+}
+// Duplicate (selector button): a new function of the same kind / family with every setting of the source copied - all three devices' values, Show-in-Mobile / Landscape and Independent flags, and the Multi Trigger list with each trigger's own settings.
+// Rename button in the selector: the function's own group title (a display override, the same one the dev panel's rename mode sets), so the selector and the panel show the same name.
+function renameCustomFunction(id, name) {
+  const g = document.querySelector(`.dp-group[data-custom-function-id="${id}"]`)
+  if (!g || !name) return
+  setDevTextOverride(g.dataset.key, name)
+  applyTextOverrides()
+  refreshCustomFunctionSelector()
+}
+// ---- Undo / Redo of function groups (2026-10-14) ----
+// The panel's Undo / Redo restores values, layout and names from snapshots; a function group that was created (Add / Duplicate) or removed has to be built / torn down as well. undoCaptureExtra records which
+// functions exist; undoApplyExtra puts that set back BEFORE the values are applied, so a recreated function is there to receive its values.
+function unregisterCustomFunctionById(id) {
+  const idx = customClickFunctionIds.findIndex((e) => e.id === id)
+  if (idx === -1) return
+  const entry = customClickFunctionIds[idx]
+  const own = (k) => k === id || (typeof k === 'string' && k.startsWith(id) && /^[A-Z]/.test(k.slice(id.length))) // the function and its Multi Trigger prefixes (custom1Trig1 ...)
+  ;[CLICK_POSE_KEYS, CLICK_HOLD_KEYS].forEach((keys) => { for (let i = keys.length - 1; i >= 0; i--) if (own(keys[i])) keys.splice(i, 1) })
+  ;[clickPoseTriggers, clickHoldPoseTriggers].forEach((t) => Object.keys(t).forEach((k) => { if (own(k)) delete t[k] }))
+  hands.forEach((hand) => { ;[hand._cp, hand._chp].forEach((st) => { if (st) Object.keys(st).forEach((k) => { if (own(k)) delete st[k] }) }) })
+  const g = document.querySelector(`.dp-group[data-custom-function-id="${id}"]`)
+  if (g) g.remove()
+  forgetControlsWithPrefix(id)
+  customClickFunctionIds.splice(idx, 1)
+  delete customFunctionPendingGroup[id]
+  delete clickCursorPivots[id]
+  return entry
+}
+async function reconcileCustomFunctions(extra) {
+  const target = extra && extra.customFunctions
+  if (!Array.isArray(target)) return
+  const want = new Set(target.map((e) => e.id))
+  const gone = customClickFunctionIds.filter((e) => !want.has(e.id)).map((e) => e.id)
+  gone.forEach(unregisterCustomFunctionById)
+  const missing = target.filter((e) => !customClickFunctionIds.some((x) => x.id === e.id))
+  if (missing.length) {
+    beginDynamicBatch()
+    try {
+      for (const e of missing) {
+        // the Multi Trigger list has to be there before the function is built, or its trigger groups are not created
+        const mt = extra.multiTriggers && extra.multiTriggers[e.id]
+        if (mt !== undefined) seedControlValue(`${e.id}MultiTriggers`, mt)
+        customClickFunctionIds.push({ id: e.id, title: e.title, kind: e.kind, family: e.family })
+        await registerCustomClickFunction(e.id, e.title, e.kind, e.family)
+        const g = document.querySelector(`.dp-group[data-custom-function-id="${e.id}"]`)
+        if (g) applyCustomFunctionCollapse(g, { collapsed: true })
+      }
+    } finally { endDynamicBatch() }
+  }
+  // functions that already existed: their trigger set may differ too (a Multi Trigger was deleted or added since the snapshot)
+  for (const e of target) {
+    if (missing.some((m) => m.id === e.id)) continue
+    await reconcileMultiTriggers(e.id, extra.multiTriggers && extra.multiTriggers[e.id] !== undefined ? extra.multiTriggers[e.id] : '[]')
+  }
+  if (gone.length || missing.length) {
+    persistCustomClickFunctionIds()
+    refreshAllCustomFunctionGroupVisibility()
+    refreshAllCustomFunctionTypeVisibility()
+    updateCustomFunctionsAnchorRowVisibility()
+  }
+}
+function captureCustomFunctionsForUndo() {
+  const multiTriggers = {}
+  customClickFunctionIds.forEach((e) => { const v = cfg[`${e.id}MultiTriggers`]; if (v && v !== '[]') multiTriggers[e.id] = v })
+  return { customFunctions: customClickFunctionIds.map(({ id, title, kind, family }) => ({ id, title, kind, family })), multiTriggers }
+}
+// opts.group: the selector group path the copy goes into (duplicating a whole group) - read by refreshCustomFunctionSelector() when it first lists the new function.
+const customFunctionPendingGroup = {}
+async function duplicateCustomClickFunction(srcId, opts) {
+  const src = customClickFunctionIds.find((e) => e.id === srcId)
+  if (!src) return
+  const id = `custom${nextCustomFunctionN}`
+  nextCustomFunctionN++
+  if (opts && opts.group) customFunctionPendingGroup[id] = opts.group
+  const base = customFunctionDisplayName(src).replace(/ Copy( \d+)?$/, '')
+  const names = new Set(customClickFunctionIds.map((e) => customFunctionDisplayName(e)))
+  let title = base + ' Copy'
+  for (let n = 2; names.has(title); n++) title = base + ' Copy ' + n
+  customClickFunctionIds.push({ id, title, kind: src.kind, family: src.family })
+  await registerCustomClickFunction(id, title, src.kind, src.family)
+  // Multi Trigger: same number of triggers, built the way "+ Add Trigger" builds them (without its Save).
+  let srcTriggers = []
+  try { srcTriggers = JSON.parse(cfg[`${srcId}MultiTriggers`] || '[]') } catch (e) { srcTriggers = [] }
+  if (!Array.isArray(srcTriggers)) srcTriggers = []
+  const newTriggers = srcTriggers.filter((t) => t && t.prefix).map((t, i) => ({ prefix: `${id}Trig${i + 1}`, title: t.title || `Trigger ${i + 1}`, from: t.prefix }))
+  if (newTriggers.length) {
+    cfg[`${id}MultiTriggers`] = JSON.stringify(newTriggers.map(({ prefix, title: tt }) => ({ prefix, title: tt })))
+    syncValue(`${id}MultiTriggers`, cfg[`${id}MultiTriggers`])
+    const enabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+    const functionBody = enabledRow ? enabledRow.parentElement : null
+    const mtGroup = functionBody ? functionBody.querySelector(':scope > .dp-group[data-key="Multi Trigger"]') : null
+    const mtBody = mtGroup ? mtGroup.querySelector(':scope > .dp-group-body') : null
+    const addBtnRow = mtBody ? mtBody.querySelector(':scope > .dp-multi-trigger-add-row') : null
+    await Promise.all(newTriggers.map((t) => registerMultiTriggerTrigger(t.prefix, t.title, mtBody, addBtnRow, src.kind, id)))
+  }
+  exclusiveTriggerSuppress++ // the copy carries the source's trigger, so copying its Enabled must not switch the source off (the copy is switched off below if they overlap)
+  // Copy every setting: the source's keys are the function id followed by an upper-case suffix (custom1Enabled, custom1Trig2OffsetX ...); custom10... does not start a custom1 key.
+  const skip = new Set([`${srcId}MultiTriggers`])
+  const pairs = []
+  Object.keys(cfg).forEach((k) => {
+    if (!k.startsWith(srcId) || skip.has(k)) return
+    const rest = k.slice(srcId.length)
+    if (!/^[A-Z]/.test(rest)) return
+    pairs.push([k, id + rest])
+  })
+  // Type last and without its handler (the new function is already registered with the source's kind, so re-running the kind switch is pointless); everything else re-runs its own onChange so visibility / parsed curves follow.
+  pairs.filter(([f]) => !f.endsWith('Type')).forEach(([f, t]) => copyControlState(f, t, true))
+  pairs.filter(([f]) => f.endsWith('Type')).forEach(([f, t]) => copyControlState(f, t, false))
+  // Multi Trigger bookkeeping rows and the new triggers' own copies of the source triggers' settings
+  newTriggers.forEach((t) => {
+    Object.keys(cfg).forEach((k) => { if (k.startsWith(t.from) && /^[A-Z]/.test(k.slice(t.from.length))) copyControlState(k, t.prefix + k.slice(t.from.length), true) })
+  })
+  try { if (src.kind === 'hold') parseClickHoldConfig(id); else parseClickPoseConfig(id) } catch (e) { /* trigger state not ready */ }
+  newTriggers.forEach((t) => { try { parseClickPoseConfig(t.prefix) } catch (e) { /* hold kind has no triggers */ } })
+  copyControlState(`${srcId}MultiTriggerEnabled`, `${id}MultiTriggerEnabled`, true)
+  exclusiveTriggerSuppress--
+  if (customFunctionOverlapNames(id).length) setCustomFunctionEnabled(id, false) // a copy of an enabled function would otherwise overlap its source: it starts off
+  updateCustomFunctionTypeVisibility(id)
+  updateClickFunctionEnabledVisibility(id)
+  // the copy's group sits right after the source's, collapsed like every other
+  const srcGroup = document.querySelector(`.dp-group[data-custom-function-id="${srcId}"]`)
+  const newGroup = document.querySelector(`.dp-group[data-custom-function-id="${id}"]`)
+  if (srcGroup && newGroup && srcGroup.parentElement === newGroup.parentElement) srcGroup.after(newGroup)
+  if (newGroup) applyCustomFunctionCollapse(newGroup, { collapsed: true })
+  refreshAllCustomFunctionGroupVisibility()
+  persistCustomClickFunctionIds()
+}
+// Every group nested inside a custom function's group, with its path of group keys below that function ("Retransition/Retransition Speed Curve").
+function customFunctionSubgroups(fnGroup) {
+  const out = []
+  fnGroup.querySelectorAll('.dp-group').forEach((el) => {
+    const keys = [el.dataset.key]
+    for (let p = el.parentElement && el.parentElement.closest('.dp-group'); p && p !== fnGroup; p = p.parentElement && p.parentElement.closest('.dp-group')) keys.unshift(p.dataset.key)
+    out.push({ path: keys.join('/'), el })
+  })
+  return out
+}
+// Direct request 2026-10-14: a custom function and every group inside it start COLLAPSED; the open / closed state recorded at the last Save wins for any group it knows (entry.cv === 2).
+function applyCustomFunctionCollapse(fnGroup, entry) {
+  const known = !!(entry && entry.cv === 2)
+  fnGroup.classList.toggle('collapsed', known ? !!entry.collapsed : true)
+  customFunctionSubgroups(fnGroup).forEach(({ path, el }) => {
+    el.classList.toggle('collapsed', known && entry.sub && path in entry.sub ? !!entry.sub[path] : true)
+  })
+}
 function persistCustomClickFunctionIds() {
   // Capture current collapse state for each custom function group before
   // saving, so the collapse state can be restored on page load (see
   // restoreCustomClickFunctions() for the restore side).
+  // Only after the startup restore has applied the saved states (customFunctionCollapseReady) -- before that the groups are still freshly built and would overwrite the saved states with "all open".
   const anchor = document.querySelector('.dp-group[data-key="Custom Click Functions"]')
-  if (anchor) {
+  if (anchor && customFunctionCollapseReady) {
     const anchorBody = anchor.querySelector(':scope > .dp-group-body')
     if (anchorBody) {
       customClickFunctionIds.forEach((entry) => {
-        const g = anchorBody.querySelector(`.dp-group[data-key="${entry.id}"]`)
-        if (g) entry.collapsed = g.classList.contains('collapsed')
+        // A function's group is keyed by its TITLE (data-key), not its id - the id lives in data-custom-function-id. The old lookup by data-key=id never matched, so no open / closed state was ever saved or restored.
+        const g = anchorBody.querySelector(`.dp-group[data-custom-function-id="${entry.id}"]`)
+        if (!g) return
+        // The group(s) this function sits in, outermost first (2026-10-15, direct report: "saving custom click functions within a group doesnt work ... now theyre not grouped"). [] = directly under the anchor.
+        const parents = []
+        for (let p = g.parentElement && g.parentElement.closest('.dp-group'); p && p !== anchor; p = p.parentElement && p.parentElement.closest('.dp-group')) parents.unshift(p.dataset.key)
+        if (parents.length) entry.parent = parents
+        else delete entry.parent
+        entry.collapsed = g.classList.contains('collapsed')
+        { const t = cfg[`${entry.id}Type`]; if (t) entry.kind = kindForCustomFunctionType(t) } // never save a kind that disagrees with the function's Type
+        // Every nested group (Offset, Rotation, Retransition ..., and a Multi Trigger's own) by its path inside this function; cv = 2 marks "recorded by this version" (older saves carried a stale function-level flag only).
+        entry.sub = {}
+        customFunctionSubgroups(g).forEach(({ path, el }) => { entry.sub[path] = el.classList.contains('collapsed') })
+        entry.cv = 2
       })
     }
   }
   const json = JSON.stringify(customClickFunctionIds)
   cfg.customClickFunctionIds = json
   syncValue('customClickFunctionIds', json)
+  refreshCustomFunctionSelector()
 }
 // Delete-function button (direct spec item) -- see initDevPanel()'s own
 // `onGroupDeleted` comment for why this piggybacks on devPanel.js's
@@ -14065,7 +16966,16 @@ function persistCustomClickFunctionIds() {
 // unchecking the group's own header cascade checkbox would have (see
 // customFunctionActiveForDeviceFamily()'s own comment) -- still present/
 // visible the next time Desktop is shown.
+// A deleted group takes every custom function group nested inside it along (2026-10-15, direct report: "right now i still see functions i have deleted" -- deleting a folder group left its functions registered, listed
+// in the Custom Click Function Selector and still firing, because only a function's OWN group was ever cleaned up). The folder may already be detached from the page here, its subtree is still readable.
 function cleanupDeletedCustomClickFunction(target) {
+  if (!target || !target.classList || !target.classList.contains('dp-group')) return
+  if (target.querySelectorAll) {
+    Array.from(target.querySelectorAll('.dp-group[data-custom-function-family]')).forEach((g) => cleanupDeletedCustomClickFunctionGroup(g))
+  }
+  cleanupDeletedCustomClickFunctionGroup(target)
+}
+function cleanupDeletedCustomClickFunctionGroup(target) {
   if (!target || !target.classList || !target.classList.contains('dp-group')) return
   if (!target.dataset.customFunctionFamily) return // not a Custom Click Function's own group (a plain user-created group, or one of the 10 static triggers)
   const title = target.dataset.key
@@ -14090,6 +17000,11 @@ function cleanupDeletedCustomClickFunction(target) {
     return
   }
   customClickFunctionIds.splice(idx, 1)
+  // Drop the deleted function's controls and stored values too (2026-10-15, direct report: saved settings did not reflect deletions after a refresh). They used to stay in the panel's registry and in every
+  // Save, so (a) each Save kept carrying values for functions that no longer exist (the saved file had values for 27 functions with 26 listed), (b) every Use / Reset still applied them, and (c) a new
+  // function that got the deleted one's number back (the next number is max id + 1 after a reload) started with its old values.
+  forgetControlsWithPrefix(id)
+  delete customFunctionPendingGroup[id]
   persistCustomClickFunctionIds()
   const keys = kind === 'hold' ? CLICK_HOLD_KEYS : CLICK_POSE_KEYS
   const triggers = kind === 'hold' ? clickHoldPoseTriggers : clickPoseTriggers
@@ -14407,7 +17322,26 @@ function nextFreeCustomFunctionClickCountOrdinal(type, family) {
 // sharing a gesture both simply fire together (same "whichever runs last
 // this frame wins" disclosed pattern already true of chp-vs-rchp
 // elsewhere in this file), so this is a heads-up, not a hard stop.
+// Click functions never overlap (2026-10-15, direct request): when two ENABLED custom functions share a trigger (same family, Type and Click / Touch selector -- customFunctionConflictBucketKey()), only the one turned on /
+// changed last stays on and the others are switched off. Not enforced while the page is still restoring its settings or while a Use / Undo / Reset applies a whole saved state (those are not user edits, and half-applied
+// values would give false overlaps); a saved set that already overlaps is only flagged red in the selector until the user turns one on.
+function customFunctionOverlapNames(id) {
+  const key = customFunctionConflictBucketKey(id)
+  if (!key) return []
+  return customClickFunctionIds.filter((e) => e.id !== id && customFunctionConflictBucketKey(e.id) === key).map((e) => customFunctionDisplayName(e))
+}
+function enforceExclusiveTrigger(id) {
+  if (!exclusiveTriggersReady || exclusiveTriggerSuppress > 0 || isApplyingPanelState()) { refreshCustomFunctionConflictWarnings(); return }
+  if (!customClickFunctionIds.some((e) => e.id === id)) return
+  const key = customFunctionConflictBucketKey(id)
+  if (!key) { refreshCustomFunctionConflictWarnings(); return }
+  customClickFunctionIds.forEach((e) => {
+    if (e.id !== id && customFunctionConflictBucketKey(e.id) === key) setCustomFunctionEnabled(e.id, false)
+  })
+  refreshCustomFunctionConflictWarnings()
+}
 function refreshCustomFunctionConflictWarnings() {
+  refreshListPickerMarksByKey('customFunctionSelector')
   const bucketCounts = new Map()
   customClickFunctionIds.forEach(({ id }) => {
     const key = customFunctionConflictBucketKey(id)
@@ -14473,8 +17407,8 @@ async function renderCustomClickFunctionGroup(id, title, kind, family, yielder) 
     // below), so the checkbox's OTHER half ("Show in Mobile/Landscape") is
     // simply never reachable here -- consistent with this setting being a
     // touch-only concept with no Desktop relevance to begin with.
-    { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 1, max: 10, step: 1, def: 1, dynamicDevice: true, onChange: () => refreshCustomFunctionConflictWarnings() },
-    { key: `${id}ClickCount`, label: kind === 'hold' ? 'Triggers On (Nth Press-And-Hold)' : 'Triggers On (Nth Click)', type: 'select', def: ['1st', '2nd', '3rd', '4th'][defaultClickCountOrdinal - 1], options: () => ['1st', '2nd', '3rd', '4th'], onChange: () => refreshCustomFunctionConflictWarnings() }
+    { key: `${id}TouchPointCount`, label: 'Touch Point Count', type: 'slider', min: 1, max: 10, step: 1, def: 1, dynamicDevice: true, onChange: () => { refreshCustomFunctionConflictWarnings(); enforceExclusiveTrigger(id) } },
+    { key: `${id}ClickCount`, label: kind === 'hold' ? 'Triggers On (Nth Press-And-Hold)' : 'Triggers On (Nth Click)', type: 'select', def: ['1st', '2nd', '3rd', '4th'][defaultClickCountOrdinal - 1], options: () => ['1st', '2nd', '3rd', '4th'], onChange: () => { refreshCustomFunctionConflictWarnings(); enforceExclusiveTrigger(id) } }
   )
   // No bespoke "Show in Mobile/Landscape" control here -- CORRECTED
   // 2026-09-24 (direct follow-up: "the click functions already have a
@@ -14622,6 +17556,7 @@ function handleCustomFunctionTypeChange(id, title, family) {
   if (newKind === oldKind) {
     updateCustomFunctionTypeVisibility(id)
     refreshCustomFunctionConflictWarnings()
+    enforceExclusiveTrigger(id)
     return
   }
   const oldKeys = oldKind === 'hold' ? CLICK_HOLD_KEYS : CLICK_POSE_KEYS
@@ -14638,7 +17573,7 @@ function handleCustomFunctionTypeChange(id, title, family) {
   if (oldGroup) oldGroup.remove()
   if (entry) entry.kind = newKind
   persistCustomClickFunctionIds()
-  registerCustomClickFunction(id, title, newKind, family)
+  Promise.resolve(registerCustomClickFunction(id, title, newKind, family)).then(() => enforceExclusiveTrigger(id))
 }
 // Registers a new (or, on restore, a previously-saved) custom function
 // into every generic pipeline this project's existing 10 triggers
@@ -14648,11 +17583,18 @@ function handleCustomFunctionTypeChange(id, title, family) {
 // code needed. The trigger-state object mirrors the exact shape every
 // other entry of its own kind already has (see clickPoseTriggers'/
 // clickHoldPoseTriggers' own declarations).
+// Group building seeds values one control at a time, so the onChange calls it makes see half-restored settings: no overlap decisions are made while it runs.
 function registerCustomClickFunction(id, title, kind, family, yielder) {
+  exclusiveTriggerSuppress++
+  let r
+  try { r = registerCustomClickFunctionInner(id, title, kind, family, yielder) } catch (e) { exclusiveTriggerSuppress--; throw e }
+  return Promise.resolve(r).finally(() => { exclusiveTriggerSuppress-- })
+}
+function registerCustomClickFunctionInner(id, title, kind, family, yielder) {
   if (kind === 'hold') {
     CLICK_HOLD_KEYS.push(id)
     clickHoldPoseTriggers[id] = {
-      active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopSegmentMs: 1,
+      active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopRing: null, loopRingW: 0, loopFwd: null, loopFwdW: 0, loopSegmentMs: 1,
       startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
       speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
       tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
@@ -14883,9 +17825,7 @@ function applyNewCustomFunctionTemplate(id) {
   const enabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
   const group = enabledRow ? enabledRow.closest('.dp-group') : null
   if (group) {
-    group.querySelectorAll(':scope .dp-group').forEach((sub) => {
-      if (NEW_CUSTOM_FUNCTION_COLLAPSED_SUBGROUPS.includes(sub.dataset.key)) sub.classList.add('collapsed')
-    })
+    group.querySelectorAll(':scope .dp-group').forEach((sub) => sub.classList.add('collapsed')) // every subgroup starts collapsed (2026-10-14)
   }
   // Enabled's own value just changed via syncValue() (which deliberately
   // doesn't fire onChange -- see syncCfgAndSlidersFromPose()'s own
@@ -14974,7 +17914,11 @@ async function restoreCustomClickFunctions() {
   // group is purely cosmetic" gotcha documents for a different cause).
   const anchor = document.querySelector('.dp-group[data-key="Custom Click Functions"]')
   const anchorBody = anchor ? anchor.querySelector(':scope > .dp-group-body') : null
-  if (anchorBody) anchorBody.querySelectorAll(':scope > .dp-group').forEach((g) => g.remove())
+  // CORRECTED 2026-10-15: this used to remove EVERY group directly under the anchor, which also deleted the user's own groups and left every function flat, so the next Save recorded the flat layout and the grouping was lost
+  // after one reload. Now only a leftover placeholder for a function group (a default "Custom Click Function N" key or a saved title, without the real data-custom-function-id) is removed, at any depth; the user's own groups stay,
+  // and each rebuilt function is moved back into its saved parent group below.
+  const ghostTitles = new Set(saved.filter((e) => e && e.id).map((e) => e.title || e.id))
+  if (anchorBody) anchorBody.querySelectorAll('.dp-group').forEach((g) => { if (!g.dataset.customFunctionId && (ghostTitles.has(g.dataset.key) || /^Custom Click Function d+$/.test(g.dataset.key || ''))) g.remove() })
   let maxN = 0
   // Batched (2026-10-04, startup perf): see beginDynamicBatch() in devPanel.js.
   beginDynamicBatch()
@@ -14984,6 +17928,10 @@ async function restoreCustomClickFunctions() {
     // and as a single block it froze the loading hand for ~2 s.
     for (const entry of saved) {
       if (!entry || !entry.id) continue
+      // The group is built in the shape its saved Type needs. A saved list can disagree with it (a function switched to Click+Hold whose entry still said "pose"): built as the wrong kind, the first Use / Reset that applied
+      // the Type rebuilt the whole group (~18 s each with the real settings), so the kind comes from the Type.
+      const savedType = peekRestoredValue(`${entry.id}Type`)
+      if (savedType) entry.kind = kindForCustomFunctionType(savedType)
       await registerCustomClickFunction(entry.id, entry.title || entry.id, entry.kind || 'pose', entry.family || 'desktop', yielder)
       const m = /^custom(\d+)$/.exec(entry.id)
       if (m) maxN = Math.max(maxN, parseInt(m[1], 10))
@@ -14996,13 +17944,28 @@ async function restoreCustomClickFunctions() {
   // before this restore hook, so the collapse state wasn't applied to them yet.
   // Apply the saved collapse state from each entry's own data.
   if (anchorBody) {
-    anchorBody.querySelectorAll(':scope > .dp-group').forEach((g) => {
-      const key = g.dataset.key
-      const entry = saved.find((e) => e && e.id === key)
-      if (entry && entry.collapsed) g.classList.add('collapsed')
-      else if (entry && !entry.collapsed) g.classList.remove('collapsed')
+    saved.forEach((entry) => {
+      if (!entry || !entry.id || !Array.isArray(entry.parent) || !entry.parent.length) return
+      const fg = anchorBody.querySelector(`.dp-group[data-custom-function-id="${entry.id}"]`)
+      if (!fg) return
+      let container = anchorBody
+      for (const key of entry.parent) {
+        let sub = Array.from(container.children).find((c) => c.classList && c.classList.contains('dp-group') && c.dataset.key === key)
+        if (!sub) { sub = createGroupElement(key); container.appendChild(sub) } // the user's group was lost from the saved layout: recreate it (its renamed title comes back through applyTextOverrides())
+        container = sub.querySelector(':scope > .dp-group-body')
+        if (!container) return
+      }
+      container.appendChild(fg)
+    })
+    applyTextOverrides()
+    saved.forEach((entry) => {
+      const fg = entry && entry.id && anchorBody.querySelector(`.dp-group[data-custom-function-id="${entry.id}"]`)
+      if (fg) applyCustomFunctionCollapse(fg, entry)
     })
   }
+  customFunctionCollapseReady = true
+  refreshCustomFunctionSelector()
+  watchCustomFunctionTitles()
   refreshAllCustomFunctionGroupVisibility()
   refreshAllCustomFunctionTypeVisibility()
   updateCustomFunctionsAnchorRowVisibility()
@@ -15021,6 +17984,7 @@ async function restoreCustomClickFunctions() {
   // animate()/renderer-resize code already uses elsewhere.
   setTimeout(() => { refreshAllCustomFunctionGroupVisibility(); refreshAllCustomFunctionTypeVisibility(); updateCustomFunctionsAnchorRowVisibility() }, 600)
 }
+
 // CORRECTED 2026-09-28 -- real bug, direct report: "Hold Conirm Delay is
 // still at the bottom fo the Custom Click Functions group... I dont see
 // the multiclick confirm duration." Root cause, confirmed by direct
@@ -15048,6 +18012,372 @@ async function restoreCustomClickFunctions() {
 // array lives in, which is not the feature group the user arranged (Responsive Arm Rotation, Responsive Palm Rotation,
 // Responsive Wrist Cropping). After the order is restored, move each pair next to its feature's first row when it is sitting
 // in a different group. A row already inside its feature's group is left exactly where the user put it.
+// Loading Preview lighting sliders -> the "Loading Preview Lighting" group (2026-10-14, direct request: "place all new loading preview lighting settings in the loading preview lighting group"). The group is whatever the user has titled that
+// (their layout already holds an empty one, key "New Group", shown as LOADING PREVIEW LIGHTING); one is created inside the Loading Preview group when none exists. A row that is no longer sitting directly in the Loading Preview group
+// (the default spot for a control the saved layout does not know) was put somewhere on purpose and is left alone.
+const LOADING_PREVIEW_LIGHT_ROW_KEYS = ['loadingPreviewKeyAzimuth', 'loadingPreviewKeyElevation', 'loadingPreviewKeyLightType', 'loadingPreviewKeyDistance', 'loadingPreviewKeyTargetHeight', 'loadingPreviewKeyIntensity', 'loadingPreviewKeyColor', 'loadingPreviewAmbientIntensity', 'loadingPreviewAmbientSkyColor', 'loadingPreviewAmbientGroundColor']
+function flashModelButton(btn, msg) { if (!btn) return; const orig = btn.dataset.origText || btn.textContent; btn.dataset.origText = orig; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1600) }
+// The list always holds the repo models (first) plus whatever was imported; imported ones keep their place.
+function refreshHandModelList() {
+  let saved = cfg.handModels
+  if (typeof saved === 'string') { try { saved = JSON.parse(saved) } catch (e) { saved = [] } }
+  if (!Array.isArray(saved)) saved = []
+  const locals = saved.filter((it) => it && it.source === 'local' && it.id)
+  const items = HAND_MODEL_BUILTINS.map((m) => ({ name: m.name, id: m.id, source: 'repo' })).concat(locals)
+  if (JSON.stringify(items) === JSON.stringify(saved)) return
+  cfg.handModels = items
+  syncValue('handModels', items)
+}
+function useHandModel(item) {
+  if (!item || item.id === activeHandModelId) return
+  if (item.source === 'local' && localHandModelPresent[item.id] === false) { alert('"' + item.name + '" was imported on another device - import the file here to use it.'); return }
+  try { localStorage.setItem(HAND_MODEL_LS_KEY, item.id) } catch (e) { alert('This browser blocks local storage, so the model choice cannot be kept.'); return }
+  try { localStorage.setItem(HAND_MODEL_PENDING_KEY, item.id) } catch (e) { /* ignore */ } // the choice is not on the server yet; the next load must not undo it
+  cfg.handModelId = item.id
+  syncValue('handModelId', item.id)
+  // Reload (the model is measured once at load) only after the save has landed, or after 8 s whichever is first - a reload during the save would cancel it.
+  let saved
+  try { saved = Promise.resolve(saveCurrentSettings()) } catch (e) { saved = Promise.resolve() }
+  Promise.race([saved.catch(() => {}), new Promise((r) => setTimeout(r, 8000))]).then(() => setTimeout(() => location.reload(), 300))
+}
+function importHandModelFile(btn) {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.glb,.gltf,model/gltf-binary'
+  input.addEventListener('change', async () => {
+    const file = input.files && input.files[0]
+    if (!file) return
+    try {
+      const buf = await file.arrayBuffer()
+      // Check it before keeping it: it has to be a skinned mesh with the hand rig this app's poses are built on.
+      const gltf = await new Promise((resolve, reject) => gltfLoader.parse(buf, '', resolve, reject))
+      const skinned = findSkinnedMesh(gltf.scene)
+      if (!skinned) { flashModelButton(btn, 'No skinned mesh'); alert('"' + file.name + '" has no skinned mesh, so it cannot be posed.'); return }
+      const missing = HAND_MODEL_BONES.filter((n) => !skinned.skeleton.getBoneByName(n))
+      if (missing.length) { flashModelButton(btn, 'Rig mismatch'); alert('"' + file.name + '" does not have the hand rig this app uses (missing bones: ' + missing.join(', ') + ').'); return }
+      const id = 'local:' + Date.now().toString(36)
+      await handModelIdbPut(id, { name: file.name, title: file.name.replace(/\.(glb|gltf)$/i, ''), blob: new Blob([buf], { type: 'model/gltf-binary' }) })
+      localHandModelPresent[id] = true
+      const items = (Array.isArray(cfg.handModels) ? cfg.handModels : []).concat([{ name: file.name.replace(/\.(glb|gltf)$/i, ''), id, source: 'local' }])
+      cfg.handModels = items
+      syncValue('handModels', items)
+      flashModelButton(btn, 'Imported')
+    } catch (e) {
+      console.error('Hand model import failed', e)
+      flashModelButton(btn, 'Failed')
+      alert('Could not read "' + file.name + '" as a 3D model.')
+    }
+  })
+  input.click()
+}
+// After the settings restore: which imported models this browser actually holds, and follow the saved choice if another device changed it (once per session, so it cannot loop).
+async function syncHandModelWithSettings() {
+  try {
+    const keys = await handModelIdbKeys()
+    ;(Array.isArray(cfg.handModels) ? cfg.handModels : []).forEach((it) => { if (it.source === 'local') localHandModelPresent[it.id] = !!(keys && keys.includes(it.id)) })
+  } catch (e) { /* no IndexedDB: imported models cannot be listed as present */ }
+  // Heal the list from this browser's own stored files: an imported model whose list entry never reached the server (a save that did not land) is added back.
+  try {
+    const keys = (await handModelIdbKeys()) || []
+    const have = new Set((Array.isArray(cfg.handModels) ? cfg.handModels : []).map((it) => it.id))
+    for (const id of keys) {
+      if (have.has(id)) continue
+      const rec = await handModelIdbGet(id)
+      cfg.handModels = (Array.isArray(cfg.handModels) ? cfg.handModels : []).concat([{ name: (rec && (rec.title || rec.name)) || id, id, source: 'local' }])
+      localHandModelPresent[id] = true
+    }
+  } catch (e) { /* ignore */ }
+  refreshHandModelList()
+  syncValue('handModels', cfg.handModels) // the list above may have been healed directly in cfg; make the panel show it
+  refreshListPickerTogglesByKey('handModels')
+  let pending = null
+  try { pending = localStorage.getItem(HAND_MODEL_PENDING_KEY) } catch (e) { /* ignore */ }
+  if (pending) {
+    try { localStorage.removeItem(HAND_MODEL_PENDING_KEY) } catch (e) { /* ignore */ }
+    if (pending === activeHandModelId) { // this device just chose it: keep it, and put it on the server again in case the save before the reload did not land
+      cfg.handModelId = activeHandModelId
+      syncValue('handModelId', activeHandModelId)
+      try { saveCurrentSettings() } catch (e) { /* ignore */ }
+      return
+    }
+  }
+  const wanted = cfg.handModelId
+  if (!wanted || wanted === activeHandModelId) return
+  const ok = HAND_MODEL_BUILTINS.some((m) => m.id === wanted) || localHandModelPresent[wanted]
+  let tried = null
+  try { tried = sessionStorage.getItem('handyDandies.handModelSync') } catch (e) { /* ignore */ }
+  if (!ok || tried === wanted) return
+  try { sessionStorage.setItem('handyDandies.handModelSync', wanted); localStorage.setItem(HAND_MODEL_LS_KEY, wanted) } catch (e) { return }
+  location.reload()
+}
+// Hand Models rows -> the group the user calls Hands (any capitalisation, singular or plural), when they are still in their default place (Field Layout).
+function placeHandModelRows() {
+  const listRow = document.querySelector('.dp-row[data-key="handModels"]')
+  const idRow = document.querySelector('.dp-row[data-key="handModelId"]')
+  if (idRow) idRow.style.display = 'none' // internal bookkeeping, never edited by hand
+  if (!listRow) return
+  const titleOf = (g) => { const t = g.querySelector(':scope > .dp-group-header .dp-group-title-text'); return t ? t.textContent.trim() : '' }
+  const groups = Array.from(document.querySelectorAll('.dp-group'))
+  const target = groups.find((g) => /^hands?$/i.test(titleOf(g)))
+  const home = listRow.parentElement && listRow.parentElement.closest('.dp-group')
+  if (!target || !home || home === target || titleOf(home) !== 'Field Layout') return
+  const body = target.querySelector(':scope > .dp-group-body')
+  if (body) body.insertBefore(listRow, body.firstChild)
+}
+// ---- Small Scale Models (2026-10-15, direct request) ----
+// Hands whose world Z is at or below a level's Z use that level's lower-resolution model. Every model shares the active model's rig (bone order and bind matrices verified for the 9 HD files), so a swap is just
+// "point the hand's existing skinned mesh at another geometry": the hand's skeleton, material, clip planes and pose are untouched. A hand takes the DEEPEST level it has reached (the lowest Z that is still >= its Z).
+// A hand keeps its current level until its Z leaves it by SMALL_SCALE_HYSTERESIS world units (an unmeasured judgment call, to stop a hand on a threshold from flickering between two silhouettes). Levels whose model has not
+// loaded yet (or cannot be used) are skipped, so a hand never shows a missing mesh.
+const SMALL_SCALE_HYSTERESIS = 0.5
+// ---- Loading Preview model (2026-10-16) ----
+function loadingPreviewModelOptions() {
+  const out = [{ value: '', text: 'Same As Hand Model' }]
+  HAND_MODEL_BUILTINS.forEach((m) => out.push({ value: m.id, text: m.name }))
+  const saved = Array.isArray(cfg.handModels) ? cfg.handModels : []
+  saved.forEach((it) => { if (it && it.source === 'local' && it.id && localHandModelPresent[it.id] !== false) out.push({ value: it.id, text: it.name + ' (imported)' }) })
+  return out
+}
+function lpPreviewModelUrl(id) {
+  const m = HAND_MODEL_BUILTINS.find((x) => x.id === id)
+  if (m) return Promise.resolve(m.url)
+  if (id.startsWith('local:')) return handModelIdbGet(id).then((rec) => { if (!rec || !rec.blob) throw new Error('not on this device'); return URL.createObjectURL(rec.blob) })
+  return Promise.reject(new Error('unknown model'))
+}
+function lpLoadPreviewModel(id) {
+  if (!id) return Promise.resolve(null)
+  let p = lpModelLoads.get(id)
+  if (p) return p
+  p = lpPreviewModelUrl(id).then((url) => new Promise((resolve, reject) => gltfLoader.load(url, resolve, undefined, reject))).then((gltf) => {
+    const root = gltf.scene
+    const skinned = findSkinnedMesh(root)
+    if (!skinned) throw new Error('no skinned mesh')
+    const missing = HAND_MODEL_BONES.filter((n) => !skinned.skeleton.getBoneByName(n))
+    if (missing.length) throw new Error('missing rig bones ' + missing.join(', '))
+    root.traverse((o) => { if (o.isMesh && o !== skinned) o.visible = false }) // the outline / crop-block meshes, like the Hand model's own load
+    root.updateMatrixWorld(true)
+    lpLoadedRoots.set(id, root)
+    logLoadingPreview('preview model "' + id + '" loaded')
+    return root
+  }).catch((err) => { console.error('Loading Preview model "' + id + '" unusable, using the Hand model instead:', err); logLoadingPreview('preview model "' + id + '" unusable (' + ((err && err.message) || err) + ') - using the Hand model'); return null })
+  lpModelLoads.set(id, p)
+  return p
+}
+// The model the preview hands are cloned from: the chosen one once it has loaded, else the Hand model.
+function lpSourceRoot() {
+  const id = cfg.loadingPreviewModelId
+  return (id && lpLoadedRoots.get(id)) || modelRoot
+}
+// Runs fn once the chosen preview model is ready (at once when it is the Hand model or already loaded; a failed load falls back to the Hand model).
+function lpWhenPreviewModelReady(fn) {
+  const id = cfg.loadingPreviewModelId
+  if (!id || lpLoadedRoots.has(id)) { fn(); return }
+  lpLoadPreviewModel(id).then(() => fn())
+}
+function onLoadingPreviewModelChanged() {
+  if (!modelMeasurementsReady) return
+  const id = cfg.loadingPreviewModelId
+  lpLoadPreviewModel(id).then(() => {
+    if (cfg.loadingPreviewModelId !== id) return // changed again meanwhile
+    // rebuild only a preview that is on screen (its canvas shown); otherwise the next build uses the new model
+    if (loadingPreviewCanvas && loadingPreviewCanvas.style.display !== 'none') { logLoadingPreview('preview model changed -- rebuilding'); buildLoadingPreview(true) }
+  })
+}
+function smallScaleModelOptions() {
+  const out = HAND_MODEL_BUILTINS.map((m) => ({ id: m.id, name: m.name }))
+  const saved = Array.isArray(cfg.handModels) ? cfg.handModels : []
+  saved.forEach((it) => { if (it && it.source === 'local' && it.id && localHandModelPresent[it.id] !== false) out.push({ id: it.id, name: it.name }) })
+  return out
+}
+function loadSmallScaleModel(id) {
+  let e = smallScaleGeomCache.get(id)
+  if (e) return e
+  e = { state: 'loading', fill: null, outline: null }
+  smallScaleGeomCache.set(id, e)
+  const builtin = HAND_MODEL_BUILTINS.find((m) => m.id === id)
+  const urlPromise = builtin
+    ? Promise.resolve(builtin.url)
+    : (id.startsWith('local:') ? handModelIdbGet(id).then((rec) => { if (!rec || !rec.blob) throw new Error('not on this device'); return URL.createObjectURL(rec.blob) }) : Promise.reject(new Error('unknown model')))
+  urlPromise.then((url) => new Promise((resolve, reject) => gltfLoader.load(url, resolve, undefined, reject))).then((gltf) => {
+    let fill = null, outline = null
+    gltf.scene.traverse((o) => {
+      if (!o.isSkinnedMesh) return
+      const n = o.material && o.material.name
+      if (n === 'OUTLINE') outline = o
+      else if (!fill || n === 'Hand') fill = o
+    })
+    const ref = modelRoot ? findSkinnedMesh(modelRoot) : null
+    if (!fill || !fill.geometry.attributes.skinIndex || !ref) throw new Error('no skinned Hand mesh')
+    const a = fill.skeleton.bones.map((b) => b.name), r = ref.skeleton.bones.map((b) => b.name)
+    if (a.length !== r.length || a.some((nm, i) => nm !== r[i])) throw new Error('bone order differs from the active hand model')
+    e.fill = fill.geometry
+    e.outline = outline ? outline.geometry : null
+    e.state = 'ready'
+    sceneNeedsRedraw = true
+  }).catch((err) => { e.state = 'failed'; console.error('Small Scale Models: "' + id + '" unusable: ' + ((err && err.message) || err)) })
+  return e
+}
+function parseSmallScaleLevels() {
+  const str = cfg.smallScaleModelLevels
+  if (str === smallScaleLevelsStr) return
+  smallScaleLevelsStr = str
+  let a = []
+  try { a = JSON.parse(str) } catch (e) { a = [] }
+  smallScaleLevels = (Array.isArray(a) ? a : []).filter((l) => l && Number.isFinite(Number(l.z)) && typeof l.model === 'string').map((l) => ({ z: Number(l.z), id: l.model })).sort((x, y) => x.z - y.z)
+}
+// entry = a ready cache entry, or null for the hand's own original model.
+function applyHandLod(hand, entry) {
+  if (!hand._lodBase) {
+    if (!entry) return
+    hand._lodBase = { fill: hand.skinnedMesh.geometry, emission: hand.emissionMesh ? hand.emissionMesh.geometry : null }
+  }
+  const fillG = entry ? entry.fill : hand._lodBase.fill
+  if (hand.skinnedMesh.geometry !== fillG) hand.skinnedMesh.geometry = fillG
+  if (hand.outlineMesh && hand.outlineMesh.geometry !== fillG) hand.outlineMesh.geometry = fillG // the negative hull is a clone of the fill mesh
+  const emG = entry && entry.outline ? entry.outline : hand._lodBase.emission
+  if (hand.emissionMesh && emG && hand.emissionMesh.geometry !== emG) hand.emissionMesh.geometry = emG
+  hand._lodGeom = entry ? entry.fill : null
+}
+function updateSmallScaleModels() {
+  const on = cfg.smallScaleModelsEnabled === true
+  if (on) parseSmallScaleLevels()
+  if (!on || !smallScaleLevels.length) {
+    if (smallScaleActiveCount) {
+      for (let i = 0; i < hands.length; i++) { const h = hands[i]; if (h._lodGeom) { applyHandLod(h, null); h._lodIdx = -1 } }
+      smallScaleActiveCount = 0
+      sceneNeedsRedraw = true
+    }
+    return
+  }
+  const ready = []
+  for (let i = 0; i < smallScaleLevels.length; i++) { const e = loadSmallScaleModel(smallScaleLevels[i].id); ready.push(e.state === 'ready' ? e : null) }
+  let used = 0, changed = false
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]
+    if (!h.wrapper || !h.skinnedMesh) continue
+    const z = h.wrapper.position.z
+    const cur = h._lodIdx === undefined ? -1 : h._lodIdx
+    let pick = -1
+    for (let k = 0; k < smallScaleLevels.length; k++) {
+      if (!ready[k]) continue
+      if (z <= smallScaleLevels[k].z + (k === cur ? SMALL_SCALE_HYSTERESIS : 0)) { pick = k; break }
+    }
+    const want = pick >= 0 ? ready[pick].fill : null
+    if ((h._lodGeom || null) !== want) { applyHandLod(h, pick >= 0 ? ready[pick] : null); changed = true }
+    h._lodIdx = pick
+    if (pick >= 0) used++
+  }
+  smallScaleActiveCount = used
+  if (changed) sceneNeedsRedraw = true
+}
+function updateSmallScaleModelsGroupVisibility() {
+  const row = document.querySelector('.dp-row[data-key="smallScaleModelLevels"]')
+  if (row) row.style.display = cfg.smallScaleModelsEnabled === true ? '' : 'none'
+}
+// The Add Level button, and one row per level: a Z slider (with a typed number box), the model dropdown, and a delete button.
+function buildSmallScaleModelWidget() {
+  const row = document.querySelector('.dp-row[data-key="smallScaleModelLevels"]')
+  const input = row && row.querySelector('.dp-text-input')
+  if (!input || row.dataset.ssmWidget) return
+  row.dataset.ssmWidget = '1'
+  input.style.display = 'none'
+  const lab = row.querySelector('label')
+  if (lab && !lab.querySelector('input,select,button')) lab.style.display = 'none'
+  row.style.flexDirection = 'column'; row.style.alignItems = 'stretch'
+  const readItems = () => { try { const a = JSON.parse(input.value); return Array.isArray(a) ? a.filter((l) => l && typeof l === 'object') : [] } catch (e) { return [] } }
+  let items = readItems(), lastSeen = input.value
+  const wrap = elLocal('div', { flex: '1', padding: '2px 0' })
+  const bar = elLocal('div', { display: 'flex', gap: '6px', marginBottom: '4px' })
+  const list = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '6px' })
+  wrap.appendChild(bar); wrap.appendChild(list); row.appendChild(wrap)
+  const write = () => { lastSeen = JSON.stringify(items); commitTextControl(input, lastSeen) }
+  const mkBtn = (text, onClick) => { const b = elLocal('button', null, { type: 'button', text }); b.className = 'dp-action-button'; b.addEventListener('click', onClick); return b }
+  const redraw = () => {
+    list.textContent = ''
+    const models = smallScaleModelOptions()
+    items.forEach((it, idx) => {
+      const r = elLocal('div', { display: 'flex', gap: '6px', alignItems: 'center' })
+      r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '48px', opacity: '.8', fontSize: '.85em' }, { text: 'Level ' + (idx + 1) }))
+      const z = document.createElement('input'); z.type = 'range'; z.min = '-400'; z.max = '400'; z.step = '0.5'; z.value = String(it.z); z.style.flex = '1 1 0'; z.style.minWidth = '0'
+      const zn = document.createElement('input'); zn.type = 'number'; zn.step = '0.5'; zn.value = String(it.z); zn.style.width = '56px'; zn.title = 'World Z at or below which this model is used'
+      z.addEventListener('input', () => { items[idx].z = Number(z.value); zn.value = z.value; write() })
+      zn.addEventListener('change', () => { const v = Number(zn.value); if (Number.isFinite(v)) { items[idx].z = v; z.value = String(v); write() } })
+      const sel = document.createElement('select'); sel.style.flex = '1 1 0'; sel.style.minWidth = '0'
+      const have = models.some((m) => m.id === it.model)
+      ;(have ? models : models.concat([{ id: it.model, name: String(it.model) + ' (not available)' }])).forEach((m) => { const op = document.createElement('option'); op.value = m.id; op.textContent = m.name; sel.appendChild(op) })
+      sel.value = it.model
+      sel.addEventListener('change', () => { items[idx].model = sel.value; write() })
+      const x = mkBtn('\u00d7', () => { items.splice(idx, 1); redraw(); write() }); x.title = 'Delete this level'
+      r.appendChild(z); r.appendChild(zn); r.appendChild(sel); r.appendChild(x)
+      list.appendChild(r)
+    })
+  }
+  bar.appendChild(mkBtn('+ Add Level', () => {
+    const models = smallScaleModelOptions()
+    const def = (models.find((m) => m.id === 'repo:HD-3K') || models[0] || {}).id
+    items.push({ z: -50, model: def })
+    redraw(); write()
+  }))
+  redraw()
+  armLengthWidgetResyncs.push(() => { if (input.value === lastSeen) return; lastSeen = input.value; items = readItems(); redraw() })
+}
+// The Small Scale Models rows -> a toggleable subgroup inside the group the user calls Hands (any capitalisation). Idempotent: a saved layout may already hold the subgroup (key "Small Scale Models").
+function placeSmallScaleModelRows() {
+  const enabledRow = document.querySelector('.dp-row[data-key="smallScaleModelsEnabled"]')
+  const levelsRow = document.querySelector('.dp-row[data-key="smallScaleModelLevels"]')
+  if (!enabledRow || !levelsRow) return
+  const titleOf = (g) => { const t = g.querySelector(':scope > .dp-group-header .dp-group-title-text'); return t ? t.textContent.trim() : '' }
+  const groups = Array.from(document.querySelectorAll('.dp-group'))
+  let sub = groups.find((g) => g.dataset.key === 'Small Scale Models')
+  if (!sub) {
+    const handsGroup = groups.find((g) => /^hands?$/i.test(titleOf(g)))
+    const home = levelsRow.parentElement && levelsRow.parentElement.closest('.dp-group')
+    const host = handsGroup || home
+    if (!host) return
+    const hostBody = host.querySelector(':scope > .dp-group-body')
+    if (!hostBody) return
+    sub = createGroupElement('Small Scale Models')
+    hostBody.appendChild(sub)
+  }
+  const body = sub.querySelector(':scope > .dp-group-body')
+  const header = sub.querySelector(':scope > .dp-group-header')
+  const titleText = header && header.querySelector(':scope > .dp-group-title-text')
+  if (!body || !header || !titleText) return
+  {
+    const handsGroup = groups.find((g) => /^hands?$/i.test(titleOf(g)))
+    const subHome = sub.parentElement && sub.parentElement.closest('.dp-group')
+    const handsBody = handsGroup && handsGroup.querySelector(':scope > .dp-group-body')
+    if (handsBody && subHome && subHome !== handsGroup && titleOf(subHome) === 'Field Layout') handsBody.appendChild(sub)
+  }
+  if (levelsRow.parentElement !== body) body.appendChild(levelsRow)
+  if (enabledRow.parentElement !== header) {
+    enabledRow.classList.add('dp-group-gate-row')
+    enabledRow.querySelectorAll('.dp-dynamic-device-checkbox, .dp-row-handle').forEach((el) => el.remove())
+    titleText.insertAdjacentElement('afterend', enabledRow)
+  }
+  buildSmallScaleModelWidget()
+  updateSmallScaleModelsGroupVisibility()
+}
+function placeLoadingPreviewLightingRows() {
+  const rows = LOADING_PREVIEW_LIGHT_ROW_KEYS.map((k) => document.querySelector('.dp-row[data-key="' + k + '"]')).filter(Boolean)
+  if (!rows.length) return
+  const titleOf = (g) => { const t = g.querySelector(':scope > .dp-group-header .dp-group-title-text'); return t ? t.textContent.trim() : '' }
+  const groups = Array.from(document.querySelectorAll('.dp-group'))
+  const lpGroup = groups.find((g) => g.dataset.key === 'Loading Preview')
+  let target = groups.find((g) => /^loading preview lighting$/i.test(titleOf(g)))
+  if (!target) {
+    if (!lpGroup) return
+    target = createGroupElement('Loading Preview Lighting')
+    lpGroup.querySelector(':scope > .dp-group-body').appendChild(target)
+  }
+  const body = target.querySelector(':scope > .dp-group-body')
+  if (!body) return
+  rows.forEach((row) => {
+    const home = row.parentElement && row.parentElement.closest('.dp-group')
+    if (home === target) return
+    if (home && home === lpGroup) body.appendChild(row) // still in the default spot -> into the lighting group
+  })
+}
 function placeDepthControlsInFeatureGroups() {
   const plan = [
     ['armRotationEnabled', ['armRotationVisibleOnly', 'armRotationUseDepth', 'armRotationTargetDepth']],
@@ -15072,8 +18402,10 @@ function enforceCustomClickFunctionsAnchorOrder() {
   if (!body) return
   const holdRow = document.querySelector('.dp-row[data-key="holdConfirmMs"]')
   const windowRow = document.querySelector('.dp-row[data-key="multiClickWindowMs"]')
+  const selectorRow = document.querySelector('.dp-row[data-key="customFunctionSelector"]')
   if (holdRow) body.insertBefore(holdRow, body.firstChild)
   if (windowRow) body.insertBefore(windowRow, holdRow ? holdRow.nextSibling : body.firstChild)
+  if (selectorRow) body.insertBefore(selectorRow, windowRow ? windowRow.nextSibling : body.firstChild)
 }
 // Multi Trigger -- direct spec (2026-09-27): "for custom click functions
 // i want a new feature: Under Retransition group, add Multi Trigger. It
@@ -15108,11 +18440,15 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'OffsetZ', 'CursorOffsetXCurve', 'CursorOffsetXRange', 'CursorOffsetYCurve', 'CursorOffsetYRange', 'CursorOffsetZCurve', 'CursorOffsetZRange',
   'CameraOffsetEnabled', 'CameraOffsetXEnabled', 'CameraOffsetYEnabled', 'CameraOffsetZEnabled', 'CameraOffsetXCurve', 'CameraOffsetXRange', 'CameraOffsetYCurve', 'CameraOffsetYRange', 'CameraOffsetZCurve', 'CameraOffsetZRange',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
+  'OffsetLoopRetransition', 'CameraOffsetLoopRetransition', 'RotationLoopRetransition', 'RotationMode', 'RotationCurveVisibleOnly',
+  'RotationXCurveEnabled', 'RotationXCurve', 'RotationXCurveRange', 'RotationYCurveEnabled', 'RotationYCurve', 'RotationYCurveRange', 'RotationZCurveEnabled', 'RotationZCurve', 'RotationZCurveRange',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'SpeedCurveVisibleOnly', 'StartTimeCurveVisibleOnly', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopDelayCurveVisibleOnly', 'CameraOffsetVisibleOnly', 'CursorOffsetVisibleOnly',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
   'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceCurve',
   'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
+  'RetransitionDistCurveEnabled', 'RetransitionDistCurve', 'RetransitionDistRange',
+  'RetransitionScalerEnabled', 'RetransitionScalerCurve', 'RetransitionScalerMulRange', 'RetransitionScalerDistRange',
   // 2026-10-06 (direct request, "1 - CH"): a hold-kind trigger in Sequence/Chain mode uses its own
   // Tween* retransition fields, which were missing here, so the Retransition / Retransition Speed
   // Curve / Retransition Start Time Curve groups of every hold-kind trigger were empty shells in
@@ -15157,7 +18493,7 @@ async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kin
     if (!CLICK_HOLD_KEYS.includes(prefix)) CLICK_HOLD_KEYS.push(prefix)
     if (!clickHoldPoseTriggers[prefix]) {
       clickHoldPoseTriggers[prefix] = {
-        active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopSegmentMs: 1,
+        active: false, holdStartTime: 0, forwardSnapshot: null, loopPoses: null, rawChainEntries: null, loopRing: null, loopRingW: 0, loopFwd: null, loopFwdW: 0, loopSegmentMs: 1,
         startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
         speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
         tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
@@ -15304,6 +18640,70 @@ async function setupMultiTriggerGroupForFunction(id, kind, yielder) {
   }
   updateMultiTriggerGroupVisibility(id)
 }
+// ---- Deleting a Multi Trigger (2026-10-16, direct report: "i cant delete multi triggers 1-4 in 20 FT - 1 - CH") ----
+// The delete tool only removed the trigger's panel group. The function's own list (`${id}MultiTriggers`, what the next load rebuilds the groups from and what the click cycle walks), the trigger's registered controls
+// and saved values, and its runtime state all stayed, so the trigger came back on the next load and kept firing. These tear all of that down together, for a delete and for Undo / Redo (reconcileMultiTriggers()).
+const MT_PREFIX_RE = /^(custom\d+)Trig\d+$/
+function unregisterMultiTriggerRuntime(prefix) {
+  ;[CLICK_POSE_KEYS, CLICK_HOLD_KEYS].forEach((keys) => { const i = keys.indexOf(prefix); if (i !== -1) keys.splice(i, 1) })
+  delete clickPoseTriggers[prefix]
+  delete clickHoldPoseTriggers[prefix]
+  hands.forEach((hand) => { if (hand._cp) delete hand._cp[prefix]; if (hand._chp) delete hand._chp[prefix] })
+  forgetControlsWithPrefix(prefix) // its registered controls and every device's saved values (the uppercase-letter rule keeps Trig1 from matching Trig10)
+}
+function cleanupDeletedMultiTriggerGroups(target) {
+  if (!target || !target.classList || !target.classList.contains('dp-group')) return
+  const groups = (target.dataset.multiTriggerPrefix ? [target] : []).concat(Array.from(target.querySelectorAll('.dp-group[data-multi-trigger-prefix]')))
+  if (!groups.length) return
+  const removedByFn = {}
+  groups.forEach((g) => {
+    const prefix = g.dataset.multiTriggerPrefix
+    const m = MT_PREFIX_RE.exec(prefix || '')
+    if (!m) return
+    ;(removedByFn[m[1]] = removedByFn[m[1]] || new Set()).add(prefix)
+  })
+  Object.keys(removedByFn).forEach((id) => {
+    const gone = removedByFn[id]
+    let list = []
+    try { list = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { list = [] }
+    if (!Array.isArray(list)) list = []
+    cfg[`${id}MultiTriggers`] = JSON.stringify(list.filter((t) => t && t.prefix && !gone.has(t.prefix)))
+    try { syncValue(`${id}MultiTriggers`, cfg[`${id}MultiTriggers`]) } catch (e) { /* no panel */ }
+    gone.forEach(unregisterMultiTriggerRuntime)
+    updateMultiTriggerGroupVisibility(id)
+  })
+  refreshCustomFunctionConflictWarnings()
+}
+function multiTriggerBodiesFor(id) {
+  const functionEnabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+  const functionBody = functionEnabledRow ? functionEnabledRow.parentElement : null
+  const mtGroup = functionBody ? functionBody.querySelector(':scope > .dp-group[data-key="Multi Trigger"]') : null
+  const mtBody = mtGroup ? mtGroup.querySelector(':scope > .dp-group-body') : null
+  return { mtBody, addBtnRow: mtBody ? mtBody.querySelector(':scope > .dp-multi-trigger-add-row') : null }
+}
+// Undo / Redo: puts a function's trigger set back to `wantJson` - tears down the triggers that should not exist, builds the ones that should (their values are applied right after, from the snapshot), and restores the order.
+async function reconcileMultiTriggers(id, wantJson) {
+  const entry = customClickFunctionIds.find((e) => e.id === id)
+  if (!entry) return
+  const parse = (j) => { try { const a = JSON.parse(j || '[]'); return Array.isArray(a) ? a.filter((t) => t && t.prefix) : [] } catch (e) { return [] } }
+  const cur = parse(cfg[`${id}MultiTriggers`]), want = parse(wantJson)
+  const wantSet = new Set(want.map((t) => t.prefix)), curSet = new Set(cur.map((t) => t.prefix))
+  if (cur.length === want.length && cur.every((t, i) => t.prefix === want[i].prefix)) return
+  const { mtBody, addBtnRow } = multiTriggerBodiesFor(id)
+  cur.forEach((t) => {
+    if (wantSet.has(t.prefix)) return
+    if (mtBody) { const g = mtBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${t.prefix}"]`); if (g) g.remove() }
+    unregisterMultiTriggerRuntime(t.prefix)
+  })
+  cfg[`${id}MultiTriggers`] = JSON.stringify(want)
+  try { syncValue(`${id}MultiTriggers`, cfg[`${id}MultiTriggers`]) } catch (e) { /* no panel */ }
+  for (const t of want) {
+    if (curSet.has(t.prefix)) continue
+    await registerMultiTriggerTrigger(t.prefix, t.title || t.prefix, mtBody, addBtnRow, entry.kind, undefined)
+  }
+  if (mtBody && addBtnRow) want.forEach((t) => { const g = mtBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${t.prefix}"]`); if (g) mtBody.insertBefore(g, addBtnRow) })
+  updateMultiTriggerGroupVisibility(id)
+}
 // "+ Add Trigger" button's own click handler. First trigger added = the
 // tween for the 2nd click on this function; each subsequent one adds the
 // next click after that -- direct spec wording ("if there are none, when
@@ -15313,7 +18713,10 @@ function addMultiTriggerTrigger(id, kind) {
   let triggers = []
   try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
   if (!Array.isArray(triggers)) triggers = []
-  const n = triggers.length + 1
+  // The next number is one past the HIGHEST one in use, not the count: after deleting a middle trigger the count + 1 is a number that is still taken (Trigger 1, 3, 4 -> 4 again), which gave two groups the same prefix.
+  let n = 1
+  triggers.forEach((t) => { const m = t && /Trig(\d+)$/.exec(t.prefix || ''); if (m) n = Math.max(n, Number(m[1]) + 1) })
+  while (triggers.some((t) => t && t.prefix === `${id}Trig${n}`)) n++
   const prefix = `${id}Trig${n}`
   const title = `Trigger ${n}`
   triggers.push({ prefix, title })
@@ -15444,6 +18847,10 @@ function triggerCustomPoseFunctions(type, clickCount = 1) {
   const deviceFamily = currentDeviceFamily()
   customClickFunctionIds.forEach(({ id, kind, family }) => {
     if (kind === 'hold' || cfg[`${id}Type`] !== type) return
+    // A function that is switched OFF fires nothing, including its Multi Trigger triggers (2026-10-15, direct report: only one hand followed the function being tuned while the others did something else). The base
+    // Enabled used to be checked only through startClickHoldPose() / triggerClickPose() for the prefix that got resolved, and a trigger prefix has its own Enabled, so every disabled function whose trigger was
+    // left on still fired on the presses its cycle landed on the trigger, together with the enabled one, and each hand ended up with whichever finished last.
+    if (!cfg[`${id}Enabled`]) return
     // Real device/family gating -- direct request 2026-09-24 (item 14):
     // previously nothing here checked family at all, so a mobile-created
     // function fired on ANY device, including Desktop. See
@@ -15495,6 +18902,7 @@ function startCustomHoldFunctions(type, ordinal = 1) {
   const deviceFamily = currentDeviceFamily()
   customClickFunctionIds.forEach(({ id, kind, family }) => {
     if (kind !== 'hold' || cfg[`${id}Type`] !== type) return
+    if (!cfg[`${id}Enabled`]) return // a switched-off function fires nothing, not even an enabled Multi Trigger trigger (see triggerCustomPoseFunctions())
     if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
     if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
     if (type === 'Click+Hold' && customFunctionWantsMultiTouch(id)) return
@@ -15538,7 +18946,7 @@ function endCustomHoldFunctions(type, ordinal = 1) {
 // (a deliberate "repeat rate," not a one-shot-per-page-load limit).
 let scrollTriggerTimer = null
 window.addEventListener('wheel', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
   if (scrollTriggerTimer) return
   triggerCustomPoseFunctions('Scroll')
   scrollTriggerTimer = setTimeout(() => { scrollTriggerTimer = null }, cfg.multiClickWindowMs)
@@ -15782,7 +19190,9 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
   // setting `.hidden` alone would silently do nothing here.
   singlePoseKeys.forEach((suffix) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
-    if (row) row.style.display = mode !== 'Single Pose' ? 'none' : ''
+    // None keeps the Single Pose timing rows but has no pose to pick
+    const visible = mode === 'Single Pose' || (mode === 'None' && suffix !== 'TargetPose' && suffix !== 'SkipIfSamePose')
+    if (row) row.style.display = visible ? '' : 'none'
   })
   // Every other Tween-shared control (speed, curves, loop, retransition)
   // applies to BOTH Sequence and Chain mode alike -- Chain just resolves a
@@ -15838,7 +19248,7 @@ function updateLoopHoldVisibility(p) {
 // own separate Tween-prefixed trio, a disclosed scoping choice, not a
 // literal instruction either way.
 function updateSingleTimingGateVisibility(p) {
-  const showBase = cfg[`${p}Mode`] === 'Single Pose'
+  const showBase = cfg[`${p}Mode`] === 'Single Pose' || cfg[`${p}Mode`] === 'None'
   const setRow = (suffix, visible) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = visible ? '' : 'none'
@@ -15986,6 +19396,15 @@ function updateSingleTimingGateVisibility(p) {
   const tweenRetransitionSpeedCurveOn = tweenRetransitionOn && retransitionSpeedCurveEnabled
   setRow('TweenRetransitionSpeedCurve', tweenRetransitionSpeedCurveOn)
   setRow('TweenRetransitionSpeedCurveRange', tweenRetransitionSpeedCurveOn)
+  setRow('RetransitionDistCurveEnabled', retransitionOn)
+  const retransitionDistOn = retransitionOn && !!cfg[`${p}RetransitionDistCurveEnabled`]
+  setRow('RetransitionDistCurve', retransitionDistOn)
+  setRow('RetransitionDistRange', retransitionDistOn)
+  setRow('RetransitionScalerEnabled', retransitionOn)
+  const retransitionScalerOn = retransitionOn && !!cfg[`${p}RetransitionScalerEnabled`]
+  setRow('RetransitionScalerCurve', retransitionScalerOn)
+  setRow('RetransitionScalerMulRange', retransitionScalerOn)
+  setRow('RetransitionScalerDistRange', retransitionScalerOn)
   // Retransition Easing Curve: the on/off follows Retransition itself; the curve shows while its own box is on.
   setRow('RetransitionEasingCurveEnabled', retransitionOn)
   setRow('RetransitionEasingCurve', retransitionOn && !!cfg[`${p}RetransitionEasingCurveEnabled`])
@@ -16162,6 +19581,8 @@ function updateOffsetRotationVisibility(p) {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = rotationOn ? '' : 'none'
   })
+  const modeRow = document.querySelector(`.dp-row[data-key="${p}RotationMode"]`)
+  if (modeRow) modeRow.style.display = rotationOn ? '' : 'none'
 }
 cfg.startupFnEnabled = true
 CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(p) })
@@ -16236,11 +19657,16 @@ function wrapClickFunctionGatedSubgroups(p) {
   // subgroup treatment as every other on/off curve below ("provide an
   // on off checkbox for each").
   wrapGatedSubgroup(`${p}EasingCurveEnabled`, [`${p}EasingCurve`], 'Easing')
-  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetVisibleOnly`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
+  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetLoopRetransition`, `${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetVisibleOnly`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
   // "Offset To Camera" (2026-10-02) -- its own mandatory gated subgroup,
   // independent of (and stackable with) "Offset" above.
-  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetVisibleOnly`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
-  wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
+  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetLoopRetransition`, `${p}CameraOffsetVisibleOnly`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
+  const rotationGroup = wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationMode`, `${p}RotationLoopRetransition`, `${p}RotationCurveVisibleOnly`, `${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
+  // Rotation Curve X / Y / Z: one toggleable group per axis inside Rotation (titles carry the axis so the three have distinct keys)
+  ;['X', 'Y', 'Z'].forEach((ax) => {
+    const axisGroup = wrapGatedSubgroup(`${p}Rotation${ax}CurveEnabled`, [`${p}Rotation${ax}Curve`, `${p}Rotation${ax}CurveRange`], `Rotation Curve ${ax}`)
+    if (rotationGroup && axisGroup) rotationGroup.querySelector(':scope > .dp-group-body').appendChild(axisGroup)
+  })
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurveVisibleOnly`, `${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
   // start-time curve (no enable toggle of its own -- see
@@ -16267,7 +19693,9 @@ function wrapClickFunctionGatedSubgroups(p) {
   wrapGatedSubgroup(`${p}RetransitionEnabled`, [
     `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
     `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`,
-    `${p}RetransitionEasingCurveEnabled`, `${p}RetransitionEasingCurve`
+    `${p}RetransitionEasingCurveEnabled`, `${p}RetransitionEasingCurve`,
+    `${p}RetransitionDistCurveEnabled`, `${p}RetransitionDistCurve`, `${p}RetransitionDistRange`,
+    `${p}RetransitionScalerEnabled`, `${p}RetransitionScalerCurve`, `${p}RetransitionScalerMulRange`, `${p}RetransitionScalerDistRange`
   ], 'Retransition')
   // Direct spec item (2026-09-27): "add a Retransition Speed Curve group
   // just like the others where it can get turned on and off... place the
@@ -16285,6 +19713,8 @@ function wrapClickFunctionGatedSubgroups(p) {
   // Retransition wrap, never before.
   wrapGatedSubgroup(`${p}RetransitionSpeedCurveEnabled`, [`${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`], 'Retransition Speed Curve')
   wrapGatedSubgroup(`${p}RetransitionEasingCurveEnabled`, [`${p}RetransitionEasingCurve`], 'Retransition Easing Curve')
+  wrapGatedSubgroup(`${p}RetransitionDistCurveEnabled`, [`${p}RetransitionDistCurve`, `${p}RetransitionDistRange`], 'Retransition Distance Curve')
+  wrapGatedSubgroup(`${p}RetransitionScalerEnabled`, [`${p}RetransitionScalerCurve`, `${p}RetransitionScalerMulRange`, `${p}RetransitionScalerDistRange`], 'Retransition Distance Scaler')
   wrapGatedSubgroup(`${p}RetransitionStartTimeCurveEnabled`, [`${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`], 'Retransition Start Time Curve')
   // Hold-kind only -- fire-and-forget triggers have no Tween Stop fields.
   // Must run AFTER the wraps above (harmless either order, since Tween
@@ -16323,6 +19753,7 @@ wrapAllClickFunctionGatedSubgroups()
 // correctly hidden for an unrelated reason (e.g. a Sequence-mode
 // trigger's own Single-Pose-only gated subgroups).
 function updateClickFunctionEnabledVisibility(p) {
+  refreshCustomFunctionSelectorToggles() // the selector's checkbox for this function follows its Enabled checkbox
   const enabledRow = document.querySelector(`.dp-row[data-key="${p}Enabled"]`)
   if (!enabledRow) return
   const group = enabledRow.closest('.dp-group')
@@ -16603,31 +20034,85 @@ function parseFieldBounds() {
   const out = {}
   let limited = false
   ;['X', 'Y', 'Z'].forEach((A) => {
-    let min = -300, max = 300
-    try { const o = JSON.parse(cfg['fieldBounds' + A] || '{}'); if (Number.isFinite(o.min)) min = o.min; if (Number.isFinite(o.max)) max = o.max } catch (e) { /* keep defaults */ }
-    if (min > max) { const t = min; min = max; max = t }
-    out[A.toLowerCase()] = [min, max]
+    const num = (k, d) => { const v = parseFloat(cfg[k]); return Number.isFinite(v) ? v : d }
+    const curve = (k) => { if (!cfg[k + 'Enabled']) return null; limited = true; const rg = sphereParse(cfg[k + 'Range'], { min: -300, max: 300 }); return { pts: sphereParse(cfg[k], [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]), lo: rg.min, hi: rg.max } } // the 2-handle Min / Max slider replaces the Y axis bottom / top values
+    const min = num('fieldBounds' + A + 'Min', -300), max = num('fieldBounds' + A + 'Max', 300)
+    out[A.toLowerCase()] = { min, max, minCurve: curve('fieldBounds' + A + 'MinCurve'), maxCurve: curve('fieldBounds' + A + 'MaxCurve') }
     if (min > -300 || max < 300) limited = true
   })
   fieldBounds = limited ? out : null
+}
+// Old saved Hand Position Min / Max (one range-bar JSON per axis) -> the new Min / Max number inputs, once, while the new inputs are still at their defaults.
+function migrateLegacyFieldBounds() {
+  ;['X', 'Y', 'Z'].forEach((A) => {
+    try {
+      const o = JSON.parse(cfg['fieldBounds' + A] || '{}')
+      if (Number.isFinite(o.min) && o.min !== -300 && cfg['fieldBounds' + A + 'Min'] === '-300') syncValue('fieldBounds' + A + 'Min', String(o.min))
+      if (Number.isFinite(o.max) && o.max !== 300 && cfg['fieldBounds' + A + 'Max'] === '300') syncValue('fieldBounds' + A + 'Max', String(o.max))
+    } catch (e) { /* keep the new inputs' values */ }
+  })
+  parseFieldBounds()
+}
+// Retransition Distance Curve: X = the hand model's actual distance from the camera position, nearest..farthest hand of the whole field = 0..1 (a hand outside that range is extrapolated by the curve); Y = Min..Max time.
+function retransitionDistanceMs(hand, p) {
+  if (!cfg[`${p}RetransitionDistCurveEnabled`]) return null
+  if (camDistFrame !== idleReposeFrameCounter) {
+    camDistFrame = idleReposeFrameCounter
+    let mn = Infinity, mx = -Infinity
+    for (let i = 0; i < hands.length; i++) { const d = hands[i].wrapper.position.distanceTo(camera.position); if (d < mn) mn = d; if (d > mx) mx = d }
+    camDistMin = mn === Infinity ? 0 : mn; camDistRange = Math.max(mx - mn, 0.001)
+  }
+  const x = (hand.wrapper.position.distanceTo(camera.position) - camDistMin) / camDistRange
+  const pts = sphereParse(cfg[`${p}RetransitionDistCurve`], [{ x: 0, y: 0 }, { x: 1, y: 1 }]), rg = sphereParse(cfg[`${p}RetransitionDistRange`], { min: 50, max: 2000 })
+  return rg.min + (rg.max - rg.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, x), 0, 1)
+}
+// Retransition Distance Scaler: speed multiplier from the hand's distance to its own field starting point (basePosition = its retransition target). X = (distance - Min) / (Max - Min) of the distance slider, so hands beyond
+// Min / Max read x < 0 or > 1 and are extrapolated by the curve; Y (0..1 at the curve's own span) maps to the multiplier Min..Max. 1 when the scaler is off. Never below 0.05 so a retransition always finishes.
+function retransitionScalerMul(hand, p) {
+  if (!cfg[`${p}RetransitionScalerEnabled`] || !hand.basePosition) return 1
+  const dr = sphereParse(cfg[`${p}RetransitionScalerDistRange`], { min: 0, max: 50 }), mr = sphereParse(cfg[`${p}RetransitionScalerMulRange`], { min: 0.5, max: 2 })
+  const pts = sphereParse(cfg[`${p}RetransitionScalerCurve`], [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+  const x = (hand.wrapper.position.distanceTo(hand.basePosition) - dr.min) / Math.max(dr.max - dr.min, 1e-6)
+  return Math.max(mr.min + (mr.max - mr.min) * evaluateArmLengthCurve(pts, x), 0.05)
 }
 function onFieldBoundsChanged() {
   parseFieldBounds()
   relayoutField() // puts idle hands back on their grid position so widening a bound releases them
 }
-const _bndRight = new THREE.Vector3(), _bndUp = new THREE.Vector3(), _bndFwd = new THREE.Vector3()
+const _bndRight = new THREE.Vector3(), _bndUp = new THREE.Vector3(), _bndFwd = new THREE.Vector3(), _bndProj = new THREE.Vector3()
 function applyFieldBounds() {
   if (!fieldBounds) return
   const b = fieldBounds
+  // Curves: X = XY-only distance of each hand's STARTING field point from the camera's XY position, over ALL hands (not just visible ones), nearest..farthest = 0..1; Y (0..1) = the curve's own Min / Max slider values.
+  const anyCurve = !!(b.x.minCurve || b.x.maxCurve || b.y.minCurve || b.y.maxCurve || b.z.minCurve || b.z.maxCurve)
+  if (anyCurve && fbDistFrame !== idleReposeFrameCounter) {
+    fbDistFrame = idleReposeFrameCounter
+    if (!fbDist || fbDist.length !== hands.length) fbDist = new Float64Array(hands.length)
+    let mn = Infinity, mx = -Infinity
+    for (let i = 0; i < hands.length; i++) {
+      const bp = hands[i].basePosition
+      let d = 0
+      if (bp) d = Math.hypot(bp.x - camera.position.x, bp.y - camera.position.y) // world XY only (no Z): the starting point's XY distance from the camera's XY position
+      fbDist[i] = d
+      if (d < mn) mn = d
+      if (d > mx) mx = d
+    }
+    fbDistMin = mn === Infinity ? 0 : mn; fbDistRange = Math.max(mx - mn, 1e-6)
+  }
+  // The curve's Y (0..1) runs from the axis's Min number box value (0) to its Max number box value (1) (direct request 2026-10-13); with the curve off the limit is simply that box's own value.
+  const lim = (o, curve, fallback, x) => (curve ? curve.lo + (curve.hi - curve.lo) * THREE.MathUtils.clamp(evaluateArmLengthCurve(curve.pts, x), 0, 1) : fallback)
   _bndRight.setFromMatrixColumn(camera.matrixWorld, 0)
   _bndUp.setFromMatrixColumn(camera.matrixWorld, 1)
   _bndFwd.setFromMatrixColumn(camera.matrixWorld, 2)
   for (let i = 0; i < hands.length; i++) {
     const hand = hands[i]
     const p = hand.wrapper.position
-    const cx = Math.min(Math.max(p.x, b.x[0]), b.x[1])
-    const cy = Math.min(Math.max(p.y, b.y[0]), b.y[1])
-    const cz = Math.min(Math.max(p.z, b.z[0]), b.z[1])
+    const xn = anyCurve ? (fbDist[i] - fbDistMin) / fbDistRange : 0
+    const bound = (o) => { let lo = lim(o, o.minCurve, o.min, xn), hi = lim(o, o.maxCurve, o.max, xn); if (lo > hi) { const t = lo; lo = hi; hi = t } return [lo, hi] }
+    const bx = bound(b.x), by = bound(b.y), bz = bound(b.z)
+    const cx = Math.min(Math.max(p.x, bx[0]), bx[1])
+    const cy = Math.min(Math.max(p.y, by[0]), by[1])
+    const cz = Math.min(Math.max(p.z, bz[0]), bz[1])
     const ex = p.x - cx, ey = p.y - cy, ez = p.z - cz
     if (ex !== 0 || ey !== 0 || ez !== 0) {
       p.set(cx, cy, cz)
@@ -16645,8 +20130,15 @@ function applyFieldBounds() {
 }
 function buildFieldBoundsWidgets() {
   ;['X', 'Y', 'Z'].forEach((A) => {
-    const row = document.querySelector('.dp-row[data-key="fieldBounds' + A + '"]')
-    if (row) buildGenericRangeBarWidget(row, { trackMin: -300, trackMax: 300, unit: 'wu', defaultValue: { min: -300, max: 300 } })
+    const legacy = document.querySelector('.dp-row[data-key="fieldBounds' + A + '"]')
+    if (legacy) legacy.style.display = 'none' // old range-bar storage, replaced by the Min / Max number inputs
+    ;['Min', 'Max'].forEach((M) => {
+      const row = document.querySelector('.dp-row[data-key="fieldBounds' + A + M + 'Curve"]')
+      if (row) buildGenericCurveWidget(row, { caption: 'X: XY Distance Of The Starting Field Point From The Camera (%, Nearest→Farthest Point, All Points, No Z)  ·  Y: ' + M + ' ' + A + ' Limit (0 = Slider Min, 1 = Slider Max)', defaultPoints: M === 'Min' ? [{ x: 0, y: 0 }, { x: 1, y: 0 }] : [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+      const rr = document.querySelector('.dp-row[data-key="fieldBounds' + A + M + 'CurveRange"]')
+      if (rr) buildGenericRangeBarWidget(rr, { trackMin: -300, trackMax: 300, unit: 'wu', defaultValue: { min: -300, max: 300 } })
+      wrapGatedSubgroup('fieldBounds' + A + M + 'CurveEnabled', ['fieldBounds' + A + M + 'Curve', 'fieldBounds' + A + M + 'CurveRange'], 'Hand Position ' + M + ' ' + A + ' Curve')
+    })
   })
 }
 function relayoutField() {
@@ -16786,14 +20278,51 @@ function createFieldHand() {
   return hand
 }
 function finishRebuildField() {
+  const __t0 = DEBUG_TIMING ? performance.now() : 0
   relayoutField()
+  const __t1 = DEBUG_TIMING ? performance.now() : 0
   applyStartupHandOffset()
   // relayoutField() only recomputes clone.position/scale -- a freshly
   // rebuilt hand's own skeleton is a brand-new (bind-pose) clone, so every
   // finger/wrist Pose slider needs reapplying too, or a rebuild (e.g.
   // changing row/column count) would silently reset every hand back to
   // its bind pose.
+  const __t2 = DEBUG_TIMING ? performance.now() : 0
   applyAllFingerPoses()
+  const __t3 = DEBUG_TIMING ? performance.now() : 0
+  updateOutlineVisibility()
+  updateHandsVisibility()
+  if (DEBUG_TIMING) logStartupTiming('finishRebuildField(): relayout ' + Math.round(__t1 - __t0) + 'ms, startup offset ' + Math.round(__t2 - __t1) + 'ms, finger poses ' + Math.round(__t3 - __t2) + 'ms, outline+visibility ' + Math.round(performance.now() - __t3) + 'ms')
+  if (!framedOnce) {
+    framedOnce = true
+    const w = (cfg.fieldCols - 1) * cfg.columnSpacing
+    const h = (cfg.fieldRows - 1) * cfg.rowSpacing
+    sceneState.fieldRadius = Math.max(Math.sqrt(w * w + h * h) / 2, Math.min(cfg.rowSpacing, cfg.columnSpacing))
+    updateKeyLightPosition()
+  }
+}
+// Startup version of finishRebuildField() (2026-10-16, direct report: the loading preview froze for a second or two). Measured on the 55 x 55 (3,025 hand) field: the finger-pose pass over every new hand was ~340 ms in one block
+// (applyCurl() also ran scene.updateMatrixWorld(true) over the WHOLE scene once per finger, 5 times). Here the hands are hidden first (they were just added to the scene; without this the in-between frames would draw all of
+// them), then each hand is posed on its own - wrist first, then one matrix update of that hand, then the five fingers (the same order as applyAllFingerPoses(); a finger only depends on its own parent chain) - in slices that
+// yield a frame. Everything else is the same as finishRebuildField().
+async function finishRebuildFieldSliced() {
+  const __tf = DEBUG_TIMING ? performance.now() : 0
+  updateHandsVisibility() // hides the warm-up hands before the first yield
+  relayoutField()
+  applyStartupHandOffset()
+  if (modelLoaded) {
+    const yielder = makeSliceYielder(8)
+    for (let i = 0; i < hands.length; i++) {
+      const hand = hands[i]
+      if (hand.skinnedMesh) {
+        applyWristPoseToSkeleton(hand.skinnedMesh.skeleton)
+        hand.wrapper.updateMatrixWorld(true)
+        FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, cloneBaseQuat, hand.wrapper.quaternion))
+      }
+      await yielder()
+    }
+  }
+  if (DEBUG_TIMING) logStartupTiming('finishRebuildFieldSliced(): ' + Math.round(performance.now() - __tf) + 'ms wall (sliced)')
   updateOutlineVisibility()
   updateHandsVisibility()
   if (!framedOnce) {
@@ -16864,13 +20393,18 @@ async function rebuildFieldChunked() {
     const t0 = performance.now()
     do { pending.push(createFieldHand()) } while (pending.length < total && performance.now() - t0 < 6)
     slices++
+    fieldBuildFrac = total ? pending.length / total : 1
     await yieldFrame()
   }
+  const __ta = DEBUG_TIMING ? performance.now() : 0
   hands.forEach((hand) => scene.remove(hand.wrapper))
   hands.length = 0
-  pending.forEach((hand) => { scene.add(hand.wrapper); hands.push(hand) })
+  // Behind the loading screen the hands are added HIDDEN and shown a few per frame (advanceFieldWarmup()) so the field's first draw is not one big frame.
+  pending.forEach((hand) => { if (!fieldStarted) hand._warmHidden = true; scene.add(hand.wrapper); hands.push(hand) })
+  if (DEBUG_TIMING) logStartupTiming('field build tail: scene.add x' + pending.length + ' ' + Math.round(performance.now() - __ta) + 'ms')
   fieldBuildInProgress = false
-  finishRebuildField()
+  if (fieldStarted) finishRebuildField()
+  else await finishRebuildFieldSliced() // behind the loading screen: the same work in ~8 ms slices, so the loading preview keeps animating
   logLoadingPreview(`field built behind the loading screen: ${total} hands in ${slices} slices over ${Math.round(performance.now() - t0All)}ms`)
   if (fieldBuildDirty) { fieldBuildDirty = false; rebuildField() }
 }
@@ -16923,15 +20457,18 @@ const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('https://unpkg.com/three@0.169.0/examples/jsm/libs/draco/gltf/')
 const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
-gltfLoader.load(
-  MODEL_URL,
+resolveHandModelUrl().then((handModelUrl) => gltfLoader.load(
+  handModelUrl,
   (gltf) => {
     const root = gltf.scene
     const skinned = findSkinnedMesh(root)
     if (!skinned) {
+      if (revertHandModelAndReload('no skinned mesh')) return
       loadingEl.textContent = 'No skinned mesh found in model.'
       return
     }
+    const missingBones = HAND_MODEL_BONES.filter((n) => !skinned.skeleton.getBoneByName(n))
+    if (missingBones.length && revertHandModelAndReload('missing rig bones ' + missingBones.join(', '))) return
     root.traverse((obj) => { if (obj.isMesh && obj !== skinned) obj.visible = false })
     root.updateMatrixWorld(true)
 
@@ -16985,8 +20522,11 @@ gltfLoader.load(
     // clones this skeleton, so every hand's own clone starts from the
     // true bind pose.
     skinned.skeleton.bones.forEach((bone) => { boneRestQuat[bone.name] = bone.quaternion.clone() })
+    detectLocalAxisRig() // the IK rig takes the local-axis pose path (see IK RIG, above)
     wristPosRaw.copy(wristPos)
     { const palmB = skinned.skeleton.getBoneByName('rMid1'); if (palmB) palmB.getWorldPosition(palmCenterPosRaw); else palmCenterPosRaw.copy(wristPos) } // end of rCarpal2
+    handoPivotRaw.addVectors(wristPos, palmCenterPosRaw).multiplyScalar(0.5)
+    boundsBox.getCenter(handBoundsBoxCenterRaw)
     // Whole-Hand Rotation at Base: the mesh's own axes relative to the scene root = product of the local rotations from the skinned mesh up to the root (HANDO's modelBaseFrameQ).
     modelBaseFrameQ.identity()
     for (let o = skinned; o && o !== root; o = o.parent) modelBaseFrameQ.premultiply(o.quaternion)
@@ -17032,9 +20572,10 @@ gltfLoader.load(
   undefined,
   (err) => {
     console.error('Failed to load hand model', err)
+    if (revertHandModelAndReload('load failed')) return
     loadingEl.textContent = 'Failed to load hand model — see console.'
   }
-)
+))
 
 // -----------------------------------------------------------------------
 // Render loop
@@ -17132,13 +20673,16 @@ function setPaused(v) {
 // `?dev=1` one -- this is why its own click handler is wired here,
 // unconditionally, rather than via a DEV_GROUPS onClick. Excluded from
 // every click-hold-pose/click-pose/click-count-chain gesture listener
-// via `.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')` (see those listeners' own
+// via `.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')` (see those listeners' own
 // guard, main.js) -- clicking it only ever calls setPaused(), never a
 // cursor-tracking-driven pose/tween trigger.
 function updatePauseButtonIcon() {
   const btn = document.getElementById('pauseButton')
   if (!btn) return
-  btn.textContent = isPaused ? '▶' : '⏸' // ▶ (resume) / ⏸ (pause)
+  // Drawn as SVG filled with currentColor (the Icon Color setting, white by default) instead of the ⏸ / ▶ characters: ⏸ (U+23F8) is an emoji on most platforms and renders as an orange tile whatever the CSS color is (2026-10-15, direct report).
+  btn.innerHTML = isPaused
+    ? '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>'
+    : '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><rect x="6" y="4.5" width="4.2" height="15"/><rect x="13.8" y="4.5" width="4.2" height="15"/></svg>'
   const label = isPaused ? 'Resume' : 'Pause'
   btn.title = label
   btn.setAttribute('aria-label', label)
@@ -17181,6 +20725,7 @@ function applyPauseButtonStyle() {
     rb.style.color = btn.style.color
     rb.style.opacity = btn.style.opacity
   }
+  applyColorPresetButtonStyle()
 }
 // Reset (direct request 2026-10-04: "a reset button next to the pause
 // button that resets all hands back to default position and pose").
@@ -17240,6 +20785,191 @@ function setupPauseButton() {
   updatePauseButtonIcon()
 }
 setupPauseButton()
+// =====================================================================================================================
+// Color Preset selector (2026-10-13, direct request): a button right of Pause / Reset that opens a panel of square preset buttons. Each button is filled with the preset's toon gradient and bordered with its background /
+// floor colour (no text). "+" adds a preset (toon steps 2, threshold 2.5, shadow floor 50, light ceiling 80); clicking a preset applies it and opens the editor (gradient bar + background / floor colour + delete) so it can be
+// changed. Built from JS (no index.html / style.css edit); looks come from the Pause Button group's settings. The list is the 'colorPresets' control, so it is saved with the other dev-panel settings; editing is dev-mode only.
+// =====================================================================================================================
+let colorPresetEditingId = null
+function getColorPresets() {
+  try { const a = JSON.parse(cfg.colorPresets); if (Array.isArray(a)) return a } catch (e) { /* default below */ }
+  return COLOR_PRESET_SEED.map((p) => ({ ...p }))
+}
+function setColorPresets(arr) {
+  const json = JSON.stringify(arr)
+  cfg.colorPresets = json
+  try { syncValue('colorPresets', json) } catch (e) { /* panel not built */ }
+}
+function colorPresetSwatch(p) {
+  if (p.w && p.w.length) return 'linear-gradient(135deg, ' + p.w.join(', ') + ')'
+  const stops = parseToonGradient(p.g || '')
+  return 'linear-gradient(135deg, ' + stops.map((x) => x.c + ' ' + (x.p * 100).toFixed(1) + '%').join(', ') + ')'
+}
+// Puts the preset's toon values, gradient and background / floor colour on screen (same path as the dev-panel rows: cfg + row via syncValue, then the effects).
+function applyColorPreset(p) {
+  const toon = { toonSteps: p.s, toonStepThreshold: p.t, toonShadowFloor: p.f, toonLightCeiling: p.c, toonGradient: p.g }
+  Object.keys(toon).forEach((k) => { if (toon[k] === undefined || toon[k] === null) return; cfg[k] = toon[k]; syncValue(k, toon[k]) })
+  rebuildGradientMap()
+  applyColorPresetBackground(p.bg)
+}
+function applyColorPresetBackground(hex) {
+  cfg.floorColor = hex; cfg.bgColor = hex
+  syncValue('floorColor', hex); syncValue('bgColor', hex)
+  scene.background = new THREE.Color(hex)
+  syncLoadingPreviewBackground()
+  updateFloor()
+  sceneNeedsRedraw = true
+}
+function colorPresetBtnStyle() { // shared look of the three kinds of button, from the Pause Button group's settings
+  return { bg: cfg.pauseBtnBgColor || '#000000', border: cfg.pauseBtnBorderColor || '#ffffff', bw: (cfg.pauseBtnBorderThickness ?? 1) + 'px', radius: (cfg.pauseBtnCornerRadius ?? 6) + 'px', fg: cfg.pauseBtnIconColor || '#ffffff', size: cfg.pauseBtnSize ?? 40 }
+}
+function applyColorPresetButtonStyle() {
+  const btn = document.getElementById('presetButton')
+  if (!btn) return
+  const st = colorPresetBtnStyle(), x = (cfg.pauseBtnXOffset ?? 12) + (st.size + 8) * 2
+  btn.style.left = x + 'px'; btn.style.top = (cfg.pauseBtnYOffset ?? 12) + 'px'
+  btn.style.width = st.size + 'px'; btn.style.height = st.size + 'px'
+  btn.style.fontSize = (cfg.pauseBtnIconSize ?? 18) + 'px'
+  btn.style.borderRadius = st.radius; btn.style.borderWidth = st.bw; btn.style.borderStyle = 'solid'; btn.style.borderColor = st.border
+  btn.style.background = st.bg; btn.style.color = st.fg; btn.style.opacity = (cfg.pauseBtnOpacity ?? 100) / 100
+  const panel = document.getElementById('presetPanel')
+  if (panel) {
+    panel.style.left = ((cfg.pauseBtnXOffset ?? 12)) + 'px'; panel.style.top = ((cfg.pauseBtnYOffset ?? 12) + st.size + 8) + 'px'
+    panel.style.background = st.bg; panel.style.color = st.fg; panel.style.borderRadius = st.radius
+    panel.style.border = st.bw + ' solid ' + st.border
+  }
+}
+// A small stand-alone gradient editor (same gestures as the Toon Shade Color Gradient row: click the bar = add a stop, click a handle = colour, double-click a handle = delete, drag = move).
+function buildColorPresetGradientEditor(getStops, onChange) {
+  const wrap = document.createElement('div')
+  wrap.style.cssText = 'width:100%;padding:2px 0 4px'
+  const bar = document.createElement('div')
+  bar.style.cssText = 'position:relative;height:24px;border-radius:4px;border:1px solid rgba(255,255,255,0.3);cursor:copy;touch-action:none'
+  const track = document.createElement('div')
+  track.style.cssText = 'position:relative;height:20px;margin-top:3px'
+  const picker = document.createElement('input')
+  picker.type = 'color'
+  picker.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:1px;height:1px'
+  wrap.appendChild(bar); wrap.appendChild(track); wrap.appendChild(picker)
+  let stops = [], editing = null, openTimer = 0, lastTap = { st: null, t: 0 }
+  const commit = () => onChange(JSON.stringify(stops.map((x) => ({ p: +x.p.toFixed(4), c: x.c }))))
+  const paintBar = () => { bar.style.background = 'linear-gradient(to right, ' + stops.slice().sort((a, b) => a.p - b.p).map((x) => x.c + ' ' + (x.p * 100).toFixed(1) + '%').join(', ') + ')' }
+  const frac = (cx) => { const r = bar.getBoundingClientRect(); return THREE.MathUtils.clamp((cx - r.left) / Math.max(r.width, 1), 0, 1) }
+  const redraw = () => {
+    stops.sort((a, b) => a.p - b.p)
+    paintBar()
+    track.textContent = ''
+    stops.forEach((st) => {
+      const h = document.createElement('div')
+      h.style.cssText = 'position:absolute;top:0;left:' + (st.p * 100) + '%;width:14px;height:20px;margin-left:-7px;background:' + st.c + ';border:2px solid #fff;border-radius:3px;box-sizing:border-box;cursor:pointer;touch-action:none;box-shadow:0 0 0 1px rgba(0,0,0,0.6)'
+      h.addEventListener('pointerdown', (e) => {
+        e.preventDefault(); e.stopPropagation()
+        try { h.setPointerCapture(e.pointerId) } catch (err) { /* synthetic pointer */ }
+        const x0 = e.clientX; let moved = false
+        const mv = (ev) => { if (Math.abs(ev.clientX - x0) > 3) moved = true; if (moved) { st.p = frac(ev.clientX); h.style.left = (st.p * 100) + '%'; paintBar() } }
+        const up = () => {
+          h.removeEventListener('pointermove', mv); h.removeEventListener('pointerup', up); h.removeEventListener('pointercancel', up)
+          if (moved) { redraw(); commit(); return }
+          const now = performance.now()
+          if (lastTap.st === st && now - lastTap.t < 350) {
+            clearTimeout(openTimer); lastTap = { st: null, t: 0 }
+            if (stops.length > 2) { stops.splice(stops.indexOf(st), 1); redraw(); commit() }
+            return
+          }
+          lastTap = { st, t: now }
+          clearTimeout(openTimer)
+          openTimer = setTimeout(() => { editing = st; picker.value = st.c; picker.click() }, 360)
+        }
+        h.addEventListener('pointermove', mv); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up)
+      })
+      track.appendChild(h)
+    })
+  }
+  bar.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); const p = frac(e.clientX); stops.push({ p, c: toonGradientHexAt(stops.slice().sort((a, b) => a.p - b.p), p) }); redraw(); commit() })
+  picker.addEventListener('input', () => { if (!editing) return; editing.c = picker.value.toLowerCase(); redraw(); commit() })
+  return { el: wrap, set(str) { stops = parseToonGradient(str).map((x) => ({ ...x })); redraw() } }
+}
+function renderColorPresetPanel() {
+  const panel = document.getElementById('presetPanel')
+  if (!panel || panel.style.display === 'none') return
+  const st = colorPresetBtnStyle(), presets = getColorPresets()
+  panel.textContent = ''
+  const grid = document.createElement('div')
+  grid.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px'
+  const tileCss = 'box-sizing:border-box;width:' + st.size + 'px;height:' + st.size + 'px;padding:0;margin:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;user-select:none;-webkit-tap-highlight-color:transparent;border-radius:' + st.radius + ';'
+  presets.forEach((p) => {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.style.cssText = tileCss + 'border:4px solid ' + p.bg + ';background:' + colorPresetSwatch(p) + ';' + (p.id === colorPresetEditingId ? 'outline:2px solid ' + st.fg + ';outline-offset:2px;' : '')
+    b.addEventListener('click', (e) => { e.stopPropagation(); applyColorPreset(p); colorPresetEditingId = DEV_MODE ? p.id : null; renderColorPresetPanel() })
+    grid.appendChild(b)
+  })
+  if (DEV_MODE) {
+    const plus = document.createElement('button')
+    plus.type = 'button'; plus.textContent = '+'
+    plus.style.cssText = tileCss + 'border:' + st.bw + ' solid ' + st.border + ';background:' + st.bg + ';color:' + st.fg + ';'
+    plus.addEventListener('click', (e) => {
+      e.stopPropagation()
+      const np = { id: 'p' + Date.now().toString(36), g: cfg.toonGradient, bg: cfg.floorEnabled ? (cfg.floorColor || '#ffffff') : (cfg.bgColor || '#ffffff'), ...COLOR_PRESET_NEW_DEFAULTS }
+      setColorPresets(getColorPresets().concat([np]))
+      applyColorPreset(np)
+      colorPresetEditingId = np.id
+      renderColorPresetPanel()
+    })
+    grid.appendChild(plus)
+  }
+  panel.appendChild(grid)
+  const cur = DEV_MODE && presets.find((p) => p.id === colorPresetEditingId)
+  if (!cur) return
+  const ed = document.createElement('div')
+  ed.style.cssText = 'margin-top:10px;display:flex;flex-direction:column;gap:8px;min-width:' + (st.size * 4) + 'px'
+  const update = (patch) => { // writes the change into the preset, then onto the screen
+    const all = getColorPresets(), i = all.findIndex((p) => p.id === cur.id)
+    if (i < 0) return
+    all[i] = { ...all[i], ...patch }
+    if (patch.g !== undefined) delete all[i].w // an edited gradient no longer uses the BW / WB swatch override
+    setColorPresets(all)
+    if (patch.g !== undefined) { cfg.toonGradient = patch.g; syncValue('toonGradient', patch.g); rebuildGradientMap() }
+    if (patch.bg !== undefined) applyColorPresetBackground(patch.bg)
+    const sw = grid.children[i]; if (sw) { sw.style.background = colorPresetSwatch(all[i]); sw.style.borderColor = all[i].bg }
+  }
+  const gradEd = buildColorPresetGradientEditor(null, (g) => update({ g }))
+  gradEd.set(cur.g)
+  ed.appendChild(gradEd.el)
+  const row = document.createElement('div')
+  row.style.cssText = 'display:flex;align-items:center;gap:10px'
+  const bgIn = document.createElement('input')
+  bgIn.type = 'color'; bgIn.value = cur.bg
+  bgIn.style.cssText = 'width:' + st.size + 'px;height:' + Math.round(st.size * 0.7) + 'px;padding:0;border:1px solid rgba(255,255,255,0.4);background:none;cursor:pointer'
+  bgIn.addEventListener('input', () => update({ bg: bgIn.value }))
+  const del = document.createElement('button')
+  del.type = 'button'; del.textContent = '\u{1F5D1}'
+  del.style.cssText = 'margin-left:auto;padding:2px 8px;cursor:pointer;background:transparent;color:inherit;border:1px solid rgba(255,255,255,0.4);border-radius:4px;font-size:16px'
+  del.addEventListener('click', (e) => { e.stopPropagation(); setColorPresets(getColorPresets().filter((p) => p.id !== cur.id)); colorPresetEditingId = null; renderColorPresetPanel() })
+  row.appendChild(bgIn); row.appendChild(del)
+  ed.appendChild(row)
+  panel.appendChild(ed)
+}
+function setupColorPresetUi() {
+  if (document.getElementById('presetButton')) return
+  const btn = document.createElement('button')
+  btn.id = 'presetButton'; btn.type = 'button'; btn.setAttribute('aria-label', 'Color presets'); btn.title = 'Color presets'; btn.textContent = '\u25A6'
+  btn.style.cssText = 'position:fixed;z-index:100001;padding:0;margin:0;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1;user-select:none;-webkit-tap-highlight-color:transparent'
+  const panel = document.createElement('div')
+  panel.id = 'presetPanel'
+  panel.style.cssText = 'position:fixed;z-index:100001;display:none;padding:10px;box-sizing:border-box;max-width:min(320px,calc(100vw - 24px));max-height:calc(100vh - 80px);overflow:auto'
+  document.body.appendChild(btn); document.body.appendChild(panel)
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation()
+    const open = panel.style.display === 'none'
+    panel.style.display = open ? 'block' : 'none'
+    if (open) renderColorPresetPanel(); else colorPresetEditingId = null
+  })
+  // a press anywhere else closes it (a native colour dialog never sends one to the page)
+  document.addEventListener('pointerdown', (e) => { if (panel.style.display !== 'none' && !(e.target.closest && e.target.closest('#presetPanel, #presetButton'))) { panel.style.display = 'none'; colorPresetEditingId = null } }, true)
+  applyColorPresetButtonStyle()
+}
+setupColorPresetUi()
 // The Pose Preview panel's own "Run" button (Saved Tween Sequences list-
 // picker, direct request) -- plays the resolved named-pose sequence on
 // the PREVIEW hand only (never the field), paced by the Tween group's own
@@ -17250,12 +20980,13 @@ setupPauseButton()
 // anchor is the only feasible choice, same tradeoff already accepted
 // elsewhere in this file). Deliberately NOT gated by Global Pause (direct
 // request) -- see animate()'s own preview-render block.
-let previewTweenPlay = null // { poses, startMs, speedMs }
+let previewTweenPlay = null // { poses, segments, startMs, speedMs } -- segments = the Hold-aware weighted timeline (2026-10-15), poses the flat list it replaces
 function runTweenSequenceOnPreview(item) {
   if (!previewHand || !item) return
   const namedPoses = resolveTweenSequencePoses(item.tweenPoses)
   if (namedPoses.length < 1) return
-  previewTweenPlay = { poses: [poseDefaultValues, ...namedPoses], startMs: nowVirtual(), speedMs: Math.max(safeTweenSpeedMs(cfg.tweenPreviewSpeedMs), 1) }
+  const segments = resolveTweenSegmentsWithAnchor(poseDefaultValues, item.tweenPoses) // from the default pose through every entry; a Hold holds the pose before it
+  previewTweenPlay = { poses: [poseDefaultValues, ...namedPoses], segments: segments.length > 0 ? segments : null, startMs: nowVirtual(), speedMs: Math.max(safeTweenSpeedMs(cfg.tweenPreviewSpeedMs), 1) }
 }
 // Both Saved Tween Sequences' new "Edit"/"Run" buttons act on the list-
 // picker's own currently-SELECTED row -- same convention as Saved Poses'
@@ -17400,8 +21131,7 @@ async function importPosesAndTweenSequences(btn) {
     cfg.savedTweenSequences = items
     syncValue('savedTweenSequences', items)
     tweensCount = count
-    safeRefreshSelectOptions('dcHoldTweenSelector'); safeRefreshSelectOptions('rcTweenSelector'); safeRefreshSelectOptions('chpTweenSelector'); safeRefreshSelectOptions('rchpTweenSelector'); safeRefreshSelectOptions('clickTweenSelector'); safeRefreshSelectOptions('dblclickTweenSelector')
-    CLICK_HOLD_KEYS.forEach((p) => safeRefreshMultiSelectOptions(`${p}TweenChain`))
+    refreshAllTweenSequenceSelectors()
   }
   if (posesCount === 0 && tweensCount === 0) { flashImportButton(btn, 'Nothing to import'); return }
   flashImportButton(btn, `Imported ${posesCount} pose(s), ${tweensCount} tween(s)!`)
@@ -17561,7 +21291,8 @@ function animate(dt, now) {
     // advances a phase while `isPaused` is true.
     if (!isPaused) {
       updateCursorTarget()
-      if (trackingActive()) {
+      const armTrackOn = trackingActiveFor('Arm'), palmTrackOn = trackingActiveFor('Palm')
+      if (armTrackOn || palmTrackOn) {
         // Per-hand now (not hoisted above the loop like before) -- with Palm
         // Faces Cursor on, each hand's own roll angle depends on ITS OWN
         // position relative to the live cursor (computeRadialRollDeg(), see
@@ -17668,7 +21399,9 @@ function animate(dt, now) {
           // `inHandoffSettle` is now a shared boolean both dampings below
           // apply the SAME handoff safety-net cap through, instead of one
           // damping value doing both jobs.
-          const inHandoffSettle = hand._handoffSettleFrames > 0
+          // The release ease-in (hand._startupEase, set by releaseStartupHold()) counts too: the settle window alone is reset to 24 frames every frame a hand is overridden by the click function that ends the startup hold, so
+          // it ran out after ~24 frames and Arm Rotation (damping 1 = instant) snapped the rest of the way to the cursor (the "rotates 180 then starts tracking" jump, 2026-10-14).
+          const inHandoffSettle = hand._handoffSettleFrames > 0 || hand._startupEase > 0
           // Responsive Arm Rotation -- the actual "hand leans/rotates
           // toward the cursor" rotation, independently-toggleable from
           // Tracking Enabled itself (direct report: "It looks like the
@@ -17710,7 +21443,7 @@ function animate(dt, now) {
           // The WRAPPER's no-cursor-influence orientation is identity: the default pose's own rotation (alignQuat * Whole-Hand * Rotation at Base = currentBaseQuat) already lives on hand.clone,
           // so using currentBaseQuat here applied it a second time whenever Arm Rotation was off or a hand's responsiveness was 0 (2026-10-11, direct report: tracking didn't respect the default rotation).
           let desired = _identityQuatTrack
-          if (cfg.armRotationEnabled) {
+          if (cfg.armRotationEnabled && armTrackOn) {
             // Default Arm Rotation / Reactive Arm Rotation curve -- same
             // role as before, now scaling the PER-FRAME TURN RATE instead
             // of a bounded target angle. At 0%, the hand simply stops
@@ -17752,7 +21485,7 @@ function animate(dt, now) {
             hand.currentArmRotationQuat.slerp(_armPartialQ, THREE.MathUtils.clamp(armRotationDampingAmt, 0, 1))
             desired = hand.currentArmRotationQuat
           }
-          let baseDeg = cfg.palmFacesCursor ? computeScreenRollDeg(hand._trk, cursorTarget) : 0
+          let baseDeg = cfg.palmFacesCursor && palmTrackOn ? computeScreenRollDeg(hand._trk, cursorTarget) : 0
           // Palm Rotation Distance Curve -- modulate cursor-tracking
           // responsiveness by distance (2026-09-24). At close distance,
           // full responsiveness; at far distance, reduced (curve y-value
@@ -17828,9 +21561,12 @@ function animate(dt, now) {
           hd.currentPalmRollDeg = 0
         }
       }
+      updateResponsiveVelocity(nowVirtual()) // Cursor Tracking > Responsive Velocity (cursor-speed effects)
+      rvApplyArmTilt(armTrackOn || palmTrackOn)
       const __uroStart = performance.now()
       updateRenderOrder()
       applyFieldBounds()
+      checkStartupFloorHide()
       __frameProfiler.updateRenderOrderMs += performance.now() - __uroStart
       if (cfg.logPoseJumpsEnabled) detectPoseJumps()
       else poseJumpLastCheckMs = 0
@@ -17856,6 +21592,7 @@ function animate(dt, now) {
     // through either trigger. controls.update()/panel-sync above are NOT
     // throttled -- camera orbit/pan/zoom stays responsive even while paused.
     if (cameraPreviewRedrawPending) { cameraPreviewRedrawPending = false; sceneNeedsRedraw = true } // a preview moved/orbited/resized/changed: the paused render-on-demand gate below must redraw
+    if (fieldWarmStage === 1 || fieldWarmStage === 2) advanceFieldWarmup()
     const __nowForRender = performance.now()
     const __pausedRenderIntervalMs = 1000 / Math.max(1, cfg.pausedRenderFps ?? 15)
     const __pausedSafetyNetIntervalMs = 2000
@@ -17869,6 +21606,8 @@ function animate(dt, now) {
       composer.render()
       renderCameraPreviewViewports() // inside the same gate: while paused the canvas only changes when composer.render() runs, so previews must be drawn with it
       __frameProfiler.composerRenderMs += performance.now() - __renderStart
+      window.__lastComposerMs = performance.now() - __renderStart
+      fieldWarmLastRenderMs = window.__lastComposerMs
       __frameProfiler.frames++
       if (fieldStarted && !fieldRevealed && ++fieldRevealFrames >= 2) finalizeReveal() // two painted field frames, then the loading screen goes
     }
@@ -17881,6 +21620,7 @@ function animate(dt, now) {
     // (fps=4.2 with both of those reading normal) where the missing time
     // had to be somewhere this line now actually measures.
     __frameProfiler.animateTotalMs += performance.now() - __animateTotalStart
+    if (DEBUG_TIMING && fieldStarted && (window.__postStartFrames = (window.__postStartFrames || 0) + 1) <= 8) logStartupTiming('post-start animate #' + window.__postStartFrames + ' total ' + Math.round(performance.now() - __animateTotalStart) + 'ms (composer ' + Math.round(window.__lastComposerMs || 0) + ')')
     {
       const elapsed = performance.now() - __frameProfiler.windowStart
       if (elapsed >= 1000) {
@@ -17914,7 +21654,7 @@ function animate(dt, now) {
       if (previewTweenPlay) {
         const elapsed = nowVirtual() - previewTweenPlay.startMs
         const progress = THREE.MathUtils.clamp(elapsed / previewTweenPlay.speedMs, 0, 1)
-        previewPosePreset(lerpTweenSequence(previewTweenPlay.poses, progress))
+        previewPosePreset(previewTweenPlay.segments ? lerpTweenSegments(previewTweenPlay.segments, progress) : lerpTweenSequence(previewTweenPlay.poses, progress))
         if (progress >= 1) previewTweenPlay = null
       }
       previewRenderer.render(previewScene, previewCamera)
@@ -17929,6 +21669,8 @@ function animate(dt, now) {
     if (!fieldRevealed && loadingPreviewRenderer) {
       try {
         updateLoadingPreviewAnimation()
+        updateLoadingPreviewPointLight()
+        updateLoadingPreviewProgressCrop()
         syncLoadingPreviewCameraFromOrbit()
         loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
         if (!loadingPreviewFirstFrameLogged) { loadingPreviewFirstFrameLogged = true; logLoadingPreview('first loading-screen preview frame rendered') }
@@ -17977,6 +21719,20 @@ safeRefreshSelectOptions('renderOrderFallbackExcept')
 safeRefreshSelectOptions('renderOrderFallback2Except')
 mergeExceptSelects()
 buildRenderOrderWidgets()
+placeSmallScaleModelRows()
+refreshAllItemSelectorMarks()
+buildToonGradientWidget()
+// Keep the marks current while the camera / lighting / loading-preview selection changes (checked every 6th frame, a few numbers).
+let marksLastSig = ''
+let marksFrame = 0
+armLengthWidgetResyncs.push(() => {
+  if (++marksFrame % 6 !== 0) return
+  const t = controls.target
+  const sig = [camera.position.x, camera.position.y, camera.position.z, camera.fov, cfg.cameraRoll || 0, t.x, t.y, t.z].map((v) => Math.round(v * 100)).join(',') + '|' + LIGHTING_PRESET_KEYS.map((k) => cfg[k]).join(',') + '|' + cfg.loadingPreviewCameraSelector + '|' + cfg.loadingPreviewLightingSelector
+  if (sig === marksLastSig) return
+  marksLastSig = sig
+  refreshListPickerMarksByKey('savedCameras'); refreshListPickerMarksByKey('savedLighting'); refreshListPickerMarksByKey('loadingPreviewSavedCameras'); refreshListPickerMarksByKey('loadingPreviewSavedLighting')
+})
 gateGroupHeader('Floor', 'floorEnabled')
 updateFloorRowVisibility()
 updateFloor()
@@ -18062,6 +21818,7 @@ function updateRenderOrder() {
   idleReposeFrameCounter++
   updateTrackingPoints(true) // before the on-screen flags: every hand-to-cursor measure below uses the tracking point
   updateOnScreenFlags()
+  updateFingerCurlSkip()
   refreshTrackingDomains() // the tracking domains need this frame's on-screen flags
   updateScreenUnitsPerPx() // world units per screen pixel at the field plane, for the screen-space click-function distance
   // Everything an IDLE hand's finger curl depends on, as one string (2026-10-04): pose settings (finger,
@@ -18155,6 +21912,7 @@ function updateRenderOrder() {
   // Wrist Splay / Wrist Cropping each measure to the cursor at their own Cursor Target Depth (2026-10-11).
   updateTrackingTargets()
   updateTrackingPointMarkers()
+  updateFieldCenterMarker()
   updateRenderOrderPointMarkers()
   let spMin = Infinity, spMax = -Infinity, crMin = Infinity, crMax = -Infinity
   let spAMin = Infinity, spAMax = -Infinity, crAMin = Infinity, crAMax = -Infinity
@@ -18241,10 +21999,12 @@ function updateRenderOrder() {
     // mirrors applyHandArmLength()'s own existing "no prior value yet"
     // fallback, so a hand's very first frame still applies its target
     // instantly rather than lerping from nothing.
-    const targetArmLengthT = cfg.armLengthUseDepth === false
+    const targetArmLengthT0 = cfg.armLengthUseDepth === false
       ? computeArmLengthT(hand, hand._trkXY ?? handXYDist(hand), cfg.armLengthVisibleOnly !== false ? trkXYFieldMin : trkXYAllMin, cfg.armLengthVisibleOnly !== false ? trkXYFieldRange : trkXYAllRange) // Wrist Cropping Use Cursor Target Depth off: screen-space XY only
       : computeArmLengthT(hand, hand._cropDist ?? live, hand._cropDist === undefined ? minLiveDist : (cfg.armLengthVisibleOnly !== false ? cropFieldMin : cropAllMin), hand._cropDist === undefined ? liveDistRange : (cfg.armLengthVisibleOnly !== false ? cropFieldRange : cropAllRange)) // distance to the cursor at Wrist Cropping's own depth
-    const armLengthDampingAmt = THREE.MathUtils.clamp(cfg.armLengthDamping ?? 1, 0.001, 1)
+    const targetArmLengthT = rvCropTarget(hand, targetArmLengthT0) // + Responsive Velocity > Velocity Wrist Crop
+    let armLengthDampingAmt = THREE.MathUtils.clamp(cfg.armLengthDamping ?? 1, 0.001, 1)
+    if (hand._startupEase > 0) { armLengthDampingAmt = Math.min(armLengthDampingAmt, STARTUP_EASE_DAMPING); hand._startupEase-- } // ease-in after the startup hold is released (see releaseStartupHold())
     hand.currentArmLengthT = hand.currentArmLengthT !== undefined
       ? hand.currentArmLengthT + (targetArmLengthT - hand.currentArmLengthT) * armLengthDampingAmt
       : targetArmLengthT
@@ -18368,8 +22128,9 @@ function updateRenderOrder() {
       // hand copies cloneBaseQuat into currentBaseQuat (which is what turns the model), and it only ran with Responsive Wrist Splay on, after a trigger, or on a hand's
       // first frame -- so with Responsive Wrist Splay off the rotation sliders, a pose's rotation applied by Default, and Rotation at Base never reached idle hands.
       const baseChanged = !overridden && hand._cloneBaseVersion !== cloneBaseVersion
-      const needsIdleRepose = !overridden && ((cfg.wristSplayResponsiveEnabled && isThisHandsStaggerTurn) || hand._wasOverriddenLastFrame || !hand.everReposed || baseChanged)
+      const needsIdleRepose = !overridden && ((cfg.wristSplayResponsiveEnabled && isThisHandsStaggerTurn) || hand._wasOverriddenLastFrame || !hand.everReposed || baseChanged || hand._rvRepose)
       if (needsIdleRepose) {
+        hand._rvRepose = false
         hand._cloneBaseVersion = cloneBaseVersion
         const wasEverReposedBeforeThisFrame = hand.everReposed
         hand.everReposed = true
@@ -18388,7 +22149,8 @@ function updateRenderOrder() {
         // starts false, so a hand's very first frame still applies its
         // target instantly rather than lerping from the field's un-posed
         // default.
-        const wristSplayDampingAmt = THREE.MathUtils.clamp(cfg.wristSplayDamping ?? 1, 0.001, 1)
+        let wristSplayDampingAmt = THREE.MathUtils.clamp(cfg.wristSplayDamping ?? 1, 0.001, 1)
+        if (hand._startupEase > 0) wristSplayDampingAmt = Math.min(wristSplayDampingAmt, STARTUP_EASE_DAMPING) // ease-in after the startup hold is released
         const extraSplay = wasEverReposedBeforeThisFrame
           ? hand.currentSplayDeg + (targetSplay - hand.currentSplayDeg) * wristSplayDampingAmt
           : targetSplay
@@ -18454,7 +22216,7 @@ function updateRenderOrder() {
         hand.currentBaseQuat.copy(cloneBaseQuat)
         if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
         hand.currentBaseRb.copy(cloneBaseRb)
-        applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay)
+        applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay
         // Keeps `hand.currentSplayDeg` (see applyPoseValuesToHand()'s own
         // 2026-09-27 comment) current for idle hands too -- this is the
         // ONLY splay-applying path in this file that doesn't already run
@@ -18466,6 +22228,7 @@ function updateRenderOrder() {
         if (hand.basePosition) applyPoseOffsetToPosition(hand.wrapper, hand.basePosition, camera, cfg)
         applyStartupDisplacementToIdleHand(hand)
         hand.clone.scale.setScalar(computeBaseScale() * (cfg.poseScale ?? 1))
+        if (startupHandScaleActive(hand)) hand.clone.scale.multiplyScalar(startupHandScale(0)) // Hand Scale Curve: waiting hands sit at the value at progress 0
         // CORRECTED 2026-09-14, root cause behind the long-running "thumb
         // pose looks wrong" reports, independent of cursor movement. The
         // wrist bone gets re-posed with LIVE Responsive Wrist Splay every
@@ -18500,14 +22263,17 @@ function updateRenderOrder() {
         // Skip the finger curl when nothing it depends on changed since this hand's last idle apply: same
         // pose/base signature and the wrist splay within 0.002 deg (the curl axes follow the wrist). Output
         // is identical; saves the dominant per-frame cost for idle hands.
-        if (hand._idleCurlSig !== idleCurlSig || Math.abs(extraSplay - hand._idleCurlSplay) >= 0.002) {
-          applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, cfg)
-          hand._idleCurlSig = idleCurlSig
-          hand._idleCurlSplay = extraSplay
+        const rvSig = idleCurlSig + rvCurlKey(hand), rvSplayNow = extraSplay + rvSplayOf(hand)
+        if (!hand._curlSkip && (hand._idleCurlSig !== rvSig || Math.abs(rvSplayNow - hand._idleCurlSplay) >= 0.002)) {
+          applyAllFingerCurls(hand.skinnedMesh.skeleton, hand.currentBaseQuat, hand.wrapper.quaternion, rvCurlValues(hand, cfg)) // + Responsive Velocity > Velocity Finger Curl
+          hand._idleCurlSig = rvSig
+          hand._idleCurlSplay = rvSplayNow
         }
       }
       hand._wasOverriddenLastFrame = overridden
     }
   })
+  rvApplyDisplacement() // Responsive Velocity displacement, once every hand's pose is final
+  updateSmallScaleModels()
 }
 animate()

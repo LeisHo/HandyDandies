@@ -38,7 +38,8 @@ HANDY DANDIES/
 │   ├── style.css               <page + dev-panel chrome styling>
 │   └── devpanel/devPanel.js   <generic dev-panel engine, reused verbatim from HANDO>
 ├── api/
-│   └── save-settings.js       <Vercel serverless function -- git-tracked Save Settings, see below>
+│   ├── save-settings.js       <Vercel serverless function -- git-tracked Save Settings, see below>
+│   └── saved-states.js        <Vercel serverless function -- the dev panel's Saved Dev Settings list, one file per item in data/processed/saved-states/, same env vars as save-settings.js>
 ├── data/processed/HAND3D/
 │   └── Hand2.glb               <rigged hand model, copied from HANDO's own asset>
 ├── data/processed/

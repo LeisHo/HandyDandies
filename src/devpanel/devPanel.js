@@ -102,6 +102,8 @@ let hostOnAnyValueChange = null
 // camera sliders: they follow the camera as you orbit/pan/zoom on the canvas, but a canvas drag is not an undo step,
 // so restoring an older snapshot used to jump the camera back to where it was at your last panel click.
 let hostUndoLiveKeys = []
+let hostSanitizeOrder = null // (order) => order: the host may drop parts of a saved layout it rebuilds itself every load, before applyOrder() uses it
+let hostOnSavedStateApplied = null // (state) => void: the host re-derives what depends on a whole saved state (default camera, item selector marks) after Use / Set Default
 const numEls = {} // key -> { slider, numInput } | { type: 'color' } | { type: 'checkbox' }
 // Set by initDevPanel()'s own saveSettings() closure (see its own comment) so
 // the exported saveCurrentSettings() below can trigger a real persisted save.
@@ -136,6 +138,8 @@ function settingsKey() { return `${storageKeyPrefix}.devSettings` }
 // {label, ms, ...} entries onto window.__dpProfile so a slow restore can be
 // broken down from the live page without a debugger. No-op otherwise.
 const DP_PROFILE = typeof location !== 'undefined' && /[?&]debugTiming=1/.test(location.search)
+// Records a stage that spans an await (dpTime only wraps synchronous work): ?debugTiming=1 -> window.__dpProfile.
+function dpMark(label, t0) { if (DP_PROFILE) (window.__dpProfile = window.__dpProfile || []).push({ label, atMs: Math.round(t0), ms: Math.round(performance.now() - t0) }) }
 function dpTime(label, fn) {
   if (!DP_PROFILE) return fn()
   const t0 = performance.now()
@@ -172,6 +176,14 @@ function savedStatesKey() { return `${storageKeyPrefix}.devSavedStates` }
 // Landscape exactly as before.
 function isTouchCapableDevice() {
   return (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || navigator.maxTouchPoints > 0
+}
+// The value the last settings restore held for `key` (this device first, then Desktop), or undefined. A host that builds controls AFTER the restore (main.js: custom click function groups) uses it to build them in the right shape.
+export function peekRestoredValue(key) {
+  const v = lastRestoredValues
+  if (!v) return undefined
+  const own = v[realDeviceClass()]
+  if (own && own[key] !== undefined) return own[key]
+  return v.desktop ? v.desktop[key] : undefined
 }
 export function realDeviceClass() {
   const w = window.innerWidth, h = window.innerHeight
@@ -225,6 +237,9 @@ function isDynamicDeviceCtrl(ctrl) {
   if (NO_DYNAMIC_DEVICE_TYPES.includes(ctrl.type)) return false
   return ctrl.dynamicDevice !== false
 }
+// Visibility-only checkbox (direct request 2026-10-14, Camera group): a perDevice control keeps its own value per device (so it has no Independent checkbox), but can opt into the Show in Mobile/Landscape checkbox with
+// `visibilityToggle: true` - unchecked, its row is hidden on the Mobile / Landscape tabs. Also counted by the group header's own Show in Mobile/Landscape cascade checkbox.
+function isVisibilityToggleCtrl(ctrl) { return !!ctrl.perDevice && !!ctrl.visibilityToggle && !NO_DYNAMIC_DEVICE_TYPES.includes(ctrl.type) }
 export function isDevRowVisible(key) { return devVisibility[key] !== false }
 // Thin setter mirroring setDevTextOverride()'s own pattern -- a host
 // occasionally needs to set a KNOWN, already-decided Show-in-Mobile/
@@ -404,6 +419,21 @@ export function syncValue(key, v) {
   if (hostOnAnyValueChange) hostOnAnyValueChange(key, v)
 }
 
+// Per-device access for a host action that targets a specific device's tab (2026-10-16, direct request: a Default set on the Mobile tab must be Mobile's own and not touch Desktop's). getEditingDevice() = the tab the panel is
+// showing; getDeviceValue() reads a device's own stored value; setDeviceValue() writes ONE device's slot of a perDevice control (every slot of a shared one), updates cfg when that device is the real one, and refreshes
+// the row when its tab is the one showing. It fires no onChange - the host decides what is live.
+export function getEditingDevice() { return editingDevice }
+export function getDeviceValue(device, key) { return store[device] ? store[device][key] : undefined }
+export function setDeviceValue(device, key, v) {
+  const ctrl = findCtrl(key)
+  if (!ctrl || !store[device]) return false
+  if (ctrl.perDevice) store[device][key] = v
+  else DEVICES.forEach((d) => { store[d][key] = v })
+  if (!ctrl.perDevice || device === realDeviceClass()) cfg[key] = v
+  if (!ctrl.perDevice || device === editingDevice) displayValue(ctrl, v)
+  return true
+}
+
 // Rebuilds entry.items (order + each item's .group) from the LIVE DOM after
 // a drag-drop -- see setupReorder()'s own onDrop param. Ungrouped items
 // (sitting directly in entry.ungroupedBody) always serialize first, then
@@ -475,10 +505,47 @@ function syncListPickerFromDom(entry) {
 // unstable); the small drag handle is a SEPARATE hit-target from the rest
 // of the row (setupReorder only starts a drag from '.dp-lp-row-handle'),
 // so tapping the row body still just selects it.
+// ctrl.isDefault(item) / ctrl.isInUse(item) (2026-10-15, direct request: the item selectors did not show which item is the default or is in use): optional host callbacks. The default item gets a left accent bar and "(default)", the one
+// matching what is live right now gets "(in use)". A callback that throws counts as false (a host value it reads may not exist yet while the panel is first built); refreshListPickerMarks() re-evaluates them without redrawing the list.
+function listPickerMarks(entry, item) {
+  const c = entry.ctrl
+  let d = false, u = false
+  try { if (c.isDefault) d = !!c.isDefault(item) } catch (e) { d = false }
+  try { if (c.isInUse) u = !!c.isInUse(item) } catch (e) { u = false }
+  let w = ''
+  try { if (c.itemWarn) w = c.itemWarn(item) || '' } catch (e) { w = '' }
+  return { d, u, w, text: (u ? '  (in use)' : '') + (d ? '  (default)' : '') }
+}
+function listPickerRowLabel(entry, item, marks) { return item.name + marks.text + (entry.ctrl.itemBadge ? (entry.ctrl.itemBadge(item) || '') : '') }
+function refreshListPickerMarks(entry) {
+  if (!entry || !entry.listEl || (!entry.ctrl.isDefault && !entry.ctrl.isInUse && !entry.ctrl.itemWarn)) return
+  entry.listEl.querySelectorAll('.dp-list-picker-row').forEach((row) => {
+    const item = row.__item
+    if (!item) return
+    const m = listPickerMarks(entry, item)
+    row.classList.toggle('dp-list-picker-row-default', m.d)
+    row.classList.toggle('dp-list-picker-row-inuse', m.u)
+    row.classList.toggle('dp-list-picker-row-conflict', !!m.w)
+    if (m.w) row.title = m.w; else if (row.title && row.dataset.warnTitle === '1') row.removeAttribute('title')
+    row.dataset.warnTitle = m.w ? '1' : ''
+    const lab = row.querySelector('.dp-lp-row-label')
+    const text = listPickerRowLabel(entry, item, m)
+    if (lab && lab.textContent !== text) lab.textContent = text
+  })
+}
+export function refreshListPickerMarksByKey(key) {
+  const entry = numEls[key]
+  if (entry && entry.type === 'list-picker') refreshListPickerMarks(entry)
+}
 function renderListPickerItemRow(entry, item) {
+  const marks = listPickerMarks(entry, item)
   const row = el('div', 'dp-list-picker-row'
     + (item === entry.selectedItem ? ' dp-list-picker-row-selected' : '')
-    + (entry.multiSelected.has(item) ? ' dp-list-picker-row-multi-selected' : ''))
+    + (entry.multiSelected.has(item) ? ' dp-list-picker-row-multi-selected' : '')
+    + (marks.d ? ' dp-list-picker-row-default' : '')
+    + (marks.u ? ' dp-list-picker-row-inuse' : '')
+    + (marks.w ? ' dp-list-picker-row-conflict' : ''))
+  if (marks.w) { row.title = marks.w; row.dataset.warnTitle = '1' }
   row.appendChild(el('span', 'dp-lp-row-handle', { textContent: '⠿' }))
   // Export checkbox -- opt-in per control (ctrl.exportable), so only a
   // picker that actually wants cross-project export (HANDO's own
@@ -498,7 +565,14 @@ function renderListPickerItemRow(entry, item) {
     })
     row.appendChild(checkbox)
   }
-  row.appendChild(el('span', 'dp-lp-row-label', { textContent: item.name }))
+  // ctrl.itemToggle { isOn(item), setOn(item, on) } (2026-10-14): an on / off checkbox on the left of every item (and of every group, see buildGroupHeader()), driven by the host so it can mirror a setting that lives elsewhere.
+  if (entry.ctrl.itemToggle) {
+    const tcb = el('input', 'dp-lp-toggle-checkbox', { type: 'checkbox', checked: !!entry.ctrl.itemToggle.isOn(item) })
+    tcb.addEventListener('click', (e) => e.stopPropagation())
+    tcb.addEventListener('change', () => { entry.ctrl.itemToggle.setOn(item, tcb.checked); refreshListPickerToggles(entry) })
+    row.appendChild(tcb)
+  }
+  row.appendChild(el('span', 'dp-lp-row-label', { textContent: listPickerRowLabel(entry, item, marks) })) // ctrl.itemBadge(item): optional suffix such as "  (in use)"
   row.__item = item
   // Direct user report, 2026-09-11: on mobile, tapping a name and hitting
   // "Use" applied a DIFFERENT (adjacent) saved item's data, even though
@@ -527,6 +601,7 @@ function renderListPickerItemRow(entry, item) {
   // moves the anchor there, same as clicking away from a multi-selection
   // in any standard list UI.
   row.addEventListener('click', (e) => {
+    entry.lastPick = 'item'
     if (e.shiftKey && entry.selectAnchor) {
       const rows = Array.from(entry.listEl.querySelectorAll('.dp-list-picker-row'))
       const anchorIdx = rows.findIndex((r) => r.__item === entry.selectAnchor)
@@ -543,10 +618,19 @@ function renderListPickerItemRow(entry, item) {
       // further shift-click keeps extending/shrinking from the SAME
       // original anchor rather than the most recent endpoint.
       entry.selectedItem = item
+    } else if (e.ctrlKey || e.metaKey) {
+      // Ctrl / Cmd-click (2026-10-14, direct request): add this row to the selection, or take it out if it is already in, without touching the others. The clicked row becomes the new anchor for a following shift-click.
+      const next = new Set(entry.multiSelected)
+      if (next.has(item)) next.delete(item)
+      else next.add(item)
+      entry.multiSelected = next
+      entry.selectAnchor = item
+      entry.selectedItem = next.has(item) ? item : (Array.from(next).pop() || null) // the active single-item target is the last row still selected
     } else {
       entry.selectedItem = item
       entry.selectAnchor = item
       entry.multiSelected = new Set([item])
+      if (entry.selectedGroups && entry.selectedGroups.size) { entry.selectedGroups = new Set(); entry.listEl.querySelectorAll('.dp-lp-group-selected').forEach((g) => g.classList.remove('dp-lp-group-selected')) }
     }
     entry.listEl.querySelectorAll('.dp-list-picker-row').forEach((r) => {
       r.classList.toggle('dp-list-picker-row-selected', r.__item === entry.selectedItem)
@@ -565,29 +649,42 @@ function renderListPickerItemRow(entry, item) {
 // "Parent" -> "Renamed" turns "Parent/Child" into "Renamed/Child" -- for a
 // leaf/nested group this prefix pass is simply a no-op (nothing else
 // starts with its own exact path plus a separator).
+// Renames the group at `path` (its last segment) and everything under it - items, empty groups, the order list, collapsed state.
+function renameListPickerGroup(entry, path) {
+  const oldLeaf = path.split(LP_GROUP_PATH_SEP).pop()
+  const newLeaf = prompt('Rename group to:', oldLeaf)
+  if (!newLeaf || newLeaf === oldLeaf) return
+  if (newLeaf.includes(LP_GROUP_PATH_SEP)) { alert(`Group name can't contain "${LP_GROUP_PATH_SEP}"`); return }
+  const segments = path.split(LP_GROUP_PATH_SEP)
+  segments[segments.length - 1] = newLeaf
+  const newPath = segments.join(LP_GROUP_PATH_SEP)
+  const prefix = path + LP_GROUP_PATH_SEP
+  const rename = (p) => (p === path ? newPath : (p.startsWith(prefix) ? newPath + LP_GROUP_PATH_SEP + p.slice(prefix.length) : p))
+  entry.items.forEach((it) => { if (it.group) it.group = rename(it.group) })
+  entry.pendingGroups = (entry.pendingGroups || []).map(rename)
+  entry.groupOrder = (entry.groupOrder || []).map(rename)
+  if (entry.collapsedGroups.has(path)) { entry.collapsedGroups.delete(path); entry.collapsedGroups.add(newPath) }
+  entry.selectedGroups = new Set()
+  commit(entry.ctrl, entry.items)
+  renderListPickerRows(entry)
+}
 function buildGroupHeader(entry, path) {
   const header = el('div', 'dp-lp-group-header')
   header.appendChild(el('span', 'dp-lp-group-handle', { textContent: '⠿' }))
   header.appendChild(el('span', 'arrow', { textContent: '▼' }))
+  if (entry.ctrl.itemToggle) {
+    const gcb = el('input', 'dp-lp-group-toggle', { type: 'checkbox' })
+    gcb.addEventListener('click', (e) => e.stopPropagation())
+    gcb.addEventListener('change', () => {
+      // Read ONCE, before the loop: switching the first item re-syncs every checkbox from the host (refreshListPickerToggles), which unticks this group checkbox while some items are still off - re-reading gcb.checked per item then switched the rest the wrong way (2026-10-15: ticking a group enabled only its first function).
+      const on = gcb.checked
+      listPickerGroupItems(entry, path).forEach((it) => entry.ctrl.itemToggle.setOn(it, on))
+      refreshListPickerToggles(entry)
+    })
+    header.appendChild(gcb)
+  }
+  // A group is renamed only through the Rename button (Ctrl / Cmd-click its header to pick it first) - clicking its title no longer prompts, which used to get in the way of picking a group (2026-10-14, direct request).
   const titleSpan = el('span', 'dp-lp-group-title', { textContent: path.split(LP_GROUP_PATH_SEP).pop() })
-  titleSpan.addEventListener('click', (e) => {
-    e.stopPropagation()
-    const oldLeaf = path.split(LP_GROUP_PATH_SEP).pop()
-    const newLeaf = prompt('Rename group to:', oldLeaf)
-    if (!newLeaf || newLeaf === oldLeaf) return
-    if (newLeaf.includes(LP_GROUP_PATH_SEP)) { alert(`Group name can't contain "${LP_GROUP_PATH_SEP}"`); return }
-    const segments = path.split(LP_GROUP_PATH_SEP)
-    segments[segments.length - 1] = newLeaf
-    const newPath = segments.join(LP_GROUP_PATH_SEP)
-    const prefix = path + LP_GROUP_PATH_SEP
-    const rename = (p) => (p === path ? newPath : (p.startsWith(prefix) ? newPath + LP_GROUP_PATH_SEP + p.slice(prefix.length) : p))
-    entry.items.forEach((it) => { if (it.group) it.group = rename(it.group) })
-    entry.pendingGroups = (entry.pendingGroups || []).map(rename)
-    entry.groupOrder = (entry.groupOrder || []).map(rename)
-    if (entry.collapsedGroups.has(path)) { entry.collapsedGroups.delete(path); entry.collapsedGroups.add(newPath) }
-    commit(entry.ctrl, entry.items)
-    renderListPickerRows(entry)
-  })
   header.appendChild(titleSpan)
   const removeBtn = el('button', 'dp-lp-group-remove', { type: 'button', textContent: '×' })
   removeBtn.addEventListener('click', (e) => {
@@ -609,8 +706,25 @@ function buildGroupHeader(entry, path) {
     renderListPickerRows(entry)
   })
   header.appendChild(removeBtn)
-  header.addEventListener('click', () => {
+  header.addEventListener('click', (e) => {
     const g = header.closest('.dp-lp-group')
+    if (e.ctrlKey || e.metaKey) {
+      // Ctrl / Cmd-click a group header (2026-10-14): pick the group (for Rename / Duplicate) instead of collapsing it
+      if (entry.selectedGroups.has(path)) entry.selectedGroups.delete(path)
+      else entry.selectedGroups.add(path)
+      entry.lastPick = 'group'
+      g.classList.toggle('dp-lp-group-selected', entry.selectedGroups.has(path))
+      return
+    }
+    // A plain click also PICKS the group (2026-10-15, direct request: clicking a group only expanded / collapsed it and never highlighted it like an item, so Rename / Duplicate had no group to act on): the group is
+    // highlighted, the item selection is cleared (the same way clicking an item clears the group pick), and the group still expands / collapses as before. Ctrl / Cmd-click above is unchanged (multi-pick, no collapse).
+    entry.selectedGroups = new Set([path])
+    entry.lastPick = 'group'
+    entry.listEl.querySelectorAll('.dp-lp-group-selected').forEach((x) => x.classList.remove('dp-lp-group-selected'))
+    g.classList.add('dp-lp-group-selected')
+    entry.selectedItem = null
+    entry.multiSelected = new Set()
+    entry.listEl.querySelectorAll('.dp-list-picker-row-selected, .dp-list-picker-row-multi-selected').forEach((r) => r.classList.remove('dp-list-picker-row-selected', 'dp-list-picker-row-multi-selected'))
     g.classList.toggle('collapsed')
     if (g.classList.contains('collapsed')) entry.collapsedGroups.add(path)
     else entry.collapsedGroups.delete(path)
@@ -639,6 +753,32 @@ function buildGroupHeader(entry, path) {
 // won't survive a reload if it's still empty at Save time (its existence
 // isn't persisted separately from its members' own .group field, only
 // inferred from them).
+// Items in a group, including everything in its subgroups.
+function listPickerGroupItems(entry, path) {
+  return entry.items.filter((it) => it.group && (it.group === path || it.group.startsWith(path + LP_GROUP_PATH_SEP)))
+}
+// Re-reads every item / group checkbox from the host (ctrl.itemToggle.isOn): a row is its own item; a group is on when all its items are, mixed when some are.
+function refreshListPickerToggles(entry) {
+  const t = entry.ctrl.itemToggle
+  if (!t) return
+  entry.listEl.querySelectorAll('.dp-list-picker-row').forEach((r) => {
+    const cb = r.querySelector(':scope > .dp-lp-toggle-checkbox')
+    if (cb && r.__item) cb.checked = !!t.isOn(r.__item)
+  })
+  entry.listEl.querySelectorAll('.dp-lp-group').forEach((g) => {
+    const cb = g.querySelector(':scope > .dp-lp-group-header > .dp-lp-group-toggle')
+    if (!cb) return
+    const items = listPickerGroupItems(entry, g.__groupName)
+    const on = items.filter((it) => t.isOn(it)).length
+    cb.disabled = items.length === 0
+    cb.checked = items.length > 0 && on === items.length
+    cb.indeterminate = on > 0 && on < items.length
+  })
+}
+export function refreshListPickerTogglesByKey(key) {
+  const entry = numEls[key]
+  if (entry && entry.type === 'list-picker') refreshListPickerToggles(entry)
+}
 function renderListPickerRows(entry) {
   entry.listEl.innerHTML = ''
   // One-level tree: top[name] = { items, subs: { subName: { items } }, subOrder }
@@ -712,6 +852,7 @@ function renderListPickerRows(entry) {
     g.appendChild(body)
     entry.listEl.appendChild(g)
   })
+  refreshListPickerToggles(entry)
 }
 
 // A plain dropdown whose OPTION LIST is host-supplied and can change at
@@ -788,7 +929,13 @@ function fillSelectOptions(ctrl, select, preferredValue) {
   })
   const next = values.includes(preferredValue) ? preferredValue : (values[0] || '')
   select.value = next
+  updateUsingLabel(select)
   return next
+}
+function updateUsingLabel(select) {
+  if (!select || !select._usingLabel) return
+  const opt = select.selectedOptions && select.selectedOptions[0]
+  select._usingLabel.textContent = 'Using: ' + (opt && select.value !== '' ? opt.textContent : 'Default')
 }
 // Triggers a real persisted save (the same localStorage/remote write the
 // panel's own Save/Sync button performs) programmatically -- e.g. for a
@@ -797,7 +944,7 @@ function fillSelectOptions(ctrl, select, preferredValue) {
 // initDevPanel() hasn't finished setting up saveSettingsRef yet, or if
 // DEV_MODE is off (no panel, no save button, nothing to trigger).
 export function saveCurrentSettings() {
-  if (saveSettingsRef) saveSettingsRef()
+  if (saveSettingsRef) return saveSettingsRef()
 }
 // Call after the underlying option list changes (e.g. a 'list-picker'
 // control's own onChange, once a Save/Delete alters what should be
@@ -805,6 +952,28 @@ export function saveCurrentSettings() {
 // in place. Re-commits the resulting value (which may differ from
 // before, if the previous selection no longer exists) so `cfg` and any
 // dependent onChange stay consistent with what's actually shown.
+// Sets a control the way a user edit does (every device slot rule, cfg, onChange, change hooks) and refreshes its visible row.
+export function setControlValue(key, v) {
+  const ctrl = findCtrl(key)
+  if (!ctrl) return false
+  commit(ctrl, v)
+  displayValue(ctrl, v)
+  return true
+}
+// Copies one control's whole state onto another (every device's stored value, its Show-in-Mobile/Landscape flag and its Independent-from-Desktop flags) - for duplicating a group of controls. `fireOnChange` re-runs the target's onChange once.
+export function copyControlState(fromKey, toKey, fireOnChange = true) {
+  const from = findCtrl(fromKey), to = findCtrl(toKey)
+  if (!from || !to) return false
+  DEVICES.forEach((d) => { if (fromKey in store[d]) store[d][toKey] = JSON.parse(JSON.stringify(store[d][fromKey])) })
+  if (fromKey in devVisibility) devVisibility[toKey] = devVisibility[fromKey]
+  ;['mobile', 'landscape'].forEach((d) => { if (devIndependence[d] && fromKey in devIndependence[d]) devIndependence[d][toKey] = devIndependence[d][fromKey] })
+  const real = store[realDeviceClass()] && store[realDeviceClass()][toKey]
+  if (real !== undefined) cfg[toKey] = real
+  const shown = store[editingDevice] && store[editingDevice][toKey]
+  if (shown !== undefined) displayValue(to, shown)
+  if (fireOnChange && to.onChange && cfg[toKey] !== undefined) { try { to.onChange(cfg[toKey]) } catch (err) { /* a handler that needs UI that is not built yet */ } }
+  return true
+}
 export function refreshSelectOptions(key) {
   const ctrl = findCtrl(key)
   const entry = numEls[key]
@@ -1075,8 +1244,15 @@ export function buildRow(ctrl) {
     buildMultiSelectRow(ctrl, row)
   } else if (ctrl.type === 'select') {
     const select = el('select')
-    select.addEventListener('change', () => commit(ctrl, select.value))
+    select.addEventListener('change', () => { commit(ctrl, select.value); updateUsingLabel(select) })
     row.appendChild(select)
+    // Direct request 2026-10-14 ("for all item selectors, show a text somewhere showing the current setting used or the default"): every select whose options come from a host list (saved cameras / lighting / poses / sequences ...)
+    // gets a line under it that names what is in use, or 'Default' when the list has nothing to pick. A select with fixed options (a Mode, a Type) is not an item selector and gets none.
+    if (typeof ctrl.options === 'function') {
+      select._usingLabel = el('div', 'dp-using-label')
+      row.appendChild(select._usingLabel)
+      updateUsingLabel(select)
+    }
     numEls[ctrl.key] = { type: 'select', select }
     // Deliberately does NOT call `ctrl.options()` here: buildRow() runs
     // synchronously inside the host's own `initDevPanel()` call, often
@@ -1239,6 +1415,16 @@ export function buildRow(ctrl) {
     row.appendChild(visCheckbox)
     row.appendChild(indepCheckbox)
     if (numEls[ctrl.key]) { numEls[ctrl.key].visCheckbox = visCheckbox; numEls[ctrl.key].indepCheckbox = indepCheckbox }
+  } else if (isVisibilityToggleCtrl(ctrl)) {
+    const visCheckbox = el('input', 'dp-dynamic-device-checkbox', { type: 'checkbox', title: 'Show in Mobile/Landscape' })
+    visCheckbox.addEventListener('click', (e) => e.stopPropagation())
+    visCheckbox.addEventListener('change', () => {
+      devVisibility[ctrl.key] = visCheckbox.checked
+      refreshRowDisplaysForEditingTab()
+      if (hostOnDevVisibilityChanged) hostOnDevVisibilityChanged(ctrl.key)
+    })
+    row.appendChild(visCheckbox)
+    if (numEls[ctrl.key]) numEls[ctrl.key].visCheckbox = visCheckbox
   }
   return row
 }
@@ -1276,7 +1462,17 @@ function buildListPickerRow(ctrl, row) {
   // since using it doesn't update that dropdown's own persisted
   // selection. A control without this flag keeps the button exactly as
   // before.
-  if (ctrl.hideUseButton) btnRow.append(saveBtn, overwriteBtn, renameBtn, deleteBtn, addGroupBtn)
+  // ctrl.hostManaged (2026-10-14, Custom Click Function Selector): the items are things the HOST already owns (custom click functions), so there is nothing to Save / Overwrite / Use / Rename / Delete here - just organizing them
+  // (+ Group, drag to order / nest) and, when the host supplies ctrl.onDuplicate, a Duplicate button. See also ctrl.itemToggle (a checkbox per item + group).
+  const duplicateBtn = el('button', null, { type: 'button', textContent: 'Duplicate' })
+  // ctrl.buttons (optional, with hostManaged): exactly these buttons, in this order - 'use', 'delete', 'import' (ctrl.onImportClick(button)), 'duplicate', 'group'.
+  const hostImportBtn = el('button', null, { type: 'button', textContent: 'Import' })
+  if (ctrl.hostManaged && Array.isArray(ctrl.buttons)) {
+    const byName = { use: useBtn, delete: deleteBtn, import: hostImportBtn, duplicate: duplicateBtn, rename: renameBtn, group: addGroupBtn }
+    ctrl.buttons.forEach((n) => { if (byName[n]) btnRow.append(byName[n]) })
+  }
+  else if (ctrl.hostManaged) { if (ctrl.onDuplicate) btnRow.append(duplicateBtn); btnRow.append(addGroupBtn) }
+  else if (ctrl.hideUseButton) btnRow.append(saveBtn, overwriteBtn, renameBtn, deleteBtn, addGroupBtn)
   else btnRow.append(saveBtn, overwriteBtn, useBtn, renameBtn, deleteBtn, addGroupBtn)
   // Cross-project pose export/import (direct user request): export ships
   // whatever's CHECKED (entry.exportChecked) as a plain JSON array to the
@@ -1330,7 +1526,9 @@ function buildListPickerRow(ctrl, row) {
     // stale creation-order priority on top of it would silently undo
     // their own drag on the next re-render.
     groupOrder: [],
-    collapsedGroups: new Set(), pendingGroups: [], exportChecked: new Set()
+    collapsedGroups: new Set(), pendingGroups: [], exportChecked: new Set(),
+    selectedGroups: new Set(), // group paths picked with Ctrl / Cmd-click on a header (for Rename / Duplicate)
+    lastPick: 'item' // 'item' | 'group': which kind the Rename button acts on
   }
   numEls[ctrl.key] = entry
 
@@ -1379,18 +1577,31 @@ function buildListPickerRow(ctrl, row) {
     if (entry.selectedItem && ctrl.onUse) ctrl.onUse(entry.selectedItem)
   })
   renameBtn.addEventListener('click', () => {
-    if (!entry.selectedItem) return
+    if (entry.lastPick === 'group' && entry.selectedGroups.size) {
+      if (entry.selectedGroups.size !== 1) { flashBtn(renameBtn, 'Pick one group'); return }
+      renameListPickerGroup(entry, Array.from(entry.selectedGroups)[0])
+      return
+    }
+    if (!entry.selectedItem) { flashBtn(renameBtn, 'Select one'); return }
     const target = entry.selectedItem
     const name = prompt('Rename to:', target.name)
     if (!name || name === target.name) return
+    if (ctrl.onRename) { ctrl.onRename(target, name); return } // a host-managed list renames the real thing (ctrl.onRename), not just the label
     entry.items = entry.items.map((it) => (it === target ? { ...it, name } : it))
     entry.selectedItem = entry.items.find((it) => it === target) || null
     commit(ctrl, entry.items)
     renderListPickerRows(entry)
   })
   deleteBtn.addEventListener('click', () => {
-    if (!entry.selectedItem) return
-    entry.items = entry.items.filter((it) => it !== entry.selectedItem)
+    // Every selected item goes (2026-10-15, direct request: "allow me to select multiple items, then click delete to delete them all"): Shift-click a range / Ctrl-click to add, then Delete. The one clicked item is deleted as before.
+    const targets = entry.items.filter((it) => entry.multiSelected.has(it) || it === entry.selectedItem)
+    if (!targets.length) return
+    if (targets.length > 1 && !confirm('Delete ' + targets.length + ' items (' + targets.slice(0, 6).map((it) => it.name).join(', ') + (targets.length > 6 ? ', ...' : '') + ')?')) return
+    // A host veto (e.g. the model in use) spares just that item.
+    const removedItems = targets.filter((it) => !(ctrl.onBeforeDelete && ctrl.onBeforeDelete(it, deleteBtn) === false))
+    if (!removedItems.length) return
+    const goneSet = new Set(removedItems)
+    entry.items = entry.items.filter((it) => !goneSet.has(it))
     entry.selectedItem = null
     // Multi-select cleared too (added 2026-09-15) -- a stale reference to
     // the just-deleted item is harmless on its own (it's simply no longer
@@ -1402,6 +1613,7 @@ function buildListPickerRow(ctrl, row) {
     entry.selectAnchor = null
     commit(ctrl, entry.items)
     renderListPickerRows(entry)
+    if (ctrl.onDeleted) removedItems.forEach((it) => ctrl.onDeleted(it))
   })
   // Direct user request: let a picker's own items be organized into groups.
   // Adds an empty group header to drag items into -- see
@@ -1422,6 +1634,36 @@ function buildListPickerRow(ctrl, row) {
   // see renderListPickerRows()'s own comment for why array position alone
   // (an earlier version of this fix) wasn't enough once an empty AND an
   // auto-assigned group could both be in play at once.
+  const flashBtn = (btn, msg) => { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1400) }
+  hostImportBtn.addEventListener('click', () => { if (ctrl.onImportClick) ctrl.onImportClick(hostImportBtn) })
+  duplicateBtn.addEventListener('click', () => {
+    // Selected groups (Ctrl / Cmd-click a header) are duplicated whole: a new group "<name> Copy" holding a copy of every item in it, subgroups included; items inside a selected group are not duplicated twice.
+    const groups = Array.from(entry.selectedGroups)
+    const inSelectedGroup = (it) => groups.some((p) => it.group && (it.group === p || it.group.startsWith(p + LP_GROUP_PATH_SEP)))
+    const picked = entry.items.filter((x) => entry.multiSelected.has(x) && !inSelectedGroup(x))
+    if (!picked.length && !groups.length && entry.selectedItem) picked.push(entry.selectedItem)
+    if (!picked.length && !groups.length) { flashBtn(duplicateBtn, 'Select one'); return }
+    if (!ctrl.onDuplicate) return
+    // Run one after another (each duplicate builds a whole function group and awaits), never all at once.
+    const tasks = []
+    picked.forEach((it) => tasks.push(() => ctrl.onDuplicate(it))) // every selected item, in list order
+    const taken = new Set([...entry.items.map((it) => it.group).filter(Boolean), ...entry.pendingGroups])
+    groups.forEach((path) => {
+      const parts = path.split(LP_GROUP_PATH_SEP)
+      const leaf = parts.pop()
+      const parent = parts.join(LP_GROUP_PATH_SEP)
+      const make = (nm) => (parent ? parent + LP_GROUP_PATH_SEP + nm : nm)
+      let nm = leaf + ' Copy'
+      for (let n = 2; taken.has(make(nm)); n++) nm = leaf + ' Copy ' + n
+      const newPath = make(nm)
+      taken.add(newPath)
+      entry.items.filter((it) => it.group && (it.group === path || it.group.startsWith(path + LP_GROUP_PATH_SEP)))
+        .forEach((it) => tasks.push(() => ctrl.onDuplicate(it, { group: newPath + it.group.slice(path.length) })))
+    })
+    ;(async () => { for (const task of tasks) { try { await task() } catch (err) { console.error('Duplicate failed', err) } } })()
+    entry.selectedGroups = new Set()
+    entry.listEl.querySelectorAll('.dp-lp-group-selected').forEach((g) => g.classList.remove('dp-lp-group-selected'))
+  })
   addGroupBtn.addEventListener('click', () => {
     const existingNames = new Set([...entry.items.map((it) => it.group).filter(Boolean), ...entry.pendingGroups])
     let name = 'New Group'
@@ -1439,7 +1681,6 @@ function buildListPickerRow(ctrl, row) {
     }
     renderListPickerRows(entry)
   })
-  const flashBtn = (btn, msg) => { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1400) }
   if (exportBtn) {
     exportBtn.addEventListener('click', async () => {
       const checked = entry.items.filter((it) => entry.exportChecked.has(it))
@@ -1448,7 +1689,7 @@ function buildListPickerRow(ctrl, row) {
       // meaningless (and could even collide) in whatever project imports
       // this; the imported items land ungrouped there, same as any other
       // freshly-Saved item.
-      const payload = checked.map(({ group, ...rest }) => rest)
+      const payload = checked.map(({ group, ...rest }) => (ctrl.exportTransform ? ctrl.exportTransform(rest) : rest)) // ctrl.exportTransform (optional): tag / convert an item on its way out (main.js: Loading Preview camera + lighting are in this project's own frame)
       try {
         await navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
         flashBtn(exportBtn, `Copied ${checked.length}!`)
@@ -1666,7 +1907,7 @@ export function createGroupElement(title) {
   visCascadeCheckbox.style.display = 'none'
   visCascadeCheckbox.addEventListener('click', (e) => e.stopPropagation())
   visCascadeCheckbox.addEventListener('change', () => {
-    forEachDynamicDeviceDescendant(g, (ctrl) => { devVisibility[ctrl.key] = visCascadeCheckbox.checked })
+    forEachVisibilityDescendant(g, (ctrl) => { devVisibility[ctrl.key] = visCascadeCheckbox.checked })
     refreshRowDisplaysForEditingTab()
     // Host extension point, added 2026-09-24 -- see buildRow()'s own
     // identical row-level call for the full reasoning; `null` (not one
@@ -1721,6 +1962,7 @@ export function createGroupElement(title) {
   g.appendChild(h)
   g.appendChild(gb)
   g._visCascadeCheckbox = visCascadeCheckbox
+  g._undockBtn = undockBtn
   g._indepCascadeCheckbox = indepCascadeCheckbox
   return g
 }
@@ -1821,6 +2063,13 @@ export function forEachDynamicDeviceDescendant(g, fn) {
     if (ctrl && isDynamicDeviceCtrl(ctrl)) fn(ctrl)
   })
 }
+// Controls the group's Show in Mobile/Landscape cascade checkbox covers: every dynamicDevice control plus the visibility-only (perDevice + visibilityToggle) ones.
+function forEachVisibilityDescendant(g, fn) {
+  g.querySelectorAll(':scope .dp-row[data-key]').forEach((row) => {
+    const ctrl = findCtrl(row.dataset.key)
+    if (ctrl && (isDynamicDeviceCtrl(ctrl) || isVisibilityToggleCtrl(ctrl))) fn(ctrl)
+  })
+}
 // Recomputes one group's own 2 cascade checkboxes: visible only if it has
 // at least one dynamicDevice descendant AND the relevant tab is active
 // (visibility cascade on Desktop, independence cascade on Mobile/
@@ -1831,12 +2080,14 @@ function refreshGroupCascadeChrome(g) {
   const onDesktop = editingDevice === 'desktop'
   const ctrls = []
   forEachDynamicDeviceDescendant(g, (ctrl) => ctrls.push(ctrl))
+  const visCtrls = []
+  forEachVisibilityDescendant(g, (ctrl) => visCtrls.push(ctrl))
   const vis = g._visCascadeCheckbox
   const indep = g._indepCascadeCheckbox
   if (vis) {
-    vis.style.display = (onDesktop && ctrls.length) ? '' : 'none'
-    if (ctrls.length) {
-      const states = ctrls.map((c) => isDevRowVisible(c.key))
+    vis.style.display = (onDesktop && visCtrls.length) ? '' : 'none'
+    if (visCtrls.length) {
+      const states = visCtrls.map((c) => isDevRowVisible(c.key))
       vis.indeterminate = states.some((s) => s) && states.some((s) => !s)
       vis.checked = !vis.indeterminate && states[0]
     }
@@ -1849,6 +2100,10 @@ function refreshGroupCascadeChrome(g) {
       indep.checked = !indep.indeterminate && states[0]
     }
   }
+  // The undock arrow and lock icon sit on the far right of every group header: the first visible cascade checkbox carries the auto left margin (CSS), and when NEITHER is shown (a group with nothing to cascade) the
+  // undock arrow takes it instead, so the icons are right-aligned in every group.
+  const anyCheckbox = (vis && vis.style.display !== 'none') || (indep && indep.style.display !== 'none')
+  if (g._undockBtn) g._undockBtn.style.marginLeft = anyCheckbox ? '' : 'auto'
 }
 
 // "+ Add Group" -- lets the user organize existing settings into their own
@@ -1959,6 +2214,31 @@ function addCustomGroup(groupsEl) {
 // exactly mirroring `applyStoredValues()`'s own per-control resolution --
 // falling back to `c.def` only when nothing was ever restored for this key
 // (a brand-new control, or no remote/local settings existed at all yet).
+// Drops every control whose key is `prefix` + an upper-case suffix (a removed custom click function's) from the registry, the stored values on every device, the Show-in-Mobile / Independent flags and cfg - so a function that is
+// undone away leaves nothing behind to be saved. Counterpart of renderDynamicGroup().
+export function forgetControlsWithPrefix(prefix) {
+  const match = (k) => typeof k === 'string' && k.startsWith(prefix) && /^[A-Z]/.test(k.slice(prefix.length))
+  let removed = 0
+  for (let i = devGroups.length - 1; i >= 0; i--) { // in place: the host holds the same array (DEV_GROUPS)
+    const g = devGroups[i]
+    const keep = g.controls.filter((c) => !match(c.key))
+    if (keep.length === g.controls.length) continue
+    removed += g.controls.length - keep.length
+    g.controls = keep
+    if (!keep.length) devGroups.splice(i, 1) // the group spec renderDynamicGroup() pushed for it is now empty
+  }
+  DEVICES.forEach((d) => { Object.keys(store[d]).forEach((k) => { if (match(k)) delete store[d][k] }) })
+  Object.keys(cfg).forEach((k) => { if (match(k)) delete cfg[k] })
+  Object.keys(numEls).forEach((k) => { if (match(k)) delete numEls[k] })
+  Object.keys(devVisibility).forEach((k) => { if (match(k)) delete devVisibility[k] })
+  ;['mobile', 'landscape'].forEach((d) => { if (devIndependence[d]) Object.keys(devIndependence[d]).forEach((k) => { if (match(k)) delete devIndependence[d][k] }) })
+  return removed
+}
+// Writes a value for a control that does not exist yet (every device slot and cfg), so renderDynamicGroup() builds it with that value instead of its default.
+export function seedControlValue(key, value) {
+  DEVICES.forEach((d) => { store[d][key] = JSON.parse(JSON.stringify(value)) })
+  cfg[key] = store[realDeviceClass()][key]
+}
 export function renderDynamicGroup(groupSpec) {
   devGroups.push(groupSpec)
   const real = realDeviceClass()
@@ -2457,8 +2737,15 @@ function initResizeHandles(panel) {
 // that might still read them directly (there's nothing in this file as
 // of this change, but it's cheap insurance) sees a sane, consistent
 // value.
+// SIZE (2026-10-14, direct report: "the save continually fails"): the saved layout was the bulk of the Save request - 3.4 MB of a 4.5 MB body with ~30 custom click functions, against Vercel's 4.5 MB request limit, so
+// Save started failing outright. Two causes, both fixed here:
+//  1. every nested group was written TWICE per level - once inside `items` and again inside `subgroups` - so a group three levels down was stored 8 times. applyOrder() only reads `subgroups` for a layout saved before `items`
+//     existed (2026-09-19), so new captures leave it out; `settings` (just the row keys) stays.
+//  2. a group the host rebuilds from its own data on every load (a custom click function, a Multi Trigger - data-custom-function-id / data-multi-trigger-prefix) is recorded as the group only, not its ~300 rows and subgroups:
+//     applyOrder() runs before the host rebuilds them and the host clears whatever it created for them, so those insides were never restored from here anyway.
 function captureGroup(g) {
-  const items = Array.from(g.querySelectorAll(':scope > .dp-group-body > .dp-row, :scope > .dp-group-body > .dp-group')).map((el) => {
+  const opaque = !!(g.dataset.customFunctionId || g.dataset.multiTriggerPrefix)
+  const items = opaque ? [] : Array.from(g.querySelectorAll(':scope > .dp-group-body > .dp-row, :scope > .dp-group-body > .dp-group')).map((el) => {
     return el.classList.contains('dp-row')
       ? { type: 'row', key: el.dataset.key }
       : { type: 'group', group: captureGroup(el) }
@@ -2469,7 +2756,6 @@ function captureGroup(g) {
     locked: g.classList.contains('dp-group-locked'),
     items,
     settings: items.filter((it) => it.type === 'row').map((it) => it.key),
-    subgroups: items.filter((it) => it.type === 'group').map((it) => it.group),
   }
 }
 function getPanelOrder(groupsEl) {
@@ -2478,6 +2764,7 @@ function getPanelOrder(groupsEl) {
 
 function applyOrder(groupsEl, order) {
   if (!order) return
+  if (hostSanitizeOrder) { try { order = hostSanitizeOrder(order) || order } catch (e) { console.warn('sanitizeOrder failed', e) } }
   // A GLOBAL map, not scoped per-group -- a row saved under a DIFFERENT
   // group than the one buildDevPanel() originally put it in (the user
   // dragged it there) has to be found wherever it currently lives in the
@@ -2619,8 +2906,27 @@ function applyOrder(groupsEl, order) {
 // Used by Undo/Redo for the live camera sliders (see hostUndoLiveKeys): merely re-running a camera slider's
 // onChange with its own current value is not free (applyCameraControl() re-applies position/zoom sequentially and
 // moved the camera), so those keys must be skipped, not re-applied with their current values.
+// True while applyStoredValues() runs (settings restore, Use, Set Default, Undo / Redo, Reset): the onChange calls it makes are not user edits, so a host that reacts to a single edit (main.js: only one of two overlapping click functions stays on) checks this first.
+let applyingStoredDepth = 0
+let applyErrorLogged = false
+export function isApplyingPanelState() { return applyingStoredDepth > 0 }
+// Callbacks run once, after every control's onChange of the OUTERMOST applyStoredValues() and BEFORE the row displays are refreshed (the order the per-control refreshes used to have): a host defers its per-control UI
+// refreshes while isApplyingPanelState() and runs them once here (main.js: one refresh per click function instead of one per control). The flag is cleared while they run so they act normally.
+const panelStateAppliedCallbacks = []
+export function onPanelStateApplied(fn) { panelStateAppliedCallbacks.push(fn) }
+function runPanelStateAppliedCallbacks() {
+  if (applyingStoredDepth !== 1) return // a nested apply: the outer one flushes
+  const t0 = DP_PROFILE ? performance.now() : 0
+  applyingStoredDepth = 0
+  try { panelStateAppliedCallbacks.forEach((cb) => { try { cb() } catch (err) { console.warn('post-apply callback threw:', err) } }) } finally { applyingStoredDepth = 1 }
+  dpMark('applied callbacks (deferred UI refresh)', t0)
+}
 function applyStoredValues(values, skipKeys = null) {
   if (!values) return
+  applyingStoredDepth++
+  try { applyStoredValuesInner(values, skipKeys) } finally { applyingStoredDepth-- }
+}
+function applyStoredValuesInner(values, skipKeys = null) {
   const real = realDeviceClass()
   const profT0 = DP_PROFILE ? performance.now() : 0
   const slow = []
@@ -2636,17 +2942,22 @@ function applyStoredValues(values, skipKeys = null) {
     if (realValue !== undefined) {
       cfg[ctrl.key] = realValue
       if (ctrl.onChange) {
-        if (DP_PROFILE) {
-          const t = performance.now()
-          ctrl.onChange(realValue)
-          const dt = performance.now() - t
-          nOnChange++; onChangeMs += dt
-          if (dt > 4) slow.push([ctrl.key, Math.round(dt)])
-        } else ctrl.onChange(realValue)
+        // One control's handler throwing must not abort the whole apply (2026-10-15: a function whose Type switched kind mid-apply rebuilt its own controls, the stale ones threw, and the rest of a Use / Set Default was never applied).
+        try {
+          if (DP_PROFILE) {
+            const t = performance.now()
+            ctrl.onChange(realValue)
+            const dt = performance.now() - t
+            nOnChange++; onChangeMs += dt
+            { const k = ctrl.key.replace(/^custom\d+(Trig\d+)?/, '$1~'); const a = (window.__dpAgg = window.__dpAgg || {}); const e = a[k] || (a[k] = { n: 0, ms: 0 }); e.n++; e.ms += dt }
+            if (dt > 4) slow.push([ctrl.key, Math.round(dt)])
+          } else ctrl.onChange(realValue)
+        } catch (err) { if (DP_PROFILE || !applyErrorLogged) { applyErrorLogged = true; console.warn('onChange of ' + ctrl.key + ' threw while applying settings (the rest was still applied):', err) } }
       }
     }
   }))
   const profT1 = DP_PROFILE ? performance.now() : 0
+  runPanelStateAppliedCallbacks()
   refreshRowDisplaysForEditingTab()
   if (DP_PROFILE) {
     slow.sort((a, b) => b[1] - a[1])
@@ -2658,7 +2969,21 @@ function applyStoredValues(values, skipKeys = null) {
   }
 }
 
+function refreshVisibilityToggleRowChrome(ctrl) {
+  const row = document.querySelector(`.dp-row[data-key="${CSS.escape(ctrl.key)}"]`)
+  if (!row) return
+  const entry = numEls[ctrl.key]
+  const onDesktop = editingDevice === 'desktop'
+  row.classList.toggle('dp-row-device-hidden', !onDesktop && !isDevRowVisible(ctrl.key))
+  if (entry && entry.visCheckbox) { entry.visCheckbox.style.display = onDesktop ? '' : 'none'; entry.visCheckbox.checked = isDevRowVisible(ctrl.key) }
+}
 function refreshRowDisplayForCtrl(ctrl) {
+  if (isVisibilityToggleCtrl(ctrl)) {
+    const v = store[editingDevice][ctrl.key]
+    if (v !== undefined) displayValue(ctrl, v)
+    refreshVisibilityToggleRowChrome(ctrl)
+    return
+  }
   if (isDynamicDeviceCtrl(ctrl)) {
     const showing = editingDevice === 'desktop' || isDevRowIndependent(editingDevice, ctrl)
     const v = showing ? store[editingDevice][ctrl.key] : store.desktop[ctrl.key]
@@ -2723,6 +3048,9 @@ function refreshEmptyGroupVisibility() {
     .forEach((g) => {
       const body = g.querySelector(':scope > .dp-group-body')
       if (!body) return
+      // A group whose content is not made of per-device rows (Saved Dev Settings: a status line, a list and buttons) has none of the rows this check looks for, so it was hidden on Mobile / Landscape; it is marked always-visible instead.
+      if (g.dataset.hideOnDevices === '1') { g.classList.add('dp-group-hidden-empty'); return } // the host switched the group off for Mobile / Landscape (Loading Preview > Layout: Show Layout In Mobile / Landscape)
+      if (g.dataset.alwaysVisible === '1') { g.classList.remove('dp-group-hidden-empty'); return }
       const hasVisibleRow = !!Array.from(body.children).find((child) => child.classList.contains('dp-row') && !child.classList.contains('dp-row-device-hidden'))
       const hasVisibleSubgroup = !!Array.from(body.children).find((child) => child.classList.contains('dp-group') && !child.classList.contains('dp-group-hidden-empty'))
       g.classList.toggle('dp-group-hidden-empty', !hasVisibleRow && !hasVisibleSubgroup)
@@ -2819,6 +3147,9 @@ async function remoteSaveSnapshot(remoteSave, snapshot) {
   // field like HANDO's own `defaultCamera`, per this function's own
   // top comment).
   const merged = { ...base, ...snapshot }
+  // Vercel rejects a request body over 4.5 MB (the function never runs, the client only sees a failure); say so instead of a vague error.
+  const approxBytes = JSON.stringify(merged).length
+  if (approxBytes > 4.4 * 1024 * 1024) return { ok: false, error: 'settings are ' + (approxBytes / 1048576).toFixed(1) + ' MB, over the 4.5 MB request limit' }
   // 2026-10-04: panelGeometry is keyed per device class; keep the devices
   // this save did not touch rather than letting the spread replace the map.
   if (snapshot.panelGeometry) merged.panelGeometry = { ...(base.panelGeometry || {}), ...snapshot.panelGeometry }
@@ -2919,6 +3250,8 @@ export function initDevPanel(groups, opts = {}) {
   hostOnDevVisibilityChanged = opts.onDevVisibilityChanged || null
   hostOnAnyValueChange = opts.onAnyValueChange || null
   hostUndoLiveKeys = Array.isArray(opts.undoLiveKeys) ? opts.undoLiveKeys : []
+  hostOnSavedStateApplied = typeof opts.onSavedStateApplied === 'function' ? opts.onSavedStateApplied : null
+  hostSanitizeOrder = typeof opts.sanitizeOrder === 'function' ? opts.sanitizeOrder : null
   editingDevice = realDeviceClass()
   // cfg/store are populated from defaults regardless of DEV_MODE -- these
   // values are the app's real, shipped defaults for every visitor; DEV_MODE
@@ -3374,6 +3707,8 @@ export function initDevPanel(groups, opts = {}) {
     // appended to document.body), so getPanelOrder(groupsEl) below would
     // silently drop it from what gets saved. Must run BEFORE that read.
     dockAllUndockedGroups()
+    // Host hook that runs BEFORE the snapshot below is assembled, for host state that lives in a registered control but is only worked out at save time (main.js: custom click function open/closed groups).
+    if (opts.onBeforeSave) { try { opts.onBeforeSave() } catch (err) { /* host hook must never block a save */ } }
     // Also flashes the HEADER save button (saveHeaderBtn) with a
     // checkmark/X + tooltip -- ported from TEMPLATE_DEV_PANEL.html's own
     // flashDevHeaderSyncStatus() (2026-09-19). The bottom Save button
@@ -3421,11 +3756,14 @@ export function initDevPanel(groups, opts = {}) {
     const geomNow = getPanelGeometry(panel)
     try { localStorage.setItem(currentGeomKey(), JSON.stringify(geomNow)) } catch (err) { /* ignore */ }
     snapshot.panelGeometry = { [realDeviceClass()]: geomNow }
+    rememberActiveState() // the live settings are written from the panel below, so the item in use is now the one they came from
+    overwriteInUseSavedState() // the item in use in Saved Dev Settings follows every Save (no-op when none is in use)
     if (opts.remoteSave) {
-      remoteSaveSnapshot(opts.remoteSave, snapshot).then((result) => {
+      // returns the promise so a host that must not reload before the save lands (the hand model Use) can wait for it
+      return remoteSaveSnapshot(opts.remoteSave, snapshot).then((result) => {
         flash(result.ok ? 'Saved!' : ('Save failed: ' + result.error))
+        return result
       })
-      return
     }
     try {
       localStorage.setItem(settingsKey(), JSON.stringify(snapshot))
@@ -3550,12 +3888,12 @@ export function initDevPanel(groups, opts = {}) {
   // assumes is possible.
   function applyFullPanelState(state, skipKeys = null) {
     if (!state) return
-    applyOrder(groupsEl, state.order)
+    dpTime('state: applyOrder', () => applyOrder(groupsEl, state.order))
     devVisibility = state.devVisibility || {}
     devIndependence = state.devIndependence || { mobile: {}, landscape: {} }
     applyStoredValues(state.values, skipKeys)
     textOverrides = { ...(state.textOverrides || {}) }
-    applyTextOverrides()
+    dpTime('state: applyTextOverrides', applyTextOverrides)
     // Set Hotkey feature -- re-renders every control's own hotkey badge
     // from the just-restored map (Undo/Redo/Save/Reset/Load/Use/Set-as-
     // Default all flow through this one function).
@@ -3630,16 +3968,25 @@ export function initDevPanel(groups, opts = {}) {
   // position -- the select/buttons stay exactly where they already are in
   // the DOM, never touched by applyOrder()'s row-placement logic.
   const savedStatesGroup = createGroupElement('Saved Dev Settings')
+  savedStatesGroup.dataset.alwaysVisible = '1' // shown on the Desktop, Mobile and Landscape tabs alike (see refreshEmptyGroupVisibility())
   const savedStatesBody = savedStatesGroup.querySelector(':scope > .dp-group-body')
-  const savedStatesSelect = el('select', null, { style: 'width:100%; margin-bottom:5px;' })
+  // An item selector (2026-10-15, direct request) instead of a dropdown: one row per saved state, click to select, the default one carries a star badge.
+  const savedStatesStatus = el('div', 'dp-ss-status') // always says which item is the default (or that none is), and which one is in use
+  const savedStatesList = el('div', 'dp-ss-list')
+  let selectedStateName = ''
+  let selectedStateNames = new Set() // every selected item (Shift-click a range / Ctrl-click to add); selectedStateName stays the one Use / Overwrite / Rename act on
+  let activeStateName = '' // the item the panel currently shows (last Used / Set Default / Save New / Overwrite, or the default after the main Save); session-only: after a refresh the panel loads the live settings, which are the default item as of the last Save
   const savedStatesBtnRow = el('div', 'dp-actions')
-  const saveStateBtn = el('button', null, { type: 'button', textContent: 'Save' })
+  savedStatesBtnRow.style.flexWrap = 'wrap'
+  const saveStateBtn = el('button', null, { type: 'button', textContent: 'Save New', title: 'Save the current panel as a NEW named item (asks for a name). The main Save button overwrites the item that is in use instead.' })
+  const overwriteStateBtn = el('button', null, { type: 'button', textContent: 'Overwrite', title: 'Replace the selected item with the current panel' })
   const useStateBtn = el('button', null, { type: 'button', textContent: 'Use' })
-  const deleteStateBtn = el('button', null, { type: 'button', textContent: 'Delete' })
+  const renameStateBtn = el('button', null, { type: 'button', textContent: 'Rename', title: 'Rename the selected item' })
+  const deleteStateBtn = el('button', null, { type: 'button', textContent: 'Delete', title: 'Delete the selected item. Shift-click a range or Ctrl-click to select several first and delete them all.' })
   const setDefaultStateBtn = el('button', null, { type: 'button', textContent: 'Set Default' })
   const exportStateBtn = el('button', null, { type: 'button', textContent: 'Export' })
-  savedStatesBtnRow.append(saveStateBtn, useStateBtn, deleteStateBtn, setDefaultStateBtn, exportStateBtn)
-  savedStatesBody.append(savedStatesSelect, savedStatesBtnRow)
+  savedStatesBtnRow.append(saveStateBtn, overwriteStateBtn, useStateBtn, renameStateBtn, deleteStateBtn, setDefaultStateBtn, exportStateBtn)
+  savedStatesBody.append(savedStatesStatus, savedStatesList, savedStatesBtnRow)
   groupsEl.insertBefore(savedStatesGroup, groupsEl.firstChild)
 
   function getSavedStates() {
@@ -3648,61 +3995,304 @@ export function initDevPanel(groups, opts = {}) {
       return raw ? JSON.parse(raw) : {}
     } catch (err) { return {} }
   }
+  // Returns null on success, or a short reason. It used to swallow every error, so a full browser storage made "Save" silently do nothing (2026-10-15, direct report: "Saved Dev Settings still not saving new instances. I click save, I give it a name and it doesn't show up in the drop down"). One state is the whole panel
+  // (about 1.5 million characters with the real settings) and a browser keeps only about 5 million characters per site, so roughly the 4th save failed.
   function setSavedStates(states) {
-    try { localStorage.setItem(savedStatesKey(), JSON.stringify(states)) } catch (err) { /* ignore -- storage full/unavailable, same tolerance as saveSettings() */ }
+    try { localStorage.setItem(savedStatesKey(), JSON.stringify(states)); return null } catch (err) { return (err && err.name) || 'storage error' }
   }
-  function renderSavedStatesList() {
+  // ---- Where the saved items live (2026-10-15, direct request: "make saved Dev settings the same across desktop and mobile") ----
+  // They used to live only in this browser's localStorage, so a phone started with an empty list. When the shared store answers (/api/saved-states, one file per item in the repo, written like the live settings)
+  // every device lists the same items and the same default; without a backend (local dev server, offline) the list falls back to this browser's own storage. The item in use stays per device.
+  const ssEndpoint = (opts.remoteSave && opts.remoteSave.endpoint) ? opts.remoteSave.endpoint.replace(/save-settings/, 'saved-states') : ''
+  let ssRemoteNames = null // string[] once the shared store answered, else null (this browser's storage is used)
+  let ssRemoteDefault = ''
+  let ssNote = '' // why the shared store is not in use, or what was moved into it
+  const ssBodies = new Map() // name -> stored item, a cache of what was fetched or written
+  async function ssCall(method, query, body) {
+    const init = { method, cache: 'no-store', headers: {} }
+    if (method === 'POST') { init.headers['Content-Type'] = 'application/json'; init.headers['X-Dev-Panel-Secret'] = opts.remoteSave.secret; init.body = JSON.stringify(body) }
+    const resp = await fetch(ssEndpoint + (query || ''), init)
+    const json = await resp.json().catch(() => ({}))
+    if (!resp.ok || json.ok !== true) throw new Error(json.error || ('HTTP ' + resp.status))
+    return json
+  }
+  function ssNames() { return ssRemoteNames ? ssRemoteNames.slice() : Object.keys(getSavedStates()) }
+  function ssDefaultName() { return ssRemoteNames ? ssRemoteDefault : getDefaultStateName() }
+  async function ssGet(name) {
+    if (!ssRemoteNames) return getSavedStates()[name]
+    if (!ssBodies.has(name)) { const j = await ssCall('GET', '?name=' + encodeURIComponent(name)); ssBodies.set(name, j.state) }
+    return ssBodies.get(name)
+  }
+  // Returns null on success, or a short reason.
+  async function ssPut(name, entry) {
+    if (ssRemoteNames) {
+      try { await ssCall('POST', '', { name, state: entry }) } catch (err) { return (err && err.message) || 'failed' }
+      ssBodies.set(name, entry)
+      if (!ssRemoteNames.includes(name)) { ssRemoteNames.push(name); ssRemoteNames.sort() }
+      return null
+    }
     const states = getSavedStates()
-    const prevValue = savedStatesSelect.value
-    savedStatesSelect.innerHTML = ''
-    Object.keys(states).forEach((name) => {
-      const opt = document.createElement('option')
-      opt.value = name
-      opt.textContent = name
-      savedStatesSelect.appendChild(opt)
-    })
-    if (states[prevValue]) savedStatesSelect.value = prevValue
+    states[name] = entry
+    return setSavedStates(states)
   }
-  function saveNamedState() {
-    const name = window.prompt('Save current settings as:')
-    if (!name) return
-    const states = getSavedStates()
-    if (states[name] && !window.confirm(`"${name}" already exists. Overwrite it?`)) return
-    states[name] = captureFullPanelState()
-    setSavedStates(states)
-    renderSavedStatesList()
-    savedStatesSelect.value = name
-  }
-  function useNamedState() {
-    const name = savedStatesSelect.value
-    if (!name) return
-    const states = getSavedStates()
-    if (states[name]) applyFullPanelState(states[name])
-  }
-  function deleteNamedState() {
-    const name = savedStatesSelect.value
-    if (!name) return
-    if (!window.confirm(`Delete "${name}"?`)) return
+  async function ssDelete(name) {
+    if (ssRemoteNames) {
+      try { await ssCall('POST', '', { delete: name }) } catch (err) { return (err && err.message) || 'failed' }
+      ssBodies.delete(name)
+      ssRemoteNames = ssRemoteNames.filter((n) => n !== name)
+      if (ssRemoteDefault === name) ssRemoteDefault = ''
+      return null
+    }
     const states = getSavedStates()
     delete states[name]
-    setSavedStates(states)
+    const failed = setSavedStates(states)
+    if (name === getDefaultStateName()) setDefaultStateName('')
+    return failed
+  }
+  async function ssSetDefault(name) {
+    if (ssRemoteNames) {
+      try { await ssCall('POST', '', { default: name }) } catch (err) { return (err && err.message) || 'failed' }
+      ssRemoteDefault = name
+      return null
+    }
+    setDefaultStateName(name)
+    return null
+  }
+  // A saved state is stored gzip-compressed (base64) as { gz }, about a tenth of its size; older plain states are still read as they are and are compressed the next time anything is saved.
+  async function gzipToB64(str) {
+    const cs = new CompressionStream('gzip')
+    const w = cs.writable.getWriter(); w.write(new TextEncoder().encode(str)); w.close()
+    const buf = new Uint8Array(await new Response(cs.readable).arrayBuffer())
+    let bin = ''
+    for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000))
+    return btoa(bin)
+  }
+  async function gunzipFromB64(b64) {
+    const bin = atob(b64)
+    const buf = new Uint8Array(bin.length)
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i)
+    const ds = new DecompressionStream('gzip')
+    const w = ds.writable.getWriter(); w.write(buf); w.close()
+    return new Response(ds.readable).text()
+  }
+  async function packState(state) {
+    if (typeof CompressionStream === 'undefined') return state
+    try { return { gz: await gzipToB64(JSON.stringify(state)) } } catch (err) { return state }
+  }
+  async function unpackState(entry) {
+    if (entry && typeof entry.gz === 'string') return JSON.parse(await gunzipFromB64(entry.gz))
+    return entry
+  }
+  // Which saved state is "the default" (marked with a star, overwritten by the main Save button) is remembered per browser, next to the saved states themselves.
+  // Which saved item the LIVE settings were last saved from: after a refresh the panel shows the live settings, so that is the item "in use" again (not the default one, which may be a different item).
+  function activeStateKey() { return `${storageKeyPrefix}.devActiveState` }
+  function rememberActiveState() { try { if (activeStateName) localStorage.setItem(activeStateKey(), activeStateName); else localStorage.removeItem(activeStateKey()) } catch (err) { /* ignore */ } }
+  function defaultStateKey() { return `${storageKeyPrefix}.devDefaultState` }
+  function withExtra(snap) { if (devUndoCaptureExtra) snap.extra = devUndoCaptureExtra(); return snap }
+  // Puts back the host's own structure (main.js: the custom click function groups that existed when the item was saved) BEFORE the values are applied, exactly as Undo does; an item saved before this existed has no extra and is applied as before.
+  async function applyStateExtra(state) {
+    if (state && state.extra !== undefined && devUndoApplyExtra) { const r = devUndoApplyExtra(state.extra); if (r && typeof r.then === 'function') await r }
+  }
+  function getDefaultStateName() { try { return localStorage.getItem(defaultStateKey()) || '' } catch (err) { return '' } }
+  function setDefaultStateName(name) { try { if (name) localStorage.setItem(defaultStateKey(), name); else localStorage.removeItem(defaultStateKey()) } catch (err) { /* ignore */ } }
+  function flashStateBtn(btn, msg) { const orig = btn.textContent; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 900) }
+  function renderSavedStatesList() {
+    const names = ssNames()
+    let def = ssDefaultName()
+    if (def && !names.includes(def)) { def = ''; if (!ssRemoteNames) setDefaultStateName('') } // the default item was deleted
+    if (!names.includes(selectedStateName)) selectedStateName = ''
+    selectedStateNames = new Set([...selectedStateNames].filter((n) => names.includes(n)))
+    if (selectedStateName) selectedStateNames.add(selectedStateName)
+    if (!names.includes(activeStateName)) activeStateName = ''
+    // The status lines (2026-10-15, direct report: "i still dont see which dev setting save is the default"): nothing is marked until a default has been chosen, which looked like the marker missing.
+    savedStatesStatus.innerHTML = ''
+    const defLine = el('div', 'dp-ss-status-line')
+    if (def) { defLine.appendChild(document.createTextNode('\u2605 Default: ')); defLine.appendChild(el('b', null, { textContent: def })); defLine.appendChild(document.createTextNode(' \u2014 what Set Default put in the live settings')) }
+    else { defLine.textContent = 'No default set. Select an item and press Set Default.'; defLine.classList.add('dp-ss-status-none') }
+    savedStatesStatus.appendChild(defLine)
+    // The main Save button overwrites the item IN USE (the last one Used / Set Default / Saved New / Overwritten), not the default one (2026-10-15, direct request).
+    const useLine = el('div', 'dp-ss-status-line')
+    if (activeStateName) { useLine.appendChild(document.createTextNode('\u25CF In use: ')); useLine.appendChild(el('b', null, { textContent: activeStateName })); useLine.appendChild(document.createTextNode(' \u2014 the main Save button overwrites it')) }
+    else { useLine.textContent = 'Nothing in use \u2014 the main Save only writes the live settings.'; useLine.classList.add('dp-ss-status-none') }
+    savedStatesStatus.appendChild(useLine)
+    // Where the items live: shared (same on every device) or this browser only.
+    if (ssEndpoint) {
+      const storeLine = el('div', 'dp-ss-status-line' + (ssRemoteNames ? '' : ' dp-ss-status-none'))
+      storeLine.textContent = ssRemoteNames ? 'Shared: the same saved settings on every device.' : (ssNote || 'Checking the shared store...')
+      savedStatesStatus.appendChild(storeLine)
+      if (ssRemoteNames && ssNote) savedStatesStatus.appendChild(el('div', 'dp-ss-status-line', { textContent: ssNote }))
+    }
+    savedStatesList.innerHTML = ''
+    if (!names.length) savedStatesList.appendChild(el('div', 'dp-ss-empty', { textContent: 'No saved settings yet' }))
+    names.forEach((name) => {
+      const row = el('div', 'dp-ss-row' + (name === selectedStateName || selectedStateNames.has(name) ? ' selected' : ''))
+      row.appendChild(el('span', 'dp-ss-name', { textContent: name, title: name }))
+      if (name === activeStateName) row.appendChild(el('span', 'dp-ss-badge dp-ss-badge-use', { textContent: '\u25CF In use', title: 'The settings the panel currently shows' }))
+      if (name === def) row.appendChild(el('span', 'dp-ss-badge', { textContent: '\u2605 Default', title: 'Set Default put this item in the live settings' }))
+      row.addEventListener('click', (e) => {
+        if (e.shiftKey && selectedStateName) {
+          const a = names.indexOf(selectedStateName), b = names.indexOf(name)
+          selectedStateNames = new Set(names.slice(Math.min(a, b), Math.max(a, b) + 1)) // the clicked-first item stays the anchor
+        } else if (e.ctrlKey || e.metaKey) {
+          if (selectedStateNames.has(name) && name !== selectedStateName) selectedStateNames.delete(name)
+          else { selectedStateNames.add(name); selectedStateName = name }
+        } else { selectedStateName = name; selectedStateNames = new Set([name]) }
+        renderSavedStatesList()
+      })
+      savedStatesList.appendChild(row)
+    })
+  }
+  // The main Save button also overwrites the item IN USE with the current panel (2026-10-15, direct request: "even if default is A, but I click Use in B, when I next click Save, it will overwrite B instead of A"). Nothing in use = nothing to overwrite. Never blocks the real save.
+  async function overwriteInUseSavedState() {
+    try {
+      const name = activeStateName
+      if (!name) return
+      if (!ssNames().includes(name)) { activeStateName = ''; renderSavedStatesList(); return }
+      const failed = await ssPut(name, await packState(withExtra(captureFullPanelState())))
+      renderSavedStatesList()
+      if (failed) console.warn(`Saved settings "${name}" not updated: ${failed}`)
+    } catch (err) { console.warn('Saved settings in use not updated', err) }
+  }
+  async function saveNamedState() {
+    const name = window.prompt('Save current settings as:')
+    if (!name) return
+    if (ssNames().includes(name) && !window.confirm(`"${name}" already exists. Overwrite it?`)) return
+    const snapshot = captureFullPanelState()
+    if (devUndoCaptureExtra) snapshot.extra = devUndoCaptureExtra() // which custom click functions exist, so Use can rebuild them
+    if (!ssRemoteNames) {
+      // This browser's own storage: compress older plain items first, so a full storage frees up before the write is tried.
+      const states = getSavedStates()
+      for (const k of Object.keys(states)) if (states[k] && typeof states[k].gz !== 'string') states[k] = await packState(states[k])
+      setSavedStates(states)
+    }
+    const failed = await ssPut(name, await packState(snapshot))
+    if (failed) {
+      window.alert(ssRemoteNames ? `Could not save "${name}" to the shared store: ${failed}` : `Could not save "${name}": this browser's storage for the page is full (${failed}). Delete some saved settings with Delete and try again.`)
+      return
+    }
+    selectedStateName = name
+    activeStateName = name
     renderSavedStatesList()
   }
-  function setNamedStateAsDefault() {
-    const name = savedStatesSelect.value
-    if (!name) return
-    const states = getSavedStates()
-    const state = states[name]
+  async function overwriteNamedState() {
+    const name = selectedStateName
+    if (!name) { flashStateBtn(overwriteStateBtn, 'Select one'); return }
+    if (!window.confirm(`Replace "${name}" with the current settings?`)) return
+    const failed = await ssPut(name, await packState(withExtra(captureFullPanelState())))
+    if (failed) { window.alert(`Could not save "${name}": ${failed}`); return }
+    activeStateName = name
+    renderSavedStatesList()
+  }
+  async function useNamedState() {
+    const name = selectedStateName
+    if (!name) { flashStateBtn(useStateBtn, 'Select one'); return }
+    let state
+    const tU = performance.now()
+    try { state = await unpackState(await ssGet(name)) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
+    dpMark('Use: load + unpack', tU)
+    if (state) { const tE = performance.now(); await applyStateExtra(state); dpMark('Use: applyStateExtra (rebuild functions)', tE); const tA = performance.now(); applyFullPanelState(state); dpMark('Use: applyFullPanelState', tA); activeStateName = name; if (hostOnSavedStateApplied) { try { hostOnSavedStateApplied(state) } catch (err) { console.warn('onSavedStateApplied failed', err) } }; const tR = performance.now(); renderSavedStatesList(); dpMark('Use: render list', tR) }
+  }
+  async function deleteNamedState() {
+    const all = ssNames()
+    const picked = (selectedStateNames.size ? [...selectedStateNames] : (selectedStateName ? [selectedStateName] : [])).filter((n) => all.includes(n))
+    if (!picked.length) { flashStateBtn(deleteStateBtn, 'Select one'); return }
+    const shared = ssRemoteNames ? ' They are removed for every device.' : ''
+    const msg = picked.length === 1
+      ? `Delete "${picked[0]}"?${picked[0] === ssDefaultName() ? ' It is the default item.' : ''}${ssRemoteNames ? ' It is removed for every device.' : ''}`
+      : `Delete ${picked.length} saved settings (${picked.join(', ')})?${picked.includes(ssDefaultName()) ? ' One of them is the default item.' : ''}${shared}`
+    if (!window.confirm(msg)) return
+    const failures = []
+    for (const name of picked) {
+      const failed = await ssDelete(name)
+      if (failed) failures.push(`"${name}": ${failed}`)
+      else if (activeStateName === name) activeStateName = ''
+    }
+    if (failures.length) window.alert(`Could not delete ${failures.join('; ')}`)
+    selectedStateName = ''
+    selectedStateNames = new Set()
+    rememberActiveState()
+    renderSavedStatesList()
+  }
+  // Rename (2026-10-15, direct request: "for Saved Dev Settings, allow me to rename"): the item is stored under its new name first and the old one removed after, so a failure part way never loses it; the default
+  // marker, the item in use and the selection follow the new name.
+  async function renameNamedState() {
+    const old = selectedStateName
+    if (!old) { flashStateBtn(renameStateBtn, 'Select one'); return }
+    const nn = (window.prompt('Rename to:', old) || '').trim()
+    if (!nn || nn === old) return
+    if (ssNames().includes(nn)) { window.alert(`"${nn}" already exists. Pick another name.`); return }
+    let entry
+    try { entry = await ssGet(old) } catch (err) { window.alert(`Could not read "${old}" (${(err && err.message) || err}).`); return }
+    if (!entry) return
+    const wasDefault = ssDefaultName() === old
+    const putFailed = await ssPut(nn, entry)
+    if (putFailed) { window.alert(`Could not rename "${old}": ${putFailed}`); return }
+    if (wasDefault) { const f = await ssSetDefault(nn); if (f) window.alert(`The default marker could not be moved to "${nn}": ${f}`) }
+    const delFailed = await ssDelete(old)
+    if (delFailed) window.alert(`"${nn}" was created but the old item "${old}" could not be removed: ${delFailed}`)
+    if (activeStateName === old) { activeStateName = nn; rememberActiveState() }
+    selectedStateName = nn
+    selectedStateNames = new Set([nn])
+    renderSavedStatesList()
+  }
+  async function setNamedStateAsDefault() {
+    const name = selectedStateName
+    if (!name) { flashStateBtn(setDefaultStateBtn, 'Select one'); return }
+    let state
+    try { state = await unpackState(await ssGet(name)) } catch (err) { window.alert(`Could not read "${name}" (${(err && err.message) || err}).`); return }
     if (!state) return
+    activeStateName = name
+    const failed = await ssSetDefault(name) // marked before the save below, which then refreshes this item from the panel (the same state)
+    if (failed) window.alert(`The default could not be saved to the shared store: ${failed}`)
+    renderSavedStatesList()
+    await applyStateExtra(state)
     applyFullPanelState(state)
+    if (hostOnSavedStateApplied) { try { hostOnSavedStateApplied(state) } catch (err) { console.warn('onSavedStateApplied failed', err) } }
     saveSettings()
   }
   saveStateBtn.addEventListener('click', saveNamedState)
+  overwriteStateBtn.addEventListener('click', overwriteNamedState)
   useStateBtn.addEventListener('click', useNamedState)
+  renameStateBtn.addEventListener('click', renameNamedState)
   deleteStateBtn.addEventListener('click', deleteNamedState)
   setDefaultStateBtn.addEventListener('click', setNamedStateAsDefault)
   exportStateBtn.addEventListener('click', exportDevPanelSettings)
+  try { activeStateName = localStorage.getItem(activeStateKey()) || '' } catch (err) { activeStateName = '' }
+  if (!getSavedStates()[activeStateName]) activeStateName = getDefaultStateName()
   renderSavedStatesList()
+  // Switch to the shared store when it answers, and move what this browser already holds into it ONCE (the local copies stay as a backup but are no longer listed; a flag stops a deleted item coming back).
+  async function initSharedSavedStates() {
+    if (!ssEndpoint) return
+    try {
+      const j = await ssCall('GET', '')
+      ssRemoteNames = (Array.isArray(j.names) ? j.names : []).slice().sort()
+      ssRemoteDefault = j.default || ''
+    } catch (err) {
+      ssNote = `Shared storage unavailable (${(err && err.message) || err}) - items are kept in this browser only.`
+      renderSavedStatesList()
+      return
+    }
+    const migratedKey = `${storageKeyPrefix}.devSavedStatesMigrated`
+    let alreadyMigrated = false
+    try { alreadyMigrated = localStorage.getItem(migratedKey) === '1' } catch (err) { /* ignore */ }
+    if (!alreadyMigrated) {
+      const local = getSavedStates()
+      const missing = Object.keys(local).filter((n) => !ssRemoteNames.includes(n))
+      let uploaded = 0, stopped = false
+      for (const n of missing) {
+        const why = await ssPut(n, local[n] && typeof local[n].gz === 'string' ? local[n] : await packState(local[n]))
+        if (why) { ssNote = `Could not upload "${n}" to the shared store: ${why}`; stopped = true; break }
+        uploaded++
+      }
+      const ld = getDefaultStateName()
+      if (!ssRemoteDefault && ld && ssRemoteNames.includes(ld)) await ssSetDefault(ld)
+      if (uploaded) ssNote = `Uploaded ${uploaded} saved setting${uploaded === 1 ? '' : 's'} from this browser so every device shows them.`
+      if (!stopped) { try { localStorage.setItem(migratedKey, '1') } catch (err) { /* ignore */ } }
+    }
+    if (!ssRemoteNames.includes(activeStateName)) activeStateName = ssRemoteNames.includes(ssRemoteDefault) ? ssRemoteDefault : ''
+    renderSavedStatesList()
+  }
+  initSharedSavedStates()
   // `.dp-collapsed`'s own CSS only hides `.dp-body`/`.dp-resize` -- it
   // can't also shrink the PANEL's own box, for 2 separate reasons that
   // BOTH had to be fixed: `panel.style.height` is set as an explicit
@@ -3914,6 +4504,10 @@ export function initDevPanel(groups, opts = {}) {
     // exact original spot.
     const parent = target.parentElement
     const nextSibling = target.nextElementSibling
+    // A group the HOST builds and tears down itself (opts.deleteUsesSnapshot, e.g. a Multi Trigger): Undo has to go through the snapshot + the host's undoApplyExtra (which rebuilds it and its values), because
+    // re-inserting the old DOM node would bring back a group the host has already unregistered. The snapshot is taken now, BEFORE the host's cleanup forgets the group's values.
+    const usesSnapshot = !!(opts.deleteUsesSnapshot && opts.deleteUsesSnapshot(target))
+    if (usesSnapshot) { pushDevPanelUndoSnapshot(); devRedoStack = [] }
     target.remove()
     // `opts.onGroupDeleted` -- a host hook, same pattern as `opts.onRestore`
     // (main.js's own DEV_MODE-agnostic restore callback), letting the host
@@ -3926,7 +4520,7 @@ export function initDevPanel(groups, opts = {}) {
     // external state on an undo is a materially bigger feature this hook
     // doesn't attempt.
     if (opts.onGroupDeleted) opts.onGroupDeleted(target)
-    pushDevDeleteUndoEntry(target, parent, nextSibling)
+    if (!usesSnapshot) pushDevDeleteUndoEntry(target, parent, nextSibling)
     disarmDevDeleteGroup()
   }, true)
   document.addEventListener('click', (e) => {
@@ -3952,8 +4546,8 @@ export function initDevPanel(groups, opts = {}) {
   // devSaveCaptureExtra/devSaveApplyExtra (below, near saveSettings()) are
   // the equivalent pair for Save/Reset specifically -- Undo/Redo alone
   // would otherwise silently lose this same state across a Save/reload.
-  let devUndoCaptureExtra = null
-  let devUndoApplyExtra = null
+  let devUndoCaptureExtra = opts.undoCaptureExtra || null // () => json: host state outside the registered controls (main.js: which custom click functions exist)
+  let devUndoApplyExtra = opts.undoApplyExtra || null // (extra) => void | Promise: puts that state back; runs BEFORE the values are applied so recreated controls exist to receive them
   // devSaveCaptureExtra/devSaveApplyExtra -- the equivalent pair for
   // Save/Reset (see saveSettings()/resetSettings() below), so the same
   // host state Undo/Redo can now cover also survives a real Save/reload,
@@ -4011,9 +4605,25 @@ export function initDevPanel(groups, opts = {}) {
         extra: extra !== undefined ? JSON.parse(JSON.stringify(extra)) : undefined,
         liveEdit: entry.liveEdit
       })
-      applyUndoEntryState(entry)
-      if (entry.extra !== undefined && devUndoApplyExtra) devUndoApplyExtra(entry.extra)
+      return applyUndoEntryAfterExtra(entry)
     }
+  }
+  // The host's structure (e.g. which function groups exist) is put back first - it may be async, a group has to exist before its values can be applied to it - then the values / order / names.
+  function applyUndoEntryAfterExtra(entry) {
+    const res = (entry.extra !== undefined && devUndoApplyExtra) ? devUndoApplyExtra(entry.extra) : undefined
+    if (res && typeof res.then === 'function') return res.then(() => applyUndoEntryState(entry))
+    applyUndoEntryState(entry)
+  }
+  // Undo / Redo can be async now; presses that arrive while one is running wait their turn.
+  let devUndoBusy = false
+  const devUndoQueue = []
+  function runUndoRedoExclusive(op) {
+    if (devUndoBusy) { devUndoQueue.push(op); return }
+    devUndoBusy = true
+    const done = () => { devUndoBusy = false; const next = devUndoQueue.shift(); if (next) runUndoRedoExclusive(next) }
+    let r
+    try { r = op() } catch (err) { done(); throw err }
+    Promise.resolve(r).then(done, (err) => { console.error('Undo/Redo failed', err); done() })
   }
   function redoDevPanelChange() {
     if (!devRedoStack.length) return
@@ -4023,8 +4633,7 @@ export function initDevPanel(groups, opts = {}) {
       entry.node.remove()
     } else {
       pushDevPanelUndoSnapshot(entry.liveEdit)
-      applyUndoEntryState(entry)
-      if (entry.extra !== undefined && devUndoApplyExtra) devUndoApplyExtra(entry.extra)
+      return applyUndoEntryAfterExtra(entry)
     }
   }
   // How long a "gesture" may hold the undo-push gate open with no
@@ -4082,8 +4691,8 @@ export function initDevPanel(groups, opts = {}) {
   // reliably regains focus the instant a native color/file/date picker
   // closes, even though the page itself never saw a pointerup.
   window.addEventListener('focus', resetDevUndoGesture)
-  undoBtn.addEventListener('click', undoDevPanelChange)
-  redoBtn.addEventListener('click', redoDevPanelChange)
+  undoBtn.addEventListener('click', () => runUndoRedoExclusive(undoDevPanelChange))
+  redoBtn.addEventListener('click', () => runUndoRedoExclusive(redoDevPanelChange))
   // Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y -- ignored while focus is in a genuine
   // text-input context (a rename textarea, a text-type control, the
   // search box) so it doesn't fight the browser/OS's own native
@@ -4097,7 +4706,7 @@ export function initDevPanel(groups, opts = {}) {
     if (tag === 'TEXTAREA' || (tag === 'INPUT' && document.activeElement.type === 'text')) return
     e.preventDefault()
     const isRedo = (e.key === 'y' || e.key === 'Y') || ((e.key === 'z' || e.key === 'Z') && e.shiftKey)
-    if (isRedo) redoDevPanelChange(); else undoDevPanelChange()
+    runUndoRedoExclusive(isRedo ? redoDevPanelChange : undoDevPanelChange)
   })
   // Clears the undo AND redo stacks on Save/Sync -- per the feature's own
   // "until i click save, then it starts new again" requirement; wired

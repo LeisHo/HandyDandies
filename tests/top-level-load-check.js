@@ -20,6 +20,9 @@ const path = require('path')
 
 const file = process.argv[2] || path.join(__dirname, '..', 'src', 'main.js')
 let src = fs.readFileSync(file, 'utf8').replace(/\r/g, '')
+// Every name main.js imports is stubbed automatically (a hand-kept list went stale: a newly imported function used as a bare value failed this check for reasons unrelated to load order).
+const importedNames = []
+src.replace(/^import {([^}]*)} from .*$/gm, (m, names) => { names.split(',').forEach((n) => { const nm = n.trim().split(/s+ass+/).pop(); if (nm) importedNames.push(nm) }); return m })
 src = src.replace(/^import .*$/gm, '').replace(/^export /gm, '')
 
 function makeStub(name) {
@@ -46,6 +49,7 @@ const sandbox = {}
   'createGroupElement', 'realDeviceClass', 'applyTextOverrides', 'setDevTextOverride', 'isDevRowVisible', 'setDevVisibility',
   'forEachDynamicDeviceDescendant', 'refreshRowDisplaysForEditingTab', 'window', 'document', 'navigator', 'performance',
   'localStorage', 'sessionStorage', 'location'].forEach((n) => { sandbox[n] = makeStub(n) })
+importedNames.forEach((n) => { if (!(n in sandbox)) sandbox[n] = makeStub(n) })
 sandbox.initDevPanel = () => new Proxy({}, { get: (t, p) => t[p], set: (t, p, v) => { t[p] = v; return true } })
 Object.assign(sandbox, {
   console, Promise, URLSearchParams,
