@@ -114,6 +114,17 @@ let saveSettingsRef = null
 const DEVICES = ['desktop', 'mobile', 'landscape']
 const store = { desktop: {}, mobile: {}, landscape: {} } // per-device value store; shared controls are kept identical across all 3
 let editingDevice = 'desktop' // which tab the panel UI is currently showing/editing
+// Slider min/max bound lock toggle - ported from TEMPLATE_DEV_PANEL.html
+// 2026-10-11, keyed "ctrlKey:min"/"ctrlKey:max". Session-only, matching
+// this file's own pre-existing min/max bound labels (buildBoundLabel's
+// own comment: "neither the ORIGINAL min/max nor a typed override is
+// captured by Copy/Save") - the lock fits that same existing convention.
+const lockedSliderBounds = new Set()
+function isSliderBoundLocked(ctrlKey, kind) { return lockedSliderBounds.has(ctrlKey + ':' + kind) }
+function setSliderBoundLocked(ctrlKey, kind, locked) {
+  const key = ctrlKey + ':' + kind
+  if (locked) lockedSliderBounds.add(key); else lockedSliderBounds.delete(key)
+}
 
 function round(v, d) {
   const m = Math.pow(10, d)
@@ -322,6 +333,19 @@ function displayValue(ctrl, v) {
     if (entry.input) entry.input.value = v
   } else if (ctrl.type === 'list-picker') {
     entry.items = (v || []).slice()
+    // Startup: every item-selector list's own groups begin collapsed. The
+    // first non-empty value applied to a picker is its startup restore, so
+    // collapse all of its groups (and nested subgroup paths) once, here.
+    // Later refreshes (Reset, tab switch) keep the user's own expand/collapse
+    // state via collapsedGroups, same as before.
+    if (!entry.startupCollapseApplied && entry.items.length) {
+      entry.startupCollapseApplied = true
+      entry.items.forEach((item) => {
+        if (!item.group) return
+        const segs = item.group.split(LP_GROUP_PATH_SEP)
+        for (let i = 1; i <= segs.length; i++) entry.collapsedGroups.add(segs.slice(0, i).join(LP_GROUP_PATH_SEP))
+      })
+    }
     entry.selectedItem = null
     // Multi-select is equally invalidated by an externally-driven refresh
     // -- same reasoning as selectedItem directly above (added 2026-09-15
@@ -1084,9 +1108,22 @@ export function buildRow(ctrl) {
         v = Math.min(Math.max(v, mn), mx)
       } else {
         // Section 12h: typing beyond the current bound expands that bound
-        // (typed value +/- 20%), not just a visual clamp of the slider handle.
-        if (v > mx) slider.max = v + Math.max(Math.abs(v), Math.abs(mx - mn), 1) * 0.2
-        if (v < mn) slider.min = v - Math.max(Math.abs(v), Math.abs(mx - mn), 1) * 0.2
+        // (typed value +/- 20%), not just a visual clamp of the slider
+        // handle -- UNLESS that specific bound is runtime-locked via the
+        // min/max label's own lock toggle below, in which case it clamps
+        // instead (ported from TEMPLATE_DEV_PANEL.html 2026-10-11).
+        if (v > mx) {
+          if (isSliderBoundLocked(ctrl.key, 'max')) { v = mx } else {
+            slider.max = v + Math.max(Math.abs(v), Math.abs(mx - mn), 1) * 0.2
+            if (maxLabel && !maxLabel.querySelector('input')) maxLabel.textContent = slider.max
+          }
+        }
+        if (v < mn) {
+          if (isSliderBoundLocked(ctrl.key, 'min')) { v = mn } else {
+            slider.min = v - Math.max(Math.abs(v), Math.abs(mx - mn), 1) * 0.2
+            if (minLabel && !minLabel.querySelector('input')) minLabel.textContent = slider.min
+          }
+        }
       }
       slider.value = v
       numInput.value = round(v, 3)
@@ -1108,6 +1145,7 @@ export function buildRow(ctrl) {
     // matching the pre-existing auto-expand's own behavior exactly.
     function buildBoundLabel(kind) {
       const boundEl = el('span', 'dp-slider-bound', { textContent: kind === 'min' ? ctrl.min : ctrl.max })
+      boundEl.classList.toggle('dp-slider-bound-locked', isSliderBoundLocked(ctrl.key, kind))
       boundEl.addEventListener('click', (e) => {
         e.stopPropagation()
         if (boundEl.querySelector('input')) return
@@ -1115,6 +1153,21 @@ export function buildRow(ctrl) {
         const boundInput = el('input', 'dp-minmax-input', { type: 'number', value: kind === 'min' ? slider.min : slider.max, step: ctrl.step || 'any' })
         boundEl.textContent = ''
         boundEl.appendChild(boundInput)
+        // Lock/unlock toggle - ported from TEMPLATE_DEV_PANEL.html
+        // 2026-10-11, always shown while editing a bound. Session-only,
+        // same as the bound value itself (see this function's own top
+        // comment).
+        const lockLabel = el('label', 'dp-slider-bound-lock-toggle', { title: 'Lock: clamp the value to this bound instead of expanding it' })
+        const lockCb = el('input', null, { type: 'checkbox', checked: isSliderBoundLocked(ctrl.key, kind) })
+        lockLabel.appendChild(lockCb)
+        lockLabel.appendChild(document.createTextNode('🔒'))
+        boundEl.appendChild(lockLabel)
+        lockLabel.addEventListener('click', (ev) => ev.stopPropagation())
+        lockLabel.addEventListener('mousedown', (ev) => ev.preventDefault())
+        lockCb.addEventListener('change', () => {
+          setSliderBoundLocked(ctrl.key, kind, lockCb.checked)
+          boundEl.classList.toggle('dp-slider-bound-locked', lockCb.checked)
+        })
         boundInput.focus()
         boundInput.select()
         let settled = false
@@ -1561,6 +1614,21 @@ function syncGroupLockIcon(g, icon) {
   const locked = g.classList.contains('dp-group-locked')
   icon.textContent = locked ? '🔒' : '🔓'
   icon.title = locked ? 'Locked -- click to unlock' : 'Unlocked -- click to lock'
+}
+// Generic collapsible log box - ported from TEMPLATE_DEV_PANEL.html
+// 2026-10-11 ("all log type text boxes are inherently collapsible").
+// Inserts a small chevron header directly before `logEl` and toggles
+// `.dp-log-collapsed` on it - separate from the group's own collapse.
+// Exported for main.js's own 5 hand-built log widgets (this engine has
+// no built-in log widget of its own, unlike the template/HANDYSET/HANDO).
+export function makeLogBoxCollapsible(logEl, label) {
+  const header = el('div', 'dp-log-box-header', { textContent: '▼ ' + label })
+  logEl.parentElement.insertBefore(header, logEl)
+  header.addEventListener('click', () => {
+    const collapsed = logEl.classList.toggle('dp-log-collapsed')
+    header.textContent = (collapsed ? '▶ ' : '▼ ') + label
+  })
+  return header
 }
 export function createGroupElement(title) {
   const g = el('div', 'dp-group')
@@ -2105,7 +2173,19 @@ function buildDevPanel(groupsEl) {
     const allBodies = Array.from(groupsEl.querySelectorAll('.dp-group > .dp-group-body'))
       .filter((b) => !item.contains(b.closest('.dp-group')))
     return [groupsEl, ...allBodies]
-  }, undefined, undefined, '.dp-group, .dp-row')
+  }, undefined, (item) => {
+    // Ported from TEMPLATE_DEV_PANEL.html 2026-10-11: a subgroup nested
+    // inside a locked ancestor is frozen from being dragged out, same as
+    // a row already is (see the row's own isLocked below). Walks
+    // ANCESTOR groups only (never the item's own lock state), so a
+    // directly-locked group still moves as a whole unit.
+    let grp = item.parentElement ? item.parentElement.closest('.dp-group') : null
+    while (grp) {
+      if (grp.classList.contains('dp-group-locked')) return true
+      grp = grp.parentElement ? grp.parentElement.closest('.dp-group') : null
+    }
+    return false
+  }, '.dp-group, .dp-row')
   // Cross-group: recomputes the live list of every group's body (top-level
   // AND nested, since this selector isn't :scope-restricted) at the start
   // of each individual drag, so a group added/removed/nested since the last

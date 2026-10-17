@@ -17400,6 +17400,73 @@ Direct request: a Wait For All Spheres checkbox: when on, the Hand Offset On Sta
 
 Direct request: while sphere sequences are running a click will not register. advanceSphereSequence() now returns without doing anything (the click is still consumed, so no real click function fires either) while anySphereRunning() - any started sphere whose sequence has not reached its end, including ones still waiting for their start time. Only once every sphere sequence has finished does the next click advance to the hands / Hand Offset On Startup. Note this makes Wait For All Spheres (on-screen spheres only) redundant: the running check already covers every sphere, on screen or not. Also exposed updateSphereSequence and sphereState on window.__debug for testing. main.js ?v=387 -> ?v=388.
 
+2026-10-12  -  (Item selector lists start collapsed)
+
+Direct request: on startup, all item selector lists are always collapsed. Each list-picker control (Saved Poses, Saved Cameras, Lighting, Toon, Tween Sequences, Loading Preview cameras/lighting) keeps its user-created groups in entry.collapsedGroups, which started empty, so every group opened on load. devPanel.js displayValue(): the first non-empty value applied to a picker (its startup restore) now adds every group path (including nested "Parent/Child" paths) to collapsedGroups before the picker renders. Later refreshes (Reset, tab switch) keep the user's own expand/collapse state. Known limit: a picker with no items at startup is not flagged, so a group created later in the session collapses only if that picker is refreshed by a tab switch or Reset. Not live-verified in the browser: the local static server cannot restore saved settings (no remote endpoint), so the startup path was checked by reading the code and node --check only.
+
+2026-10-12  -  (Loading Preview: Easing subgroup)
+
+Direct request: "For loading preview group, add an Easing subgroup, just like the click functions." The Loading Preview group now has an "Easing" subgroup holding an Easing Curve On/Off checkbox (in the subgroup header) and the Easing Curve speed-profile editor, built and gated the same way as the click functions' own Easing subgroup (wrapGatedSubgroup(), buildGenericCurveWidget(), curve hidden while off). New keys loadingPreviewEasingCurveEnabled / loadingPreviewEasingCurve. The curve reuses getEasingProfile() / easingProfilePAt() unchanged, through a small trig-shaped object (loadingPreviewEasingTrig, declared at the top of main.js).
+
+DEVIATION FROM THE CLICK FUNCTIONS, DISCLOSED: a click function's Easing replaces the lap's duration (T = integral of the speed profile). The Loading Preview keeps its own duration rules, because Count mode's Min Loading Time / Count split must still hold. So here the curve only reshapes position within each lap (updateLoadingPreviewAnimation(): easedT is used for the Oscillate, instant-jump and smooth-wrap lerps; the raw lapT still drives lap completion). If you want the click-function duration behaviour instead, say so; it would conflict with Count mode.
+
+Verified in the local preview: the Easing subgroup sits under Loading Preview, the gate is in its header, the curve is hidden while off and appears when the gate is clicked on, no script errors, cfg updated. Not verified: the visual effect on the loading hand (no saved loading tween sequence loads in this local server). top-level-load-check.js passes. main.js ?v=388 -> ?v=389.
+
+2026-10-12  -  (4 dev-panel engine features ported from TEMPLATE_DEV_PANEL.html)
+
+Direct request: "apply all those things to Hando, Handy Dandies, and Handyset" -- the 4 features just added to the shared .claude/TEMPLATE_DEV_PANEL.html template this session.
+1. All 7 of this project's own hand-built log widgets (Mouse Tracking, Hand Behaviour, Frame Rate, Loading Preview, Pose Jump, Render Reordering, Snapshot -- all in main.js, since devPanel.js has no built-in log widget of its own) are now inherently collapsible via a new exported makeLogBoxCollapsible(logEl, label) helper (devPanel.js) -- independent of the group's own collapse, so collapsing the log output leaves the rest of that group's controls visible. devPanel.js ?v=65 -> ?v=66.
+2. Verified drag-to-reorder is gated purely by the .dp-drag-handle/.dp-row-handle icons (structural code read, not re-tested live) -- already correct, no change needed.
+3. Locking a group now also freezes nested subgroups from being dragged/nested/regrouped, not just rows -- the group-level setupReorder() call previously passed `isLocked: undefined`; it now walks ancestor .dp-group elements, mirroring the row-level check that was already correct via .closest('.dp-group'). A directly-locked group still moves as a whole; only its contents (at any depth) are frozen.
+4. NEW: a per-bound lock toggle on the slider min/max click-to-edit labels this project already had (buildBoundLabel(), added 2026-09-28) -- locking clamps a later value-overshoot to that bound instead of the normal +-20% auto-expand. Session-only (lockedSliderBounds, a module-level Set), matching this project's own existing convention that the bound labels themselves are session-only (not captured by Copy/Save).
+Separately confirmed: this project's own list-picker groups already collapse on startup (the "Item selector lists start collapsed" entry directly above, same day) -- no change needed.
+main.js ?v=389 -> ?v=390, style.css ?v=25 -> ?v=26. Not browser-verified this round (large multi-project task; node --check passed on both files).
+
+--------------------------------------------------------------------------------
+2026-10-13 -- New feature: Camera Preview (floating secondary-camera viewport panels), ported from 3JS ENGINE (which ported it from HANDYSET).
+
+Direct request: "port the camera preview functionality to the Handy Dandies project." Nested subgroup Camera > "Preview Camera" (HANDYSET's own names and row
+order): Preview Camera On/Off, Camera X/Y/Z Position, Field Of View, Zoom (Distance To Pan Target), Lock Camera Pan/Zoom/Rotate, Camera Yaw/Pitch, Saved
+Preview Cameras (list-picker), Add Camera Preview, Camera Previews: (live count), Delete All Camera Previews. Each open panel is a draggable (title bar),
+natively resizable DOM panel showing the scene from its own PerspectiveCamera with its own OrbitControls (bound to that panel, so no cross-talk with the
+main camera, which only pans/zooms), scissor-rendered into the one canvas right after the main composer.render(). One shared control row drives the ACTIVE
+panel; each panel keeps its own camera and locks. main.js: state in the early declarations block (this file's TDZ rule), controls appended to the Camera
+group + a CAMERA_SUBGROUP_SPECS entry for organizeGroupSubgroups(), the engine block right after syncCameraPanelFromLive(), 3 hooks in animate().
+
+HANDY DANDIES-SPECIFIC DECISIONS (each found by reading the real code, not assumed):
+- Render-on-demand while paused: previews are drawn INSIDE animate()'s existing `__shouldRenderThisFrame` block, and every preview change (orbit, drag,
+  resize, slider, add/remove) sets cameraPreviewRedrawPending, which animate() turns into sceneNeedsRedraw. Verified: with Global Pause on, dragging a panel
+  repaints the preview at the new position and the area it left.
+- syncValue() fires onAnyValueChange (-> sceneNeedsRedraw), so the per-frame mirror of the active panel only pushes a value when it CHANGED (same as
+  syncCameraPanelFromLive()); pushing every frame would have kept a paused scene redrawing forever.
+- TDZ: onAnyValueChange assigns sceneNeedsRedraw, a `let` declared ~16,000 lines below. Module-level setup is therefore DOM-only, handlers are guarded by
+  cameraPreviewEngineReady, and a saved On/Off=checked is honored by a one-shot in the first animate() tick. Verified live: Sync, reload -> master toggle
+  restored checked, one panel auto-created, no startup error.
+- The app's window-level handlers (cursor tracking, click/hold pose functions, wheel/touch gestures) must not react to a preview. The panel stops
+  pointerdown/pointermove/wheel/touchstart/touchend/click/dblclick/contextmenu bubbling (NOT pointerup: a panel drag ends on a window-level pointerup), and
+  the 7 existing `.closest('.dp-panel, #pauseButton, #resetButton')` filters (one is capture-phase, which stopPropagation cannot block) now also list
+  `.camera-preview-panel`. Verified: an orbit drag inside a preview left the window-level bubble listeners at 0 pointerdown / 0 pointermove / 0 click / 0
+  wheel, and the main camera unmoved.
+- Hand stacking order comes from cursor distance, not the camera, so overlapping hands layer in a preview exactly as in the main view.
+- Names are `cameraPreview*` / `*CameraPreview*` because `previewCamera` already means the Pose Preview's camera in this file.
+
+DIFFERENCES FROM THE SOURCE (disclosed): previews skip the EffectComposer chain, so the Outline Pass and Invert All Colors do not apply inside a preview
+(the hands' own outline meshes do); IK picking from HANDYSET is not applicable; Yaw/Pitch here ORBIT around the panel's pan target, while the main "Camera
+Yaw/Pitch" turns the camera in place -- same labels, different meaning; a preview's own pan target is not stored in Saved Preview Cameras (Use pivots on world
+(0,0,0), HANDYSET's design). Bugs in HANDYSET's version fixed (already fixed in the 3JS ENGINE port): locked sliders re-enabled every frame, lock checkboxes
+not following the active panel, a 320px panel starting off-screen on a phone (start position clamped to the viewport).
+
+VERIFIED LIVE (real mouse where it matters, Chrome pane, local static server): panel renders the full hand field inside itself matching the main look; panel
+orbit changes only the preview; title-bar drag; paused-redraw (above); slider independence (Zoom 300, then Yaw 90 and Pitch -20 each left the others alone);
+per-panel locks, switching panels by real click, and the lock surviving frames; close x / numbering after close / master Off / Add while Off / Delete All;
+Saved Preview Cameras Save then Use restored position and FOV exactly ([174,43.5,174,50]); save+reload restore. NOT verified: a real phone, and
+non-default Resolution/pixel-ratio settings on this app (it has no Resolution Scale control; the mapping is generic and was verified in 3JS ENGINE).
+Observed once, not chased: after a Sync+reload in the test browser the scene came back with a light background, with the preview matching the main view;
+that is this app's own settings save/restore, unrelated to these controls (test-browser storage cleared afterwards).
+
+NOT COMMITTED: this project's working tree already held another session's uncommitted edits (devPanel.js, main.js, style.css, index.html, CLAUDE.md,
+this file) when this was written, so nothing was staged or committed here. main.js ?v=390 -> ?v=391 and style.css ?v=26 -> ?v=27 in index.html.
+
 ================================================================================
 APPEND-ONLY. Never rewrite, reorder, or delete a prior entry, even to fix
 formatting (CLAUDE.md §4a / Never-Skip rule #3). If an entry needs a

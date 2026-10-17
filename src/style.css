@@ -273,6 +273,16 @@ html, body {
    for the actual lock state + reorder-refusal logic. */
 .dp-group-lock-icon { flex: 0 0 auto; cursor: pointer; opacity: 0.6; padding: 0 2px; }
 .dp-group-lock-icon:hover { opacity: 1; }
+/* Generic collapsible log-box header - ported from
+   TEMPLATE_DEV_PANEL.html 2026-10-11. Independent of the group's own
+   collapse - only hides the log's own scrollable output. */
+.dp-log-box-header {
+  display: flex; align-items: center; gap: 4px; cursor: pointer;
+  margin-top: 4px; opacity: 0.75; user-select: none;
+  font-size: 9px; color: var(--dp-text-color, #c9c9d8);
+}
+.dp-log-box-header:hover { opacity: 1; }
+.dp-log-collapsed { display: none !important; }
 /* Undock/Dock button (ported from TEMPLATE_DEV_PANEL.html) -- sits
    between the group's own device checkbox and the lock icon in DOM
    order (createGroupElement()), deliberately WITHOUT its own
@@ -438,6 +448,17 @@ html, body {
   flex: 0 0 auto; font-size: 9px; opacity: 0.6; cursor: pointer; min-width: 16px; text-align: center;
 }
 .dp-slider-bound input.dp-minmax-input { width: 46px; font-size: 9px; padding: 1px 2px; }
+/* Locked-bound highlight + the in-edit lock toggle, ported from
+   TEMPLATE_DEV_PANEL.html 2026-10-11. */
+.dp-slider-bound-locked {
+  opacity: 1; color: #ff4d4d; font-weight: bold;
+  text-shadow: 0 0 3px rgba(255, 77, 77, 0.6);
+}
+.dp-slider-bound-lock-toggle {
+  display: inline-flex; align-items: center; gap: 2px;
+  margin-left: 3px; cursor: pointer; font-size: 9px; vertical-align: middle;
+}
+.dp-slider-bound-lock-toggle input { margin: 0; cursor: pointer; }
 .dp-num {
   flex: 0 0 auto; width: 52px; text-align: right; font-size: var(--dp-value-font-size, var(--dp-body-font-size, 11px));
   background: #0f0f18; color: var(--dp-value-text-color, var(--dp-text-color, #e8e8f0)); border: 1px solid #3a3a4a; border-radius: 4px;
@@ -603,3 +624,25 @@ html, body {
   font-weight: var(--dp-button-weight, 400);
 }
 .dp-panel.dp-caps-settings-text .dp-row label { text-transform: uppercase; }
+
+/* ---- Camera Preview (ported from 3JS ENGINE / HANDYSET) ----------------------------------------------------------------------------------
+   Floating secondary-camera panels. The panel is ordinary DOM; its viewport element stays fully transparent because the picture inside it is
+   scissor-rendered into the main canvas at that screen rectangle (renderCameraPreviewViewports() in main.js). z-index sits below the dev panel
+   and the Pose Preview panel (9998). */
+.camera-preview-panel {
+  position: fixed; width: 320px; height: 240px; min-width: 160px; min-height: 120px; z-index: 9000;
+  display: flex; flex-direction: column; resize: both; overflow: hidden;
+  border: 2px solid rgba(0, 255, 255, 0.35); border-radius: 4px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5); background: transparent;
+}
+.camera-preview-panel.camera-preview-active { border-color: #0ff; box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.55), 0 2px 12px rgba(0, 0, 0, 0.5); }
+.camera-preview-titlebar {
+  flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 3px 6px;
+  background: rgba(0, 0, 0, 0.65); color: #0ff; font: 11px monospace; cursor: move; user-select: none; touch-action: none;
+}
+.camera-preview-title-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.camera-preview-close { background: none; border: none; color: #fff; cursor: pointer; font-size: 14px; line-height: 1; padding: 0 3px; flex-shrink: 0; }
+.camera-preview-close:hover { color: #f55; }
+.camera-preview-viewport { flex: 1 1 auto; cursor: grab; touch-action: none; }
+.camera-preview-viewport:active { cursor: grabbing; }
+/* A slider whose motion is locked (Lock Camera Pan/Zoom/Rotate on the active preview). */
+.dp-row-locked { opacity: 0.4; }

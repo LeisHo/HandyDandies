@@ -8,7 +8,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
-import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch } from './devpanel/devPanel.js?v=65'
+import { initDevPanel, syncValue, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=66'
 
 // A defensive wrapper around devPanel.js's own refreshSelectOptions() --
 // found via live testing (direct user report: "I dont see any of the
@@ -200,6 +200,18 @@ const forearmPosRaw = new THREE.Vector3()
 let armLengthRangeParsed = { min: 30, max: 90 }
 let armLengthCurveParsed = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
 const armLengthWidgetResyncs = []
+// Camera Previews' shared state -- declared up here for the same TDZ reason as the block above: the Camera group's own
+// onChange handlers (declared in DEV_GROUPS, run during/after initDevPanel()) reach these long before the engine block
+// that defines the functions using them (next to syncCameraPanelFromLive()) is evaluated.
+const cameraPreviews = []
+let activeCameraPreviewId = null
+let cameraPreviewIdCounter = 0
+let cameraPreviewEngineReady = false // flipped true at the end of the Camera Preview engine block, once camera/controls/renderer exist
+let cameraPreviewRedrawPending = false // read by animate() -> sceneNeedsRedraw, because that flag is declared far below this block
+let cameraPreviewStartupChecked = false // one-shot in animate(): creates the first panel if a saved On/Off=checked was restored before the engine was ready
+const _cameraPreviewRendererSize = new THREE.Vector2()
+const CAMERA_PREVIEW_SLIDER_KEYS = ['cameraPreviewX', 'cameraPreviewY', 'cameraPreviewZ', 'cameraPreviewFov', 'cameraPreviewZoom', 'cameraPreviewYaw', 'cameraPreviewPitch']
+const __lastSyncedCameraPreview = {}
 // FIX 2026-10-04 (production outage: "pause button missing. hands not
 // loading"): these 3 curve-editor constants used to be declared next to the
 // functions that use them, ~4,000 lines below this point. The curve widgets
@@ -262,6 +274,12 @@ const CURVE_GRAPH_OPACITY_DEFAULT = 0.06
 const LOADING_PREVIEW_REFERENCE_RADIUS = 22.97
 let loadingPreviewModelScale = 1
 let loadingPreviewAnchorActive = false
+// Loading Preview Easing Curve (direct request 2026-10-12: "add an Easing
+// subgroup, just like the click functions"). Holds the parsed speed-profile
+// curve in the same `trig`-shaped object getEasingProfile() reads, so the
+// shared profile code is reused unchanged. Declared up here, not next to its
+// functions: the restore can call its onChange at top level (TDZ gotcha).
+let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: null, speedRangeParsed: null }
 const loadingPreviewAnchor = new THREE.Vector3()
 const _loadingPreviewBase = new THREE.Vector3()
 // World-XY-only cursor distance for click-function settings (2026-10-04,
@@ -1984,6 +2002,11 @@ const DEV_GROUPS = [
       // selected."
       { key: 'loadingPreviewLightingSelector', label: 'Loading Preview Lighting', type: 'select', def: '', options: () => (cfg.loadingPreviewSavedLighting || []).map((l) => ({ value: l.name, group: l.group || null })), onChange: () => { if (!loadingPreviewKeyLightRef || !loadingPreviewHemiLightRef) return; const item = (cfg.loadingPreviewSavedLighting || []).find((l) => l.name === cfg.loadingPreviewLightingSelector); if (item) applyLoadingPreviewLighting(loadingPreviewKeyLightRef, loadingPreviewHemiLightRef, item); else applyLoadingPreviewLightingDefault() } },
       { key: 'loadingPreviewSpeedMs', label: 'Loading Preview Speed (Ms / Cycle)', type: 'slider', min: 200, max: 5000, step: 50, def: 900 },
+      // Easing Curve (2026-10-12) -- the same speed-profile control the click
+      // functions use (see getEasingProfile()). Gated by its own on/off
+      // checkbox inside an "Easing" subgroup (setupLoadingPreviewEasingGroup()).
+      { key: 'loadingPreviewEasingCurveEnabled', label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: (v) => updateLoadingPreviewEasingCurveVisibility(v) },
+      { key: 'loadingPreviewEasingCurve', label: 'Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseLoadingPreviewEasingConfig() },
       // Sequence Mode - Count/Loop/Oscillate -- direct spec item, the
       // SAME control shape just added to every click function (see
       // makeClickPoseGroup()'s own matching comment for the full
@@ -2669,7 +2692,30 @@ const DEV_GROUPS = [
       // the default camera").
       { key: 'lockCameraPan', label: 'Lock Camera Pan', type: 'checkbox', def: false, perDevice: true, onChange: () => applyCameraLockState() },
       { key: 'lockCameraZoom', label: 'Lock Camera Zoom', type: 'checkbox', def: false, perDevice: true, onChange: () => applyCameraLockState() },
-      { key: 'cameraMaxExtentsEnabled', label: 'Set Default Camera As Max Extents', type: 'checkbox', def: false, perDevice: true, onChange: () => updateCameraMaxExtentsBound() }
+      { key: 'cameraMaxExtentsEnabled', label: 'Set Default Camera As Max Extents', type: 'checkbox', def: false, perDevice: true, onChange: () => updateCameraMaxExtentsBound() },
+      { key: 'cameraXYCenterFieldBtn', label: 'XY Center Field Mid Point', type: 'button', placeAfter: 'cameraMaxExtentsEnabled', onClick: () => xyCenterCameraOnField() },
+      // ---- Preview Camera (nested subgroup, see CAMERA_SUBGROUP_SPECS) -- ported from 3JS ENGINE, which ported it from HANDYSET (names and
+      // row order are HANDYSET's own, unrenamed there). Floating secondary-camera panels; ONE shared set of controls drives whichever panel
+      // is active. None of these are perDevice: they mirror the ACTIVE panel's live camera, not a layout preference. Every handler is
+      // guarded by cameraPreviewEngineReady (they can run during initDevPanel(), before camera/controls exist).
+      { key: 'cameraPreviewEnabled', label: 'Preview Camera On/Off', type: 'checkbox', def: false, onChange: (v) => { if (!cameraPreviewEngineReady) return; if (v) { if (cameraPreviews.length === 0) createCameraPreview() } else removeAllCameraPreviews() } },
+      { key: 'cameraPreviewX', label: 'Camera X Position (x)', type: 'slider', min: -600, max: 600, step: 0.5, def: 0, onChange: (v) => withActiveCameraPreview((pc) => { pc.camera.position.x = v; pc.controls.update() }) },
+      { key: 'cameraPreviewY', label: 'Camera Y Position (x)', type: 'slider', min: -600, max: 600, step: 0.5, def: 0, onChange: (v) => withActiveCameraPreview((pc) => { pc.camera.position.y = v; pc.controls.update() }) },
+      { key: 'cameraPreviewZ', label: 'Camera Z Position (x)', type: 'slider', min: -600, max: 600, step: 0.5, def: 0, onChange: (v) => withActiveCameraPreview((pc) => { pc.camera.position.z = v; pc.controls.update() }) },
+      { key: 'cameraPreviewFov', label: 'Field Of View (Deg)', type: 'slider', min: 15, max: 90, step: 1, def: 35, onChange: (v) => withActiveCameraPreview((pc) => { pc.camera.fov = v; pc.camera.updateProjectionMatrix() }) },
+      { key: 'cameraPreviewZoom', label: 'Zoom (Distance To Pan Target) (x)', type: 'slider', min: 1, max: 800, step: 0.5, def: 260, onChange: (v) => withActiveCameraPreview((pc) => setSphericalFor(pc.camera, pc.controls, { dist: v })) },
+      { key: 'lockCameraPreviewPan', label: 'Lock Camera Pan', type: 'checkbox', def: false, onChange: (v) => withActiveCameraPreview((pc) => { pc.locks.pan = v; applyCameraPreviewLockState() }) },
+      { key: 'lockCameraPreviewZoom', label: 'Lock Camera Zoom', type: 'checkbox', def: false, onChange: (v) => withActiveCameraPreview((pc) => { pc.locks.zoom = v; applyCameraPreviewLockState() }) },
+      { key: 'lockCameraPreviewRotate', label: 'Lock Camera Rotate', type: 'checkbox', def: false, onChange: (v) => withActiveCameraPreview((pc) => { pc.locks.rotate = v; applyCameraPreviewLockState() }) },
+      { key: 'cameraPreviewYaw', label: 'Camera Yaw (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => withActiveCameraPreview((pc) => setSphericalFor(pc.camera, pc.controls, { yaw: v })) },
+      { key: 'cameraPreviewPitch', label: 'Camera Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => withActiveCameraPreview((pc) => setSphericalFor(pc.camera, pc.controls, { pitch: v })) },
+      // Same list-picker shape as Saved Cameras above. A preview's own pan target is not stored: Use always pivots on world (0,0,0)
+      // (HANDYSET's documented design), unlike Saved Cameras, which stores its target.
+      { key: 'savedCameraPreviews', label: 'Saved Preview Cameras', type: 'list-picker', def: [], itemLabel: 'Preview Camera', exportable: true, importable: true, captureCurrent: () => captureCameraPreviewFromLive(), onUse: (item) => applyCameraPreviewPreset(item) },
+      { key: 'addCameraPreviewBtn', label: 'Add Camera Preview', type: 'button', onClick: () => { if (cameraPreviewEngineReady) createCameraPreview() } },
+      // A live count. This dev panel has no read-only label control, so it is a text control made read-only once the panel exists.
+      { key: 'cameraPreviewCount', label: 'Camera Previews:', type: 'text', def: '0' },
+      { key: 'deleteAllCameraPreviewsBtn', label: 'Delete All Camera Previews', type: 'button', onClick: () => { if (!cameraPreviewEngineReady) return; removeAllCameraPreviews(); syncValue('cameraPreviewEnabled', false) } }
     ]
   },
   {
@@ -3038,6 +3084,9 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 const FIELD_LAYOUT_SUBGROUP_SPECS = [
   { title: 'Render Order', collapsed: false, keys: ['renderOrderMode', 'renderOrderModeExcept', 'renderOrderModeTerms', 'renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallbackTerms', 'renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderFallback2Terms', 'renderOrderExtraFallbacks', 'renderOrderFlipLock'] }
 ]
+const CAMERA_SUBGROUP_SPECS = [
+  { title: 'Preview Camera', collapsed: true, keys: ['cameraPreviewEnabled', 'cameraPreviewX', 'cameraPreviewY', 'cameraPreviewZ', 'cameraPreviewFov', 'cameraPreviewZoom', 'lockCameraPreviewPan', 'lockCameraPreviewZoom', 'lockCameraPreviewRotate', 'cameraPreviewYaw', 'cameraPreviewPitch', 'savedCameraPreviews', 'addCameraPreviewBtn', 'cameraPreviewCount', 'deleteAllCameraPreviewsBtn'] }
+]
 const SNAPSHOT_SUBGROUP_SPECS = [
   { title: 'Snapshot', collapsed: false, keys: ['snapshotCursor', 'snapshotMouse', 'snapshotHandBehaviour', 'snapshotFrameRate', 'snapshotPoseJumps', 'snapshotRenderOrder', 'snapshotTrackingPoints', 'snapshotTakeBtn'] }
 ]
@@ -3063,7 +3112,7 @@ const DEV_PANEL_SAVE_SECRET = 'PkrbMti03M6xm3FEThYXa8gGW_08BOGj'
 const SAVE_SETTINGS_ENDPOINT = '/api/save-settings'
 const cfg = initDevPanel(DEV_GROUPS, {
   storageKeyPrefix: 'handyDandies',
-  organizeSubgroups: (groupsEl) => { organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Debug', SNAPSHOT_SUBGROUP_SPECS) },
+  organizeSubgroups: (groupsEl) => { organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Debug', SNAPSHOT_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Camera', CAMERA_SUBGROUP_SPECS) },
   remoteSave: { endpoint: SAVE_SETTINGS_ENDPOINT, secret: DEV_PANEL_SAVE_SECRET },
   // ROOT CAUSE of the middle/ring finger "outstretched" bug's REAL
   // return, 2026-09-16 (direct user report, correctly suspecting "the
@@ -3379,6 +3428,283 @@ function syncCameraPanelFromLive() {
   if (roll !== __lastSyncedCameraRoll) { syncValue('cameraRoll', roll); __lastSyncedCameraRoll = roll }
 }
 
+// ---- Camera Preview (ported from 3JS ENGINE, which ported it from HANDYSET; 2026-10-13) -------------------------------------------------
+// Floating, draggable (title bar), natively resizable DOM panels, each showing the same scene from its own PerspectiveCamera with its own
+// OrbitControls bound to THAT panel's viewport (no cross-talk with the main camera, which only pans/zooms). Each panel is SCISSOR-rendered
+// into this one canvas right after the main composer.render() (see animate()); the viewport element is transparent so those pixels show
+// through. No second renderer, no render target, no readback. ONE shared set of dev-panel controls drives the ACTIVE panel (last clicked or
+// orbited); each panel keeps its own camera and lock state.
+//
+// Disclosed differences from the source: (1) previews skip the EffectComposer chain, so the Outline Pass, Invert All Colors and the global
+// output stage do NOT apply inside a preview (the hands' own outline meshes do); (2) this app renders on demand while paused, so every preview
+// change sets cameraPreviewRedrawPending (animate() turns it into sceneNeedsRedraw) and the previews are drawn only inside that same gated
+// render block; (3) hand stacking order is the main view's (it comes from cursor distance, not the camera), so overlapping hands layer the
+// same way in a preview regardless of its angle; (4) IK picking from the source is not applicable here.
+// Bugs in HANDYSET's version fixed in the engine port and kept here: locked sliders were re-enabled every frame; the lock checkboxes did
+// not follow the active panel; a 320px panel started off-screen on a phone.
+// Yaw/Pitch here orbit AROUND the panel's pan target (camera minus target), which is NOT what the main "Camera Yaw/Pitch" above does (it turns
+// the camera in place) -- same labels as the source, different meaning.
+function getYawPitchFor(cam, ctrls) {
+  const dir = cam.position.clone().sub(ctrls.target)
+  const dist = dir.length() || 1
+  dir.normalize()
+  const pitch = Math.asin(Math.max(-1, Math.min(1, dir.y))) * 180 / Math.PI
+  const yaw = Math.atan2(dir.x, dir.z) * 180 / Math.PI
+  return { yaw, pitch, dist }
+}
+function flushOrbitInertiaFor(ctrls) {
+  const damping = ctrls.enableDamping
+  ctrls.enableDamping = false // without damping update() applies the whole pending delta and clears it
+  ctrls.update()
+  ctrls.enableDamping = damping
+}
+// Zoom/Yaw/Pitch are three coordinates of ONE position around the target: flush leftover damping inertia, read the LIVE values, change only
+// the requested one, rebuild the position from all three -- so dragging one slider never nudges the others.
+function setSphericalFor(cam, ctrls, { yaw, pitch, dist }) {
+  flushOrbitInertiaFor(ctrls)
+  const live = getYawPitchFor(cam, ctrls)
+  const yawRad = (yaw === undefined ? live.yaw : yaw) * Math.PI / 180
+  const pitchRad = (pitch === undefined ? live.pitch : pitch) * Math.PI / 180
+  const d = dist === undefined ? live.dist : dist
+  if (!(d > 1e-6)) return
+  const dir = new THREE.Vector3(Math.cos(pitchRad) * Math.sin(yawRad), Math.sin(pitchRad), Math.cos(pitchRad) * Math.cos(yawRad))
+  cam.position.copy(ctrls.target).addScaledVector(dir, d)
+  ctrls.update()
+}
+function markCameraPreviewRedraw() { cameraPreviewRedrawPending = true }
+function getActiveCameraPreview() { return cameraPreviews.find((pc) => pc.id === activeCameraPreviewId) || null }
+function withActiveCameraPreview(fn) {
+  const pc = getActiveCameraPreview()
+  if (!pc) return
+  fn(pc)
+  markCameraPreviewRedraw()
+}
+// syncValue() also fires the dev panel's any-value-changed hook (which sets sceneNeedsRedraw), so pushing unchanged values every frame
+// would defeat render-on-demand while paused -- only push a value when it actually changed, same as syncCameraPanelFromLive() above.
+function syncCameraPreviewValue(key, value) {
+  if (__lastSyncedCameraPreview[key] === value) return
+  __lastSyncedCameraPreview[key] = value
+  syncValue(key, value)
+}
+function setCameraPreviewRowDisabled(key, disabled, locked) {
+  const row = document.querySelector(`.dp-row[data-key="${key}"]`)
+  if (!row) return
+  row.querySelectorAll('input').forEach((i) => { i.disabled = disabled })
+  row.classList.toggle('dp-row-locked', !!locked)
+}
+function setActiveCameraPreview(id) {
+  if (activeCameraPreviewId === id) return
+  activeCameraPreviewId = id
+  cameraPreviews.forEach((pc) => pc.panel.classList.toggle('camera-preview-active', pc.id === id))
+  Object.keys(__lastSyncedCameraPreview).forEach((k) => { delete __lastSyncedCameraPreview[k] }) // new active panel: re-push every value
+  applyCameraPreviewLockState()
+  syncCameraPreviewPanelFromLive()
+  markCameraPreviewRedraw()
+}
+function updateCameraPreviewCount() { syncCameraPreviewValue('cameraPreviewCount', String(cameraPreviews.length)) }
+function createCameraPreview() {
+  syncValue('cameraPreviewEnabled', true) // flips the checkbox WITHOUT firing its onChange (which would re-enter here and create a 2nd camera)
+  const id = 'cp' + (++cameraPreviewIdCounter)
+  const pcCamera = new THREE.PerspectiveCamera(camera.fov, 320 / 240, camera.near, camera.far)
+  pcCamera.position.copy(camera.position) // starts framed like the main camera's CURRENT view
+  pcCamera.up.copy(camera.up)
+
+  const panel = document.createElement('div')
+  panel.className = 'camera-preview-panel'
+  // Monotonic counter, not cameraPreviews.length: cascade offset and title never repeat a number for a still-open panel after an earlier one
+  // was closed. Clamped to the viewport so a 320px panel's close button is never pushed off a phone screen.
+  const n = cameraPreviewIdCounter
+  const cascade = ((n - 1) % 6) * 28
+  panel.style.left = Math.max(0, Math.min(72 + cascade, window.innerWidth - 320 - 8)) + 'px'
+  panel.style.top = Math.max(0, Math.min(72 + cascade, window.innerHeight - 240 - 8)) + 'px'
+
+  const titlebar = document.createElement('div')
+  titlebar.className = 'camera-preview-titlebar'
+  const titleLabel = document.createElement('span')
+  titleLabel.className = 'camera-preview-title-label'
+  titleLabel.textContent = 'Preview Camera ' + n
+  const closeBtn = document.createElement('button')
+  closeBtn.type = 'button'
+  closeBtn.className = 'camera-preview-close'
+  closeBtn.textContent = '×'
+  closeBtn.title = 'Close this preview'
+  titlebar.append(titleLabel, closeBtn)
+  const viewportEl = document.createElement('div')
+  viewportEl.className = 'camera-preview-viewport'
+  panel.append(titlebar, viewportEl)
+  document.body.appendChild(panel)
+
+  const pcControls = new OrbitControls(pcCamera, viewportEl)
+  pcControls.target.copy(controls.target)
+  pcControls.enableDamping = true
+  pcCamera.lookAt(pcControls.target)
+  pcControls.update()
+
+  const entry = { id, camera: pcCamera, controls: pcControls, panel, viewportEl, titleLabel, locks: { pan: false, zoom: false, rotate: false } }
+  cameraPreviews.push(entry)
+
+  pcControls.addEventListener('change', () => { setActiveCameraPreview(id); markCameraPreviewRedraw() })
+  titlebar.addEventListener('pointerdown', (e) => {
+    if (e.target === closeBtn) return
+    setActiveCameraPreview(id)
+    startCameraPreviewDrag(entry, e)
+  })
+  viewportEl.addEventListener('pointerdown', () => setActiveCameraPreview(id))
+  // The panel is a sibling of the canvas, so its events cannot reach the main OrbitControls through the DOM; these stops also keep them from
+  // this app's window-level listeners (cursor tracking, click/hold pose functions, wheel/touch gestures) so a preview never acts on the main
+  // view. pointerup is deliberately NOT stopped: a panel drag ends on a window-level pointerup (HANDYSET 2026-10-12). The app's CAPTURE-phase
+  // window listeners cannot be stopped from here, so they, and the bubbling ones that filter by target, also ignore `.camera-preview-panel`
+  // via their existing `.closest('.dp-panel, ...')` selector.
+  ;['pointerdown', 'pointermove', 'wheel', 'touchstart', 'touchend', 'dblclick', 'click', 'contextmenu'].forEach((t) => panel.addEventListener(t, (e) => e.stopPropagation()))
+  closeBtn.addEventListener('click', () => removeCameraPreview(id))
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => {
+      const r = viewportEl.getBoundingClientRect()
+      if (r.width < 2 || r.height < 2) return
+      pcCamera.aspect = r.width / r.height
+      pcCamera.updateProjectionMatrix()
+      markCameraPreviewRedraw()
+    })
+    ro.observe(panel)
+    entry.resizeObserver = ro
+  }
+  setActiveCameraPreview(id)
+  updateCameraPreviewCount()
+  markCameraPreviewRedraw()
+  return entry
+}
+function removeCameraPreview(id) {
+  const idx = cameraPreviews.findIndex((pc) => pc.id === id)
+  if (idx < 0) return
+  const [entry] = cameraPreviews.splice(idx, 1)
+  if (entry.resizeObserver) entry.resizeObserver.disconnect()
+  entry.controls.dispose()
+  entry.panel.remove()
+  if (activeCameraPreviewId === id) {
+    activeCameraPreviewId = null
+    if (cameraPreviews.length) setActiveCameraPreview(cameraPreviews[cameraPreviews.length - 1].id)
+  }
+  updateCameraPreviewCount()
+  applyCameraPreviewLockState()
+  syncCameraPreviewPanelFromLive()
+  markCameraPreviewRedraw()
+}
+function removeAllCameraPreviews() {
+  cameraPreviews.slice().forEach((pc) => removeCameraPreview(pc.id)) // copy first: removeCameraPreview mutates cameraPreviews
+}
+// Drag by the title bar only -- the viewport's own pointer events belong to that panel's OrbitControls, so the two regions never overlap.
+function startCameraPreviewDrag(entry, downEvent) {
+  const panel = entry.panel
+  const startLeft = panel.offsetLeft
+  const startTop = panel.offsetTop
+  const startX = downEvent.clientX
+  const startY = downEvent.clientY
+  function onMove(e) {
+    const nextLeft = startLeft + (e.clientX - startX)
+    const nextTop = startTop + (e.clientY - startY)
+    panel.style.left = Math.max(-panel.offsetWidth + 40, Math.min(window.innerWidth - 40, nextLeft)) + 'px'
+    panel.style.top = Math.max(0, Math.min(window.innerHeight - 24, nextTop)) + 'px'
+    markCameraPreviewRedraw()
+  }
+  function onUp() {
+    window.removeEventListener('pointermove', onMove, true)
+    window.removeEventListener('pointerup', onUp, true)
+    window.removeEventListener('pointercancel', onUp, true)
+    markCameraPreviewRedraw()
+  }
+  // Capture phase: the release must end the drag wherever it lands.
+  window.addEventListener('pointermove', onMove, true)
+  window.addEventListener('pointerup', onUp, true)
+  window.addEventListener('pointercancel', onUp, true)
+}
+// Mirrors syncCameraPanelFromLive() for the ACTIVE preview camera, every frame. With no panel the shared controls are disabled; with one, the
+// enabled/locked state belongs to applyCameraPreviewLockState() (HANDYSET re-enabled everything here each frame, undoing the locks).
+function syncCameraPreviewPanelFromLive() {
+  const pc = getActiveCameraPreview()
+  if (!pc) {
+    CAMERA_PREVIEW_SLIDER_KEYS.forEach((k) => setCameraPreviewRowDisabled(k, true, false))
+    return
+  }
+  const yp = getYawPitchFor(pc.camera, pc.controls)
+  syncCameraPreviewValue('cameraPreviewX', pc.camera.position.x)
+  syncCameraPreviewValue('cameraPreviewY', pc.camera.position.y)
+  syncCameraPreviewValue('cameraPreviewZ', pc.camera.position.z)
+  syncCameraPreviewValue('cameraPreviewYaw', yp.yaw)
+  syncCameraPreviewValue('cameraPreviewPitch', yp.pitch)
+  syncCameraPreviewValue('cameraPreviewFov', pc.camera.fov)
+  syncCameraPreviewValue('cameraPreviewZoom', pc.camera.position.distanceTo(pc.controls.target))
+}
+// Pan locks the 3 position sliders, Zoom the Zoom slider, Rotate Yaw/Pitch; FOV is never locked. Each panel has its own locks, and the
+// shared checkboxes always show the ACTIVE panel's.
+function applyCameraPreviewLockState() {
+  const pc = getActiveCameraPreview()
+  const locks = pc ? pc.locks : { pan: false, zoom: false, rotate: false }
+  if (pc) {
+    pc.controls.enablePan = !locks.pan
+    pc.controls.enableZoom = !locks.zoom
+    pc.controls.enableRotate = !locks.rotate
+  }
+  const off = !pc
+  ;['cameraPreviewX', 'cameraPreviewY', 'cameraPreviewZ'].forEach((k) => setCameraPreviewRowDisabled(k, off || locks.pan, locks.pan))
+  setCameraPreviewRowDisabled('cameraPreviewZoom', off || locks.zoom, locks.zoom)
+  ;['cameraPreviewYaw', 'cameraPreviewPitch'].forEach((k) => setCameraPreviewRowDisabled(k, off || locks.rotate, locks.rotate))
+  setCameraPreviewRowDisabled('cameraPreviewFov', off, false)
+  syncCameraPreviewValue('lockCameraPreviewPan', locks.pan)
+  syncCameraPreviewValue('lockCameraPreviewZoom', locks.zoom)
+  syncCameraPreviewValue('lockCameraPreviewRotate', locks.rotate)
+}
+// Scissor-renders every open panel's camera into its own rectangle, right after the main composer.render(). setScissor()/setViewport() take the
+// renderer's own size units and apply the pixel ratio themselves (passing device pixels drew previews at the wrong place and DPR-times too large
+// in HANDYSET), so DOM rects are mapped through renderer-size / canvas-CSS-size.
+function renderCameraPreviewViewports() {
+  if (cameraPreviews.length === 0) return
+  const canvasRect = renderer.domElement.getBoundingClientRect()
+  if (canvasRect.width < 2 || canvasRect.height < 2) return
+  renderer.getSize(_cameraPreviewRendererSize)
+  const sx = _cameraPreviewRendererSize.x / canvasRect.width
+  const sy = _cameraPreviewRendererSize.y / canvasRect.height
+  cameraPreviews.forEach((pc) => {
+    const rect = pc.viewportEl.getBoundingClientRect()
+    if (rect.width < 2 || rect.height < 2) return
+    const x = Math.round((rect.left - canvasRect.left) * sx)
+    const w = Math.round(rect.width * sx)
+    const h = Math.round(rect.height * sy)
+    const y = Math.round(_cameraPreviewRendererSize.y) - Math.round((rect.top - canvasRect.top) * sy) - h // WebGL origin is bottom-left; DOM is top-left
+    renderer.setScissorTest(true)
+    renderer.setScissor(x, y, w, h)
+    renderer.setViewport(x, y, w, h)
+    renderer.clear(true, true)
+    renderer.render(scene, pc.camera)
+  })
+  renderer.setScissorTest(false)
+  renderer.setViewport(0, 0, _cameraPreviewRendererSize.x, _cameraPreviewRendererSize.y)
+}
+// Saved Preview Cameras preset: HANDYSET's own {x,y,z,fov,zoom} shape; the pan target is not stored.
+function captureCameraPreviewFromLive() {
+  const pc = getActiveCameraPreview()
+  if (!pc) return {}
+  return { x: pc.camera.position.x, y: pc.camera.position.y, z: pc.camera.position.z, fov: pc.camera.fov, zoom: pc.camera.position.distanceTo(pc.controls.target) }
+}
+function applyCameraPreviewPreset(item) {
+  const pc = getActiveCameraPreview()
+  if (!pc) return
+  pc.controls.target.set(0, 0, 0)
+  pc.camera.position.set(item.x, item.y, item.z)
+  pc.camera.fov = item.fov
+  pc.camera.updateProjectionMatrix()
+  pc.controls.update()
+  markCameraPreviewRedraw()
+}
+// Module-level setup here must stay DOM-only: syncValue() fires the dev panel's any-value-changed hook, which assigns sceneNeedsRedraw -- a `let`
+// declared ~16,000 lines further down, so calling it at this point is the TDZ outage this file documents (see where the fixed-list selects are
+// filled, "after sceneNeedsRedraw exists"). The first animate() tick does the rest (cameraPreviewStartupChecked).
+{
+  const countInput = document.querySelector('.dp-row[data-key="cameraPreviewCount"] input')
+  if (countInput) countInput.readOnly = true // a display, not an input (this panel has no read-only label control)
+  CAMERA_PREVIEW_SLIDER_KEYS.forEach((k) => setCameraPreviewRowDisabled(k, true, false)) // no panel yet
+  cameraPreviewEngineReady = true
+}
+
 const composer = new EffectComposer(renderer)
 composer.addPass(new RenderPass(scene, camera))
 const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera)
@@ -3634,7 +3960,7 @@ function fireStartupHandOffset() {
 }
 window.addEventListener('pointerdown', (e) => {
   if (e.button !== 0) return
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
   if (!hands.length || !fieldRevealed) return
   if (sphereSeqActive()) { startupConsumeActive = true; advanceSphereSequence(); return } // Field Grid Sphere Sequence comes first
   if (!cfg.handOffsetOnStartupEnabled || startupHandOffsetStage !== 0) return
@@ -4050,6 +4376,7 @@ function buildMouseTrackingLogWidget() {
   clearBtn.addEventListener('click', () => clearMouseTrackingLog())
   wrap.appendChild(headerRow)
   wrap.appendChild(mouseTrackingLogEl)
+  makeLogBoxCollapsible(mouseTrackingLogEl, 'Log')
   body.appendChild(wrap)
   logMouseLogViewportContext('start')
 }
@@ -4224,6 +4551,7 @@ function buildHandBehaviourLogWidget() {
   clearBtn.addEventListener('click', () => clearHandBehaviourLog())
   wrap.appendChild(headerRow)
   wrap.appendChild(handBehaviourLogEl)
+  makeLogBoxCollapsible(handBehaviourLogEl, 'Log')
   body.appendChild(wrap)
 }
 // Frame Rate Drop Log's own state -- declared at the TOP of the file
@@ -4333,6 +4661,7 @@ function buildFrameRateLogWidget() {
   clearBtn.addEventListener('click', () => clearFrameRateLog())
   wrap.appendChild(headerRow)
   wrap.appendChild(frameRateLogEl)
+  makeLogBoxCollapsible(frameRateLogEl, 'Log')
   body.appendChild(wrap)
 }
 // Loading Preview Log -- always on (no enable checkbox): the events that matter
@@ -4405,6 +4734,7 @@ function buildLoadingPreviewLogWidget() {
   clearBtn.addEventListener('click', () => clearLoadingPreviewLog())
   wrap.appendChild(headerRow)
   wrap.appendChild(loadingPreviewLogEl)
+  makeLogBoxCollapsible(loadingPreviewLogEl, 'Log')
   body.appendChild(wrap)
 }
 function appendPoseJumpLogLine(line) {
@@ -4517,6 +4847,7 @@ function buildPoseJumpLogWidget() {
   clearBtn.addEventListener('click', () => clearPoseJumpLog())
   wrap.appendChild(headerRow)
   wrap.appendChild(poseJumpLogEl)
+  makeLogBoxCollapsible(poseJumpLogEl, 'Log')
   body.appendChild(wrap)
 }
 function appendRenderReorderLogLine(line) {
@@ -4564,6 +4895,7 @@ function buildRenderReorderLogWidget() {
   clearBtn.addEventListener('click', () => clearRenderReorderLog())
   wrap.appendChild(headerRow)
   wrap.appendChild(renderReorderLogEl)
+  makeLogBoxCollapsible(renderReorderLogEl, 'Log')
   body.appendChild(wrap)
 }
 // Debug > Snapshot (2026-10-11): ONE log of the moment the button is pressed, replacing the previous one. Each ticked category writes the CURRENT state plus the last lines of the matching running log.
@@ -4596,6 +4928,7 @@ function buildSnapshotWidget() {
   clearBtn.addEventListener('click', () => { snapshotText = ''; snapshotLogEl.textContent = '' })
   wrap.appendChild(headerRow)
   wrap.appendChild(snapshotLogEl)
+  makeLogBoxCollapsible(snapshotLogEl, 'Log')
   g.appendChild(wrap)
 }
 function takeDebugSnapshot() {
@@ -6865,9 +7198,34 @@ function updateCameraMaxExtentsBound() {
 // at runtime (checkbox onChange, or endClickHoldPose()'s own call),
 // never during module init.
 function applyCameraLockState() {
-  const anyHoldActive = clickHoldPoseTriggers.chp.active || clickHoldPoseTriggers.rchp.active
-  controls.enablePan = !cfg.lockCameraPan && !anyHoldActive
-  controls.enableZoom = !cfg.lockCameraZoom
+  // Every hold trigger counts, not only chp / rchp: startClickHoldPose() turns pan off for any of them, so a custom Click+Hold has to keep it off too.
+  let anyHoldActive = false
+  for (const k in clickHoldPoseTriggers) { const t = clickHoldPoseTriggers[k]; if (t && t.active) { anyHoldActive = true; break } }
+  const pan = !cfg.lockCameraPan && !anyHoldActive
+  const zoom = !cfg.lockCameraZoom
+  if (controls.enablePan !== pan) controls.enablePan = pan
+  if (controls.enableZoom !== zoom) controls.enableZoom = zoom
+}
+// Moves the main camera in world X / Y only so the field mid point (the average of every hand's rest position, the same point as the Debug > FIELD CENTER POINT dot) sits on the
+// camera's pan target. The camera and its target move by the same amount, so zoom distance and orientation are untouched.
+function xyCenterCameraOnField() {
+  let sumX = 0, sumY = 0, n = 0
+  for (const hand of hands) {
+    const p = hand.basePosition
+    if (!p) continue
+    sumX += p.x; sumY += p.y; n++
+  }
+  const midX = n ? sumX / n : (cfg.fieldOffsetX || 0)
+  const midY = n ? sumY / n : (cfg.fieldOffsetY || 0)
+  const dx = midX - controls.target.x
+  const dy = midY - controls.target.y
+  camera.position.x += dx
+  camera.position.y += dy
+  controls.target.x += dx
+  controls.target.y += dy
+  controls.update()
+  syncCameraPanelFromLive()
+  sceneNeedsRedraw = true
 }
 const _cameraExtentTargetScratch = new THREE.Vector3()
 const _cameraExtentOffsetScratch = new THREE.Vector3()
@@ -7912,6 +8270,29 @@ function updateLoadingPreviewSequenceVisibility() {
   const speedRow = document.querySelector('.dp-row[data-key="loadingPreviewSpeedMs"]')
   if (speedRow) speedRow.style.display = isCount ? 'none' : ''
 }
+// Easing Curve for the Loading Preview (2026-10-12). Parses the curve text
+// into loadingPreviewEasingTrig; a bad edit keeps the last good curve, same
+// as every other curve parser in this file.
+function parseLoadingPreviewEasingConfig() {
+  try { loadingPreviewEasingTrig.easingCurveParsed = JSON.parse(cfg.loadingPreviewEasingCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+}
+// Hides the curve while the Easing gate is off, same as the click functions'
+// own Easing curve row (updateSingleTimingGateVisibility()). Guarded: the
+// restore can fire this before the row exists.
+function updateLoadingPreviewEasingCurveVisibility(on) {
+  const row = document.querySelector('.dp-row[data-key="loadingPreviewEasingCurve"]')
+  if (row) row.style.display = on ? '' : 'none'
+}
+// Builds the curve editor and wraps the on/off gate + curve into the "Easing"
+// subgroup, the same way wrapClickFunctionGatedSubgroups() does for each
+// click function. Called once from the startup block, after the panel exists.
+function setupLoadingPreviewEasingGroup() {
+  parseLoadingPreviewEasingConfig()
+  const curveRow = document.querySelector('.dp-row[data-key="loadingPreviewEasingCurve"]')
+  if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Lap Progress (0-100%)  ·  Y: Speed (0=Slowest, 1=Fastest)', defaultPoints: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] })
+  wrapGatedSubgroup('loadingPreviewEasingCurveEnabled', ['loadingPreviewEasingCurve'], 'Easing')
+  updateLoadingPreviewEasingCurveVisibility(!!cfg.loadingPreviewEasingCurveEnabled)
+}
 // Plays the selected Tween Sequence (every named pose in it) for as
 // long as the loading screen stays up, per the Sequence Mode
 // (Count/Loop/Oscillate) settings -- same lap-based mechanism as
@@ -7994,6 +8375,12 @@ function updateLoadingPreviewAnimation() {
     ? Math.max((cfg.loadingMinTimeMs || 0) / totalLaps, 1)
     : Math.max(safeTweenSpeedMs(cfg.loadingPreviewSpeedMs), 1)
   const lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / speedMs, 0, 1)
+  // Easing Curve (2026-10-12): reshapes WHERE in the lap the pose sits, not
+  // how long a lap lasts. The profile's own total is discarded here on
+  // purpose -- Count mode's Min Loading Time / Count split must still hold --
+  // so this only uses the profile's shape (easingProfilePAt() maps linear lap
+  // time to eased position over the same 0-1 range).
+  const easedT = cfg.loadingPreviewEasingCurveEnabled ? easingProfilePAt(getEasingProfile('loadingPreview', true, loadingPreviewEasingTrig), lapT) : lapT
   let values
   if (segments.length === 0) {
     // Only the anchor pose itself, nothing after it (a single-pose
@@ -8002,10 +8389,10 @@ function updateLoadingPreviewAnimation() {
     // just returning that one pose's own values, static.
     values = anchorPose
   } else if (lapStyle === 'Oscillate') {
-    const t = loadingPreviewDirection === 1 ? lapT : 1 - lapT
+    const t = loadingPreviewDirection === 1 ? easedT : 1 - easedT
     values = lerpTweenSegments(segments, t)
   } else if (cfg.loadingPreviewSequenceLoopTransition === false) {
-    values = lerpTweenSegments(segments, lapT) // instant jump back to frame 1 between laps -- same forward pass every time, no wrap interpolation
+    values = lerpTweenSegments(segments, easedT) // instant jump back to frame 1 between laps -- same forward pass every time, no wrap interpolation
   } else {
     // Smooth wrap-back -- same cyclic-ring approach lerpLoopSequence()
     // used before this fix, generalized to WEIGHTED segments (a Hold's
@@ -8017,7 +8404,7 @@ function updateLoadingPreviewAnimation() {
     // when every segment had weight 1.
     const ringSegments = segments.concat([{ poseA: lastPose, poseB: anchorPose, weight: 1 }])
     const totalRingWeight = ringSegments.reduce((sum, seg) => sum + seg.weight, 0)
-    const tCyclic = (loadingPreviewLapIndex - 1 + lapT) * totalRingWeight
+    const tCyclic = (loadingPreviewLapIndex - 1 + easedT) * totalRingWeight
     values = lerpLoopSegments(ringSegments, tCyclic)
   }
   applyLoadingPreviewPose(values)
@@ -11937,7 +12324,7 @@ function endClickHoldPose(p) {
 // triggers, so a hand can never get stuck mid-transition forever with no
 // way to reach it.
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
   // CORRECTED 2026-09-30 -- see isClickHoldChainContinuation()'s own
   // comment (declared further below, but a plain function declaration is
   // hoisted, and this callback only ever runs on a real later pointerdown
@@ -12727,7 +13114,7 @@ let leftPointerDown = false
 window.addEventListener('pointerdown', (e) => { if (e.button === 0) leftPointerDown = true })
 window.addEventListener('pointerup', (e) => { if (e.button === 0) leftPointerDown = false })
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
   if (e.button !== 0) return
   // This exact pointerup was releasing a Click-Hold-Pose hold, not a
   // standalone click -- see lastPointerupWasHoldRelease's own comment
@@ -12829,7 +13216,7 @@ window.addEventListener('pointerup', (e) => {
 let rightClickPoseClickCount = 0
 let rightClickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
   if (e.button !== 2) return
   if (lastPointerupWasRchpHoldRelease) return
   triggerClickPose('rc')
@@ -12936,7 +13323,7 @@ function isClickHoldChainContinuation(now) {
   return now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs
 }
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
   if (e.button !== 0) return
   const now = performance.now()
   if (isClickHoldChainContinuation(now)) {
@@ -15151,7 +15538,7 @@ function endCustomHoldFunctions(type, ordinal = 1) {
 // (a deliberate "repeat rate," not a one-shot-per-page-load limit).
 let scrollTriggerTimer = null
 window.addEventListener('wheel', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')) return
   if (scrollTriggerTimer) return
   triggerCustomPoseFunctions('Scroll')
   scrollTriggerTimer = setTimeout(() => { scrollTriggerTimer = null }, cfg.multiClickWindowMs)
@@ -16745,7 +17132,7 @@ function setPaused(v) {
 // `?dev=1` one -- this is why its own click handler is wired here,
 // unconditionally, rather than via a DEV_GROUPS onClick. Excluded from
 // every click-hold-pose/click-pose/click-count-chain gesture listener
-// via `.closest('.dp-panel, #pauseButton, #resetButton')` (see those listeners' own
+// via `.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton')` (see those listeners' own
 // guard, main.js) -- clicking it only ever calls setPaused(), never a
 // cursor-tracking-driven pose/tween trigger.
 function updatePauseButtonIcon() {
@@ -17150,9 +17537,19 @@ function animate(dt, now) {
     // OrbitControls damping/pan-extent/panel-sync keep running unchanged
     // regardless of Global Pause, so the user can still look around while
     // paused.
+    // Re-derive pan / zoom enabled from the Lock checkboxes and any active hold every frame, so a missed update (a restore that does not fire onChange, a reset during a hold) can never leave them stuck off.
+    applyCameraLockState()
     controls.update()
     enforceCameraPanExtent()
     syncCameraPanelFromLive()
+    // Camera Preview panels: each one's own OrbitControls needs update() every frame too (keeps a damped glide alive, makes a locked
+    // pan/zoom/rotate take effect), and the shared controls mirror the active panel -- all of it, like the main camera's, regardless of Global Pause.
+    if (!cameraPreviewStartupChecked) {
+      cameraPreviewStartupChecked = true // one-shot: a saved On/Off=checked restored before the engine was ready (sceneNeedsRedraw exists by now)
+      if (cfg.cameraPreviewEnabled && cameraPreviews.length === 0) createCameraPreview()
+    }
+    cameraPreviews.forEach((pc) => pc.controls.update())
+    syncCameraPreviewPanelFromLive()
     armLengthWidgetResyncs.forEach((fn) => fn())
     updateHandNumberLabels()
     updateSphereSequence()
@@ -17458,6 +17855,7 @@ function animate(dt, now) {
     // flag, in case some future change mutates the scene without going
     // through either trigger. controls.update()/panel-sync above are NOT
     // throttled -- camera orbit/pan/zoom stays responsive even while paused.
+    if (cameraPreviewRedrawPending) { cameraPreviewRedrawPending = false; sceneNeedsRedraw = true } // a preview moved/orbited/resized/changed: the paused render-on-demand gate below must redraw
     const __nowForRender = performance.now()
     const __pausedRenderIntervalMs = 1000 / Math.max(1, cfg.pausedRenderFps ?? 15)
     const __pausedSafetyNetIntervalMs = 2000
@@ -17469,6 +17867,7 @@ function animate(dt, now) {
       if (isPaused) { lastPausedRenderMs = __nowForRender; sceneNeedsRedraw = false }
       const __renderStart = performance.now()
       composer.render()
+      renderCameraPreviewViewports() // inside the same gate: while paused the canvas only changes when composer.render() runs, so previews must be drawn with it
       __frameProfiler.composerRenderMs += performance.now() - __renderStart
       __frameProfiler.frames++
       if (fieldStarted && !fieldRevealed && ++fieldRevealFrames >= 2) finalizeReveal() // two painted field frames, then the loading screen goes
@@ -17583,6 +17982,7 @@ updateFloorRowVisibility()
 updateFloor()
 setupHandOffsetStartupGroup()
 setupSphereSequenceGroup()
+setupLoadingPreviewEasingGroup()
 safeRefreshSelectOptions('trackingPoint')
 document.addEventListener('visibilitychange', syncPauseWithVisibility)
 window.addEventListener('blur', syncPauseWithVisibility)

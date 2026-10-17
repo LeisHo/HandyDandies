@@ -3505,6 +3505,17 @@ remains permanently in `CHANGELOG.txt`; this summary keeps only what's
 still relevant to understanding current state, per this doc's own
 "live document, not a log" convention.)
 
+- **Camera Preview** (2026-10-13, ported from 3JS ENGINE/HANDYSET): nested
+  subgroup Camera > "Preview Camera" -- floating, draggable, resizable
+  panels, each showing the field from its own orbiting camera,
+  scissor-rendered into the main canvas inside animate()'s paused-render gate.
+  Previews skip the composer (no Outline Pass / Invert All Colors inside
+  them); Yaw/Pitch orbit the panel's pan target (unlike the main camera's
+  in-place Yaw/Pitch). State lives in the early declarations block and
+  module setup is DOM-only because `sceneNeedsRedraw` is declared far below
+  (TDZ). **Left uncommitted on purpose** -- another session's edits were
+  already in this working tree. Details and verification: CHANGELOG.txt
+  2026-10-13.
 - Initial build: a three.js field of rigged hands that each independently
   rotate to point at the live cursor, reusing HANDO's `Hand2.glb` rigged
   asset and its generic dev-panel engine. Camera pan/zoom (OrbitControls,
