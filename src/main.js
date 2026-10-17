@@ -776,6 +776,7 @@ let fieldRevealed = false, fieldRevealFrames = 0, fieldWarmCompiled = false
 // The field is now warmed behind the loading screen while the preview keeps animating: 1 = compiling the programs without blocking (renderer.compileAsync), 2 = the hands are made visible a few per frame so each
 // frame's first-draw cost stays small, 3 = done (tryStartField() may start the field). The 20000 ms cap is an UNMEASURED judgment call: if warming has not finished by then (a stuck compile), the rest is revealed at once.
 let fieldWarmStage = 0, fieldWarmRevealIndex = 0, fieldWarmStartMs = 0, fieldWarmBatch = 1, fieldWarmLastRenderMs = 0, fieldWarmPrevRenderMs = 0
+let fieldWarmPrevStart = 0, fieldWarmBaseMs = Infinity // warm-up: where the previous batch started, and the cheapest field render seen (the near-empty field)
 // Batch size adapts to how much the last batch ADDED to the draw time (not to the absolute draw time, which a slow GPU has even with nothing new): doubled while a batch added under 10 ms, halved (never below 4) when it added over 25 ms -- both thresholds and the floor of 4 are judgment calls, not measurements.
 const FIELD_WARM_CAP_MS = 20000
 // Exclusive click-function triggers (see enforceExclusiveTrigger()); declared up here because Enabled onChange handlers run during the very first settings restore, before the code further down has executed.
@@ -1166,7 +1167,7 @@ function lpApplyProgressCrop(h, crop, flip) {
   pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
 }
 let lpCropLast = { progress: 0, crop: 0 }
-window.__lpCropDbg = { get cfg() { return cfg }, update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
+window.__lpCropDbg = { get cfg() { return cfg }, frame: (dt, now) => animate(dt, now), visibleHands: () => hands.filter((h) => h.wrapper.visible).length, poseSig: (i) => { const sk = hands[i].skinnedMesh.skeleton; return sk.bones.map((b) => b.quaternion.toArray().map((v) => +v.toFixed(5)).join(',')).join('|') }, reposeAll: () => applyAllFingerPoses(), warm: () => ({ stage: fieldWarmStage, idx: fieldWarmRevealIndex, batch: fieldWarmBatch, hands: hands.length }), update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
 window.__lpCrop = () => ({ ...lpCropLast, boxMs: lpProgressCropBox && lpProgressCropBox.ms, hand1: loadingPreviewHand && loadingPreviewHand.progressCrop ? { ext: loadingPreviewHand.progressCrop.ext, wrist: loadingPreviewHand.progressCrop.wrist, tip: loadingPreviewHand.progressCrop.tip, yMin: loadingPreviewHand.progressCrop.yMin, yMax: loadingPreviewHand.progressCrop.yMax, sgn: loadingPreviewHand.progressCrop.sgn, plane: loadingPreviewHand.progressCrop.uni.value.toArray() } : null, hand2: !!loadingPreviewHand2 }) // debug read-out for tests
 function updateLoadingPreviewProgressCrop() {
   let crop = 0, progress = 0
@@ -1307,10 +1308,16 @@ function advanceFieldWarmup() {
   const capped = performance.now() - fieldWarmStartMs > FIELD_WARM_CAP_MS
   if (fieldWarmStage === 1 && !capped) return // programs still linking (non-blocking); the loading preview keeps animating
   if (fieldWarmRevealIndex > 0) {
-    const added = fieldWarmLastRenderMs - fieldWarmPrevRenderMs
+    // Each batch is drawn ONCE and then hidden again (below), so the last field render drew only that batch: what it cost over the cheapest render so far is what the batch cost. (It used to keep every revealed hand
+    // visible, so the field render - and with it every frame of the loading preview - kept getting longer through the last stretch of loading, up to the full field's draw time.)
+    fieldWarmBaseMs = Math.min(fieldWarmBaseMs, fieldWarmLastRenderMs)
+    const added = fieldWarmLastRenderMs - fieldWarmBaseMs
     if (added < 10) fieldWarmBatch = Math.min(hands.length, Math.max(4, fieldWarmBatch * 2)); else if (added > 25) fieldWarmBatch = Math.max(4, Math.floor(fieldWarmBatch / 2))
   }
   fieldWarmPrevRenderMs = fieldWarmLastRenderMs
+  // The previous batch has been drawn once (its program, buffers and uniforms are on the GPU): hide it again so the next frames stay cheap. Everything is shown together at the end.
+  for (let i = fieldWarmPrevStart; i < fieldWarmRevealIndex; i++) hands[i]._warmHidden = true
+  fieldWarmPrevStart = fieldWarmRevealIndex
   const batch = capped ? hands.length : fieldWarmBatch // starts at 1: the first hand alone carries the one-time geometry upload
   let shown = 0
   while (fieldWarmRevealIndex < hands.length && shown < batch) { hands[fieldWarmRevealIndex++]._warmHidden = false; shown++ }
@@ -1339,7 +1346,9 @@ function tryStartField() {
     fieldWarmStage = 1; fieldWarmCompiled = true; fieldWarmStartMs = performance.now()
     const t0 = performance.now()
     const done = () => { logStartupTiming('renderer.compileAsync() ready after ' + Math.round(performance.now() - t0) + 'ms (' + hands.length + ' hands)'); if (fieldWarmStage === 1) fieldWarmStage = 2 }
-    try { renderer.compileAsync(scene, camera).then(done, done) } catch (err) { done() }
+    // Only a sample of hands (2026-10-16): every hand has the same shader program (same code and parameters), so compiling all 3,025 materials only repeated the same cache lookup (about 390 ms in one block, measured);
+    // the rest are looked up by their first draw during the warm-up reveal. compileAsync(object, camera, scene) compiles just that object's materials, with the scene's lights.
+    try { Promise.all(hands.slice(0, 2).map((h) => renderer.compileAsync(h.wrapper, camera, scene))).then(done, done) } catch (err) { done() }
     setTimeout(() => { if (fieldWarmStage < 3) advanceFieldWarmup() }, FIELD_WARM_CAP_MS + 100) // animate() may not be ticking (hidden tab): finish regardless
   }
   if (fieldWarmStage !== 3) return // advanceFieldWarmup() (animate) calls tryStartField() again when the hands are warmed
@@ -19908,14 +19917,51 @@ function createFieldHand() {
   return hand
 }
 function finishRebuildField() {
+  const __t0 = DEBUG_TIMING ? performance.now() : 0
   relayoutField()
+  const __t1 = DEBUG_TIMING ? performance.now() : 0
   applyStartupHandOffset()
   // relayoutField() only recomputes clone.position/scale -- a freshly
   // rebuilt hand's own skeleton is a brand-new (bind-pose) clone, so every
   // finger/wrist Pose slider needs reapplying too, or a rebuild (e.g.
   // changing row/column count) would silently reset every hand back to
   // its bind pose.
+  const __t2 = DEBUG_TIMING ? performance.now() : 0
   applyAllFingerPoses()
+  const __t3 = DEBUG_TIMING ? performance.now() : 0
+  updateOutlineVisibility()
+  updateHandsVisibility()
+  if (DEBUG_TIMING) logStartupTiming('finishRebuildField(): relayout ' + Math.round(__t1 - __t0) + 'ms, startup offset ' + Math.round(__t2 - __t1) + 'ms, finger poses ' + Math.round(__t3 - __t2) + 'ms, outline+visibility ' + Math.round(performance.now() - __t3) + 'ms')
+  if (!framedOnce) {
+    framedOnce = true
+    const w = (cfg.fieldCols - 1) * cfg.columnSpacing
+    const h = (cfg.fieldRows - 1) * cfg.rowSpacing
+    sceneState.fieldRadius = Math.max(Math.sqrt(w * w + h * h) / 2, Math.min(cfg.rowSpacing, cfg.columnSpacing))
+    updateKeyLightPosition()
+  }
+}
+// Startup version of finishRebuildField() (2026-10-16, direct report: the loading preview froze for a second or two). Measured on the 55 x 55 (3,025 hand) field: the finger-pose pass over every new hand was ~340 ms in one block
+// (applyCurl() also ran scene.updateMatrixWorld(true) over the WHOLE scene once per finger, 5 times). Here the hands are hidden first (they were just added to the scene; without this the in-between frames would draw all of
+// them), then each hand is posed on its own - wrist first, then one matrix update of that hand, then the five fingers (the same order as applyAllFingerPoses(); a finger only depends on its own parent chain) - in slices that
+// yield a frame. Everything else is the same as finishRebuildField().
+async function finishRebuildFieldSliced() {
+  const __tf = DEBUG_TIMING ? performance.now() : 0
+  updateHandsVisibility() // hides the warm-up hands before the first yield
+  relayoutField()
+  applyStartupHandOffset()
+  if (modelLoaded) {
+    const yielder = makeSliceYielder(8)
+    for (let i = 0; i < hands.length; i++) {
+      const hand = hands[i]
+      if (hand.skinnedMesh) {
+        applyWristPoseToSkeleton(hand.skinnedMesh.skeleton)
+        hand.wrapper.updateMatrixWorld(true)
+        FINGER_NAMES.forEach((name) => applyCurlToSkeleton(name, hand.skinnedMesh.skeleton, cloneBaseQuat, hand.wrapper.quaternion))
+      }
+      await yielder()
+    }
+  }
+  if (DEBUG_TIMING) logStartupTiming('finishRebuildFieldSliced(): ' + Math.round(performance.now() - __tf) + 'ms wall (sliced)')
   updateOutlineVisibility()
   updateHandsVisibility()
   if (!framedOnce) {
@@ -19989,12 +20035,15 @@ async function rebuildFieldChunked() {
     fieldBuildFrac = total ? pending.length / total : 1
     await yieldFrame()
   }
+  const __ta = DEBUG_TIMING ? performance.now() : 0
   hands.forEach((hand) => scene.remove(hand.wrapper))
   hands.length = 0
   // Behind the loading screen the hands are added HIDDEN and shown a few per frame (advanceFieldWarmup()) so the field's first draw is not one big frame.
   pending.forEach((hand) => { if (!fieldStarted) hand._warmHidden = true; scene.add(hand.wrapper); hands.push(hand) })
+  if (DEBUG_TIMING) logStartupTiming('field build tail: scene.add x' + pending.length + ' ' + Math.round(performance.now() - __ta) + 'ms')
   fieldBuildInProgress = false
-  finishRebuildField()
+  if (fieldStarted) finishRebuildField()
+  else await finishRebuildFieldSliced() // behind the loading screen: the same work in ~8 ms slices, so the loading preview keeps animating
   logLoadingPreview(`field built behind the loading screen: ${total} hands in ${slices} slices over ${Math.round(performance.now() - t0All)}ms`)
   if (fieldBuildDirty) { fieldBuildDirty = false; rebuildField() }
 }
