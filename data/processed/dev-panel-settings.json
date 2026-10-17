@@ -16448,8 +16448,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":94}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5056890012642226,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5121113503476612,\"y\":0}}]",
+      "armLengthRange": "{\"min\":43,\"max\":96}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34163409640796577,\"y\":-0.3638020833333333}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5121113503476612,\"y\":0}}]",
       "armLengthDamping": 0.08,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -37026,8 +37026,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":94}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5056890012642226,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5121113503476612,\"y\":0}}]",
+      "armLengthRange": "{\"min\":43,\"max\":96}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34163409640796577,\"y\":-0.3638020833333333}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5121113503476612,\"y\":0}}]",
       "armLengthDamping": 0.24,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -57604,8 +57604,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":0,\"max\":94}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5056890012642226,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5121113503476612,\"y\":0}}]",
+      "armLengthRange": "{\"min\":43,\"max\":96}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.34163409640796577,\"y\":-0.3638020833333333}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5121113503476612,\"y\":0}}]",
       "armLengthDamping": 0.08,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -63066,7 +63066,7 @@
           "type": "group",
           "group": {
             "key": "Outline",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -63605,7 +63605,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -63814,7 +63814,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (4)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -63871,7 +63871,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Velocity",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -64045,7 +64045,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Angle to Velocity 1",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
