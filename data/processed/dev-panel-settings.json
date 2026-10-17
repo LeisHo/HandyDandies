@@ -20670,7 +20670,7 @@
       "alternateRowOffset": -7,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": false,
+      "hideHands": true,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
       "fieldOffsetZ": 0,
@@ -20728,7 +20728,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 0,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -61938,7 +61938,7 @@
           "type": "group",
           "group": {
             "key": "Pause Button",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -62027,7 +62027,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -62058,7 +62058,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -62430,7 +62430,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -69388,10 +69388,10 @@
       "height": 617.1875
     },
     "mobile": {
-      "left": 59.61309814453125,
-      "top": 237.88690185546875,
-      "width": 355.38690185546875,
-      "height": 535.1369018554688
+      "left": 35.613094329833984,
+      "top": 282.41668701171875,
+      "width": 358.81549072265625,
+      "height": 492.125
     }
   }
 }
