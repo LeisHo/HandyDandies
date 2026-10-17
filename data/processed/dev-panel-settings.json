@@ -14,7 +14,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD_IK_500",
+      "handModelId": "repo:HD_IK_1k",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -540,7 +540,7 @@
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
       "loadingPreviewRotationX": -86.01368143278576,
-      "loadingPreviewRotationY": 163.3350277982371,
+      "loadingPreviewRotationY": 163.33502779823706,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -20182,7 +20182,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD_IK_500",
+      "handModelId": "repo:HD_IK_1k",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -20433,7 +20433,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 0,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -20608,7 +20608,7 @@
           "targetZ": -36.1786236132897
         }
       ],
-      "loadingPreviewCameraSelector": "LOADING HANDS - MOBILE",
+      "loadingPreviewCameraSelector": "Loading Preview Camera 17",
       "loadingPreviewSavedLighting": [
         {
           "name": "3 Tone - SideFront",
@@ -20677,7 +20677,7 @@
           "ambientGroundColor": "#3a2f2a"
         }
       ],
-      "loadingPreviewLightingSelector": "LOADING HANDS",
+      "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
       "loadingPreviewKeyAzimuth": 52,
       "loadingPreviewKeyElevation": 0,
       "loadingPreviewKeyLightType": "Directional",
@@ -20688,7 +20688,7 @@
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
-      "loadingPreviewSpeedMs": 700,
+      "loadingPreviewSpeedMs": 1150,
       "loadingPreviewEasingCurveEnabled": false,
       "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "loadingPreviewHand2ExtraX": 0,
@@ -20699,7 +20699,7 @@
       "loadingPreviewSequenceCountMode": "Loop",
       "loadingPreviewSequenceLoopTransition": true,
       "loadingPreviewSequenceHoldMs": 0,
-      "loadingPreviewSize": 1390,
+      "loadingPreviewSize": 1600,
       "loadingPreviewLayout": "{\"loadingPreviewCanvas\":{\"layout\":{\"position\":{\"mode\":\"anchor\",\"horizontal\":{\"anchor\":\"center\",\"offset\":\"0px\"},\"vertical\":{\"anchor\":\"center\",\"offset\":\"0px\"}},\"size\":{\"width\":{\"mode\":\"fixed\",\"value\":\"1600px\"},\"height\":{\"mode\":\"fixed\",\"value\":\"1600px\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{\"widthValue\":\"1390px\",\"heightValue\":\"1390px\"}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}},\"loadingPreviewText\":{\"layout\":{\"position\":{\"mode\":\"anchor\",\"horizontal\":{\"anchor\":\"left\",\"offset\":\"1.5%\"},\"vertical\":{\"anchor\":\"bottom\",\"offset\":\"4%\"}},\"size\":{\"width\":{\"mode\":\"content\"},\"height\":{\"mode\":\"content\"}}},\"contexts\":{\"mobilePortrait\":{\"enabled\":true,\"overrides\":{}},\"mobileLandscape\":{\"enabled\":true,\"overrides\":{}}}}}",
       "loadingPreviewLayoutOnMobile": true,
       "loadingPreviewScalePct": 100,
@@ -20708,7 +20708,7 @@
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
       "loadingPreviewRotationX": -86.01368143278576,
-      "loadingPreviewRotationY": 163.3350277982371,
+      "loadingPreviewRotationY": 163.33502779823706,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -40350,7 +40350,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD_IK_500",
+      "handModelId": "repo:HD_IK_1k",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -40876,7 +40876,7 @@
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
       "loadingPreviewRotationX": -86.01368143278576,
-      "loadingPreviewRotationY": 163.3350277982371,
+      "loadingPreviewRotationY": 163.33502779823706,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -61120,7 +61120,7 @@
           "type": "group",
           "group": {
             "key": "Background",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -61142,7 +61142,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -61831,7 +61831,7 @@
           "type": "group",
           "group": {
             "key": "Outline",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -62370,7 +62370,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -63027,7 +63027,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -63076,7 +63076,7 @@
           "type": "group",
           "group": {
             "key": "New Group (16)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -66146,7 +66146,7 @@
     "mobile": {
       "custom13RetransitionSpeedCurveEnabled": true,
       "loadingPreviewCameraEditMode": true,
-      "loadingPreviewSpeedMs": true,
+      "loadingPreviewSpeedMs": false,
       "custom13Enabled": true,
       "custom13Type": true,
       "custom13TouchPointCount": true,
@@ -66403,15 +66403,15 @@
       "loadingPreviewOffsetZ": true,
       "loadingPreviewCameraFov": true,
       "loadingPreviewCameraZoom": true,
-      "loadingPreviewTweenSelector": true,
-      "loadingPreviewCameraSelector": true,
-      "loadingPreviewLightingSelector": true,
-      "loadingPreviewSequenceMode": true,
-      "loadingPreviewSequenceCountMode": true,
-      "loadingPreviewSequenceCount": true,
-      "loadingPreviewSize": true,
-      "loadingPreviewSequenceHoldMs": true,
-      "loadingPreviewSequenceLoopTransition": true,
+      "loadingPreviewTweenSelector": false,
+      "loadingPreviewCameraSelector": false,
+      "loadingPreviewLightingSelector": false,
+      "loadingPreviewSequenceMode": false,
+      "loadingPreviewSequenceCountMode": false,
+      "loadingPreviewSequenceCount": false,
+      "loadingPreviewSize": false,
+      "loadingPreviewSequenceHoldMs": false,
+      "loadingPreviewSequenceLoopTransition": false,
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
@@ -68492,7 +68492,10 @@
       "custom54Trig1RotationCurveVisibleOnly": false,
       "custom54Trig1RotationXCurveEnabled": false,
       "custom54Trig1RotationYCurveEnabled": false,
-      "custom54Trig1RotationZCurveEnabled": false
+      "custom54Trig1RotationZCurveEnabled": false,
+      "loadingPreviewHand2ExtraY": false,
+      "loadingPreviewHand2ExtraZ": false,
+      "loadingPreviewHand2ExtraX": false
     },
     "landscape": {}
   },
