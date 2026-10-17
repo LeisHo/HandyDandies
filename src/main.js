@@ -416,41 +416,29 @@ const _brAX = new THREE.Vector3(1, 0, 0), _brAY = new THREE.Vector3(0, 1, 0), _b
 // Render Order Mode / Fallback options (2026-10-11). Z modes order by a Z position (closest to the camera on top); the cursor modes order by distance to the cursor: XY = screen-space only, XYZ = also the Z gap
 // to the cursor target (its Cursor Target Depth). 'closest' = nearest the cursor on top, 'farthest' = furthest on top.
 // '-' modes (2026-10-11): the same Z with the sign flipped, so the hand with the LOWER Z value is drawn on top.
-const RO_NEG_BASE = { negZ: 'z', negArmBase: 'armBase', negArmEnd: 'armEnd', negPalmCenter: 'palmCenter', negCamPalmCenter: 'camPalmCenter', negCamArmBase: 'camArmBase', negCamArmEnd: 'camArmEnd' }
-// "Closest to Camera (XY)" modes (2026-10-16): the same points (rig nodes), ordered by their XY distance to the camera - how far the point sits from the centre of the view on screen (the camera's own X / Y; depth is ignored), the
-// same screen-space meaning as the (XY) cursor modes but measured to the camera. Scalar: the point nearer the camera's XY is drawn on top. Pair modes: the same former-hand rule as the Z pair modes below, comparing those
-// distances instead of Z. The '-' versions reverse the verdict.
-const RO_CAM_NODES = { camPalmCenter: 'palmCenter', camArmBase: 'armBase', camArmEnd: 'armEnd' }
-const RO_CAM_PAIR_NEG = { negCamArmBaseToPalm: 'camArmBaseToPalm', negCamArmEndToPalm: 'camArmEndToPalm', negCamArmEndToArmBase: 'camArmEndToArmBase' }
-const RO_CAM_PAIR_DEFS = { camArmBaseToPalm: ['armBase', 'palmCenter'], camArmEndToPalm: ['armEnd', 'palmCenter'], camArmEndToArmBase: ['armEnd', 'armBase'] }
-// '-' pair modes (2026-10-11): the same test with the verdict reversed (the LOWER former point goes on top).
-const RO_PAIR_NEG = { negPalmToArm: 'palmToArm', negPalmToArmEnd: 'palmToArmEnd', negArmBaseToPalm: 'armBaseToPalm', negArmEndToPalm: 'armEndToPalm', negArmBaseToArmEnd: 'armBaseToArmEnd', negArmEndToArmBase: 'armEndToArmBase' }
-const RO_PAIR_DEFS = { palmToArm: ['palmCenter', 'armBase'], palmToArmEnd: ['palmCenter', 'armEnd'], armBaseToPalm: ['armBase', 'palmCenter'], armEndToPalm: ['armEnd', 'palmCenter'], armBaseToArmEnd: ['armBase', 'armEnd'], armEndToArmBase: ['armEnd', 'armBase'] }
-const RENDER_ORDER_MODE_OPTIONS = [
-  { value: 'none', text: 'None' },
-  { value: 'z', text: 'Z Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' },
-  { value: 'negZ', text: '-Z Position' }, { value: 'negArmBase', text: '-Arm Base' }, { value: 'negArmEnd', text: '-Arm End' }, { value: 'negPalmCenter', text: '-Palm Center' },
-  { value: 'closest', text: 'Closest To Cursor (XY)' }, { value: 'farthest', text: 'Farthest From Cursor (XY)' },
-  { value: 'closestZ', text: 'Closest To Cursor (XYZ)' }, { value: 'farthestZ', text: 'Farthest From Cursor (XYZ)' },
-  { value: 'palmToArm', text: 'Palm To Arm Base' },
-  { value: 'palmToArmEnd', text: 'Palm To Arm End' },
-  { value: 'armBaseToPalm', text: 'Arm Base To Palm Center' },
-  { value: 'armEndToPalm', text: 'Arm End To Palm Center' },
-  { value: 'armBaseToArmEnd', text: 'Arm Base To Arm End' },
-  { value: 'armEndToArmBase', text: 'Arm End To Arm Base' },
-  { value: 'negPalmToArm', text: '-Palm To Arm Base' },
-  { value: 'negPalmToArmEnd', text: '-Palm To Arm End' },
-  { value: 'negArmBaseToPalm', text: '-Arm Base To Palm Center' },
-  { value: 'negArmEndToPalm', text: '-Arm End To Palm Center' },
-  { value: 'negArmBaseToArmEnd', text: '-Arm Base To Arm End' },
-  { value: 'negArmEndToArmBase', text: '-Arm End To Arm Base' },
-  { value: 'camArmBaseToPalm', text: 'Arm Base To Palm Center Closest to Camera (XY)' }, { value: 'negCamArmBaseToPalm', text: '-Arm Base To Palm Center Closest to Camera (XY)' },
-  { value: 'camArmEndToPalm', text: 'Arm End To Palm Center Closest to Camera (XY)' }, { value: 'negCamArmEndToPalm', text: '-Arm End To Palm Center Closest to Camera (XY)' },
-  { value: 'camArmEndToArmBase', text: 'Arm End To Arm Base Closest to Camera (XY)' }, { value: 'negCamArmEndToArmBase', text: '-Arm End To Arm Base Closest to Camera (XY)' },
-  { value: 'camPalmCenter', text: 'Palm Center Closest to Camera (XY)' }, { value: 'negCamPalmCenter', text: '-Palm Center Closest to Camera (XY)' },
-  { value: 'camArmBase', text: 'Arm Base Closest to Camera (XY)' }, { value: 'negCamArmBase', text: '-Arm Base Closest to Camera (XY)' },
-  { value: 'camArmEnd', text: 'Arm End Closest to Camera (XY)' }, { value: 'negCamArmEnd', text: '-Arm End Closest to Camera (XY)' }
+// ---- Render Order RULES (2026-10-16, direct request: "redesign it so it has the full functionality of the kind of logic i want") ----
+// The old Mode / Fallback / Except / + And / + Or / - Subtract dropdowns are gone. Render order is an ordered list of rules; the first rule that decides a pair of hands wins.
+//  - IF rule: IF <conditions joined by AND / OR> THEN Hand A (or Hand B) renders on top. A condition compares a set of points of one hand with a set of points of another hand under one measure, with all / any on each side:
+//    "all of Hand A's [Arm Base + Palm Center] Z is higher than all of Hand B's [...]" = every A value beats every B value. Every rule is tried both ways round (either hand can be A); a rule that fires for both
+//    labellings with different winners, or for neither, does not decide the pair (the next rule does).
+//  - Sort rule: Order by <point> <measure>, closest / highest on top (or the reverse): a plain total order, like the old scalar modes.
+// Measures (a bigger key is better): cam = minus the point's XY distance to the camera (how far it sits from the centre of the view on screen, depth ignored), z = Z toward the camera, cur = minus the screen XY
+// distance to the cursor, cur3 = minus the 3D distance to the cursor target. "beats" reads closer than / higher than, "loses" farther than / lower than. Two values within 0.01 world units are equal.
+const RO_POINTS = [
+  { value: 'palmCenter', text: 'Palm Center' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'position', text: 'Hand Position' },
+  { value: 'middleTip', text: 'Middle Finger Tip' }, { value: 'thumbTip', text: 'Thumb Tip' }, { value: 'pinkyTip', text: 'Pinky Tip' }
 ]
+const RO_MEASURES = [{ value: 'cam', text: 'Camera XY' }, { value: 'z', text: 'Z (Toward Camera)' }, { value: 'cur', text: 'Cursor XY' }, { value: 'cur3', text: 'Cursor XYZ' }]
+const RO_DEFAULT_RULES = JSON.stringify({ v: 3, rules: [
+  // 1: every point of A (arm base + palm center) is nearer the camera in Z than every point of B -> A on top
+  { t: 'if', on: true, join: 'and', win: 'A', conds: [{ xs: 'A', xp: ['armBase', 'palmCenter'], xq: 'all', m: 'z', cmp: 'beats', ys: 'B', yp: ['armBase', 'palmCenter'], yq: 'all' }] },
+  // 2: A's palm is nearer the camera XY than B's palm, AND B's palm is nearer than A's arm base -> B on top
+  { t: 'if', on: true, join: 'and', win: 'B', conds: [
+    { xs: 'A', xp: ['palmCenter'], xq: 'all', m: 'cam', cmp: 'beats', ys: 'B', yp: ['palmCenter'], yq: 'all' },
+    { xs: 'B', xp: ['palmCenter'], xq: 'all', m: 'cam', cmp: 'beats', ys: 'A', yp: ['armBase'], yq: 'all' }] },
+  // 3: whatever the rules above leave undecided: the hand nearest the camera in Z on top
+  { t: 'sort', on: true, p: 'position', m: 'z', dir: 'best' }
+] })
 // Cursor tracking point (2026-10-11): the point on each hand that every cursor-tracking measurement (aim, palm angle, screen-space distances, splay / crop distances) is taken from. Computed at the hand's
 // no-tracking pose (so it does not chase the rotation it drives). hand._trk = world position, hand._trkXY = its screen-space distance to the cursor.
 const TRACKING_POINT_OPTIONS = [{ value: 'hand', text: 'Hand Position' }, { value: 'armBase', text: 'Arm Base' }, { value: 'armEnd', text: 'Arm End' }, { value: 'palmCenter', text: 'Palm Center' }]
@@ -1185,7 +1173,7 @@ function lpApplyProgressCrop(h, crop, flip) {
   pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
 }
 let lpCropLast = { progress: 0, crop: 0 }
-window.__lpCropDbg = { get cfg() { return cfg }, frame: (dt, now) => animate(dt, now), previewSeq: () => { const r = loadingPreviewHand && loadingPreviewHand.clipRig; return { done: loadingPreviewSequenceDone, lap: loadingPreviewLapIndex, startup: lpPrevStartupPhase, cropT: r ? +(1 - (r.baseY - r.block.position.y) / r.topY0).toFixed(3) : (loadingPreviewHand && loadingPreviewHand.wristClipPlane ? +loadingPreviewHand.wristClipPlane.constant.toFixed(4) : null), animT: +lpAnimT.toFixed(3), progress: +loadingProgressNow(true).toFixed(3) } }, visibleHands: () => hands.filter((h) => h.wrapper.visible).length, poseSig: (i) => { const sk = hands[i].skinnedMesh.skeleton; return sk.bones.map((b) => b.quaternion.toArray().map((v) => +v.toFixed(5)).join(',')).join('|') }, reposeAll: () => applyAllFingerPoses(), warm: () => ({ stage: fieldWarmStage, idx: fieldWarmRevealIndex, batch: fieldWarmBatch, hands: hands.length }), update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
+window.__lpCropDbg = { get cfg() { return cfg }, frame: (dt, now) => animate(dt, now), previewSeq: () => { const r = loadingPreviewHand && loadingPreviewHand.clipRig; return { done: loadingPreviewSequenceDone, lap: loadingPreviewLapIndex, startup: lpPrevStartupPhase, cropT: r ? +(1 - (r.baseY - r.block.position.y) / r.topY0).toFixed(3) : (loadingPreviewHand && loadingPreviewHand.wristClipPlane ? +loadingPreviewHand.wristClipPlane.constant.toFixed(4) : null), animT: +lpAnimT.toFixed(3), progress: +loadingProgressNow(true).toFixed(3) } }, visibleHands: () => hands.filter((h) => h.wrapper.visible).length, poseSig: (i) => { const sk = hands[i].skinnedMesh.skeleton; return sk.bones.map((b) => b.quaternion.toArray().map((v) => +v.toFixed(5)).join(',')).join('|') }, reposeAll: () => applyAllFingerPoses(), warm: () => ({ stage: fieldWarmStage, idx: fieldWarmRevealIndex, batch: fieldWarmBatch, hands: hands.length }), update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, roHands: () => hands, roCmp: (a, b) => roLastCmp(a, b), roPoint: (i, p) => { const v = new THREE.Vector3(); roPointInto(hands[i], p, v); return v.toArray() }, roSetRules: (obj) => { cfg.renderOrderRules = JSON.stringify(obj) }, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
 window.__lpCrop = () => ({ ...lpCropLast, boxMs: lpProgressCropBox && lpProgressCropBox.ms, hand1: loadingPreviewHand && loadingPreviewHand.progressCrop ? { ext: loadingPreviewHand.progressCrop.ext, wrist: loadingPreviewHand.progressCrop.wrist, tip: loadingPreviewHand.progressCrop.tip, yMin: loadingPreviewHand.progressCrop.yMin, yMax: loadingPreviewHand.progressCrop.yMax, sgn: loadingPreviewHand.progressCrop.sgn, plane: loadingPreviewHand.progressCrop.uni.value.toArray() } : null, hand2: !!loadingPreviewHand2 }) // debug read-out for tests
 function updateLoadingPreviewProgressCrop() {
   let crop = 0, progress = 0
@@ -1520,15 +1508,7 @@ const _lookAtQuatScratch = new THREE.Quaternion()
 // Render Order Mode (Z Position / Arm Base / Arm End / Palm Center use this Z; Closest / Farthest To Cursor skip it, see the render-order line in updateRenderOrder()): the Z (world) that orders a hand against the others. 'z' = the hand's field position (the old behaviour); the others read a rig node's world Z from the previous render
 // (matrixWorld, so one frame old at most): armBase = the head of rForearmBend (1st node of the chain), armEnd = the head of rHand = the end (tail) of rForearmTwist (3rd node),
 // palmCenter = the head of rMid1 = the end (tail) of rCarpal2. A missing bone falls back to the field position.
-const RENDER_ORDER_NODES = { armBase: 'rForearmBend', armEnd: 'rHand', palmCenter: 'rMid1' }
-// Z of the point a Z mode stands for: 'z' = the field position, 'armBase' / 'armEnd' / 'palmCenter' = that rig node. Takes the mode explicitly (it used to read cfg.renderOrderMode, so a Z mode chosen as a FALLBACK silently used the primary mode's node).
-function renderOrderModeZ(hand, mode) {
-  if (!mode || mode === 'z' || !RENDER_ORDER_NODES[mode]) return hand.wrapper.position.z
-  const bone = renderOrderBone(hand, mode)
-  return bone ? bone.matrixWorld.elements[14] : hand.wrapper.position.z
-}
-// Priority of a hand under one mode, in world units, higher = drawn on top. Z modes: Z toward the camera. Cursor modes: +/- the distance to the cursor (XY = hand._xyCursorDist, computed each frame before the
-// per-hand loop; XYZ = hand.effectiveRenderOrder, the 3D distance to the cursor target with the overlap smoothing).
+const RENDER_ORDER_NODES = { armBase: 'rForearmBend', armEnd: 'rHand', palmCenter: 'rMid1', middleTip: 'rMid3', thumbTip: 'rThumb3', pinkyTip: 'rPinky3' } // the finger tips are the heads of the last finger bones (rMid3 / rThumb3 / rPinky3)
 // World position of a rig node (previous render's matrixWorld) used by the render-order modes: key = 'armBase' | 'palmCenter' (| 'armEnd'). Returns the bone or null.
 function renderOrderBone(hand, key) {
   if (!hand.skinnedMesh) return null
@@ -1539,10 +1519,9 @@ function renderOrderBone(hand, key) {
 // Per-frame render ordering across ALL hands (2026-10-11): the Mode, Fallback and Fallback 2 dropdowns are three levels of one sort; the sorted position becomes each hand's renderOrder (0..n-1, so the values stay small and
 // exact). A level is either a scalar priority (Z modes, cursor-distance modes; two hands tie when they agree to 0.01 world units) or "Palm To Arm Base", a pairwise rule: hand A goes above hand B when A's palm center is higher
 // in Z than B's arm base (by more than 0.01); when each hand's palm is higher than the other's arm base, the hand whose arm base is FARTHER from the cursor on screen (XY only, no Z) goes above; when neither is, the level ties.
-let roKindXY = false, roPriority = 0
+let roKindXY = false, roPriority = 0, roLastCmp = null
 const RO_NEIGHBOURS = 8 // a hand is only compared with this many nearest hands (screen XY) in the pairwise render-order modes
 let roOrder = [], roPalmZ = null, roBaseZ = null, roBaseXY = null, roEndZ = null, roEndXY = null, roSX = null, roSY = null, roSR = null, roIndeg = null, roHead = null, roDone = null, roVis = null, roLayer = null, roLockIndeg = null, roPos = null
-const roScalar = {}
 const _roV = new THREE.Vector3()
 // ---- Pairwise render-order support (2026-10-11) ----
 // Each hand's K = RO_NEIGHBOURS nearest hands in screen-space XY, as unique pairs: roPairLo[t] < roPairHi[t], t < the returned count.
@@ -1632,85 +1611,63 @@ function roUpdateSequences() {
   }
 }
 let roPrevRank = null, roLocks = new Map(), roLockPruneCounter = 0
-const roLevelName = (l) => (l === 0 ? 'Mode' : 'Fallback ' + l)
-// Mode terms (+ And / + Or / - Subtract) and the extra Fallback levels are JSON lists kept in two hidden text controls (see buildRenderOrderWidgets()); parsed once per distinct string.
-const RO_VALID_MODES = new Set(RENDER_ORDER_MODE_OPTIONS.map((o) => o.value))
-const roA2A = {}
-let roExtraStr = null, roExtraVal = []
-const roTermsCache = new Map()
-const roCleanTerms = (a) => (Array.isArray(a) ? a.filter((t) => t && (t.op === 'and' || t.op === 'or' || t.op === 'sub') && RO_VALID_MODES.has(t.m) && t.m !== 'none') : [])
-// Every level (Mode, Fallback, Fallback 2, each extra fallback) has its OWN + And / + Or / - Subtract list, stored as JSON.
-function roTermsOf(str) {
-  str = str || '[]'
-  let v = roTermsCache.get(str)
-  if (v) return v
-  v = []
-  try { v = roCleanTerms(JSON.parse(str)) } catch (e) { /* none */ }
-  if (roTermsCache.size > 64) roTermsCache.clear()
-  roTermsCache.set(str, v)
-  return v
+const roLevelName = (l) => 'Rule ' + (l + 1)
+// ---- Render Order Rules: parsing, text, and the per-frame point keys ----
+const RO_PT_TEXT = {}
+RO_POINTS.forEach((o) => { RO_PT_TEXT[o.value] = o.text })
+const RO_PT_OK = new Set(RO_POINTS.map((o) => o.value)), RO_M_OK = new Set(RO_MEASURES.map((o) => o.value))
+function roCleanPts(a) { const v = Array.isArray(a) ? a.filter((p) => RO_PT_OK.has(p)) : []; return v.length ? v : ['palmCenter'] }
+function roCleanCond(c) {
+  c = c || {}
+  return { xs: c.xs === 'B' ? 'B' : 'A', xp: roCleanPts(c.xp), xq: c.xq === 'any' ? 'any' : 'all', m: RO_M_OK.has(c.m) ? c.m : 'cam', cmp: c.cmp === 'loses' ? 'loses' : 'beats', ys: c.ys === 'A' ? 'A' : 'B', yp: roCleanPts(c.yp), yq: c.yq === 'any' ? 'any' : 'all' }
 }
-// The fallbacks are ONE list (renderOrderExtraFallbacks, {"v":2,"items":[{m,q,t}]}), every entry deletable. The two former fixed rows (Fallback / Fallback 2, keys renderOrderFallback*, renderOrderFallback2*) are kept
-// only as hidden legacy storage: while the list is still in its old array form it is read as [legacy Fallback, legacy Fallback 2, ...the old extras], and normalizeRenderOrderFallbacks() (onRestore) rewrites it as v2.
-function roLegacyItems() {
-  return [['renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallbackTerms'], ['renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderFallback2Terms']].map((k) => ({
-    m: RO_VALID_MODES.has(cfg[k[0]]) ? cfg[k[0]] : 'farthestZ', q: RO_VALID_MODES.has(cfg[k[1]]) ? cfg[k[1]] : 'none', t: roTermsOf(cfg[k[2]]).map((x) => ({ op: x.op, m: x.m }))
-  }))
+function roCleanRule(r) {
+  r = r || {}
+  if (r.t === 'sort') return { t: 'sort', on: r.on !== false, p: RO_PT_OK.has(r.p) ? r.p : 'position', m: RO_M_OK.has(r.m) ? r.m : 'z', dir: r.dir === 'worst' ? 'worst' : 'best' }
+  return { t: 'if', on: r.on !== false, join: r.join === 'or' ? 'or' : 'and', win: r.win === 'B' ? 'B' : 'A', conds: (Array.isArray(r.conds) ? r.conds : []).map(roCleanCond) }
 }
-// Fresh, cleaned, independent copy of the fallback list stored in str (safe for a widget to mutate).
-function roExtraItemsFromStr(str) {
-  let raw
-  try {
-    const p = JSON.parse(str || '[]')
-    if (Array.isArray(p)) raw = roLegacyItems().concat(p)
-    else if (p && p.v === 2 && Array.isArray(p.items)) raw = p.items
-    else raw = roLegacyItems()
-  } catch (e) { raw = roLegacyItems() }
-  return raw.filter((t) => t && RO_VALID_MODES.has(t.m)).map((t) => ({ m: t.m, q: RO_VALID_MODES.has(t.q) ? t.q : 'none', t: roCleanTerms(t.t).map((x) => ({ op: x.op, m: x.m })) }))
-}
-function roParseExtra() {
-  const str = cfg.renderOrderExtraFallbacks || '[]'
-  const key = str.charAt(0) === '[' ? str + '|' + cfg.renderOrderFallback + '|' + cfg.renderOrderFallbackExcept + '|' + cfg.renderOrderFallbackTerms + '|' + cfg.renderOrderFallback2 + '|' + cfg.renderOrderFallback2Except + '|' + cfg.renderOrderFallback2Terms : str
-  if (key === roExtraStr) return roExtraVal
-  roExtraStr = key
-  roExtraVal = roExtraItemsFromStr(str)
-  return roExtraVal
-}
-// Persists the list in v2 form (called after the settings restore, so the legacy rows' saved values are carried over and the next Save stores them).
-function normalizeRenderOrderFallbacks() {
+// Fresh, cleaned copy of the rule list stored in str (safe for the widget to mutate); an unreadable value = the default rules.
+function roParseRules(str) {
   let p = null
-  try { p = JSON.parse(cfg.renderOrderExtraFallbacks || '[]') } catch (e) { /* legacy */ }
-  if (p && !Array.isArray(p) && p.v === 2) return
-  const str = JSON.stringify({ v: 2, items: roExtraItemsFromStr(cfg.renderOrderExtraFallbacks) })
-  const row = document.querySelector('.dp-row[data-key="renderOrderExtraFallbacks"]')
-  const input = row && row.querySelector('.dp-text-input')
-  if (input) commitTextControl(input, str); else cfg.renderOrderExtraFallbacks = str
+  try { p = JSON.parse(str || RO_DEFAULT_RULES) } catch (e) { p = null }
+  if (!p || !Array.isArray(p.rules)) p = JSON.parse(RO_DEFAULT_RULES)
+  return p.rules.map(roCleanRule)
 }
-const roOptText = (mode) => { const o = RENDER_ORDER_MODE_OPTIONS.find((x) => x.value === mode); return o ? o.text : String(mode) }
+let roRulesStr = null, roRulesVal = []
+function roRules() {
+  const str = cfg.renderOrderRules || RO_DEFAULT_RULES
+  if (str === roRulesStr) return roRulesVal
+  roRulesStr = str
+  roRulesVal = roParseRules(str)
+  return roRulesVal
+}
+function roCondText(c) {
+  const pts = (arr) => arr.map((p) => RO_PT_TEXT[p] || p).join(' + ')
+  const meas = c.m === 'z' ? 'Z' : c.m === 'cur' ? 'Cursor XY' : c.m === 'cur3' ? 'Cursor XYZ' : 'Camera XY'
+  const cmp = c.m === 'z' ? (c.cmp === 'beats' ? 'higher than' : 'lower than') : (c.cmp === 'beats' ? 'closer than' : 'farther than')
+  return (c.xq === 'any' ? 'any of ' : 'all of ') + 'Hand ' + c.xs + ' [' + pts(c.xp) + '] ' + meas + ' is ' + cmp + ' ' + (c.yq === 'any' ? 'any of ' : 'all of ') + 'Hand ' + c.ys + ' [' + pts(c.yp) + ']'
+}
+function roRuleText(r) {
+  if (r.t === 'sort') return 'Order by ' + (RO_PT_TEXT[r.p] || r.p) + ' ' + (RO_MEASURES.find((o) => o.value === r.m) || { text: r.m }).text + ': ' + (r.m === 'z' ? (r.dir === 'worst' ? 'lowest' : 'highest (nearest the camera)') : (r.dir === 'worst' ? 'farthest' : 'closest')) + ' on top'
+  return 'IF ' + (r.conds.length ? r.conds.map(roCondText).join(r.join === 'or' ? ' OR ' : ' AND ') : '(no conditions)') + ' THEN Hand ' + r.win + ' on top'
+}
+// The world position of one point of one hand (last render's rig node; the hand's field position for 'position' or a missing bone) into out.
+const _roNodeV = new THREE.Vector3()
+function roPointInto(hand, p, out) {
+  const bone = p === 'position' ? null : renderOrderBone(hand, p)
+  if (bone) { const e = bone.matrixWorld.elements; return out.set(e[12], e[13], e[14]) }
+  return out.copy(hand.wrapper.position)
+}
+const roKeyArrs = {}
 // Which condition the rule fired on for this pair, e.g. "Mode [Palm To Arm End]: Hand 12 palm center Z 4.21 is higher than Hand 13 arm end Z 3.90". Called right after cmpLevels(lo, hi) (it reads roPriority) with the same
 // frame's evaluator arrays. loAbove = the FINAL order; if the rule wanted the other way (flip lock or a conflicting constraint decided), that is said too.
 function roExplain(lv, r, lo, hi, loAbove) {
-  if (r === 0) return 'no level decides this pair (order kept / set by the constraint graph)'
-  const l = roPriority >> 1, kindXY = (roPriority & 1) === 1
-  const L = lv[l], ev = L.m
+  if (r === 0) return 'no rule decides this pair (order kept / set by the constraint graph)'
+  const l = roPriority >> 1
+  const ev = lv[l].m
   const ruleLoAbove = r > 0
   const up = ruleLoAbove ? lo : hi, down = ruleLoAbove ? hi : lo
-  let cond
-  if (ev.comp) cond = 'Hand ' + (up + 1) + ' above Hand ' + (down + 1) + ' (' + ev.detail(up, down) + ')'
-  else if (ev.a2a) {
-    const nm = (n) => (n === 'armBase' ? 'arm base' : n === 'armEnd' ? 'arm end' : 'palm center')
-    const fa = hands[up]._xyCursorDist ?? 0, fd = hands[down]._xyCursorDist ?? 0
-    const F = (fa < fd || (fa === fd && up < down)) ? up : down, Lh = F === up ? down : up
-    cond = ev.cam
-      ? 'Hand ' + (F + 1) + ' (the closer to the cursor, the former) ' + nm(ev.fromNode) + ' XY distance to the camera ' + (-ev.fromZ[F]).toFixed(2) + ((F === up) === !ev.neg ? ' is nearer than ' : ' is farther than ') + 'Hand ' + (Lh + 1) + ' ' + nm(ev.toNode) + ' ' + (-ev.toZ[Lh]).toFixed(2)
-      : 'Hand ' + (F + 1) + ' (the closer to the cursor, the former) ' + nm(ev.fromNode) + ' Z ' + ev.fromZ[F].toFixed(2) + ((F === up) === !ev.neg ? ' is higher than ' : ' is lower than ') + 'Hand ' + (Lh + 1) + ' ' + nm(ev.toNode) + ' Z ' + ev.toZ[Lh].toFixed(2)
-  } else {
-    const neg = ev.mode === 'closest' || ev.mode === 'closestZ' // their key is minus the distance
-    const show = (i) => ((neg ? -1 : 1) * ev.k[i] * 0.01).toFixed(2)
-    cond = 'Hand ' + (up + 1) + ' ' + show(up) + ' vs Hand ' + (down + 1) + ' ' + show(down) + (neg ? ' (distance, nearer goes above)' : '')
-  }
-  const ex = L.q ? '; Except [' + roOptText(L.q.mode) + '] did not oppose it' : ''
-  return roLevelName(l) + ' [' + (ev.comp ? ev.desc : roOptText(ev.mode)) + ']: ' + cond + ex + (ruleLoAbove === loAbove ? '' : ' -- NOTE the rule wanted Hand ' + (up + 1) + ' above, but the final order differs (flip lock / conflicting constraint)')
+  return roLevelName(l) + ' [' + ev.desc + ']: Hand ' + (up + 1) + ' above Hand ' + (down + 1) + ' (' + ev.detail(up, down) + ')' + (ruleLoAbove === loAbove ? '' : ' -- NOTE the rule wanted Hand ' + (up + 1) + ' above, but the final order differs (flip lock / conflicting constraint)')
 }
 function roFinishFrame(n, np, cmpLevels, logOn, lockOn, lv) {
   if (!logOn && !lockOn) { roPrevRank = null; roLocks.clear(); return }
@@ -1746,103 +1703,62 @@ function computeRenderOrderRanks() {
   const n = hands.length
   const camSign = camera.position.z >= 0 ? 1 : -1
   const TOL = 0.01
-  // Per-frame evaluators, one per distinct mode used by any level or qualifier: null (None), a scalar key array (two hands tie when equal to 0.01 world units), or the pairwise Palm To Arm Base / Arm End data.
-  const evs = new Map()
-  let palmDone = false
-  const evalMode = (mode) => {
-    if (!mode || mode === 'none') return null
-    if (evs.has(mode)) return evs.get(mode)
-    let ev
-    const camPairBase = RO_CAM_PAIR_NEG[mode] || mode
-    const pairBase = RO_PAIR_NEG[mode] || mode
-    if (RO_CAM_PAIR_DEFS[camPairBase]) {
-      // Camera-XY pair modes: the same former-hand rule and tolerance as the Z pair modes below; the compared number is minus the point's XY distance to the camera (larger = nearer the camera = on top).
-      const fromNode = RO_CAM_PAIR_DEFS[camPairBase][0], toNode = RO_CAM_PAIR_DEFS[camPairBase][1]
-      let arr = roA2A[mode]
-      if (!arr || arr.fromZ.length !== n) arr = roA2A[mode] = { fromZ: new Float64Array(n), toZ: new Float64Array(n) }
-      for (let i = 0; i < n; i++) { arr.fromZ[i] = -cameraDistXYOfNode(hands[i], fromNode); arr.toZ[i] = -cameraDistXYOfNode(hands[i], toNode) }
-      ev = { pair: true, a2a: true, cam: true, fromZ: arr.fromZ, toZ: arr.toZ, fromNode, toNode, mode, neg: !!RO_CAM_PAIR_NEG[mode] }
-    } else if (RO_PAIR_DEFS[pairBase]) {
-      // Pair modes (2026-10-11): the hand CLOSER to the cursor in screen XY is always the FORMER hand (ties: the lower index); its FIRST-named point is compared with the other hand's SECOND-named point. Former point higher in Z by
-      // more than the tolerance = the former hand is on top; lower = the other hand is on top; within the tolerance = no decision (the next level decides).
-      const fromNode = RO_PAIR_DEFS[pairBase][0], toNode = RO_PAIR_DEFS[pairBase][1]
-      let arr = roA2A[mode]
-      if (!arr || arr.fromZ.length !== n) arr = roA2A[mode] = { fromZ: new Float64Array(n), toZ: new Float64Array(n) }
-      for (let i = 0; i < n; i++) {
-        const h = hands[i], fb = renderOrderBone(h, fromNode), tb = renderOrderBone(h, toNode)
-        arr.fromZ[i] = (fb ? fb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
-        arr.toZ[i] = (tb ? tb.matrixWorld.elements[14] : h.wrapper.position.z) * camSign
-      }
-      ev = { pair: true, a2a: true, fromZ: arr.fromZ, toZ: arr.toZ, fromNode, toNode, mode, neg: !!RO_PAIR_NEG[mode] }
-    } else {
-      let k = roScalar[mode]
-      if (!k || k.length !== n) k = roScalar[mode] = new Float64Array(n)
-      for (let i = 0; i < n; i++) k[i] = Math.round(renderOrderPriority(hands[i], mode) / TOL)
-      ev = { pair: false, k, mode }
+  // Per-frame point keys (a bigger key is better, see RO_MEASURES): one array per (measure, point), computed once per frame and only for what the rules use.
+  const keyCache = new Map()
+  const keyOf = (m, p) => {
+    const id = m + '|' + p
+    let k = keyCache.get(id)
+    if (k) return k
+    k = roKeyArrs[id]
+    if (!k || k.length !== n) k = roKeyArrs[id] = new Float64Array(n)
+    for (let i = 0; i < n; i++) {
+      const h = hands[i]
+      roPointInto(h, p, _roNodeV)
+      k[i] = m === 'z' ? _roNodeV.z * camSign : m === 'cur' ? -cursorDistXY(_roNodeV) : m === 'cur3' ? -_roNodeV.distanceTo(cursorTarget) : -cameraDistXYOfNode(h, p)
     }
-    evs.set(mode, ev)
-    return ev
+    keyCache.set(id, k)
+    return k
   }
-  // Standardised score of one scalar mode over all hands (mean 0, stdev 1), so differently scaled modes (distances, Z values) can be added / subtracted.
-  const zs = new Map()
-  const zOf = (mode) => {
-    let z = zs.get(mode)
-    if (z) return z
-    z = new Float64Array(n)
-    let sum = 0
-    for (let i = 0; i < n; i++) { z[i] = renderOrderPriority(hands[i], mode); sum += z[i] }
-    const mean = n ? sum / n : 0
-    let v = 0
-    for (let i = 0; i < n; i++) { z[i] -= mean; v += z[i] * z[i] }
-    const sd = Math.sqrt(n ? v / n : 0) || 1
-    for (let i = 0; i < n; i++) z[i] /= sd
-    zs.set(mode, z)
-    return z
-  }
-  // The Mode plus its + And / + Or / - Subtract terms as one evaluator. Terms are read left to right: And / Subtract add / take away the term's standardised score from the group built so far; Or starts a new group.
-  // A group is a sum; its verdict for a pair is the sign of the difference between the two hands' sums (Palm To Arm style modes count as +-1). Groups combine like OR: if any group puts a hand on top and none puts the other
-  // on top, that hand is above; if groups disagree the pair is a tie (the next level decides). With only scalar terms and no Or, the whole thing is one scalar key.
-  const evalComposite = (mainMode, terms) => {
-    if (!terms.length) return evalMode(mainMode)
-    const groups = [[]]
-    if (mainMode && mainMode !== 'none') groups[0].push({ sign: 1, mode: mainMode })
-    terms.forEach((t) => { if (t.op === 'or') groups.push([{ sign: 1, mode: t.m }]); else groups[groups.length - 1].push({ sign: t.op === 'sub' ? -1 : 1, mode: t.m }) })
-    const gs = groups.filter((g) => g.length)
-    if (!gs.length) return null
-    let anyPair = false
-    gs.forEach((g) => g.forEach((it) => { it.ev = evalMode(it.mode); if (it.ev.pair) anyPair = true; else it.z = zOf(it.mode) }))
-    const descGroup = (g) => g.map((it, i) => (i === 0 ? (it.sign < 0 ? '-' : '') : (it.sign < 0 ? ' - ' : ' + ')) + roOptText(it.mode)).join('')
-    const desc = gs.map(descGroup).join(' OR ')
-    if (!anyPair && gs.length === 1) {
+  // Smallest / largest value of a hand over a set of key arrays.
+  const aggOf = (arrs, h, useMax) => { let v = useMax ? -Infinity : Infinity; for (let i = 0; i < arrs.length; i++) { const x = arrs[i][h]; if (useMax ? x > v : x < v) v = x } return v }
+  const compileRule = (r) => {
+    if (r.t === 'sort') {
+      const kk = keyOf(r.m, r.p), sg = r.dir === 'worst' ? -1 : 1
       const k = new Float64Array(n)
-      for (let i = 0; i < n; i++) { let t = 0; gs[0].forEach((it) => { t += it.sign * it.z[i] }); k[i] = Math.round(t * 1000) }
-      return { pair: false, k, mode: 'comp', comp: true, desc, detail: (u, d) => gs[0].map((it) => (it.sign < 0 ? '-' : '+') + roOptText(it.mode) + ' ' + (it.z[u] - it.z[d]).toFixed(2)).join(' ') + ' = ' + ((k[u] - k[d]) / 1000).toFixed(2) }
+      for (let i = 0; i < n; i++) k[i] = Math.round(sg * kk[i] / TOL)
+      return { pair: false, k, mode: 'sort', desc: roRuleText(r), detail: (u, d) => 'Hand ' + (u + 1) + ' ' + (sg * kk[u]).toFixed(2) + ' vs Hand ' + (d + 1) + ' ' + (sg * kk[d]).toFixed(2) }
     }
-    const groupDiff = (g, a, b) => { let D = 0; g.forEach((it) => { D += it.sign * (it.ev.pair ? cmpMode(it.ev, a, b) : it.z[a] - it.z[b]) }); return D }
+    if (!r.conds.length) return null
+    // One condition for an ordered pair (a = Hand A, b = Hand B) -> { ok, L, R }. beats: L > R, where all of X is the smallest of X, any of X the largest; the right side is all = largest, any = smallest (every x must beat every y /
+    // some y). loses: the mirror image (X is farther / lower).
+    const conds = r.conds.map((c) => {
+      const xa = c.xp.map((p) => keyOf(c.m, p)), ya = c.yp.map((p) => keyOf(c.m, p))
+      return (a, b) => {
+        const hx = c.xs === 'A' ? a : b, hy = c.ys === 'A' ? a : b
+        if (c.cmp === 'beats') { const L = aggOf(xa, hx, c.xq === 'any'), R = aggOf(ya, hy, c.yq === 'all'); return { ok: L > R + TOL, L, R } }
+        const L = aggOf(xa, hx, c.xq === 'all'), R = aggOf(ya, hy, c.yq === 'any')
+        return { ok: L < R - TOL, L, R }
+      }
+    })
+    const fires = (a, b) => { let any = false, all = true; for (let i = 0; i < conds.length; i++) { if (conds[i](a, b).ok) any = true; else all = false } return r.join === 'or' ? any : all }
     const cmp = (a, b) => {
-      let pos = false, neg = false
-      for (let g = 0; g < gs.length; g++) { const D = groupDiff(gs[g], a, b); if (D > 0.001) pos = true; else if (D < -0.001) neg = true }
-      return pos && !neg ? 1 : neg && !pos ? -1 : 0
+      const w1 = fires(a, b) ? (r.win === 'A' ? a : b) : -1 // winner when a is Hand A
+      const w2 = fires(b, a) ? (r.win === 'A' ? b : a) : -1 // winner when b is Hand A
+      if (w1 !== -1 && w2 !== -1 && w1 !== w2) return 0 // the rule fires both ways with different winners: no decision
+      const w = w1 !== -1 ? w1 : w2
+      return w === -1 ? 0 : (w === a ? 1 : -1)
     }
-    const detail = (u, d) => gs.map((g) => '[' + descGroup(g) + ': ' + groupDiff(g, u, d).toFixed(2) + ']').join(' OR ')
-    return { pair: true, comp: true, cmp, mode: 'comp', desc, detail }
+    const detail = (u, d) => [[u, d], [d, u]].filter(([a, b]) => fires(a, b)).map(([a, b]) => 'A = Hand ' + (a + 1) + ', B = Hand ' + (b + 1) + ': ' + conds.map((f) => { const e = f(a, b); return e.L.toFixed(2) + ' vs ' + e.R.toFixed(2) }).join(' | ')).join(' ; ')
+    return { pair: true, comp: true, cmp, mode: 'rule', desc: roRuleText(r), detail }
   }
-  // +1 = a goes above b, -1 = b goes above a, 0 = this mode does not decide the pair
+  // +1 = a goes above b, -1 = b goes above a, 0 = this rule does not decide the pair
   const cmpMode = (ev, a, b) => {
     if (ev.comp && ev.cmp) return ev.cmp(a, b)
-    if (ev.a2a) {
-      const da = hands[a]._xyCursorDist ?? 0, db = hands[b]._xyCursorDist ?? 0
-      const aFormer = da < db || (da === db && a < b)
-      const F = aFormer ? a : b, Lh = aFormer ? b : a
-      const d = ev.fromZ[F] - ev.toZ[Lh]
-      const vF = (d > TOL ? 1 : d < -TOL ? -1 : 0) * (ev.neg ? -1 : 1)
-      return aFormer ? vF : -vF
-    }
     const d = ev.k[a] - ev.k[b]
     return d > 0 ? 1 : d < 0 ? -1 : 0
   }
-  const lv = [{ m: evalComposite(cfg.renderOrderMode || 'z', roTermsOf(cfg.renderOrderModeTerms)), q: evalMode(cfg.renderOrderModeExcept) }]
-  roParseExtra().forEach((e) => lv.push({ m: evalComposite(e.m, e.t), q: evalMode(e.q) }))
+  const lv = []
+  roRules().forEach((r) => { if (r.on === false) return; const ev = compileRule(r); if (ev) lv.push({ m: ev, q: null }) })
   // The three levels (each with its optional Except) as one pairwise decision: +1 = a above b, -1 = b above a, 0 = every level ties.
   // roPriority (set as a side effect) = how strong the deciding rule is: 2 * level, +1 when it was a Palm To Arm 'both palms higher' tie-break by arm distance. Lower = stronger.
   const cmpLevels = (a, b) => {
@@ -1858,6 +1774,7 @@ function computeRenderOrderRanks() {
     }
     return 0
   }
+  roLastCmp = cmpLevels // (debug read-out: the combined pairwise verdict of this frame)
   const pairwise = lv.some((L) => (L.m && L.m.pair) || (L.q && L.q.pair))
   const lockOn = cfg.renderOrderFlipLock !== false
   const logOn = !!cfg.logRenderReorderEnabled
@@ -2039,127 +1956,112 @@ function buildToonGradientWidget() {
   redraw()
   armLengthWidgetResyncs.push(() => { if (input.value === lastSeen) return; lastSeen = input.value; stops = parseToonGradient(input.value).map((x) => ({ ...x })); redraw() })
 }
-function buildRenderOrderWidgets() {
-  const fillSel = (sel, value, allowNone) => {
-    RENDER_ORDER_MODE_OPTIONS.forEach((o) => { if (!allowNone && o.value === 'none') return; const op = document.createElement('option'); op.value = o.value; op.textContent = o.text; sel.appendChild(op) })
+// The Render Order rules editor (2026-10-16): rule cards in the hidden renderOrderRules text control. Each card: on / off, move up / down, delete, and its sentence; an IF rule has its conditions (each: all / any of Hand A / B's
+// point toggles, measure, comparison, all / any of Hand A / B's point toggles), AND / OR, and the winner; a Sort rule has point, measure and direction.
+function buildRenderOrderRulesWidget() {
+  const row = document.querySelector('.dp-row[data-key="renderOrderRules"]')
+  const input = row && row.querySelector('.dp-text-input')
+  if (!input || row.dataset.roWidget) return
+  row.dataset.roWidget = '1'
+  input.style.display = 'none'
+  const lab = row.querySelector('label')
+  if (lab && !lab.querySelector('input,select,button')) lab.style.display = 'none'
+  row.style.flexDirection = 'column'; row.style.alignItems = 'stretch'
+  let data = roParseRules(input.value), lastSeen = input.value
+  const write = () => { lastSeen = JSON.stringify({ v: 3, rules: data }); commitTextControl(input, lastSeen) }
+  const mkBtn = (text, onClick, title) => { const b = elLocal('button', null, { type: 'button', text }); b.className = 'dp-action-button'; if (title) b.title = title; b.addEventListener('click', onClick); return b }
+  const mkSel = (opts, value, onChange) => {
+    const sel = document.createElement('select')
+    opts.forEach((o) => { const op = document.createElement('option'); op.value = o.value; op.textContent = o.text; sel.appendChild(op) })
     sel.value = value
-    Object.assign(sel.style, { flex: '1 1 0', minWidth: '0' })
+    sel.addEventListener('change', () => onChange(sel.value))
+    return sel
   }
-  const OPS = { and: '+ And', or: '+ Or', sub: '- Subtract' }
-  const mkBtn = (text, onClick) => { const b = elLocal('button', null, { type: 'button', text }); b.className = 'dp-action-button'; b.addEventListener('click', onClick); return b }
-  // One level's + And / + Or / - Subtract editor: get() returns the live term array, changed() persists it.
-  const termsEditor = (get, changed) => {
-    const wrap = elLocal('div', { padding: '2px 0' })
-    const bar = elLocal('div', { display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' })
-    const list = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '4px' })
-    wrap.appendChild(bar); wrap.appendChild(list)
-    const redraw = () => {
-      list.textContent = ''
-      get().forEach((it, idx) => {
-        const r = elLocal('div', { display: 'flex', gap: '6px', alignItems: 'center' })
-        r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '62px', opacity: '.8', fontSize: '.85em' }, { text: OPS[it.op] || it.op }))
-        const sel = document.createElement('select'); fillSel(sel, it.m, false)
-        sel.addEventListener('change', () => { get()[idx].m = sel.value; changed() })
-        r.appendChild(sel)
-        const x = mkBtn('\u00d7', () => { get().splice(idx, 1); redraw(); changed() }); x.title = 'Remove'
-        r.appendChild(x)
-        list.appendChild(r)
+  const wrap = elLocal('div', { flex: '1', padding: '2px 0' })
+  const bar = elLocal('div', { display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '6px' })
+  const list = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '8px' })
+  wrap.appendChild(bar); wrap.appendChild(list); row.appendChild(wrap)
+  const QUANT = [{ value: 'all', text: 'all of' }, { value: 'any', text: 'any of' }]
+  const HAND = [{ value: 'A', text: 'Hand A' }, { value: 'B', text: 'Hand B' }]
+  const cmpOpts = (m) => (m === 'z' ? [{ value: 'beats', text: 'higher than' }, { value: 'loses', text: 'lower than' }] : [{ value: 'beats', text: 'closer than' }, { value: 'loses', text: 'farther than' }])
+  const ptChips = (arr, onChange) => {
+    const box = elLocal('div', { display: 'flex', gap: '4px', flexWrap: 'wrap', margin: '2px 0 4px 0' })
+    RO_POINTS.forEach((o) => {
+      const on = arr.includes(o.value)
+      const b = elLocal('button', { opacity: on ? '1' : '0.45', fontWeight: on ? 'bold' : 'normal', outline: on ? '1px solid var(--dp-accent, #7d8cff)' : 'none' }, { type: 'button', text: o.text })
+      b.className = 'dp-action-button'
+      b.addEventListener('click', () => { const next = on ? arr.filter((p) => p !== o.value) : arr.concat(o.value); if (!next.length) return; onChange(RO_POINTS.map((q) => q.value).filter((p) => next.includes(p))) })
+      box.appendChild(b)
+    })
+    return box
+  }
+  const line = () => elLocal('div', { display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' })
+  const changed = () => { write(); redraw() }
+  const condBox = (r, c, ci) => {
+    const box = elLocal('div', { border: '1px solid rgba(255,255,255,0.18)', borderRadius: '4px', padding: '4px 6px', display: 'flex', flexDirection: 'column', gap: '2px' })
+    const l1 = line()
+    l1.appendChild(mkSel(QUANT, c.xq, (v) => { c.xq = v; changed() }))
+    l1.appendChild(mkSel(HAND, c.xs, (v) => { c.xs = v; changed() }))
+    const x = mkBtn('\u00d7', () => { r.conds.splice(ci, 1); changed() }, 'Remove this condition'); x.style.marginLeft = 'auto'
+    l1.appendChild(x)
+    box.appendChild(l1)
+    box.appendChild(ptChips(c.xp, (v) => { c.xp = v; changed() }))
+    const l2 = line()
+    l2.appendChild(mkSel(RO_MEASURES, c.m, (v) => { c.m = v; changed() }))
+    l2.appendChild(elLocal('span', { opacity: '.8', fontSize: '.85em' }, { text: 'is' }))
+    l2.appendChild(mkSel(cmpOpts(c.m), c.cmp, (v) => { c.cmp = v; changed() }))
+    box.appendChild(l2)
+    const l3 = line()
+    l3.appendChild(mkSel(QUANT, c.yq, (v) => { c.yq = v; changed() }))
+    l3.appendChild(mkSel(HAND, c.ys, (v) => { c.ys = v; changed() }))
+    box.appendChild(l3)
+    box.appendChild(ptChips(c.yp, (v) => { c.yp = v; changed() }))
+    return box
+  }
+  const card = (r, i) => {
+    const el = elLocal('div', { border: '1px solid rgba(255,255,255,0.25)', borderRadius: '6px', padding: '6px', display: 'flex', flexDirection: 'column', gap: '4px', opacity: r.on === false ? '0.55' : '1' })
+    const head = line()
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = r.on !== false; cb.title = 'Rule on / off'
+    cb.addEventListener('change', () => { r.on = cb.checked; changed() })
+    head.appendChild(cb)
+    head.appendChild(elLocal('span', { fontWeight: 'bold' }, { text: 'Rule ' + (i + 1) + (r.t === 'sort' ? ' - Order By' : ' - IF') }))
+    const rt = elLocal('span', { marginLeft: 'auto', display: 'flex', gap: '4px' })
+    rt.appendChild(mkBtn('\u2191', () => { if (i > 0) { data.splice(i - 1, 0, data.splice(i, 1)[0]); changed() } }, 'Move up (rules are tried in this order)'))
+    rt.appendChild(mkBtn('\u2193', () => { if (i < data.length - 1) { data.splice(i + 1, 0, data.splice(i, 1)[0]); changed() } }, 'Move down'))
+    rt.appendChild(mkBtn('\u00d7', () => { data.splice(i, 1); changed() }, 'Delete this rule'))
+    head.appendChild(rt)
+    el.appendChild(head)
+    el.appendChild(elLocal('div', { opacity: '.75', fontSize: '.8em', fontStyle: 'italic' }, { text: roRuleText(r) }))
+    if (r.t === 'sort') {
+      const l = line()
+      l.appendChild(mkSel(RO_POINTS, r.p, (v) => { r.p = v; changed() }))
+      l.appendChild(mkSel(RO_MEASURES, r.m, (v) => { r.m = v; changed() }))
+      l.appendChild(mkSel([{ value: 'best', text: r.m === 'z' ? 'highest on top' : 'closest on top' }, { value: 'worst', text: r.m === 'z' ? 'lowest on top' : 'farthest on top' }], r.dir, (v) => { r.dir = v; changed() }))
+      el.appendChild(l)
+    } else {
+      r.conds.forEach((c, ci) => {
+        if (ci > 0) {
+          const jl = line()
+          jl.appendChild(mkSel([{ value: 'and', text: 'AND (all conditions)' }, { value: 'or', text: 'OR (any condition)' }], r.join, (v) => { r.join = v; changed() }))
+          el.appendChild(jl)
+        }
+        el.appendChild(condBox(r, c, ci))
       })
+      const bl = line()
+      bl.appendChild(mkBtn('+ Add Condition', () => { r.conds.push(roCleanCond({})); changed() }))
+      bl.appendChild(elLocal('span', { marginLeft: '8px', opacity: '.85' }, { text: 'THEN' }))
+      bl.appendChild(mkSel(HAND, r.win, (v) => { r.win = v; changed() }))
+      bl.appendChild(elLocal('span', { opacity: '.85' }, { text: 'renders on top' }))
+      el.appendChild(bl)
     }
-    ;['and', 'or', 'sub'].forEach((op) => bar.appendChild(mkBtn(OPS[op], () => { get().push({ op, m: 'armEnd' }); redraw(); changed() })))
-    return { el: wrap, redraw }
+    return el
   }
-  // Hides a text control's own input / label and returns its row + input for a custom widget.
-  const prep = (key) => {
-    const row = document.querySelector('.dp-row[data-key="' + key + '"]')
-    const input = row && row.querySelector('.dp-text-input')
-    if (!input || row.dataset.roWidget) return null
-    row.dataset.roWidget = '1'
-    input.style.display = 'none'
-    const lab = row.querySelector('label')
-    if (lab && !lab.querySelector('input,select,button')) lab.style.display = 'none'
-    row.style.flexDirection = 'column'; row.style.alignItems = 'stretch'
-    return { row, input }
-  }
-  const readJson = (input) => { try { const a = JSON.parse(input.value); return Array.isArray(a) ? a : [] } catch (e) { return [] } }
-  const mkTerms = (key) => {
-    const p = prep(key)
-    if (!p) return
-    let items = readJson(p.input), lastSeen = p.input.value
-    const ed = termsEditor(() => items, () => { lastSeen = JSON.stringify(items); commitTextControl(p.input, lastSeen) })
-    p.row.appendChild(ed.el)
-    ed.redraw()
-    armLengthWidgetResyncs.push(() => { if (p.input.value === lastSeen) return; lastSeen = p.input.value; items = readJson(p.input); ed.redraw() })
-  }
-  const mkExtras = (key) => {
-    const p = prep(key)
-    if (!p) return
-    let items = roExtraItemsFromStr(p.input.value), lastSeen = p.input.value
-    const wrap = elLocal('div', { flex: '1', padding: '2px 0' })
-    const bar = elLocal('div', { display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' })
-    const list = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '8px' })
-    wrap.appendChild(bar); wrap.appendChild(list); p.row.appendChild(wrap)
-    const write = () => { lastSeen = JSON.stringify({ v: 2, items }); commitTextControl(p.input, lastSeen) }
-    const redraw = () => {
-      list.textContent = ''
-      items.forEach((it, idx) => {
-        const block = elLocal('div', { display: 'flex', flexDirection: 'column', gap: '4px' })
-        const r = elLocal('div', { display: 'flex', gap: '6px', alignItems: 'center' })
-        r.appendChild(elLocal('span', { flex: '0 0 auto', minWidth: '62px', opacity: '.8', fontSize: '.85em' }, { text: 'Fallback ' + (idx + 1) }))
-        const sel = document.createElement('select'); fillSel(sel, it.m, true)
-        sel.addEventListener('change', () => { items[idx].m = sel.value; write() })
-        r.appendChild(sel)
-        r.appendChild(elLocal('span', { flex: '0 0 auto', margin: '0 2px 0 4px', opacity: '.75', fontSize: '.85em' }, { text: 'Except' }))
-        const q = document.createElement('select'); fillSel(q, it.q || 'none', true)
-        q.addEventListener('change', () => { items[idx].q = q.value; write() })
-        r.appendChild(q)
-        const x = mkBtn('\u00d7', () => { items.splice(idx, 1); redraw(); write() }); x.title = 'Remove'
-        r.appendChild(x)
-        block.appendChild(r)
-        const ed = termsEditor(() => (items[idx].t || (items[idx].t = [])), write)
-        ed.el.style.paddingLeft = '14px'
-        block.appendChild(ed.el)
-        ed.redraw()
-        list.appendChild(block)
-      })
-    }
-    bar.appendChild(mkBtn('+ Add Fallback', () => { items.push({ m: 'farthestZ', q: 'none', t: [] }); redraw(); write() }))
-    redraw()
-    armLengthWidgetResyncs.push(() => { if (p.input.value === lastSeen) return; lastSeen = p.input.value; items = roExtraItemsFromStr(p.input.value); redraw() })
-  }
-  mkTerms('renderOrderModeTerms')
-  mkExtras('renderOrderExtraFallbacks')
-  // The two former fixed fallbacks live on as hidden legacy storage (see roLegacyItems()).
-  ;['renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallbackTerms', 'renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderFallback2Terms'].forEach((k) => {
-    const row = document.querySelector('.dp-row[data-key="' + k + '"]')
-    if (row) row.style.display = 'none'
-  })
-}
-function mergeExceptSelects() {
-  [['renderOrderMode', 'renderOrderModeExcept']].forEach(([a, b]) => {
-    const rowA = document.querySelector('.dp-row[data-key="' + a + '"]'), rowB = document.querySelector('.dp-row[data-key="' + b + '"]')
-    if (!rowA || !rowB) return
-    const selA = rowA.querySelector('select'), selB = rowB.querySelector('select')
-    if (!selA || !selB || selB.parentNode === rowA) return
-    const lab = document.createElement('span')
-    lab.textContent = 'Except'
-    lab.style.cssText = 'margin:0 6px 0 8px;opacity:.75;font-size:.85em;white-space:nowrap;flex:0 0 auto'
-    rowA.appendChild(lab)
-    rowA.appendChild(selB)
-    selA.style.flex = '1 1 0'; selA.style.minWidth = '0'; selB.style.flex = '1 1 0'; selB.style.minWidth = '0'
-    rowB.style.display = 'none'
-  })
-}
-function renderOrderPriority(hand, mode) {
-  if (RO_NEG_BASE[mode]) return -renderOrderPriority(hand, RO_NEG_BASE[mode])
-  switch (mode) {
-    case 'closest': return -(hand._xyCursorDist ?? 0)
-    case 'farthest': return hand._xyCursorDist ?? 0
-    case 'closestZ': return -hand.effectiveRenderOrder
-    case 'farthestZ': return hand.effectiveRenderOrder
-    case 'camPalmCenter': case 'camArmBase': case 'camArmEnd': return -cameraDistXYOfNode(hand, RO_CAM_NODES[mode]) // nearer the camera's XY = higher = on top
-    default: return renderOrderModeZ(hand, mode) * (camera.position.z >= 0 ? 1 : -1)
-  }
+  const redraw = () => { list.textContent = ''; data.forEach((r, i) => list.appendChild(card(r, i))) }
+  bar.appendChild(mkBtn('+ Add IF Rule', () => { data.push(roCleanRule({ t: 'if', conds: [{}] })); changed() }))
+  bar.appendChild(mkBtn('+ Add Sort Rule', () => { data.push(roCleanRule({ t: 'sort' })); changed() }))
+  bar.appendChild(mkBtn('Reset To Default Rules', () => { data = roParseRules(RO_DEFAULT_RULES); changed() }))
+  redraw()
+  armLengthWidgetResyncs.push(() => { if (input.value === lastSeen) return; lastSeen = input.value; data = roParseRules(input.value); redraw() })
 }
 const _swingRef = new THREE.Vector3(0, 0, -1)
 // World position of the hand's cursor tracking point (Cursor Tracking > Tracking Point) at its no-tracking pose. Hand Position = the field position (the cut point); Arm Base = rForearmBend; Arm End = the head of rHand
@@ -2420,23 +2322,9 @@ const DEV_GROUPS = [
     // realDeviceClass()` generically -- no devPanel.js changes were
     // needed to support this, just the `perDevice: true` flag per control.
     controls: [
-      // Render Order Mode (2026-10-11, direct request): which point's Z decides which hand draws on top (closest to the camera wins; cursor distance only breaks ties). See renderOrderPriority().
-      { key: 'renderOrderMode', label: 'Render Order Mode', type: 'select', def: 'z', options: () => RENDER_ORDER_MODE_OPTIONS },
-      // Except (qualifier) for each level (2026-10-11): this level's decision for a pair is voided (the level ties and the next one decides) when the qualifier mode says the opposite for that pair. The select is moved into the main dropdown's row, to its right (mergeExceptSelects()).
-      { key: 'renderOrderModeExcept', label: 'Render Order Mode: Except', type: 'select', def: 'none', options: () => RENDER_ORDER_MODE_OPTIONS },
-      // Fallback: used when two hands tie on the Render Order Mode's own value (same Z to 0.01 world units, or the same distance). Default = the original behaviour (the hand furthest from the cursor on top).
-      { key: 'renderOrderFallback', label: 'Render Order Fallback', type: 'select', def: 'farthestZ', options: () => RENDER_ORDER_MODE_OPTIONS },
-      { key: 'renderOrderFallbackExcept', label: 'Render Order Fallback: Except', type: 'select', def: 'none', options: () => RENDER_ORDER_MODE_OPTIONS },
-      // Third level (2026-10-11, direct request): used when two hands tie on both the Mode and the Fallback.
-      { key: 'renderOrderFallback2', label: 'Render Order Fallback 2', type: 'select', def: 'farthestZ', placeAfter: 'renderOrderFallback', options: () => RENDER_ORDER_MODE_OPTIONS },
-      { key: 'renderOrderFallback2Except', label: 'Render Order Fallback 2: Except', type: 'select', def: 'none', options: () => RENDER_ORDER_MODE_OPTIONS },
+      // Render Order Rules (2026-10-16): the ordered rule list (JSON, edited with the rule cards - see buildRenderOrderRulesWidget() and the RO_* tables). Replaces the old Mode / Fallback / Except / terms controls.
+      { key: 'renderOrderRules', label: 'Render Order Rules', type: 'text', def: RO_DEFAULT_RULES },
       // Flip lock (2026-10-11, direct request: "hands only seem to switch order once per trigger or retransition sequence"): a pair of nearby hands may swap render order at most ONCE per sequence (a new trigger or a retransition starting on either hand); a pair the rules leave tied keeps its previous order.
-      // + And / + Or / - Subtract terms of the Render Order Mode (2026-10-11): a JSON list edited through the buttons / dropdowns (buildRenderOrderWidgets()).
-      { key: 'renderOrderModeTerms', label: 'Render Order Mode: Terms', type: 'text', placeAfter: 'renderOrderModeExcept', def: '[]' },
-      { key: 'renderOrderFallbackTerms', label: 'Render Order Fallback: Terms', type: 'text', placeAfter: 'renderOrderFallbackExcept', def: '[]' },
-      { key: 'renderOrderFallback2Terms', label: 'Render Order Fallback 2: Terms', type: 'text', placeAfter: 'renderOrderFallback2Except', def: '[]' },
-      // Extra Fallback levels beyond Fallback 2, added with the Add Fallback button.
-      { key: 'renderOrderExtraFallbacks', label: 'Render Order: Extra Fallbacks', type: 'text', placeAfter: 'renderOrderFallback2Except', def: '[]' },
       { key: 'renderOrderFlipLock', label: 'Render Order: Flip Once Per Sequence', type: 'checkbox', def: true },
       // Hand Model (2026-10-14): which hand model is loaded, and the list to choose from. Moved into the group titled Hands (any capitalisation) after the restore, see placeHandModelRows().
       { key: 'handModelId', label: 'Hand Model (Internal, Auto-Managed)', type: 'text', def: HAND_MODEL_DEFAULT_ID },
@@ -3970,7 +3858,7 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 // whatever was last interacted with there, not a deliberate choice worth
 // preserving).
 const FIELD_LAYOUT_SUBGROUP_SPECS = [
-  { title: 'Render Order', collapsed: false, keys: ['renderOrderMode', 'renderOrderModeExcept', 'renderOrderModeTerms', 'renderOrderFallback', 'renderOrderFallbackExcept', 'renderOrderFallbackTerms', 'renderOrderFallback2', 'renderOrderFallback2Except', 'renderOrderFallback2Terms', 'renderOrderExtraFallbacks', 'renderOrderFlipLock'] }
+  { title: 'Render Order', collapsed: false, keys: ['renderOrderRules', 'renderOrderFlipLock'] }
 ]
 const CAMERA_SUBGROUP_SPECS = [
   { title: 'Preview Camera', collapsed: true, keys: ['cameraPreviewEnabled', 'cameraPreviewX', 'cameraPreviewY', 'cameraPreviewZ', 'cameraPreviewFov', 'cameraPreviewZoom', 'lockCameraPreviewPan', 'lockCameraPreviewZoom', 'lockCameraPreviewRotate', 'cameraPreviewYaw', 'cameraPreviewPitch', 'savedCameraPreviews', 'addCameraPreviewBtn', 'cameraPreviewCount', 'deleteAllCameraPreviewsBtn'] }
@@ -4051,7 +3939,6 @@ const cfg = initDevPanel(DEV_GROUPS, {
       gateGroupHeader('Field Grid Sphere Sequence', 'sphereSeqEnabled'); nestGroupInto('Field Grid Sphere Sequence', 'Starting State'); updateGroupContentsVisibility('Field Grid Sphere Sequence', !!cfg.sphereSeqEnabled)
       if (cfg.sphereSeqEnabled && sphereStage === 2 && !startupConsumeActive) { sphereStage = 0; updateHandsVisibility() } // a saved-on sequence starts waiting for its first click
     } catch (e) { /* panel not built */ }
-    try { normalizeRenderOrderFallbacks() } catch (e) { /* not ready */ }
     // Each step timed when ?debugTiming=1 (see devPanel.js dpTime()).
     const prof = (label, fn) => {
       if (!DEBUG_TIMING) { fn(); return }
@@ -6090,10 +5977,8 @@ function buildSnapshotText() {
   }
   if (cfg.snapshotRenderOrder) {
     any = true
-    const tm = (str) => roTermsOf(str).map((t) => (t.op === 'sub' ? ' - ' : t.op === 'or' ? ' OR ' : ' + ') + roOptText(t.m)).join('')
     L.push('', '--- Render Order ---')
-    L.push('Mode: ' + roOptText(cfg.renderOrderMode) + tm(cfg.renderOrderModeTerms) + (cfg.renderOrderModeExcept && cfg.renderOrderModeExcept !== 'none' ? ' | Except ' + roOptText(cfg.renderOrderModeExcept) : ''))
-    roParseExtra().forEach((e, i) => L.push('Fallback ' + (i + 1) + ': ' + roOptText(e.m) + e.t.map((t) => (t.op === 'sub' ? ' - ' : t.op === 'or' ? ' OR ' : ' + ') + roOptText(t.m)).join('') + (e.q !== 'none' ? ' | Except ' + roOptText(e.q) : '')))
+    roRules().forEach((r, i) => L.push('Rule ' + (i + 1) + (r.on === false ? ' (off)' : '') + ': ' + roRuleText(r)))
     L.push('flip once per sequence: ' + (cfg.renderOrderFlipLock !== false) + ' | active flip locks: ' + roLocks.size)
     L.push('the ' + NEAR + ' hands nearest the cursor (screen XY), rank = drawn order (higher = on top):')
     nearest(NEAR).forEach((o) => {
@@ -21756,14 +21641,7 @@ function syncPauseWithVisibility() {
 }
 // Selects whose options are fixed lists: filled once, here, after sceneNeedsRedraw exists (refreshSelectOptions() commits the value, and the commit fires onAnyValueChange -> sceneNeedsRedraw; calling it earlier hit that
 // binding's temporal dead zone: 2026-10-11).
-safeRefreshSelectOptions('renderOrderMode')
-safeRefreshSelectOptions('renderOrderFallback')
-safeRefreshSelectOptions('renderOrderFallback2')
-safeRefreshSelectOptions('renderOrderModeExcept')
-safeRefreshSelectOptions('renderOrderFallbackExcept')
-safeRefreshSelectOptions('renderOrderFallback2Except')
-mergeExceptSelects()
-buildRenderOrderWidgets()
+buildRenderOrderRulesWidget()
 placeSmallScaleModelRows()
 refreshAllItemSelectorMarks()
 buildToonGradientWidget()
