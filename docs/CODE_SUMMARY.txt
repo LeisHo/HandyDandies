@@ -861,7 +861,7 @@ GOTCHAS
 - **A concurrent session (working from the HANDO project, per direct
   request: "I may want the possibility of saving poses in the Hando app,
   then somehow importing those poses into this app") added a "Saved
-  Poses" import list-picker and a standalone "Pose Preview" mini-viewer
+  Poses" import list-picker and a standalone "Pose Preview" mini-viewer (since removed, 2026-10-17)
   to this project's own `main.js`/`devpanel.js` WHILE this round's own 6
   fixes were being implemented in the same working tree.** Confirmed via
   direct diff inspection (not assumed) before touching anything further:
