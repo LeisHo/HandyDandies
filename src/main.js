@@ -2902,9 +2902,9 @@ const DEV_GROUPS = [
       // so a rebuild always snaps back to the dropdown's own camera,
       // exactly as before -- orbiting never overrides it unless the user
       // explicitly re-Saves via the list-picker's own Save button.
-      { key: 'loadingPreviewRotationX', label: 'Loading Preview Rotation X (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
-      { key: 'loadingPreviewRotationY', label: 'Loading Preview Rotation Y (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
-      { key: 'loadingPreviewRotationZ', label: 'Loading Preview Rotation Z (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewRotationX', label: 'Loading Preview Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewRotationY', label: 'Loading Preview Yaw (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewRotationZ', label: 'Loading Preview Roll (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       { key: 'loadingPreviewOffsetX', label: 'Loading Preview Offset X (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       { key: 'loadingPreviewOffsetY', label: 'Loading Preview Offset Y (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       // Direct request 2026-09-20 ("provide Loading Preview Offset Z...
