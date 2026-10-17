@@ -10603,7 +10603,8 @@ function rvProfile(key, x) {
 function rvLerp(range, t) { return range.min + (range.max - range.min) * t }
 
 function rvSharedControls() {
-  const pd = { perDevice: true, onChange: () => rvQueueUi() }
+  // visibilityToggle (2026-10-17, direct request): perDevice rows have no Independent checkbox, but get the Show in Mobile/Landscape one (checkbox / slider / select rows; the engine gives text-widget rows - ranges, curves - none anywhere).
+  const pd = { perDevice: true, visibilityToggle: true, onChange: () => rvQueueUi() }
   return [
     { key: 'rvEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
     { key: 'rvHoldOnly', label: 'On Hold Only', type: 'checkbox', def: false, ...pd },
@@ -10642,7 +10643,8 @@ function rvSharedControls() {
   ]
 }
 function rvSetControls(S) {
-  const pd = { perDevice: true, onChange: () => rvQueueUi() }
+  // visibilityToggle (2026-10-17, direct request): perDevice rows have no Independent checkbox, but get the Show in Mobile/Landscape one (checkbox / slider / select rows; the engine gives text-widget rows - ranges, curves - none anywhere).
+  const pd = { perDevice: true, visibilityToggle: true, onChange: () => rvQueueUi() }
   const effect = (name, defRange, label, unit) => [
     { key: `${S}${name}Enabled`, label: 'On/Off', type: 'checkbox', def: false, ...pd },
     { key: `${S}${name}Range`, label: `Min / Max ${label} (${unit})`, type: 'text', def: defRange, ...pd },
