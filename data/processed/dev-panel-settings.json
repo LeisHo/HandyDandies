@@ -207,7 +207,7 @@
       "alternateRowOffset": 4,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": false,
+      "hideHands": true,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
       "fieldOffsetZ": 0,
@@ -265,7 +265,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -438,6 +438,16 @@
           "targetX": -15.21024509151875,
           "targetY": -32.32990855561796,
           "targetZ": -36.1786236132897
+        },
+        {
+          "name": "LOADING - 1",
+          "cameraX": 53.73883476111049,
+          "cameraY": 447.3675549930931,
+          "cameraZ": -322.2644834596188,
+          "cameraFov": 15,
+          "targetX": 36.962969892719805,
+          "targetY": -13.366083573810585,
+          "targetZ": -15.038420659905807
         }
       ],
       "loadingPreviewCameraSelector": "Loading Preview Camera 17",
@@ -507,6 +517,19 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "LOADING 1",
+          "keyAzimuth": 30,
+          "keyElevation": 12.999999999999998,
+          "keyTargetHeight": -100,
+          "keyIntensity": 6,
+          "keyColor": "#ffffff",
+          "keyLightType": "Directional",
+          "keyDistance": 4,
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
       "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
@@ -539,14 +562,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -81.14969571270518,
-      "loadingPreviewRotationY": 176.54915527346924,
+      "loadingPreviewRotationX": -60.360390239033926,
+      "loadingPreviewRotationY": 178.88646262628282,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043942,
+      "loadingPreviewCameraZoom": 554.0259642043793,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -555,7 +578,7 @@
       "loadingPreviewTextFont": "Cormorant Garamond",
       "loadingPreviewTextOffsetX": -660,
       "loadingPreviewTextOffsetY": 318,
-      "loadingPreviewProgressCropEnabled": true,
+      "loadingPreviewProgressCropEnabled": false,
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
@@ -16929,7 +16952,7 @@
         }
       ],
       "cameraX": 1.5625001668540408,
-      "cameraY": 4.024390316066679e-13,
+      "cameraY": 4.2062503657400595e-13,
       "cameraZ": 197.9876688948102,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -17342,7 +17365,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 2,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -20901,6 +20924,16 @@
           "targetX": -15.21024509151875,
           "targetY": -32.32990855561796,
           "targetZ": -36.1786236132897
+        },
+        {
+          "name": "LOADING - 1",
+          "cameraX": 53.73883476111049,
+          "cameraY": 447.3675549930931,
+          "cameraZ": -322.2644834596188,
+          "cameraFov": 15,
+          "targetX": 36.962969892719805,
+          "targetY": -13.366083573810585,
+          "targetZ": -15.038420659905807
         }
       ],
       "loadingPreviewCameraSelector": "Loading Preview Camera 17",
@@ -20970,6 +21003,19 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "LOADING 1",
+          "keyAzimuth": 30,
+          "keyElevation": 12.999999999999998,
+          "keyTargetHeight": -100,
+          "keyIntensity": 6,
+          "keyColor": "#ffffff",
+          "keyLightType": "Directional",
+          "keyDistance": 4,
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
       "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
@@ -21002,14 +21048,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -81.14969571270518,
-      "loadingPreviewRotationY": 176.54915527346924,
+      "loadingPreviewRotationX": -60.360390239033926,
+      "loadingPreviewRotationY": 178.88646262628282,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043942,
+      "loadingPreviewCameraZoom": 554.0259642043793,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -37805,7 +37851,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 2,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -41191,7 +41237,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewSavedCameras": [
@@ -41364,6 +41410,16 @@
           "targetX": -15.21024509151875,
           "targetY": -32.32990855561796,
           "targetZ": -36.1786236132897
+        },
+        {
+          "name": "LOADING - 1",
+          "cameraX": 53.73883476111049,
+          "cameraY": 447.3675549930931,
+          "cameraZ": -322.2644834596188,
+          "cameraFov": 15,
+          "targetX": 36.962969892719805,
+          "targetY": -13.366083573810585,
+          "targetZ": -15.038420659905807
         }
       ],
       "loadingPreviewCameraSelector": "Loading Preview Camera 17",
@@ -41433,6 +41489,19 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "LOADING 1",
+          "keyAzimuth": 30,
+          "keyElevation": 12.999999999999998,
+          "keyTargetHeight": -100,
+          "keyIntensity": 6,
+          "keyColor": "#ffffff",
+          "keyLightType": "Directional",
+          "keyDistance": 4,
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
       "loadingPreviewLightingSelector": "Loading Preview Lighting 6",
@@ -41465,14 +41534,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -81.14969571270518,
-      "loadingPreviewRotationY": 176.54915527346924,
+      "loadingPreviewRotationX": -60.360390239033926,
+      "loadingPreviewRotationY": 178.88646262628282,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043942,
+      "loadingPreviewCameraZoom": 554.0259642043793,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -41481,7 +41550,7 @@
       "loadingPreviewTextFont": "Cormorant Garamond",
       "loadingPreviewTextOffsetX": 0,
       "loadingPreviewTextOffsetY": 0,
-      "loadingPreviewProgressCropEnabled": true,
+      "loadingPreviewProgressCropEnabled": false,
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
@@ -58268,7 +58337,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 2,
+      "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -61938,7 +62007,7 @@
           "type": "group",
           "group": {
             "key": "Pause Button",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -62027,7 +62096,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -62140,7 +62209,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -62178,6 +62247,10 @@
                     {
                       "type": "row",
                       "key": "loadingPreviewCameraZoom"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewCenterHandsBtn"
                     }
                   ],
                   "settings": [
@@ -62189,7 +62262,8 @@
                     "loadingPreviewOffsetZ",
                     "loadingPreviewCameraFov",
                     "loadingPreviewSavedCameras",
-                    "loadingPreviewCameraZoom"
+                    "loadingPreviewCameraZoom",
+                    "loadingPreviewCenterHandsBtn"
                   ]
                 }
               },
@@ -62197,7 +62271,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -69382,10 +69456,10 @@
   "devHotkeys": {},
   "panelGeometry": {
     "desktop": {
-      "left": 85.5999984741211,
-      "top": 100.7874984741211,
-      "width": 472.7749938964844,
-      "height": 617.1875
+      "left": 85.59722137451172,
+      "top": 100.77777862548828,
+      "width": 476.3194580078125,
+      "height": 618.9583129882812
     },
     "mobile": {
       "left": 35.613094329833984,
