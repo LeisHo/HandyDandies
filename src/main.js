@@ -2931,6 +2931,9 @@ const DEV_GROUPS = [
       // scene's own.
       { key: 'loadingPreviewCameraFov', label: 'Loading Preview Camera FOV (Deg)', type: 'slider', min: 15, max: 90, step: 1, def: 35, onChange: (v) => { if (!loadingPreviewCamera) return; loadingPreviewCamera.fov = v; loadingPreviewCamera.updateProjectionMatrix() } },
       { key: 'loadingPreviewCameraZoom', label: 'Loading Preview Camera Zoom (Distance To Target) (x)', type: 'slider', min: 1, max: 300, step: 0.5, def: 55, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      // 2026-10-17, direct request: a button that centres the preview hand(s) on screen by panning the Loading Preview camera in SCREEN space X / Y (see centerLoadingPreviewCameraOnHands()).
+      // placeAfter puts it next to the Zoom slider, the last row of the saved "LOADING PREVIEW CAMERA" subgroup.
+      { key: 'loadingPreviewCenterHandsBtn', label: 'Center Hands On Screen (X / Y)', type: 'button', placeAfter: 'loadingPreviewCameraZoom', onClick: () => centerLoadingPreviewCameraOnHands() },
       // Direct request ("Provide a Loading Preview Camera Edit Mode
       // checkbox. When Turned on, I can use my mouse's click and drag to
       // orbit the camera, and right click to pan the camera, as well as
@@ -9381,6 +9384,51 @@ function applyLoadingPreviewOrbitFromSliders() {
   applyLoadingPreviewRoll(target)
   loadingPreviewCameraTarget.copy(target)
   syncLoadingPreviewOrbitControlsTarget()
+}
+// "Center Hands On Screen (X / Y)" (2026-10-17, direct request): pans the Loading Preview camera sideways / up-down in the CAMERA's own screen plane (not world X / Y) so the middle of the
+// animation hand(s) sits at the centre of the preview. The camera and its orbit target move by the same vector, so zoom distance, angles and roll are untouched; the Offset X / Y / Z sliders
+// then follow through deriveLoadingPreviewOrbitSliders(), so the new framing is what Save / Saved Cameras capture.
+// "The hands" = the bones of the palm and fingers (everything under rHand) of the main hand and, in a two-hand tween, the second hand -- not the forearm, which the wrist crop hides. The bounding box of those
+// bones is projected through the camera and its middle brought to the screen centre. It is a snapshot of the pose being shown at the click: an animation that moves the hands later is not tracked.
+// Three passes because the pan shifts perspective slightly; each pass moves the box middle by the NDC error times the half-view size at the hands' mean depth.
+function centerLoadingPreviewCameraOnHands() {
+  const cam = loadingPreviewCamera
+  if (!cam || !loadingPreviewScene) return
+  const pts = []
+  ;[loadingPreviewHand, loadingPreviewHand2].forEach((h) => {
+    if (!h || !h.skinnedMesh || !h.clone.visible) return
+    h.clone.updateMatrixWorld(true)
+    const sk = h.skinnedMesh.skeleton
+    const root = skeletonBone(sk, 'rHand')
+    const bones = []
+    if (root) root.traverse((o) => { if (o.isBone) bones.push(o) }); else bones.push(...sk.bones)
+    bones.forEach((b) => pts.push(b.getWorldPosition(new THREE.Vector3())))
+  })
+  if (!pts.length) return
+  const ndc = new THREE.Vector3(), right = new THREE.Vector3(), up = new THREE.Vector3(), fwd = new THREE.Vector3(), delta = new THREE.Vector3()
+  for (let pass = 0; pass < 3; pass++) {
+    cam.updateMatrixWorld(true)
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, depth = 0
+    cam.getWorldDirection(fwd)
+    pts.forEach((p) => {
+      ndc.copy(p).project(cam)
+      minX = Math.min(minX, ndc.x); maxX = Math.max(maxX, ndc.x)
+      minY = Math.min(minY, ndc.y); maxY = Math.max(maxY, ndc.y)
+      depth += ndc.copy(p).sub(cam.position).dot(fwd)
+    })
+    const mx = (minX + maxX) / 2, my = (minY + maxY) / 2
+    if (Math.abs(mx) < 1e-4 && Math.abs(my) < 1e-4) break
+    depth /= pts.length
+    const halfH = Math.tan(THREE.MathUtils.degToRad(cam.fov) / 2) * depth
+    const halfW = halfH * cam.aspect
+    right.set(1, 0, 0).applyQuaternion(cam.quaternion)
+    up.set(0, 1, 0).applyQuaternion(cam.quaternion)
+    delta.set(0, 0, 0).addScaledVector(right, mx * halfW).addScaledVector(up, my * halfH)
+    cam.position.add(delta)
+    loadingPreviewCameraTarget.add(delta)
+  }
+  syncLoadingPreviewOrbitControlsTarget()
+  deriveLoadingPreviewOrbitSliders()
 }
 // Camera roll (Rotation Z) -- no native OrbitControls mouse gesture
 // drives this (there's no standard "roll" drag binding), but it's still
