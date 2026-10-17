@@ -20553,7 +20553,7 @@
       "rvEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2420761254919111,\"y\":0}},{\"x\":0.49808104576368795,\"y\":0.5201042175292969,\"h2\":{\"x\":-0.15265989501529392,\"y\":0},\"h1\":{\"x\":0.16826240944716064,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.21032795125519754,\"y\":0.02666651407877607}}]",
       "rvSet1Enabled": true,
       "rvSet1Angle": 0,
-      "rvSet1DisplacementRange": "{\"min\":0,\"max\":1.5}",
+      "rvSet1DisplacementRange": "{\"min\":0,\"max\":1}",
       "rvSet1DisplacementCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3967103333579234,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5253122070015039,\"y\":0}}]",
       "rvSet1DisplacementDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.19981724032896742,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.833323194891296,\"y\":0}}]",
       "rvSet1TriggerAngleRange": "{\"min\":60,\"max\":180}",
@@ -20561,11 +20561,11 @@
       "rvSet1AngleCurveRange": "{\"min\":0,\"max\":-80}",
       "rvSet1AngleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4780737165807672,\"y\":0.032499949137369755}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.24845611244388488,\"y\":-0.02083333333333337}}]",
       "rvSet1ArmEnabled": true,
-      "rvSet1ArmRange": "{\"min\":0,\"max\":120}",
+      "rvSet1ArmRange": "{\"min\":0,\"max\":35.7}",
       "rvSet1ArmCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3702826059891438,\"y\":0.018437449137369777}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.48799201528715386,\"y\":0}}]",
       "rvSet1ArmDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.26249141925110764,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.288378762917763,\"y\":0}}]",
       "rvSet1SplayEnabled": true,
-      "rvSet1SplayRange": "{\"min\":-45,\"max\":0}",
+      "rvSet1SplayRange": "{\"min\":-32,\"max\":0}",
       "rvSet1SplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7954588183066637,\"y\":0.01270802815755212}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.20254507962820756,\"y\":0}}]",
       "rvSet1SplayDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7056328547404378,\"y\":-0.028958384195963527}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.19855279935153713,\"y\":0}}]",
       "rvSet1CropEnabled": false,
@@ -63814,7 +63814,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (4)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -64094,7 +64094,7 @@
                             "type": "group",
                             "group": {
                               "key": "Velocity Arm Rotation",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -64121,7 +64121,7 @@
                             "type": "group",
                             "group": {
                               "key": "Velocity Wrist Splay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
