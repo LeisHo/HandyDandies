@@ -3321,7 +3321,7 @@ const DEV_GROUPS = [
         // refreshSelectOptions() call, not automatically -- without this,
         // saving or deleting a pose here wouldn't show up there until the
         // page reloads.
-        onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose'); safeRefreshSelectOptions('rcTargetPose'); safeRefreshSelectOptions('dcHoldTargetPose'); safeRefreshMultiSelectOptions('tweenPoses') }
+        onChange: () => { safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose'); safeRefreshSelectOptions('rcTargetPose'); safeRefreshSelectOptions('dcHoldTargetPose'); rvRefreshPoseSelects(); safeRefreshMultiSelectOptions('tweenPoses') }
       },
       // The "Default" button used to live here as its own DEV_GROUPS row
       // (reset every pose slider to its own CODE default). Direct
@@ -10642,6 +10642,16 @@ function rvSharedControls() {
     { key: 'rvSets', label: 'Displacement Angle Sets (internal)', type: 'text', def: '[]', onChange: () => rvReconcileSets() }
   ]
 }
+// Options of a Pose Transition's Target Pose: '' (none) then every saved pose. Refreshed when the saved poses change, see rvRefreshPoseSelects().
+function rvPoseOptions() { return [{ value: '', text: '(None)' }, ...(cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null }))] }
+function rvRefreshPoseSelects() {
+  try { rvSetList.forEach((e) => safeRefreshSelectOptions(`${e.prefix}CurlTargetPose`)) } catch (err) { /* sets not built yet (module order) */ }
+}
+function rvPoseByName(name) {
+  if (!name) return null
+  const m = (cfg.savedPoses || []).filter((p) => p.name === name)
+  return m[m.length - 1] || null
+}
 function rvSetControls(S) {
   // visibilityToggle (2026-10-17, direct request): perDevice rows have no Independent checkbox, but get the Show in Mobile/Landscape one (checkbox / slider / select rows; the engine gives text-widget rows - ranges, curves - none anywhere).
   const pd = { perDevice: true, visibilityToggle: true, onChange: () => rvQueueUi() }
@@ -10664,8 +10674,11 @@ function rvSetControls(S) {
     ...effect('Arm', '{"min":0,"max":12}', 'Rotation', 'Deg'),
     ...effect('Splay', '{"min":0,"max":25}', 'Splay', 'Deg'),
     ...effect('Crop', '{"min":0,"max":0.4}', 'Crop', '0-1'),
-    ...effect('Curl', '{"min":0,"max":40}', 'Finger Curl', '%'),
-    { key: `${S}CurlMax`, label: 'Max Finger Curl (%)', type: 'slider', min: -200, max: 200, step: 1, def: 100, ...pd }
+    // Pose Transition (2026-10-17, direct request; replaces Finger Curl - the keys keep the Curl names so the saved layout and values stay attached): the hand blends toward ONE target pose by the curve's progress (X: velocity, Y: 0 = no change, 1 = the target pose).
+    { key: `${S}CurlEnabled`, label: 'On/Off', type: 'checkbox', def: false, ...pd },
+    { key: `${S}CurlTargetPose`, label: 'Target Pose', type: 'select', def: '', options: rvPoseOptions, ...pd },
+    { key: `${S}CurlCurve`, label: 'Pose Transition Curve (Velocity -> Progress To Target Pose)', type: 'text', def: RV_LIN, ...pd },
+    { key: `${S}CurlDistCurve`, label: 'Pose Transition Distance Curve (Distance -> Scaler)', type: 'text', def: RV_FLAT1, ...pd }
   ]
 }
 function rvQueueUi() {
@@ -10709,14 +10722,14 @@ function rvRegisterSet(prefix, title, mainBody, beforeEl) {
   rvRangeRow(`${S}TriggerAngleRange`, { trackMin: 0, trackMax: 180, unit: 'deg', defaultValue: { min: 0, max: 0 } })
   rvRangeRow(`${S}AngleCurveRange`, { trackMin: -360, trackMax: 360, unit: 'deg', defaultValue: { min: 0, max: 180 } })
   rvCurveRow(`${S}AngleCurve`, 'X: Hand Angle To The Cursor Path (Min -> Max Trigger Angle)  ·  Y: Displacement Angle (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
-  const effects = [['Arm', 'Velocity Arm Rotation', 'Rotation', 60, 'deg', 1, { min: 0, max: 12 }], ['Splay', 'Velocity Wrist Splay', 'Splay', 90, 'deg', 1, { min: 0, max: 25 }], ['Crop', 'Velocity Wrist Crop', 'Crop', 1, '', 2, { min: 0, max: 0.4 }], ['Curl', 'Velocity Finger Curl', 'Finger Curl', 200, '%', 0, { min: 0, max: 40 }]]
+  const effects = [['Arm', 'Velocity Arm Rotation', 'Rotation', 60, 'deg', 1, { min: 0, max: 12 }], ['Splay', 'Velocity Wrist Splay', 'Splay', 90, 'deg', 1, { min: 0, max: 25 }], ['Crop', 'Velocity Wrist Crop', 'Crop', 1, '', 2, { min: 0, max: 0.4 }], ['Curl', 'Velocity Finger Curl', 'Pose Transition', 200, '%', 0, { min: 0, max: 40 }]]
   effects.forEach(([name, , label, trackMax, unit, decimals, defVal]) => {
-    rvRangeRow(`${S}${name}Range`, { trackMin: name === 'Curl' ? -200 : (name === 'Arm' || name === 'Splay' ? -trackMax : 0), trackMax, unit: unit || 'x', decimals, defaultValue: defVal })
-    rvCurveRow(`${S}${name}Curve`, RV_CURVE_X_VELOCITY + `  ·  Y: ${label} (0 = Min, 1 = Max)`, [{ x: 0, y: 0 }, { x: 1, y: 1 }])
+    if (name !== 'Curl') rvRangeRow(`${S}${name}Range`, { trackMin: name === 'Arm' || name === 'Splay' ? -trackMax : 0, trackMax, unit: unit || 'x', decimals, defaultValue: defVal })
+    rvCurveRow(`${S}${name}Curve`, RV_CURVE_X_VELOCITY + (name === 'Curl' ? '  ·  Y: Progress To The Target Pose (0 = No Change, 1 = The Target Pose)' : `  ·  Y: ${label} (0 = Min, 1 = Max)`), [{ x: 0, y: 0 }, { x: 1, y: 1 }])
     rvCurveRow(`${S}${name}DistCurve`, RV_CURVE_X_DIST + `  ·  Y: ${label} Scaler (0 - 1)`, [{ x: 0, y: 1 }, { x: 1, y: 1 }])
   })
   wrapGatedSubgroup(`${S}AngleCurveEnabled`, [`${S}AngleCurveRange`, `${S}AngleCurve`], 'Displacement Angle Curve')
-  effects.forEach(([name, subTitle]) => wrapGatedSubgroup(`${S}${name}Enabled`, [`${S}${name}Range`, `${S}${name}Curve`, `${S}${name}DistCurve`, ...(name === 'Curl' ? [`${S}CurlMax`] : [])], subTitle))
+  effects.forEach(([name, subTitle]) => wrapGatedSubgroup(`${S}${name}Enabled`, [name === 'Curl' ? `${S}CurlTargetPose` : `${S}${name}Range`, `${S}${name}Curve`, `${S}${name}DistCurve`], subTitle))
   rvGateHeader(g, `${S}Enabled`)
   g.classList.add('collapsed')
   g.querySelectorAll('.dp-group').forEach((sg) => sg.classList.add('collapsed'))
@@ -10911,10 +10924,11 @@ function rvRefreshUi() {
 // ---- runtime ----
 function rvResetAll() {
   hands.forEach((h) => {
-    if (!h._rv && !h._rvSplay && !h._rvCurl && !h._rvCrop) return
+    if (!h._rv && !h._rvSplay && !h._rvPoseKey && !h._rvCrop) return
     h._rv = null
-    if (h._rvSplay || h._rvCurl) h._rvRepose = true
-    h._rvSplay = 0; h._rvCurl = 0; h._rvCrop = 0
+    if (h._rvSplay || h._rvPoseKey) h._rvRepose = true
+    h._rvSplay = 0; h._rvPoseKey = ''; h._rvCrop = 0
+    if (h._rvPL) h._rvPL.length = 0
     if (h._rvDisp) h._rvDisp.set(0, 0, 0)
     if (h._rvTilt) h._rvTilt.set(0, 0, 0)
   })
@@ -10981,7 +10995,7 @@ function updateResponsiveVelocity(nowMs) {
       S, on: cfg[`${S}Enabled`] !== false, angle: rvNum(`${S}Angle`, 0), disp: rvRange(`${S}DisplacementRange`, 0, 5), trig: rvRange(`${S}TriggerAngleRange`, 0, 0),
       angleCurve: !!cfg[`${S}AngleCurveEnabled`], angleR: rvRange(`${S}AngleCurveRange`, 0, 180),
       arm: !!cfg[`${S}ArmEnabled`] && rvRange(`${S}ArmRange`, 0, 12), splay: !!cfg[`${S}SplayEnabled`] && rvRange(`${S}SplayRange`, 0, 25),
-      crop: !!cfg[`${S}CropEnabled`] && rvRange(`${S}CropRange`, 0, 0.4), curl: !!cfg[`${S}CurlEnabled`] && rvRange(`${S}CurlRange`, 0, 40), curlMax: rvNum(`${S}CurlMax`, 100),
+      crop: !!cfg[`${S}CropEnabled`] && rvRange(`${S}CropRange`, 0, 0.4), curl: !!cfg[`${S}CurlEnabled`] && rvPoseByName(cfg[`${S}CurlTargetPose`]),
       kAng: `${S}AngleCurve`, kDD: `${S}DisplacementDistCurve`, kD: `${S}DisplacementCurve`, kA: `${S}ArmCurve`, kAD: `${S}ArmDistCurve`, kS: `${S}SplayCurve`, kSD: `${S}SplayDistCurve`, kC: `${S}CropCurve`, kCD: `${S}CropDistCurve`, kL: `${S}CurlCurve`, kLD: `${S}CurlDistCurve`
     }
   })
@@ -11008,7 +11022,9 @@ function updateResponsiveVelocity(nowMs) {
     const ndLive = dMax > 0 ? THREE.MathUtils.clamp(dist / dMax, 0, 1) : 0
     let ndPath = -1 // this hand's distance from the cursor path, worked out once, at its onset
     const dispSum = hand._rvDisp.set(0, 0, 0), tiltSum = hand._rvTilt.set(0, 0, 0)
-    let splay = 0, crop = 0, curl = 0, ceil = Infinity, live = false
+    let splay = 0, crop = 0, live = false
+    const pl = hand._rvPL || (hand._rvPL = []) // [target pose, weight, ...] of the Pose Transitions in play this frame
+    pl.length = 0
     for (let si = 0; si < sets.length; si++) {
       const c = sets[si]
       let st = rv.s[c.S]
@@ -11044,8 +11060,7 @@ function updateResponsiveVelocity(nowMs) {
         st.arm = c.arm ? rvLerp(c.arm, rvCurveY(c.kA, vn)) * rvCurveY(c.kAD, ndU) : 0
         st.splay = c.splay ? rvLerp(c.splay, rvCurveY(c.kS, vn)) * rvCurveY(c.kSD, ndU) : 0
         st.crop = c.crop ? rvLerp(c.crop, rvCurveY(c.kC, vn)) * rvCurveY(c.kCD, ndU) : 0
-        st.curl = c.curl ? rvLerp(c.curl, rvCurveY(c.kL, vn)) * rvCurveY(c.kLD, ndU) : 0
-        st.ceil = c.curlMax
+        st.curl = c.curl ? rvCurveY(c.kL, vn) * rvCurveY(c.kLD, ndU) : 0 // progress toward the target pose (0..1), fixed at the onset like the other amounts
         st.nd = ndU
       }
       // Sequence (2026-10-15, direct request: hands already triggered finish their sequence even when the cursor has moved away). A hand that is triggered starts an onset: its start delay, then progress 0 -> 1 over
@@ -11072,12 +11087,14 @@ function updateResponsiveVelocity(nowMs) {
       if (st.disp) dispSum.set(dispSum.x + st.wx * st.disp * w, dispSum.y + st.wy * st.disp * w, dispSum.z + st.wz * st.disp * w)
       if (st.arm) tiltSum.set(tiltSum.x + st.wx * st.arm * w, tiltSum.y + st.wy * st.arm * w, tiltSum.z + st.wz * st.arm * w)
       splay += st.splay * w; crop += st.crop * w
-      if (st.curl) { curl += st.curl * w; ceil = Math.min(ceil, st.ceil) }
+      if (st.curl && c.curl) pl.push(c.curl, Math.min(st.curl * w, 1))
     }
     rv.live = live
     if (live) any = true
-    if (Math.abs(splay - (hand._rvSplay || 0)) > 1e-4 || Math.abs(curl - (hand._rvCurl || 0)) > 1e-4) hand._rvRepose = true
-    hand._rvSplay = splay; hand._rvCrop = crop; hand._rvCurl = curl; hand._rvCurlCeil = ceil
+    let pk = ''
+    for (let i = 0; i < pl.length; i += 2) pk += pl[i].name + ':' + pl[i + 1].toFixed(3) + ';'
+    if (Math.abs(splay - (hand._rvSplay || 0)) > 1e-4 || pk !== (hand._rvPoseKey || '')) hand._rvRepose = true
+    hand._rvSplay = splay; hand._rvCrop = crop; hand._rvPoseKey = pk
   }
   rvHasState = any || rvHasState
   if (!any && !trigActive) rvHasState = false
@@ -11115,19 +11132,14 @@ function rvApplyDisplacement() {
 }
 function rvCropTarget(hand, target) { return hand._rvCrop ? THREE.MathUtils.clamp(target + hand._rvCrop, 0, 1) : target }
 function rvSplayOf(hand) { return hand._rvSplay || 0 }
-function rvCurlKey(hand) { return hand._rvCurl ? '|c' + hand._rvCurl.toFixed(3) : '' }
-// The pose values the fingers are curled with: the hand's own values plus the velocity curl (clamped to the Max Finger Curl ceiling, never pulling a finger below where it already is).
+function rvCurlKey(hand) { return hand._rvPoseKey ? '|p' + hand._rvPoseKey : '' }
+// The pose values the wrist and fingers are posed with: the hand's own values blended toward each in-play Pose Transition's target pose by its progress (in set order). The same object is returned untouched when none is in play.
 function rvCurlValues(hand, values) {
-  const d = hand._rvCurl
-  if (!d) return values
-  const v = Object.create(values)
-  const ceil = hand._rvCurlCeil ?? 100
-  FINGER_NAMES.forEach((n) => {
-    const key = FINGER_CURL_KEY[n], base = values[key]
-    if (typeof base !== 'number') return
-    v[key] = d > 0 ? Math.min(base + d, Math.max(base, ceil)) : base + d
-  })
-  return v
+  const pl = hand._rvPL
+  if (!pl || !pl.length) return values
+  let v = values
+  for (let i = 0; i < pl.length; i += 2) { const w = pl[i + 1]; if (w > 0) v = lerpPoseValues(v, pl[i], w) }
+  return v === values ? values : Object.assign(Object.create(values), v)
 }
 
 // Small local DOM helper -- devPanel.js's own `el()` isn't exported, and
@@ -12353,7 +12365,7 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
   hand.currentBaseRb.copy(_poseBaseRb)
   // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment.
-  applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, poseValues, extraSplayDeg + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay (hand.currentSplayDeg below stays the plain value)
+  applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, rvCurlValues(hand, poseValues), extraSplayDeg + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay (hand.currentSplayDeg below stays the plain value)
   // CORRECTED 2026-09-27 -- direct report: releasing a Click-Hold, waiting
   // a moment, then clicking elsewhere made the wrist visibly SNAP instead
   // of transitioning smoothly. Root cause: `extraSplayDeg` (Responsive
@@ -20817,7 +20829,7 @@ async function importPosesAndTweenSequences(btn) {
     cfg.savedPoses = items
     syncValue('savedPoses', items)
     posesCount = count
-    safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose'); safeRefreshSelectOptions('rcTargetPose'); safeRefreshSelectOptions('dcHoldTargetPose'); safeRefreshMultiSelectOptions('tweenPoses')
+    safeRefreshSelectOptions('chpTargetPose'); safeRefreshSelectOptions('rchpTargetPose'); safeRefreshSelectOptions('clickTargetPose'); safeRefreshSelectOptions('dblclickTargetPose'); safeRefreshSelectOptions('rcTargetPose'); safeRefreshSelectOptions('dcHoldTargetPose'); rvRefreshPoseSelects(); safeRefreshMultiSelectOptions('tweenPoses')
   }
   if (Array.isArray(incomingTweenSequences)) {
     const { items, count } = mergeImportedListByName(cfg.savedTweenSequences, incomingTweenSequences)
@@ -21881,7 +21893,7 @@ function updateRenderOrder() {
         hand.currentBaseQuat.copy(cloneBaseQuat)
         if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
         hand.currentBaseRb.copy(cloneBaseRb)
-        applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, cfg, extraSplay + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay
+        applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, rvCurlValues(hand, cfg), extraSplay + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay
         // Keeps `hand.currentSplayDeg` (see applyPoseValuesToHand()'s own
         // 2026-09-27 comment) current for idle hands too -- this is the
         // ONLY splay-applying path in this file that doesn't already run
