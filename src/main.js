@@ -1617,7 +1617,7 @@ const RO_PT_OK = new Set(RO_POINTS.map((o) => o.value)), RO_M_OK = new Set(RO_ME
 function roCleanPts(a) { const v = Array.isArray(a) ? a.filter((p) => RO_PT_OK.has(p)) : []; return v.length ? v : ['palmCenter'] }
 function roCleanCond(c) {
   c = c || {}
-  return { xs: c.xs === 'B' ? 'B' : 'A', xp: roCleanPts(c.xp), xq: c.xq === 'any' ? 'any' : 'all', m: RO_M_OK.has(c.m) ? c.m : 'cam', cmp: c.cmp === 'loses' ? 'loses' : 'beats', ys: c.ys === 'A' ? 'A' : 'B', yp: roCleanPts(c.yp), yq: c.yq === 'any' ? 'any' : 'all' }
+  return { xs: c.xs === 'B' ? 'B' : 'A', xp: roCleanPts(c.xp), xq: c.xq === 'any' ? 'any' : 'all', m: RO_M_OK.has(c.m) ? c.m : 'cam', cmp: c.cmp === 'loses' ? 'loses' : c.cmp === 'equal' ? 'equal' : 'beats', ys: c.ys === 'A' ? 'A' : 'B', yp: roCleanPts(c.yp), yq: c.yq === 'any' ? 'any' : 'all' }
 }
 function roCleanRule(r) {
   r = r || {}
@@ -1643,7 +1643,7 @@ function roRules() {
 function roCondText(c) {
   const pts = (arr) => arr.map((p) => RO_PT_TEXT[p] || p).join(' + ')
   const meas = c.m === 'z' ? 'Z' : c.m === 'cur' ? 'Cursor XY' : c.m === 'cur3' ? 'Cursor XYZ' : 'Camera XY'
-  const cmp = c.m === 'z' ? (c.cmp === 'beats' ? 'higher than' : 'lower than') : (c.cmp === 'beats' ? 'closer than' : 'farther than')
+  const cmp = c.cmp === 'equal' ? 'equal to (within 0.01)' : c.m === 'z' ? (c.cmp === 'beats' ? 'higher than' : 'lower than') : (c.cmp === 'beats' ? 'closer than' : 'farther than')
   return (c.xq === 'any' ? 'any of ' : 'all of ') + 'Hand ' + c.xs + ' [' + pts(c.xp) + '] ' + meas + ' is ' + cmp + ' ' + (c.yq === 'any' ? 'any of ' : 'all of ') + 'Hand ' + c.ys + ' [' + pts(c.yp) + ']'
 }
 function roRuleText(r) {
@@ -1734,6 +1734,13 @@ function computeRenderOrderRanks() {
       const xa = c.xp.map((p) => keyOf(c.m, p)), ya = c.yp.map((p) => keyOf(c.m, p))
       return (a, b) => {
         const hx = c.xs === 'A' ? a : b, hy = c.ys === 'A' ? a : b
+        if (c.cmp === 'equal') {
+          // Equal (2026-10-17): the values are the same to within the tolerance. all / any apply as everywhere: all of X vs all of Y = every x equals every y; all vs any = every x equals some y; any vs all = some x equals every y; any vs any = some x equals some y.
+          const xv = xa.map((arr) => arr[hx]), yv = ya.map((arr) => arr[hy])
+          const eq = (p, q) => Math.abs(p - q) <= TOL
+          const ok = c.xq === 'all' ? xv.every((p) => (c.yq === 'all' ? yv.every((q) => eq(p, q)) : yv.some((q) => eq(p, q)))) : xv.some((p) => (c.yq === 'all' ? yv.every((q) => eq(p, q)) : yv.some((q) => eq(p, q))))
+          return { ok, L: aggOf(xa, hx, false), R: aggOf(ya, hy, false) }
+        }
         if (c.cmp === 'beats') { const L = aggOf(xa, hx, c.xq === 'any'), R = aggOf(ya, hy, c.yq === 'all'); return { ok: L > R + TOL, L, R } }
         const L = aggOf(xa, hx, c.xq === 'all'), R = aggOf(ya, hy, c.yq === 'any')
         return { ok: L < R - TOL, L, R }
@@ -1982,7 +1989,7 @@ function buildRenderOrderRulesWidget() {
   wrap.appendChild(bar); wrap.appendChild(list); row.appendChild(wrap)
   const QUANT = [{ value: 'all', text: 'all of' }, { value: 'any', text: 'any of' }]
   const HAND = [{ value: 'A', text: 'Hand A' }, { value: 'B', text: 'Hand B' }]
-  const cmpOpts = (m) => (m === 'z' ? [{ value: 'beats', text: 'higher than' }, { value: 'loses', text: 'lower than' }] : [{ value: 'beats', text: 'closer than' }, { value: 'loses', text: 'farther than' }])
+  const cmpOpts = (m) => (m === 'z' ? [{ value: 'beats', text: 'higher than' }, { value: 'loses', text: 'lower than' }, { value: 'equal', text: 'equal to' }] : [{ value: 'beats', text: 'closer than' }, { value: 'loses', text: 'farther than' }, { value: 'equal', text: 'equal to' }])
   const ptChips = (arr, onChange) => {
     const box = elLocal('div', { display: 'flex', gap: '4px', flexWrap: 'wrap', margin: '2px 0 4px 0' })
     RO_POINTS.forEach((o) => {
