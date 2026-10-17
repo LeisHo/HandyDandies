@@ -1173,7 +1173,7 @@ function lpApplyProgressCrop(h, crop, flip) {
   pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
 }
 let lpCropLast = { progress: 0, crop: 0 }
-window.__lpCropDbg = { get cfg() { return cfg }, frame: (dt, now) => animate(dt, now), previewSeq: () => { const r = loadingPreviewHand && loadingPreviewHand.clipRig; return { done: loadingPreviewSequenceDone, lap: loadingPreviewLapIndex, startup: lpPrevStartupPhase, cropT: r ? +(1 - (r.baseY - r.block.position.y) / r.topY0).toFixed(3) : (loadingPreviewHand && loadingPreviewHand.wristClipPlane ? +loadingPreviewHand.wristClipPlane.constant.toFixed(4) : null), animT: +lpAnimT.toFixed(3), progress: +loadingProgressNow(true).toFixed(3) } }, visibleHands: () => hands.filter((h) => h.wrapper.visible).length, poseSig: (i) => { const sk = hands[i].skinnedMesh.skeleton; return sk.bones.map((b) => b.quaternion.toArray().map((v) => +v.toFixed(5)).join(',')).join('|') }, reposeAll: () => applyAllFingerPoses(), warm: () => ({ stage: fieldWarmStage, idx: fieldWarmRevealIndex, batch: fieldWarmBatch, hands: hands.length }), update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, roHands: () => hands, roCmp: (a, b) => roLastCmp(a, b), roPoint: (i, p) => { const v = new THREE.Vector3(); roPointInto(hands[i], p, v); return v.toArray() }, roSetRules: (obj) => { cfg.renderOrderRules = JSON.stringify(obj) }, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
+window.__lpCropDbg = { get cfg() { return cfg }, frame: (dt, now) => animate(dt, now), previewSeq: () => { const r = loadingPreviewHand && loadingPreviewHand.clipRig; return { done: loadingPreviewSequenceDone, lap: loadingPreviewLapIndex, startup: lpPrevStartupPhase, cropT: r ? +(1 - (r.baseY - r.block.position.y) / r.topY0).toFixed(3) : (loadingPreviewHand && loadingPreviewHand.wristClipPlane ? +loadingPreviewHand.wristClipPlane.constant.toFixed(4) : null), animT: +lpAnimT.toFixed(3), progress: +loadingProgressNow(true).toFixed(3) } }, visibleHands: () => hands.filter((h) => h.wrapper.visible).length, poseSig: (i) => { const sk = hands[i].skinnedMesh.skeleton; return sk.bones.map((b) => b.quaternion.toArray().map((v) => +v.toFixed(5)).join(',')).join('|') }, reposeAll: () => applyAllFingerPoses(), warm: () => ({ stage: fieldWarmStage, idx: fieldWarmRevealIndex, batch: fieldWarmBatch, hands: hands.length }), update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, roHands: () => hands, roHit: (a, b) => roHandsIntersect(a, b), roHitInfo: () => { const m = roBuildHitModel(); return { segs: m.segs.length, radii: m.segs.map((x) => +x.r.toFixed(4)) } }, roFrame: () => { roFrameNo++; roHitMemo.clear() }, roCmp: (a, b) => roLastCmp(a, b), roPoint: (i, p) => { const v = new THREE.Vector3(); roPointInto(hands[i], p, v); return v.toArray() }, roSetRules: (obj) => { cfg.renderOrderRules = JSON.stringify(obj) }, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
 window.__lpCrop = () => ({ ...lpCropLast, boxMs: lpProgressCropBox && lpProgressCropBox.ms, hand1: loadingPreviewHand && loadingPreviewHand.progressCrop ? { ext: loadingPreviewHand.progressCrop.ext, wrist: loadingPreviewHand.progressCrop.wrist, tip: loadingPreviewHand.progressCrop.tip, yMin: loadingPreviewHand.progressCrop.yMin, yMax: loadingPreviewHand.progressCrop.yMax, sgn: loadingPreviewHand.progressCrop.sgn, plane: loadingPreviewHand.progressCrop.uni.value.toArray() } : null, hand2: !!loadingPreviewHand2 }) // debug read-out for tests
 function updateLoadingPreviewProgressCrop() {
   let crop = 0, progress = 0
@@ -1617,7 +1617,7 @@ const RO_PT_OK = new Set(RO_POINTS.map((o) => o.value)), RO_M_OK = new Set(RO_ME
 function roCleanPts(a) { const v = Array.isArray(a) ? a.filter((p) => RO_PT_OK.has(p)) : []; return v.length ? v : ['palmCenter'] }
 function roCleanCond(c) {
   c = c || {}
-  return { xs: c.xs === 'B' ? 'B' : 'A', xp: roCleanPts(c.xp), xq: c.xq === 'any' ? 'any' : 'all', m: RO_M_OK.has(c.m) ? c.m : 'cam', cmp: c.cmp === 'loses' ? 'loses' : c.cmp === 'equal' ? 'equal' : 'beats', ys: c.ys === 'A' ? 'A' : 'B', yp: roCleanPts(c.yp), yq: c.yq === 'any' ? 'any' : 'all' }
+  return { k: c.k === 'hit' ? 'hit' : c.k === 'nohit' ? 'nohit' : 'cmp', xs: c.xs === 'B' ? 'B' : 'A', xp: roCleanPts(c.xp), xq: c.xq === 'any' ? 'any' : 'all', m: RO_M_OK.has(c.m) ? c.m : 'cam', cmp: c.cmp === 'loses' ? 'loses' : c.cmp === 'equal' ? 'equal' : 'beats', ys: c.ys === 'A' ? 'A' : 'B', yp: roCleanPts(c.yp), yq: c.yq === 'any' ? 'any' : 'all' }
 }
 function roCleanRule(r) {
   r = r || {}
@@ -1641,6 +1641,8 @@ function roRules() {
   return roRulesVal
 }
 function roCondText(c) {
+  if (c.k === 'hit') return "the two hands' models intersect"
+  if (c.k === 'nohit') return "the two hands' models do not intersect"
   const pts = (arr) => arr.map((p) => RO_PT_TEXT[p] || p).join(' + ')
   const meas = c.m === 'z' ? 'Z' : c.m === 'cur' ? 'Cursor XY' : c.m === 'cur3' ? 'Cursor XYZ' : 'Camera XY'
   const cmp = c.cmp === 'equal' ? 'equal to (within 0.01)' : c.m === 'z' ? (c.cmp === 'beats' ? 'higher than' : 'lower than') : (c.cmp === 'beats' ? 'closer than' : 'farther than')
@@ -1658,6 +1660,136 @@ function roPointInto(hand, p, out) {
   return out.copy(hand.wrapper.position)
 }
 const roKeyArrs = {}
+// ---- Hand model intersection (2026-10-17, direct request: "if the 3d models are intersecting physically" / "does not intersect") ----
+// Comparing two skinned meshes triangle by triangle for thousands of hands per frame is not feasible, so each hand is a chain of CAPSULES along its bones. Measured once from the loaded model (rest pose): every bone owns the segments from
+// its head to each child bone's head (a leaf bone: to the mean of its farthest vertices), and the capsule radius is the 85th percentile of the distance of the vertices that bone dominates (largest skin weight) to those segments, in the
+// bone's own local units; at run time the radius is multiplied by the bone's current world scale, so it follows Pose Scale and the field scale. Two hands intersect when any capsule of one overlaps any capsule of the other
+// (segment-to-segment distance < the sum of the radii). A bounding-box test per hand pair rejects almost every pair first. It is an approximation of the real mesh (a few millimetres of slack either way); poses move the bones, so it
+// follows the pose. Uses last render's bone matrices like the other render-order points.
+let roHitModel = null // { segs: [{ b: bone index, c: child bone index or -1, tip: Vector3 (leaf: local end) or null, r: radius in the bone's local units }] }
+let roFrameNo = 0
+const roHitMemo = new Map()
+function roBuildHitModel() {
+  if (roHitModel) return roHitModel
+  roHitModel = { segs: [] }
+  const skinned = modelRoot ? findSkinnedMesh(modelRoot) : null
+  if (!skinned || !skinned.skeleton || !skinned.geometry.attributes.skinIndex || !skinned.geometry.attributes.skinWeight) return roHitModel
+  const skel = skinned.skeleton, bones = skel.bones
+  const g = skinned.geometry, pos = g.attributes.position, si = g.attributes.skinIndex, sw = g.attributes.skinWeight
+  const idx = new Map(bones.map((b, i) => [b, i]))
+  const kids = bones.map((b) => b.children.filter((c) => idx.has(c)).map((c) => idx.get(c)))
+  const mats = bones.map((_, i) => new THREE.Matrix4().multiplyMatrices(skel.boneInverses[i], skinned.bindMatrix)) // mesh vertex -> that bone's local frame (rest pose)
+  const pts = bones.map(() => [])
+  const v = new THREE.Vector3()
+  for (let i = 0; i < pos.count; i++) {
+    let best = 0, bw = -1
+    for (let k = 0; k < 4; k++) { const w = sw.getComponent(i, k); if (w > bw) { bw = w; best = si.getComponent(i, k) } }
+    if (bw <= 0) continue
+    v.fromBufferAttribute(pos, i).applyMatrix4(mats[best])
+    pts[best].push(v.x, v.y, v.z)
+  }
+  const segDist = (px, py, pz, ex, ey, ez) => { // point to the segment (0,0,0) -> e
+    const L = ex * ex + ey * ey + ez * ez
+    const t = L > 1e-12 ? Math.min(1, Math.max(0, (px * ex + py * ey + pz * ez) / L)) : 0
+    return Math.hypot(px - ex * t, py - ey * t, pz - ez * t)
+  }
+  for (let b = 0; b < bones.length; b++) {
+    const P = pts[b]
+    if (P.length < 18) continue // fewer than 6 vertices: this bone owns no visible part
+    const ends = kids[b].map((c) => bones[c].position.clone())
+    let tip = null
+    if (!ends.length) {
+      // leaf bone: its end is the mean of the 10% of its vertices farthest from its head
+      const order = []
+      for (let i = 0; i < P.length; i += 3) order.push([Math.hypot(P[i], P[i + 1], P[i + 2]), i])
+      order.sort((a, c) => c[0] - a[0])
+      const top = order.slice(0, Math.max(1, Math.round(order.length * 0.1)))
+      tip = new THREE.Vector3()
+      top.forEach(([, i]) => tip.add(v.set(P[i], P[i + 1], P[i + 2])))
+      tip.multiplyScalar(1 / top.length)
+      ends.push(tip)
+    }
+    const d = []
+    for (let i = 0; i < P.length; i += 3) { let m = Infinity; ends.forEach((e) => { m = Math.min(m, segDist(P[i], P[i + 1], P[i + 2], e.x, e.y, e.z)) }); d.push(m) }
+    d.sort((a, c) => a - c)
+    const r = d[Math.min(d.length - 1, Math.floor(d.length * 0.85))]
+    kids[b].forEach((c, ci) => roHitModel.segs.push({ b, c, tip: null, r }))
+    if (tip) roHitModel.segs.push({ b, c: -1, tip, r })
+  }
+  return roHitModel
+}
+// One hand's capsules in world space for this frame (lazy; null when the hand has no skeleton or the model has no skin data).
+function roHandCaps(hand) {
+  if (hand._roCapFrame === roFrameNo) return hand._roCap
+  hand._roCapFrame = roFrameNo
+  const m = roBuildHitModel()
+  if (!m.segs.length || !hand.skinnedMesh) { hand._roCap = null; return null }
+  const bones = hand.skinnedMesh.skeleton.bones, S = m.segs.length
+  let cap = hand._roCap
+  if (!cap || cap.n !== S) cap = hand._roCap = { n: S, p: new Float64Array(S * 6), r: new Float64Array(S), min: [0, 0, 0], max: [0, 0, 0] }
+  let x0 = Infinity, y0 = Infinity, z0 = Infinity, x1 = -Infinity, y1 = -Infinity, z1 = -Infinity
+  for (let i = 0; i < S; i++) {
+    const sg = m.segs[i], bone = bones[sg.b], e = bone.matrixWorld.elements
+    const o = i * 6
+    cap.p[o] = e[12]; cap.p[o + 1] = e[13]; cap.p[o + 2] = e[14]
+    if (sg.c >= 0) { const f = bones[sg.c].matrixWorld.elements; cap.p[o + 3] = f[12]; cap.p[o + 4] = f[13]; cap.p[o + 5] = f[14] }
+    else { _roNodeV.copy(sg.tip).applyMatrix4(bone.matrixWorld); cap.p[o + 3] = _roNodeV.x; cap.p[o + 4] = _roNodeV.y; cap.p[o + 5] = _roNodeV.z }
+    const r = sg.r * Math.hypot(e[0], e[1], e[2])
+    cap.r[i] = r
+    for (let k = 0; k < 2; k++) {
+      const x = cap.p[o + k * 3], y = cap.p[o + k * 3 + 1], z = cap.p[o + k * 3 + 2]
+      if (x - r < x0) x0 = x - r; if (x + r > x1) x1 = x + r
+      if (y - r < y0) y0 = y - r; if (y + r > y1) y1 = y + r
+      if (z - r < z0) z0 = z - r; if (z + r > z1) z1 = z + r
+    }
+  }
+  cap.min[0] = x0; cap.min[1] = y0; cap.min[2] = z0; cap.max[0] = x1; cap.max[1] = y1; cap.max[2] = z1
+  return cap
+}
+// Squared distance between segments P1Q1 and P2Q2 (closest points, clamped; Ericson, Real-Time Collision Detection 5.1.9).
+function roSegDistSq(p1x, p1y, p1z, q1x, q1y, q1z, p2x, p2y, p2z, q2x, q2y, q2z) {
+  const d1x = q1x - p1x, d1y = q1y - p1y, d1z = q1z - p1z, d2x = q2x - p2x, d2y = q2y - p2y, d2z = q2z - p2z
+  const rx = p1x - p2x, ry = p1y - p2y, rz = p1z - p2z
+  const a = d1x * d1x + d1y * d1y + d1z * d1z, e = d2x * d2x + d2y * d2y + d2z * d2z, f = d2x * rx + d2y * ry + d2z * rz
+  const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x)
+  const EPS = 1e-12
+  let s, t
+  if (a <= EPS && e <= EPS) { s = 0; t = 0 }
+  else if (a <= EPS) { s = 0; t = clamp01(f / e) }
+  else {
+    const c = d1x * rx + d1y * ry + d1z * rz
+    if (e <= EPS) { t = 0; s = clamp01(-c / a) }
+    else {
+      const b = d1x * d2x + d1y * d2y + d1z * d2z, den = a * e - b * b
+      s = den > EPS ? clamp01((b * f - c * e) / den) : 0
+      t = (b * s + f) / e
+      if (t < 0) { t = 0; s = clamp01(-c / a) } else if (t > 1) { t = 1; s = clamp01((b - c) / a) }
+    }
+  }
+  const cx = p1x + d1x * s - (p2x + d2x * t), cy = p1y + d1y * s - (p2y + d2y * t), cz = p1z + d1z * s - (p2z + d2z * t)
+  return cx * cx + cy * cy + cz * cz
+}
+// Do the models of hands a and b physically intersect (this frame; memoised per pair)?
+function roHandsIntersect(a, b) {
+  if (a > b) { const t = a; a = b; b = t }
+  const key = a * 100003 + b
+  const hit = roHitMemo.get(key)
+  if (hit !== undefined) return hit
+  let res = false
+  const ca = roHandCaps(hands[a]), cb = roHandCaps(hands[b])
+  if (ca && cb && !(ca.max[0] < cb.min[0] || cb.max[0] < ca.min[0] || ca.max[1] < cb.min[1] || cb.max[1] < ca.min[1] || ca.max[2] < cb.min[2] || cb.max[2] < ca.min[2])) {
+    outer:
+    for (let i = 0; i < ca.n; i++) {
+      const o = i * 6
+      for (let j = 0; j < cb.n; j++) {
+        const q = j * 6, rr = ca.r[i] + cb.r[j]
+        if (roSegDistSq(ca.p[o], ca.p[o + 1], ca.p[o + 2], ca.p[o + 3], ca.p[o + 4], ca.p[o + 5], cb.p[q], cb.p[q + 1], cb.p[q + 2], cb.p[q + 3], cb.p[q + 4], cb.p[q + 5]) < rr * rr) { res = true; break outer }
+      }
+    }
+  }
+  roHitMemo.set(key, res)
+  return res
+}
 // Which condition the rule fired on for this pair, e.g. "Mode [Palm To Arm End]: Hand 12 palm center Z 4.21 is higher than Hand 13 arm end Z 3.90". Called right after cmpLevels(lo, hi) (it reads roPriority) with the same
 // frame's evaluator arrays. loAbove = the FINAL order; if the rule wanted the other way (flip lock or a conflicting constraint decided), that is said too.
 function roExplain(lv, r, lo, hi, loAbove) {
@@ -1700,6 +1832,7 @@ function roFinishFrame(n, np, cmpLevels, logOn, lockOn, lv) {
 }
 function computeRenderOrderRanks() {
   const n = hands.length
+  roFrameNo++; roHitMemo.clear()
   const camSign = camera.position.z >= 0 ? 1 : -1
   const TOL = 0.01
   // Per-frame point keys (a bigger key is better, see RO_MEASURES): one array per (measure, point), computed once per frame and only for what the rules use.
@@ -1731,6 +1864,7 @@ function computeRenderOrderRanks() {
     // One condition for an ordered pair (a = Hand A, b = Hand B) -> { ok, L, R }. beats: L > R, where all of X is the smallest of X, any of X the largest; the right side is all = largest, any = smallest (every x must beat every y /
     // some y). loses: the mirror image (X is farther / lower).
     const conds = r.conds.map((c) => {
+      if (c.k === 'hit' || c.k === 'nohit') return (a, b) => { const hit = roHandsIntersect(a, b); return { ok: c.k === 'hit' ? hit : !hit, L: hit ? 1 : 0, R: 0 } } // symmetric in A / B
       const xa = c.xp.map((p) => keyOf(c.m, p)), ya = c.yp.map((p) => keyOf(c.m, p))
       return (a, b) => {
         const hx = c.xs === 'A' ? a : b, hy = c.ys === 'A' ? a : b
@@ -2003,8 +2137,20 @@ function buildRenderOrderRulesWidget() {
   }
   const line = () => elLocal('div', { display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' })
   const changed = () => { write(); redraw() }
+  const COND_KINDS = [{ value: 'cmp', text: 'Compare points' }, { value: 'hit', text: "Hand models intersect" }, { value: 'nohit', text: "Hand models do not intersect" }]
   const condBox = (r, c, ci) => {
     const box = elLocal('div', { border: '1px solid rgba(255,255,255,0.18)', borderRadius: '4px', padding: '4px 6px', display: 'flex', flexDirection: 'column', gap: '2px' })
+    if (c.k === 'hit' || c.k === 'nohit') {
+      const lk = line()
+      lk.appendChild(mkSel(COND_KINDS, c.k, (v) => { c.k = v; changed() }))
+      const xk = mkBtn('\u00d7', () => { r.conds.splice(ci, 1); changed() }, 'Remove this condition'); xk.style.marginLeft = 'auto'
+      lk.appendChild(xk)
+      box.appendChild(lk)
+      return box
+    }
+    const l0 = line()
+    l0.appendChild(mkSel(COND_KINDS, c.k || 'cmp', (v) => { c.k = v; changed() }))
+    box.appendChild(l0)
     const l1 = line()
     l1.appendChild(mkSel(QUANT, c.xq, (v) => { c.xq = v; changed() }))
     l1.appendChild(mkSel(HAND, c.xs, (v) => { c.xs = v; changed() }))
