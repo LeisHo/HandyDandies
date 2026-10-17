@@ -19573,15 +19573,15 @@
       "rvRetransitionEnabled": true,
       "rvRetransitionSpeedMs": 3000,
       "rvRetransitionSpeedCurveEnabled": true,
-      "rvRetransitionSpeedRange": "{\"min\":771,\"max\":1711}",
+      "rvRetransitionSpeedRange": "{\"min\":1102,\"max\":1557}",
       "rvRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3532455511941396,\"y\":0.016041819254557277}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.30411404903012607,\"y\":-0.010624949137369777}}]",
       "rvRetransitionStartTimeCurveEnabled": true,
       "rvRetransitionStartTimeRange": "{\"min\":0,\"max\":576}",
       "rvRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3761819986567636,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35357760153286977,\"y\":0}}]",
       "rvRetransitionEasingCurveEnabled": true,
-      "rvRetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5250899593329849,\"y\":0}},{\"x\":0.7175100416594987,\"y\":1,\"h2\":{\"x\":-0.2899852512803038,\"y\":0},\"h1\":{\"x\":0.14228244759686637,\"y\":-0.006666564941406272}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.0805843691691589,\"y\":0.17593765258789062}}]",
+      "rvRetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3963582210310581,\"y\":0.015937296549479174}},{\"x\":0.5034088451378229,\"y\":0.3692708333333333,\"h2\":{\"x\":-0.16667371398938702,\"y\":0},\"h1\":{\"x\":0.21410119652167592,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.1388524604908824,\"y\":0}}]",
       "rvEasingCurveEnabled": true,
-      "rvEasingCurve": "[{\"x\":0,\"y\":0.5173957824707032,\"h1\":{\"x\":0.2420761254919111,\"y\":0}},{\"x\":0.596011699711758,\"y\":1,\"h2\":{\"x\":-0.3507807724979016,\"y\":0},\"h1\":{\"x\":0.16826240944716064,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.21032795125519754,\"y\":0.02666651407877607}}]",
+      "rvEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2420761254919111,\"y\":0}},{\"x\":0.507354457394722,\"y\":0.7390625,\"h2\":{\"x\":-0.15265989501529392,\"y\":0},\"h1\":{\"x\":0.16826240944716064,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.21032795125519754,\"y\":0.02666651407877607}}]",
       "rvSet1Enabled": true,
       "rvSet1Angle": 0,
       "rvSet1DisplacementRange": "{\"min\":1,\"max\":4}",
@@ -61026,7 +61026,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -61048,7 +61048,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -61070,7 +61070,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -61148,7 +61148,7 @@
                       "type": "group",
                       "group": {
                         "key": "Easing",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
