@@ -1121,15 +1121,15 @@ function setupLoadingPreviewProgressCropGroup() {
 // The loading progress, 0..1. There is no single measured progress value in this app, so it is built from the real startup stages: model (10%), settings applied (10%), the hands built in slices (45%), the shader warm-up and
 // hand reveal (35%) - and never ahead of the elapsed share of Min Loading Time (the reveal is held back until both are done, so the two reach 100% together). With "Use Real-Time Loading Progress" off it is the Min Loading Time share alone. Those weights are a judgment call, not a measurement.
 // Once the loading screen is gone (the live preview), it loops 0 -> 100% over Min Loading Time (at least 1.5 s) so the curve can be tuned by eye.
-function loadingProgressNow() {
+function loadingProgressNow(real = cfg.loadingPreviewProgressCropRealtime !== false) {
   const now = performance.now()
   if (fieldRevealed) { const period = Math.max(cfg.loadingMinTimeMs || 0, 1500); return (now % period) / period }
   if (fieldStarted) return 1
   const warm = fieldWarmStage >= 3 ? 1 : fieldWarmStage >= 1 ? 0.3 * (fieldWarmStage >= 2 ? 1 : Math.min(1, (now - fieldWarmStartMs) / FIELD_WARM_CAP_MS)) + 0.7 * (hands.length ? fieldWarmRevealIndex / hands.length : 0) : 0
   const work = 0.1 * (modelMeasurementsReady ? 1 : 0) + 0.1 * (startupSettingsReady ? 1 : 0) + 0.45 * (fieldBuildDone ? 1 : fieldBuildFrac) + 0.35 * warm
   const timeFrac = Math.min(1, (now - pageLoadStartMs) / Math.max(cfg.loadingMinTimeMs || 0, 1))
-  loadingProgressShown = Math.max(loadingProgressShown, cfg.loadingPreviewProgressCropRealtime === false ? timeFrac : Math.min(work, timeFrac))
-  return loadingProgressShown
+  loadingProgressShown = Math.max(loadingProgressShown, Math.min(work, timeFrac)) // the real progress (never ahead of the Min Loading Time clock, never backwards)
+  return real ? loadingProgressShown : timeFrac // real = stage progress; otherwise just the Min Loading Time clock (Progress Crop's own checkbox picks which)
 }
 // Per loading hand: a fragment-shader clip against ONE plane in the hand's own frame (injected through onBeforeCompile on top of the toon shader, so it is independent per hand - the optional second hand has its own orientation -
 // and does not collide with the Clipping Block planes, which are an intersection set). The plane is {normal = the hand's local Y axis}; the model's extent along Y comes from its bind-pose bounding box.
@@ -1185,7 +1185,7 @@ function lpApplyProgressCrop(h, crop, flip) {
   pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
 }
 let lpCropLast = { progress: 0, crop: 0 }
-window.__lpCropDbg = { get cfg() { return cfg }, frame: (dt, now) => animate(dt, now), visibleHands: () => hands.filter((h) => h.wrapper.visible).length, poseSig: (i) => { const sk = hands[i].skinnedMesh.skeleton; return sk.bones.map((b) => b.quaternion.toArray().map((v) => +v.toFixed(5)).join(',')).join('|') }, reposeAll: () => applyAllFingerPoses(), warm: () => ({ stage: fieldWarmStage, idx: fieldWarmRevealIndex, batch: fieldWarmBatch, hands: hands.length }), update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
+window.__lpCropDbg = { get cfg() { return cfg }, frame: (dt, now) => animate(dt, now), previewSeq: () => { const r = loadingPreviewHand && loadingPreviewHand.clipRig; return { done: loadingPreviewSequenceDone, lap: loadingPreviewLapIndex, startup: lpPrevStartupPhase, cropT: r ? +(1 - (r.baseY - r.block.position.y) / r.topY0).toFixed(3) : (loadingPreviewHand && loadingPreviewHand.wristClipPlane ? +loadingPreviewHand.wristClipPlane.constant.toFixed(4) : null), animT: +lpAnimT.toFixed(3), progress: +loadingProgressNow(true).toFixed(3) } }, visibleHands: () => hands.filter((h) => h.wrapper.visible).length, poseSig: (i) => { const sk = hands[i].skinnedMesh.skeleton; return sk.bones.map((b) => b.quaternion.toArray().map((v) => +v.toFixed(5)).join(',')).join('|') }, reposeAll: () => applyAllFingerPoses(), warm: () => ({ stage: fieldWarmStage, idx: fieldWarmRevealIndex, batch: fieldWarmBatch, hands: hands.length }), update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
 window.__lpCrop = () => ({ ...lpCropLast, boxMs: lpProgressCropBox && lpProgressCropBox.ms, hand1: loadingPreviewHand && loadingPreviewHand.progressCrop ? { ext: loadingPreviewHand.progressCrop.ext, wrist: loadingPreviewHand.progressCrop.wrist, tip: loadingPreviewHand.progressCrop.tip, yMin: loadingPreviewHand.progressCrop.yMin, yMax: loadingPreviewHand.progressCrop.yMax, sgn: loadingPreviewHand.progressCrop.sgn, plane: loadingPreviewHand.progressCrop.uni.value.toArray() } : null, hand2: !!loadingPreviewHand2 }) // debug read-out for tests
 function updateLoadingPreviewProgressCrop() {
   let crop = 0, progress = 0
@@ -2645,6 +2645,9 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewEnabled', label: 'Show Hand Loading Animation', type: 'checkbox', def: true },
       // Loading Preview model (2026-10-16, direct request: "allow me to select the model to use for Preview Loading. provide a dropdown"). Same As Hand Model (default) = the model the field uses. Any other choice is loaded separately
       // just for the preview; its measurements (alignment, bounds, bone rest poses) still come from the Hand model, so a model with a different rest pose / proportions will not pose exactly like the saved poses (accepted for now).
+      // Real Time Loading (2026-10-16, direct request): on = the Loading Preview's wrist crop follows the ACTUAL loading progress (0% loaded = 0% crop ... loaded = 100% crop) instead of the crop values stored in the poses of the
+      // tween (the "wrist crop curve"). Applies to both hands and to the on-screen loading animation; after the loading screen (the live preview) the progress loops 0 -> 100% so it can be watched.
+      { key: 'loadingPreviewRealTimeLoading', label: 'Real Time Loading', type: 'checkbox', def: false, placeAfter: 'loadingPreviewModelId' },
       { key: 'loadingPreviewModelId', label: 'Loading Preview Model', type: 'select', def: '', placeAfter: 'loadingPreviewEnabled', options: () => loadingPreviewModelOptions(), onChange: () => onLoadingPreviewModelChanged() },
       // Direct request, following up on the Offset X/Y sliders below
       // ("so i can position the loading hand preview" implies actually
@@ -8987,7 +8990,8 @@ function updateLoadingPreviewHand2(seq, lapStyle, t) {
   hand2.clone.matrix.copy(_lp2Final)
   hand2.clone.matrixWorldNeedsUpdate = true
   hand2.clone.updateMatrixWorld(true)
-  updateHand2WristClip(typeof cfg2.hand2HideWrist === 'number' ? cfg2.hand2HideWrist : 100)
+  const rtCrop2 = lpRealTimeCropPct()
+  updateHand2WristClip(rtCrop2 !== null ? rtCrop2 : (typeof cfg2.hand2HideWrist === 'number' ? cfg2.hand2HideWrist : 100))
 }
 // Same crop as updateLoadingPreviewWristClip(), for the second hand.
 function updateHand2WristClip(percent) {
@@ -9042,6 +9046,8 @@ let loadingPreviewLapStartMs = 0
 let loadingPreviewHoldEndMs = 0
 let loadingPreviewDirection = 1
 let loadingPreviewSequenceDone = false
+let lpAnimT = 0, lpAnimLastMs = 0 // startup pass: the smoothed animation position (0..1) and the time of the last update
+let lpPrevStartupPhase = true // was the loading screen still up on the previous preview frame (see updateLoadingPreviewAnimation())
 // Called once, from the GLTFLoader callback, right after modelRoot/
 // alignQuat/toonMaterial/handBoundsCenterLocal/handBoundsRadiusLocal are
 // all measured -- same one-time-measurement dependencies buildPosePreview()
@@ -9189,6 +9195,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   // runs once).
   loadingPreviewLapIndex = 1
   loadingPreviewLapStartMs = loadingPreviewAnimStartMs
+  lpAnimT = 0; lpAnimLastMs = loadingPreviewAnimStartMs
   loadingPreviewHoldEndMs = 0
   loadingPreviewDirection = 1
   loadingPreviewSequenceDone = false
@@ -9908,7 +9915,8 @@ function applyLoadingPreviewPose(item) {
   // default aesthetic -- see that control's own def) for whatever has no
   // wrist-crop data at all (poseDefaultValues, which -- like `values` --
   // is also built from POSE_PRESET_KEYS only).
-  updateLoadingPreviewWristClip(item.hideWrist ?? 100)
+  const rtCrop = lpRealTimeCropPct()
+  updateLoadingPreviewWristClip(rtCrop !== null ? rtCrop : (item.hideWrist ?? 100))
 }
 // Loading Preview's own per-pose wrist crop -- direct report ("the
 // imported tweens and poses dont seem to read the wrist cropping data
@@ -9935,6 +9943,10 @@ const _loadingPreviewClipFarPos = new THREE.Vector3()
 const _loadingPreviewClipNearPos = new THREE.Vector3()
 const _loadingPreviewClipDir = new THREE.Vector3()
 const _loadingPreviewClipPoint = new THREE.Vector3()
+// Real Time Loading: the wrist crop in percent from the actual loading progress (0 .. 100), or null when the checkbox is off (the poses' own crop values are used).
+function lpRealTimeCropPct() {
+  return cfg.loadingPreviewRealTimeLoading ? THREE.MathUtils.clamp(loadingProgressNow(true), 0, 1) * 100 : null
+}
 function updateLoadingPreviewWristClip(hideWristPercent) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh || !loadingPreviewHand.wristClipPlane) return
   if (loadingPreviewHand.clipRig) { // Clipping Block path (see makeClipRig)
@@ -10055,13 +10067,26 @@ function updateLoadingPreviewAnimation() {
     applyLoadingPreviewPose(poseDefaultValues)
     return
   }
-  if (loadingPreviewSequenceDone) return // frozen at whatever was last applied
+  // PLAYS ONCE while the loading screen is up (2026-10-16, direct request, desktop and mobile: "only play through once. It begins on startup, and ends when loading is complete. It never loops"): whatever Sequence Mode is set,
+  // the startup preview plays the selected tween exactly once, forward, paced by the real loading progress (see lapT below), and then holds the last pose until the field is
+  // revealed. The configured Sequence Mode (Count / Loop / Oscillate) only applies to the live preview after the loading screen (Show Loading Preview), which starts its own count from the moment the loading screen goes.
+  const startupPhase = !fieldRevealed
+  if (lpPrevStartupPhase && !startupPhase) {
+    loadingPreviewSequenceDone = false; loadingPreviewLapIndex = 1; loadingPreviewHoldEndMs = 0; loadingPreviewLapStartMs = performance.now(); loadingPreviewDirection = 1
+  }
+  lpPrevStartupPhase = startupPhase
+  if (loadingPreviewSequenceDone) {
+    // frozen at whatever was last applied - except the Real Time Loading wrist crop, which keeps following the loading progress
+    const rt = lpRealTimeCropPct()
+    if (rt !== null) { updateLoadingPreviewWristClip(rt); if (loadingPreviewHand2) updateHand2WristClip(rt) }
+    return
+  }
   const segments = resolveTweenSegmentsWithAnchor(anchorPose, rawEntries.slice(anchorIdx + 1))
   const lastPose = segments.length > 0 ? segments[segments.length - 1].poseB : anchorPose
-  const playMode = cfg.loadingPreviewSequenceMode
-  const lapStyle = playMode === 'Count' ? cfg.loadingPreviewSequenceCountMode : playMode
-  const totalLaps = playMode === 'Count' ? Math.max(cfg.loadingPreviewSequenceCount || 1, 1) : Infinity
-  const holdMs = Math.max(cfg.loadingPreviewSequenceHoldMs || 0, 0)
+  const playMode = startupPhase ? 'Count' : cfg.loadingPreviewSequenceMode
+  const lapStyle = startupPhase ? 'Loop' : (playMode === 'Count' ? cfg.loadingPreviewSequenceCountMode : playMode)
+  const totalLaps = startupPhase ? 1 : (playMode === 'Count' ? Math.max(cfg.loadingPreviewSequenceCount || 1, 1) : Infinity)
+  const holdMs = startupPhase ? 0 : Math.max(cfg.loadingPreviewSequenceHoldMs || 0, 0)
   const now = performance.now()
   if (loadingPreviewHoldEndMs && now < loadingPreviewHoldEndMs) return // mid-hold -- last applied pose stays, nothing to reapply (no other config drives this preview's own idle state)
   if (loadingPreviewHoldEndMs && now >= loadingPreviewHoldEndMs) {
@@ -10082,7 +10107,17 @@ function updateLoadingPreviewAnimation() {
   const speedMs = playMode === 'Count'
     ? Math.max((cfg.loadingMinTimeMs || 0) / totalLaps, 1)
     : Math.max(safeTweenSpeedMs(cfg.loadingPreviewSpeedMs), 1)
-  const lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / speedMs, 0, 1)
+  // Startup: the single pass is paced by the REAL loading progress (the stage-weighted progress, never ahead of the Min Loading Time clock), smoothed (time constant 250 ms) so a stage that finishes in one step does not
+  // jump the animation; it therefore starts with the loading and reaches its last pose as loading completes, however long that takes. After the loading screen the lap clock is used as before.
+  let lapT
+  if (startupPhase) {
+    const dtMs = Math.min(Math.max(now - lpAnimLastMs, 0), 1000)
+    lpAnimLastMs = now
+    lpAnimT += (loadingProgressNow(true) - lpAnimT) * (1 - Math.exp(-dtMs / 250))
+    lapT = lpAnimT >= 0.995 ? 1 : lpAnimT
+  } else {
+    lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / speedMs, 0, 1)
+  }
   // Easing Curve (2026-10-12): reshapes WHERE in the lap the pose sits, not
   // how long a lap lasts. The profile's own total is discarded here on
   // purpose -- Count mode's Min Loading Time / Count split must still hold --
@@ -10099,8 +10134,8 @@ function updateLoadingPreviewAnimation() {
   } else if (lapStyle === 'Oscillate') {
     const t = loadingPreviewDirection === 1 ? easedT : 1 - easedT
     values = lerpTweenSegments(segments, t)
-  } else if (cfg.loadingPreviewSequenceLoopTransition === false) {
-    values = lerpTweenSegments(segments, easedT) // instant jump back to frame 1 between laps -- same forward pass every time, no wrap interpolation
+  } else if (startupPhase || cfg.loadingPreviewSequenceLoopTransition === false) {
+    values = lerpTweenSegments(segments, easedT) // (startup: one forward pass, no wrap back to frame 1) instant jump back to frame 1 between laps -- same forward pass every time, no wrap interpolation
   } else {
     // Smooth wrap-back -- same cyclic-ring approach lerpLoopSequence()
     // used before this fix, generalized to WEIGHTED segments (a Hold's
