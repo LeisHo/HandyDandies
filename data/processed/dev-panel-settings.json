@@ -19557,36 +19557,36 @@
       "custom54Trig1TweenStopDelayCurveVisibleOnly": true,
       "custom54Trig1TweenStopDelayCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom54Trig1TweenStopDelayRange": "{\"min\":0,\"max\":2000}",
-      "rvEnabled": false,
+      "rvEnabled": true,
       "rvHoldOnly": false,
-      "rvVelocityRange": "{\"min\":700,\"max\":2500}",
+      "rvVelocityRange": "{\"min\":700,\"max\":4000}",
       "rvVelocitySmoothing": 0.31,
-      "rvTriggerDistanceRange": "{\"min\":15,\"max\":30}",
+      "rvTriggerDistanceRange": "{\"min\":15,\"max\":35}",
       "rvTriggerDistanceCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3572238009602319,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3288804677939753,\"y\":-0.008645884195963571}}]",
       "rvDistanceFrom": "Path Line",
       "rvStartTimeEnabled": true,
-      "rvStartTimeRange": "{\"min\":20,\"max\":500}",
-      "rvStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.26224496887956517,\"y\":0.46552073160807295}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3223635039520899,\"y\":0}}]",
+      "rvStartTimeRange": "{\"min\":0,\"max\":2000}",
+      "rvStartTimeCurve": "[{\"x\":0,\"y\":0.9262499491373698,\"h1\":{\"x\":0.12467185880434682,\"y\":1}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3223635039520899,\"y\":0}}]",
       "rvSpeedEnabled": true,
-      "rvSpeedRange": "{\"min\":904,\"max\":1531}",
-      "rvSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2515702070184387,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.24036571904091975,\"y\":0}}]",
+      "rvSpeedRange": "{\"min\":624,\"max\":1071}",
+      "rvSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5286886580058924,\"y\":0.2421875}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.24036571904091975,\"y\":0}}]",
       "rvRetransitionEnabled": true,
       "rvRetransitionSpeedMs": 3000,
       "rvRetransitionSpeedCurveEnabled": true,
-      "rvRetransitionSpeedRange": "{\"min\":2000,\"max\":3000}",
+      "rvRetransitionSpeedRange": "{\"min\":771,\"max\":1711}",
       "rvRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3532455511941396,\"y\":0.016041819254557277}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.30411404903012607,\"y\":-0.010624949137369777}}]",
       "rvRetransitionStartTimeCurveEnabled": true,
-      "rvRetransitionStartTimeRange": "{\"min\":0,\"max\":1000}",
+      "rvRetransitionStartTimeRange": "{\"min\":0,\"max\":576}",
       "rvRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3761819986567636,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35357760153286977,\"y\":0}}]",
       "rvRetransitionEasingCurveEnabled": true,
-      "rvRetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13192274029367795,\"y\":0.00958328247070317}},{\"x\":0.4876786159319298,\"y\":1,\"h2\":{\"x\":-0.21182526574229643,\"y\":0},\"h1\":{\"x\":0.2234719746970209,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.18443573828960846,\"y\":0.0029164632161458037}}]",
+      "rvRetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5250899593329849,\"y\":0}},{\"x\":0.7175100416594987,\"y\":1,\"h2\":{\"x\":-0.2899852512803038,\"y\":0},\"h1\":{\"x\":0.14228244759686637,\"y\":-0.006666564941406272}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.0805843691691589,\"y\":0.17593765258789062}}]",
       "rvEasingCurveEnabled": true,
       "rvEasingCurve": "[{\"x\":0,\"y\":0.5173957824707032,\"h1\":{\"x\":0.2420761254919111,\"y\":0}},{\"x\":0.596011699711758,\"y\":1,\"h2\":{\"x\":-0.3507807724979016,\"y\":0},\"h1\":{\"x\":0.16826240944716064,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.21032795125519754,\"y\":0.02666651407877607}}]",
       "rvSet1Enabled": true,
       "rvSet1Angle": 0,
-      "rvSet1DisplacementRange": "{\"min\":1,\"max\":3}",
-      "rvSet1DisplacementCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5848903685838712,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.7530462820148024,\"y\":0}}]",
-      "rvSet1DisplacementDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.33829535165870184,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.08596651168645542,\"y\":1}}]",
+      "rvSet1DisplacementRange": "{\"min\":1,\"max\":4}",
+      "rvSet1DisplacementCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.5100212451873049,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3379724610124262,\"y\":0}}]",
+      "rvSet1DisplacementDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.09000374466263499,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.7579899361047228,\"y\":0.02499974568684893}}]",
       "rvSet1TriggerAngleRange": "{\"min\":90,\"max\":270}",
       "rvSet1AngleCurveEnabled": false,
       "rvSet1AngleCurveRange": "{\"min\":0,\"max\":180}",
@@ -60667,7 +60667,7 @@
                 "type": "group",
                 "group": {
                   "key": "Whole-Hand Rotation at Base",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -60729,7 +60729,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -60995,7 +60995,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Velocity",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -61026,7 +61026,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -61048,7 +61048,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -61070,7 +61070,7 @@
                       "type": "group",
                       "group": {
                         "key": "Retransition",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -61081,7 +61081,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Speed Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
@@ -61125,7 +61125,7 @@
                             "type": "group",
                             "group": {
                               "key": "Retransition Easing Curve",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
