@@ -12,7 +12,7 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\",\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\",\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"sort\",\"on\":true,\"p\":\"position\",\"m\":\"z\",\"dir\":\"best\"}]}",
+      "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\",\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\",\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"}]},{\"t\":\"sort\",\"on\":true,\"p\":\"position\",\"m\":\"z\",\"dir\":\"best\"}]}",
       "renderOrderFlipLock": true,
       "handModelId": "repo:HD_IK_500",
       "handModels": [
@@ -625,7 +625,6 @@
       "multiClickWindowMs": 540,
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
-      "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -14974,7 +14973,6 @@
       "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.520072387209009,\"y\":0.023333485921223973}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.47992761279099105,\"y\":-0.0033332824707030806}}]",
       "wristSplayDamping": 0.46,
       "tweenPoses": [],
-      "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
         {
           "name": "Waiting Horizontal Tap",
@@ -15537,7 +15535,7 @@
         }
       ],
       "cameraX": 1.5625001668540408,
-      "cameraY": 3.115090067699776e-13,
+      "cameraY": 3.296950117373157e-13,
       "cameraZ": 197.9876688948102,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -19629,7 +19627,7 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\",\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\",\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"sort\",\"on\":true,\"p\":\"position\",\"m\":\"z\",\"dir\":\"best\"}]}",
+      "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\",\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\",\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"}]},{\"t\":\"sort\",\"on\":true,\"p\":\"position\",\"m\":\"z\",\"dir\":\"best\"}]}",
       "renderOrderFlipLock": true,
       "handModelId": "repo:HD_IK_500",
       "handModels": [
@@ -20242,7 +20240,6 @@
       "multiClickWindowMs": 540,
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
-      "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -34591,7 +34588,6 @@
       "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.520072387209009,\"y\":0.023333485921223973}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.47992761279099105,\"y\":-0.0033332824707030806}}]",
       "wristSplayDamping": 0.24,
       "tweenPoses": [],
-      "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
         {
           "name": "Waiting Horizontal Tap",
@@ -39246,7 +39242,7 @@
       "pauseBtnIconColor": "#ffffff",
       "pauseBtnBorderColor": "#ffffff",
       "pausedRenderFps": 15,
-      "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\",\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\",\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"sort\",\"on\":true,\"p\":\"position\",\"m\":\"z\",\"dir\":\"best\"}]}",
+      "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\",\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\",\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"}]},{\"t\":\"sort\",\"on\":true,\"p\":\"position\",\"m\":\"z\",\"dir\":\"best\"}]}",
       "renderOrderFlipLock": true,
       "handModelId": "repo:HD_IK_500",
       "handModels": [
@@ -39859,7 +39855,6 @@
       "multiClickWindowMs": 540,
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
-      "posePreviewEnabled": false,
       "thumbCurl": 75,
       "thumbSplay": 42,
       "thumbSplay2": 13,
@@ -54208,7 +54203,6 @@
       "wristSplayCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.520072387209009,\"y\":0.023333485921223973}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.47992761279099105,\"y\":-0.0033332824707030806}}]",
       "wristSplayDamping": 0.46,
       "tweenPoses": [],
-      "tweenPreviewSpeedMs": 602,
       "savedTweenSequences": [
         {
           "name": "Waiting Horizontal Tap",
@@ -59892,7 +59886,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -60114,6 +60108,16 @@
               {
                 "type": "row",
                 "key": "handModelId"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Render Order",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [],
+                  "settings": []
+                }
               }
             ],
             "settings": [
@@ -60231,10 +60235,6 @@
               {
                 "type": "row",
                 "key": "poseScale"
-              },
-              {
-                "type": "row",
-                "key": "posePreviewEnabled"
               },
               {
                 "type": "row",
@@ -60681,7 +60681,6 @@
             ],
             "settings": [
               "poseScale",
-              "posePreviewEnabled",
               "savedPoses"
             ]
           }
@@ -60695,10 +60694,6 @@
             "items": [
               {
                 "type": "row",
-                "key": "tweenPreviewSpeedMs"
-              },
-              {
-                "type": "row",
                 "key": "tweenPoses"
               },
               {
@@ -60707,7 +60702,6 @@
               }
             ],
             "settings": [
-              "tweenPreviewSpeedMs",
               "tweenPoses",
               "savedTweenSequences"
             ]
@@ -67192,8 +67186,8 @@
     "desktop": {
       "left": 85.5999984741211,
       "top": 100.7874984741211,
-      "width": 668.7750244140625,
-      "height": 605.9874877929688
+      "width": 671.9750366210938,
+      "height": 607.5875244140625
     },
     "mobile": {
       "left": 59.61309814453125,
