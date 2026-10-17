@@ -3648,6 +3648,7 @@ const DEV_GROUPS = [
         itemLabel: 'Toon',
         exportable: true,
         importable: true,
+        isInUse: (item) => toonItemMatchesLive(item), // (in use) = the item whose values equal the live Toon Shading settings
         captureCurrent: () => captureToonPreset(),
         onUse: (item) => useToonPreset(item)
       }
@@ -6420,6 +6421,14 @@ function captureToonPreset() {
   TOON_PRESET_KEYS.forEach((key) => { item[key] = cfg[key] })
   return item
 }
+// An item is "in use" when every value it stores equals the live Toon Shading setting (numbers within 1e-3, colours case-insensitively).
+function toonItemMatchesLive(item) {
+  return TOON_PRESET_KEYS.every((k) => {
+    if (item[k] === undefined) return true
+    const a = item[k], b = cfg[k]
+    return typeof a === 'string' && typeof b === 'string' ? a.toLowerCase() === b.toLowerCase() : nearNum(a, b, 1e-3)
+  })
+}
 function useToonPreset(item) {
   TOON_PRESET_KEYS.forEach((key) => {
     if (item[key] === undefined) return
@@ -8554,7 +8563,7 @@ function lightingItemMatchesLive(item) {
   })
 }
 function refreshAllItemSelectorMarks() {
-  ;['savedPoses', 'savedCameras', 'savedLighting', 'loadingPreviewSavedCameras', 'loadingPreviewSavedLighting'].forEach(refreshListPickerMarksByKey)
+  ;['savedPoses', 'savedCameras', 'savedLighting', 'savedToon', 'loadingPreviewSavedCameras', 'loadingPreviewSavedLighting'].forEach(refreshListPickerMarksByKey)
 }
 // Default is PER DEVICE (2026-10-16, direct request: a Default set on the Mobile tab is Mobile's own and does not override Desktop's). It goes to the device whose tab is showing: on the real device's own tab it also puts the
 // live camera there (as before); on another device's tab nothing live moves - that device's stored default is set and its camera sliders (what it starts from) are put on the same view.
@@ -21763,10 +21772,10 @@ let marksFrame = 0
 armLengthWidgetResyncs.push(() => {
   if (++marksFrame % 6 !== 0) return
   const t = controls.target
-  const sig = [camera.position.x, camera.position.y, camera.position.z, camera.fov, cfg.cameraRoll || 0, t.x, t.y, t.z].map((v) => Math.round(v * 100)).join(',') + '|' + LIGHTING_PRESET_KEYS.map((k) => cfg[k]).join(',') + '|' + cfg.loadingPreviewCameraSelector + '|' + cfg.loadingPreviewLightingSelector
+  const sig = [camera.position.x, camera.position.y, camera.position.z, camera.fov, cfg.cameraRoll || 0, t.x, t.y, t.z].map((v) => Math.round(v * 100)).join(',') + '|' + LIGHTING_PRESET_KEYS.map((k) => cfg[k]).join(',') + '|' + cfg.loadingPreviewCameraSelector + '|' + cfg.loadingPreviewLightingSelector + '|' + TOON_PRESET_KEYS.map((k) => cfg[k]).join(',')
   if (sig === marksLastSig) return
   marksLastSig = sig
-  refreshListPickerMarksByKey('savedCameras'); refreshListPickerMarksByKey('savedLighting'); refreshListPickerMarksByKey('loadingPreviewSavedCameras'); refreshListPickerMarksByKey('loadingPreviewSavedLighting')
+  refreshListPickerMarksByKey('savedCameras'); refreshListPickerMarksByKey('savedLighting'); refreshListPickerMarksByKey('savedToon'); refreshListPickerMarksByKey('loadingPreviewSavedCameras'); refreshListPickerMarksByKey('loadingPreviewSavedLighting')
 })
 gateGroupHeader('Floor', 'floorEnabled')
 updateFloorRowVisibility()
