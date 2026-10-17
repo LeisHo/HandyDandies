@@ -388,6 +388,9 @@ let loadingPreviewAnchorActive = false
 let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: null, speedRangeParsed: null }
 const loadingPreviewAnchor = new THREE.Vector3()
 const _loadingPreviewBase = new THREE.Vector3(), _loadingPreviewV2 = new THREE.Vector3()
+// Two-hand tween: the base position applyLoadingPreviewPose() gave the main hand (before the Pose Offset), and whether it was HANDO's exact pivots (see there) - updateLoadingPreviewHand2() needs both for the mirror plane.
+const _lpTwoHandBase = new THREE.Vector3(), _lpWholeRotQ = new THREE.Quaternion(), _lpPivotDelta = new THREE.Vector3()
+let lpTwoHandExact = false
 // World-XY-only cursor distance for click-function settings (2026-10-04,
 // direct request: "for any click function settings that depend on distance
 // from cursor, the distance should only be based off of world XY vectors").
@@ -8833,13 +8836,24 @@ async function importTwoHandTween(btn) {
     incoming.forEach((item) => {
       if (!item || typeof item.name !== 'string') return
       const i = out.findIndex((x) => x.name === item.name)
-      if (i >= 0) out[i] = { ...item, ...(out[i].group ? { group: out[i].group } : {}) }
+      // an incoming MAIN pose replacing a leftover second-hand pose of the same name (an earlier import with the name clash below) does not inherit that pose's "2ND HAND" group
+      if (i >= 0) out[i] = { ...item, ...(out[i].group && !(out[i].hand2Pose && !item.hand2Pose) ? { group: out[i].group } : {}) }
       else out.push(item)
     })
     return out
   }
   const mainPoses = Array.isArray(data.poses) ? data.poses : []
-  const hand2Poses = (Array.isArray(data.hand2Poses) ? data.hand2Poses : []).filter((p) => p && typeof p.name === 'string').map((p) => ({ ...hand2PoseToMainItem(p), group: '2ND HAND' }))
+  // HANDO keeps the main hand's poses and the 2nd hand's poses in two SEPARATE lists, so the same name can be used in both (a "2 TWIDS - 0" for each hand). Saved Poses here is ONE list keyed by name, so merging both by name made the
+  // 2nd hand's pose overwrite the main hand's - the main hand then played the 2nd hand's pose (its Whole-Hand Rotation / Base Rotation / Pose Offset / Pose Scale lost, the finger values of the wrong hand). 2026-10-17, direct report:
+  // the hand rotation and offset came out completely off. A 2nd-hand pose whose name a main pose already uses is stored as "<name> (2ND HAND)" and the sequences' tweenPosesHand2 are pointed at the new name.
+  const mainPoseNames = new Set(mainPoses.filter((p) => p && typeof p.name === 'string').map((p) => p.name))
+  const hand2NameMap = {}
+  const hand2Poses = (Array.isArray(data.hand2Poses) ? data.hand2Poses : []).filter((p) => p && typeof p.name === 'string').map((p) => {
+    const item = { ...hand2PoseToMainItem(p), group: '2ND HAND' }
+    if (mainPoseNames.has(p.name)) { hand2NameMap[p.name] = p.name + ' (2ND HAND)'; item.name = hand2NameMap[p.name] }
+    return item
+  })
+  const renameHand2Entries = (list) => (Array.isArray(list) ? list.map((e) => (typeof e === 'string' && hand2NameMap[e] ? hand2NameMap[e] : e)) : list)
   const poses = mergeByName(cfg.savedPoses || [], [...mainPoses, ...hand2Poses])
   cfg.savedPoses = poses
   syncValue('savedPoses', poses)
@@ -8863,7 +8877,7 @@ async function importTwoHandTween(btn) {
   if (handoScale && ma && typeof ma.x === 'number') handoAnchorRaw = { x: ma.x / handoScale, y: ma.y / handoScale, z: ma.z / handoScale }
   const incomingSeqs = (Array.isArray(data.tweenSequences) && data.tweenSequences.length ? data.tweenSequences : [{ name: data.name || 'Two-Hand Tween', tweenPoses: data.tweenPoses, tweenPosesHand2: data.tweenPosesHand2 }])
     .filter((q) => q && typeof q.name === 'string')
-    .map((q) => ({ name: q.name, tweenPoses: Array.isArray(q.tweenPoses) ? q.tweenPoses : (data.tweenPoses || []), tweenPosesHand2: Array.isArray(q.tweenPosesHand2) ? q.tweenPosesHand2 : (data.tweenPosesHand2 || []), twoHand: h2.show2ndHand !== false, hand2: placement, ...(handoScale ? { handoScale } : {}), ...(handoAnchorRaw ? { handoAnchorRaw } : {}) }))
+    .map((q) => ({ name: q.name, tweenPoses: Array.isArray(q.tweenPoses) ? q.tweenPoses : (data.tweenPoses || []), tweenPosesHand2: renameHand2Entries(Array.isArray(q.tweenPosesHand2) ? q.tweenPosesHand2 : (data.tweenPosesHand2 || [])), twoHand: h2.show2ndHand !== false, hand2: placement, ...(handoScale ? { handoScale } : {}), ...(handoAnchorRaw ? { handoAnchorRaw } : {}) }))
   if (!incomingSeqs.length) { flash('No sequence found'); return }
   const sequences = mergeByName(cfg.savedTweenSequences || [], incomingSeqs)
   cfg.savedTweenSequences = sequences
@@ -8965,7 +8979,10 @@ function updateLoadingPreviewHand2(seq, lapStyle, t) {
     // (A non-zero Pose Offset on the main hand moves HANDO's hand but not its anchor; the preview adds it to the position, so that case is left as it was.)
     const sMain = loadingPreviewModelScale > 0 ? c1.scale.x / loadingPreviewModelScale : 1
     _lp2Rh.copy(alignQuat).invert().multiply(c1.quaternion)
-    _lp2V2.copy(handoPivotRaw).applyQuaternion(_lp2Rh).multiplyScalar(sMain).add(seq.handoAnchorRaw ? _lp2Anchor.set(seq.handoAnchorRaw.x, seq.handoAnchorRaw.y, seq.handoAnchorRaw.z) : handBoundsBoxCenterRaw).sub(handoPivotRaw).applyQuaternion(alignQuat).multiplyScalar(loadingPreviewModelScale).add(c1.position)
+    // With HANDO's exact main-hand placement (lpTwoHandExact) the anchor is simply the FIXED point HANDO reflects about: its raw position through alignQuat and the model scale, plus whatever the Pose Offset added to the hand
+    // (HANDO's anchor does not move with it - the old behaviour, kept).
+    if (lpTwoHandExact) _lp2V2.copy(seq.handoAnchorRaw ? _lp2Anchor.set(seq.handoAnchorRaw.x, seq.handoAnchorRaw.y, seq.handoAnchorRaw.z) : handBoundsBoxCenterRaw).applyQuaternion(alignQuat).multiplyScalar(loadingPreviewModelScale).add(c1.position).sub(_lpTwoHandBase)
+    else _lp2V2.copy(handoPivotRaw).applyQuaternion(_lp2Rh).multiplyScalar(sMain).add(seq.handoAnchorRaw ? _lp2Anchor.set(seq.handoAnchorRaw.x, seq.handoAnchorRaw.y, seq.handoAnchorRaw.z) : handBoundsBoxCenterRaw).sub(handoPivotRaw).applyQuaternion(alignQuat).multiplyScalar(loadingPreviewModelScale).add(c1.position)
     _lp2Final.makeTranslation(_lp2V2.x, _lp2V2.y, _lp2V2.z).multiply(_lp2Mir).multiply(_lp2Tmp.makeTranslation(-_lp2V2.x, -_lp2V2.y, -_lp2V2.z)).multiply(_lp2U)
   } else {
     _lp2Final.copy(_lp2U)
@@ -9870,15 +9887,24 @@ function applyLoadingPreviewPose(item) {
   // offsets are then added on top as before.
   const previewScale = (values.poseScale ?? 1) * loadingPreviewModelScale
   let previewBase = _poseOffsetZeroVec
+  lpTwoHandExact = false
   if (loadingPreviewAnchorActive && loadingPreviewTwoHandActive) {
     // Two-hand tween (2026-10-14, direct report: the two hands were too far apart). convertHandoCameraPreset() maps HANDO's camera AND target by a pure rotation (alignQuat, no translation), so for this preview to look like
     // HANDO under that camera the main hand must sit exactly where HANDO puts it, not be re-centred on the target: HANDO turns / scales the main hand about its PALM centre Pn (x -> Pn + s*R*(x - Pn)), which in this
     // preview (raw -> alignQuat * modelScale) is a base position of modelScale * (alignQuat*Pn - s * baseQuat*Pn). Pinning the bounds centre to the target (the single-hand behaviour) moves the pair off HANDO's framing - a preset
     // such as "2 HAND TWIDDLING" deliberately aims between the hands - and so moved hand 2, whose mirror plane is HANDO's fixed one (see updateLoadingPreviewHand2()), relative to the frame.
-    _loadingPreviewBase.copy(handoPivotRaw).applyQuaternion(alignQuat)
-    _loadingPreviewBase.addScaledVector(_loadingPreviewV2.copy(handoPivotRaw).applyQuaternion(loadingPreviewHand.clone.quaternion), -(values.poseScale ?? 1))
+    // CORRECTED 2026-10-17 (direct report: a Whole-Hand Rotation at Base of 135 on X put the whole pair ~200 HANDO units off): the above turns the WHOLE rotation about the palm, but HANDO turns only Whole-Hand Rotation about the palm and
+    // the Base Rotation about the ARM BASE (rForearmBend, forearmPosRaw): M(x) = W + s*q*(x - Pb) with W = Pn + s*q0*(Pb - Pn) (q0 = the Whole-Hand part, q = q0*Rb). With no Base Rotation this is exactly the old palm-pivot formula
+    // (W - s*q*Pb = Pn - s*q*Pn). q0 in this preview's axes is alignQuat * wholeRot (the clone's quaternion is alignQuat * wholeRot * Rb).
+    const sP = values.poseScale ?? 1
+    _lpWholeRotQ.setFromEuler(_loadingPreviewWholeHandRotEuler).premultiply(alignQuat)
+    _lpPivotDelta.copy(forearmPosRaw).sub(handoPivotRaw).applyQuaternion(_lpWholeRotQ).multiplyScalar(sP) // s * q0 * (Pb - Pn)
+    _loadingPreviewBase.copy(handoPivotRaw).applyQuaternion(alignQuat).add(_lpPivotDelta) // W
+    _loadingPreviewBase.addScaledVector(_loadingPreviewV2.copy(forearmPosRaw).applyQuaternion(loadingPreviewHand.clone.quaternion), -sP) // - s * q * Pb
     _loadingPreviewBase.multiplyScalar(loadingPreviewModelScale)
     previewBase = _loadingPreviewBase
+    _lpTwoHandBase.copy(_loadingPreviewBase)
+    lpTwoHandExact = true
   } else if (loadingPreviewAnchorActive) {
     _loadingPreviewBase.copy(handBoundsCenterLocal).multiplyScalar(previewScale).applyQuaternion(loadingPreviewHand.clone.quaternion)
     _loadingPreviewBase.copy(loadingPreviewAnchor).sub(_loadingPreviewBase)
