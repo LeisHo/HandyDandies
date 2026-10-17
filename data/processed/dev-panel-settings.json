@@ -541,7 +541,7 @@
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
       "loadingPreviewRotationX": -86.01368143278576,
-      "loadingPreviewRotationY": 163.33502779823712,
+      "loadingPreviewRotationY": 163.33502779823706,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -15981,7 +15981,7 @@
       "startupFnSequenceHoldMs": 5000,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09543983904136633,\"y\":0.00031229654947917407}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.5199999491373698}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09543983904136633,\"y\":0.00031229654947917407}},{\"x\":0.4706317530284705,\"y\":1,\"h1\":{\"x\":0.32258469020531544,\"y\":0.02971216837565105},\"h2\":{\"x\":-0.2908549882123181,\"y\":-0.2641248067220051}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.1557522669841115,\"y\":0}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
       "startupFnSpeedCurveEnabled": true,
@@ -20151,7 +20151,7 @@
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
       "loadingPreviewRotationX": -86.01368143278576,
-      "loadingPreviewRotationY": 163.33502779823712,
+      "loadingPreviewRotationY": 163.33502779823706,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -35153,14 +35153,14 @@
         }
       ],
       "cameraX": -3.4222222222222225,
-      "cameraY": 2.6530905421778093e-13,
-      "cameraZ": 495.9876563792681,
+      "cameraY": 3.564227102601027e-13,
+      "cameraZ": 495.98819379333213,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":-3.4222222222222225,\"cameraY\":1.7419533236278442e-13,\"cameraZ\":495.98765636647585,\"cameraFov\":20,\"cameraZoom\":496,\"cameraRoll\":0,\"targetX\":-3.4222222222222225,\"targetY\":1.4382409174393005e-13,\"targetZ\":-0.012343633524153574}",
-      "cameraZoom": 495.99999999999994,
+      "cameraZoom": 495.9999999999999,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -35591,7 +35591,7 @@
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09543983904136633,\"y\":0.00031229654947917407}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.5199999491373698}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09543983904136633,\"y\":0.00031229654947917407}},{\"x\":0.4706317530284705,\"y\":1,\"h1\":{\"x\":0.32258469020531544,\"y\":0.02971216837565105},\"h2\":{\"x\":-0.2908549882123181,\"y\":-0.2641248067220051}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.1557522669841115,\"y\":0}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
       "startupFnSpeedCurveEnabled": true,
@@ -39761,7 +39761,7 @@
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
       "loadingPreviewRotationX": -86.01368143278576,
-      "loadingPreviewRotationY": 163.33502779823712,
+      "loadingPreviewRotationY": 163.33502779823706,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
@@ -55201,7 +55201,7 @@
       "startupFnSequenceHoldMs": 5000,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09543983904136633,\"y\":0.00031229654947917407}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.5199999491373698}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09543983904136633,\"y\":0.00031229654947917407}},{\"x\":0.4706317530284705,\"y\":1,\"h1\":{\"x\":0.32258469020531544,\"y\":0.02971216837565105},\"h2\":{\"x\":-0.2908549882123181,\"y\":-0.2641248067220051}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.1557522669841115,\"y\":0}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
       "startupFnSpeedCurveEnabled": true,
@@ -59372,7 +59372,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -59468,7 +59468,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -60180,7 +60180,7 @@
           "type": "group",
           "group": {
             "key": "Outline",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -61886,7 +61886,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -61905,7 +61905,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -62128,7 +62128,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Easing",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -67121,10 +67121,10 @@
       "height": 602.7875366210938
     },
     "mobile": {
-      "left": 20,
-      "top": 337.0952453613281,
-      "width": 397.8571472167969,
-      "height": 407.54168701171875
+      "left": 63.03571701049805,
+      "top": 237.88690185546875,
+      "width": 331.38690185546875,
+      "height": 414.88690185546875
     }
   }
 }
