@@ -2084,6 +2084,9 @@ function refreshGroupCascadeChrome(g) {
   forEachVisibilityDescendant(g, (ctrl) => visCtrls.push(ctrl))
   const vis = g._visCascadeCheckbox
   const indep = g._indepCascadeCheckbox
+  // 2026-10-18, direct request: a group whose Show in Mobile/Landscape box is unchecked on Desktop (every checkable setting inside it hidden) must not be visible on Mobile / Landscape at all, even if it also holds rows the checkbox system
+  // cannot cover (text widgets, buttons, curves). Computed here, with the checkbox state, and read by refreshEmptyGroupVisibility().
+  g._allVisOff = visCtrls.length > 0 && visCtrls.every((c) => !isDevRowVisible(c.key))
   if (vis) {
     vis.style.display = (onDesktop && visCtrls.length) ? '' : 'none'
     if (visCtrls.length) {
@@ -3065,7 +3068,7 @@ function refreshEmptyGroupVisibility() {
       if (g.dataset.alwaysVisible === '1') { g.classList.remove('dp-group-hidden-empty'); return }
       const hasVisibleRow = !!Array.from(body.children).find((child) => child.classList.contains('dp-row') && !child.classList.contains('dp-row-device-hidden'))
       const hasVisibleSubgroup = !!Array.from(body.children).find((child) => child.classList.contains('dp-group') && !child.classList.contains('dp-group-hidden-empty'))
-      g.classList.toggle('dp-group-hidden-empty', !hasVisibleRow && !hasVisibleSubgroup)
+      g.classList.toggle('dp-group-hidden-empty', !!g._allVisOff || (!hasVisibleRow && !hasVisibleSubgroup))
     })
 }
 
