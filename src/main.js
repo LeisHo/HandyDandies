@@ -1111,10 +1111,10 @@ function setupLoadingPreviewProgressCropGroup() {
 }
 // The loading progress, 0..1. There is no single measured progress value in this app, so it is built from the real startup stages: model (10%), settings applied (10%), the hands built in slices (45%), the shader warm-up and
 // hand reveal (35%) - and never ahead of the elapsed share of Min Loading Time (the reveal is held back until both are done, so the two reach 100% together). With "Use Real-Time Loading Progress" off it is the Min Loading Time share alone. Those weights are a judgment call, not a measurement.
-// Once the loading screen is gone (the live preview), it loops 0 -> 100% over Min Loading Time (at least 1.5 s) so the curve can be tuned by eye.
+// The crop runs ONCE (2026-10-17, direct request: "the cropping from 100 to 0 only runs once"): 0 -> 1 over the loading, then it holds at 1 - the loading screen going away does not restart it (it used to loop 0 -> 1 over Min Loading Time in the live preview).
 function loadingProgressNow(real = cfg.loadingPreviewProgressCropRealtime !== false) {
   const now = performance.now()
-  if (fieldRevealed) { const period = Math.max(cfg.loadingMinTimeMs || 0, 1500); return (now % period) / period }
+  if (fieldRevealed) return 1
   if (fieldStarted) return 1
   const warm = fieldWarmStage >= 3 ? 1 : fieldWarmStage >= 1 ? 0.3 * (fieldWarmStage >= 2 ? 1 : Math.min(1, (now - fieldWarmStartMs) / FIELD_WARM_CAP_MS)) + 0.7 * (hands.length ? fieldWarmRevealIndex / hands.length : 0) : 0
   const work = 0.1 * (modelMeasurementsReady ? 1 : 0) + 0.1 * (startupSettingsReady ? 1 : 0) + 0.45 * (fieldBuildDone ? 1 : fieldBuildFrac) + 0.35 * warm
@@ -1176,7 +1176,7 @@ function lpApplyProgressCrop(h, crop, flip) {
   pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
 }
 let lpCropLast = { progress: 0, crop: 0 }
-window.__lpCropDbg = { get cfg() { return cfg }, frame: (dt, now) => animate(dt, now), previewSeq: () => { const r = loadingPreviewHand && loadingPreviewHand.clipRig; return { done: loadingPreviewSequenceDone, lap: loadingPreviewLapIndex, startup: lpPrevStartupPhase, cropT: r ? +(1 - (r.baseY - r.block.position.y) / r.topY0).toFixed(3) : (loadingPreviewHand && loadingPreviewHand.wristClipPlane ? +loadingPreviewHand.wristClipPlane.constant.toFixed(4) : null), animT: +lpAnimT.toFixed(3), progress: +loadingProgressNow(true).toFixed(3) } }, visibleHands: () => hands.filter((h) => h.wrapper.visible).length, poseSig: (i) => { const sk = hands[i].skinnedMesh.skeleton; return sk.bones.map((b) => b.quaternion.toArray().map((v) => +v.toFixed(5)).join(',')).join('|') }, reposeAll: () => applyAllFingerPoses(), warm: () => ({ stage: fieldWarmStage, idx: fieldWarmRevealIndex, batch: fieldWarmBatch, hands: hands.length }), update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, roHands: () => hands, roHit: (a, b) => roHandsIntersect(a, b), roHitInfo: () => { const m = roBuildHitModel(); return { segs: m.segs.length, radii: m.segs.map((x) => +x.r.toFixed(4)) } }, roFrame: () => { roFrameNo++; roHitMemo.clear() }, roCmp: (a, b) => roLastCmp(a, b), roPoint: (i, p) => { const v = new THREE.Vector3(); roPointInto(hands[i], p, v); return v.toArray() }, roSetRules: (obj) => { cfg.renderOrderRules = JSON.stringify(obj) }, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
+window.__lpCropDbg = { get cfg() { return cfg }, frame: (dt, now) => animate(dt, now), previewSeq: () => { const r = loadingPreviewHand && loadingPreviewHand.clipRig; return { done: loadingPreviewSequenceDone, lap: loadingPreviewLapIndex, cropT: r ? +(1 - (r.baseY - r.block.position.y) / r.topY0).toFixed(3) : (loadingPreviewHand && loadingPreviewHand.wristClipPlane ? +loadingPreviewHand.wristClipPlane.constant.toFixed(4) : null), progress: +loadingProgressNow(true).toFixed(3) } }, visibleHands: () => hands.filter((h) => h.wrapper.visible).length, poseSig: (i) => { const sk = hands[i].skinnedMesh.skeleton; return sk.bones.map((b) => b.quaternion.toArray().map((v) => +v.toFixed(5)).join(',')).join('|') }, reposeAll: () => applyAllFingerPoses(), warm: () => ({ stage: fieldWarmStage, idx: fieldWarmRevealIndex, batch: fieldWarmBatch, hands: hands.length }), update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, roHands: () => hands, roHit: (a, b) => roHandsIntersect(a, b), roHitInfo: () => { const m = roBuildHitModel(); return { segs: m.segs.length, radii: m.segs.map((x) => +x.r.toFixed(4)) } }, roFrame: () => { roFrameNo++; roHitMemo.clear() }, roCmp: (a, b) => roLastCmp(a, b), roPoint: (i, p) => { const v = new THREE.Vector3(); roPointInto(hands[i], p, v); return v.toArray() }, roSetRules: (obj) => { cfg.renderOrderRules = JSON.stringify(obj) }, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
 window.__lpCrop = () => ({ ...lpCropLast, boxMs: lpProgressCropBox && lpProgressCropBox.ms, hand1: loadingPreviewHand && loadingPreviewHand.progressCrop ? { ext: loadingPreviewHand.progressCrop.ext, wrist: loadingPreviewHand.progressCrop.wrist, tip: loadingPreviewHand.progressCrop.tip, yMin: loadingPreviewHand.progressCrop.yMin, yMax: loadingPreviewHand.progressCrop.yMax, sgn: loadingPreviewHand.progressCrop.sgn, plane: loadingPreviewHand.progressCrop.uni.value.toArray() } : null, hand2: !!loadingPreviewHand2 }) // debug read-out for tests
 function updateLoadingPreviewProgressCrop() {
   let crop = 0, progress = 0
@@ -7617,6 +7617,11 @@ function offsetExtraControls(p, parseFn) {
     rows.push({ key: `${p}CursorOffset${ax}Curve`, label: `Cursor Offset ${ax} Curve (Distance -> Offset)`, type: 'text', def: linear, onChange: () => parseFn(p) })
     rows.push({ key: `${p}CursorOffset${ax}Range`, label: `Cursor Offset ${ax} Min / Max (World Units)`, type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
   })
+  // Clamp Distance from Cursor (2026-10-17, direct request): Cursor Offset mode only. A minimum distance from the cursor for every hand; Min = the minimum for the nearest hand ON SCREEN, Max = the minimum for the
+  // farthest hand on screen, the Curve shapes the steps in between (same nearest -> farthest domain as the Cursor Offset curves, "Visible Hands Only" included). See clampOffsetFromCursor().
+  rows.push({ key: `${p}CursorClampEnabled`, label: 'Clamp Distance From Cursor On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) })
+  rows.push({ key: `${p}CursorClampCurve`, label: 'Clamp Distance Curve (Distance From Cursor -> Minimum Distance)', type: 'text', def: linear, onChange: () => parseFn(p) })
+  rows.push({ key: `${p}CursorClampRange`, label: 'Clamp Min / Max Distance From Cursor (World Units)', type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
   rows.push({ key: `${p}CameraOffsetEnabled`, label: 'Offset To Camera On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) })
   rows.push({ key: `${p}CameraOffsetVisibleOnly`, label: 'Offset To Camera Curves: Visible Hands Only', type: 'checkbox', def: true }) // see the other Visible Hands Only rows
   ;['X', 'Y', 'Z'].forEach((ax) => {
@@ -9056,8 +9061,6 @@ let loadingPreviewLapStartMs = 0
 let loadingPreviewHoldEndMs = 0
 let loadingPreviewDirection = 1
 let loadingPreviewSequenceDone = false
-let lpAnimT = 0, lpAnimLastMs = 0 // startup pass: the smoothed animation position (0..1) and the time of the last update
-let lpPrevStartupPhase = true // was the loading screen still up on the previous preview frame (see updateLoadingPreviewAnimation())
 // Called once, from the GLTFLoader callback, right after modelRoot/
 // alignQuat/toonMaterial/handBoundsCenterLocal/handBoundsRadiusLocal are
 // all measured -- same one-time-measurement dependencies buildPosePreview()
@@ -9205,7 +9208,6 @@ function buildLoadingPreview(bypassEnabledGate) {
   // runs once).
   loadingPreviewLapIndex = 1
   loadingPreviewLapStartMs = loadingPreviewAnimStartMs
-  lpAnimT = 0; lpAnimLastMs = loadingPreviewAnimStartMs
   loadingPreviewHoldEndMs = 0
   loadingPreviewDirection = 1
   loadingPreviewSequenceDone = false
@@ -10132,26 +10134,20 @@ function updateLoadingPreviewAnimation() {
     applyLoadingPreviewPose(poseDefaultValues)
     return
   }
-  // PLAYS ONCE while the loading screen is up (2026-10-16, direct request, desktop and mobile: "only play through once. It begins on startup, and ends when loading is complete. It never loops"): whatever Sequence Mode is set,
-  // the startup preview plays the selected tween exactly once, forward, paced by the real loading progress (see lapT below), and then holds the last pose until the field is
-  // revealed. The configured Sequence Mode (Count / Loop / Oscillate) only applies to the live preview after the loading screen (Show Loading Preview), which starts its own count from the moment the loading screen goes.
-  const startupPhase = !fieldRevealed
-  if (lpPrevStartupPhase && !startupPhase) {
-    loadingPreviewSequenceDone = false; loadingPreviewLapIndex = 1; loadingPreviewHoldEndMs = 0; loadingPreviewLapStartMs = performance.now(); loadingPreviewDirection = 1
-  }
-  lpPrevStartupPhase = startupPhase
+  // CORRECTED 2026-10-17 (the user misspoke on 2026-10-16: "only play through once" meant the CROP, not the animation): the animation sequence loops / counts exactly as Sequence Mode and the speed settings say, loading screen
+  // or not. What runs once is the loading-progress crop (loadingProgressNow() goes 0 -> 1 over the loading and then holds at 1).
   if (loadingPreviewSequenceDone) {
-    // frozen at whatever was last applied - except the Real Time Loading wrist crop, which keeps following the loading progress
+    // frozen at whatever was last applied (a finished Count) - except the Real Time Loading wrist crop, which keeps following the loading progress
     const rt = lpRealTimeCropPct()
     if (rt !== null) { updateLoadingPreviewWristClip(rt); if (loadingPreviewHand2) updateHand2WristClip(rt) }
     return
   }
   const segments = resolveTweenSegmentsWithAnchor(anchorPose, rawEntries.slice(anchorIdx + 1))
   const lastPose = segments.length > 0 ? segments[segments.length - 1].poseB : anchorPose
-  const playMode = startupPhase ? 'Count' : cfg.loadingPreviewSequenceMode
-  const lapStyle = startupPhase ? 'Loop' : (playMode === 'Count' ? cfg.loadingPreviewSequenceCountMode : playMode)
-  const totalLaps = startupPhase ? 1 : (playMode === 'Count' ? Math.max(cfg.loadingPreviewSequenceCount || 1, 1) : Infinity)
-  const holdMs = startupPhase ? 0 : Math.max(cfg.loadingPreviewSequenceHoldMs || 0, 0)
+  const playMode = cfg.loadingPreviewSequenceMode
+  const lapStyle = playMode === 'Count' ? cfg.loadingPreviewSequenceCountMode : playMode
+  const totalLaps = playMode === 'Count' ? Math.max(cfg.loadingPreviewSequenceCount || 1, 1) : Infinity
+  const holdMs = Math.max(cfg.loadingPreviewSequenceHoldMs || 0, 0)
   const now = performance.now()
   if (loadingPreviewHoldEndMs && now < loadingPreviewHoldEndMs) return // mid-hold -- last applied pose stays, nothing to reapply (no other config drives this preview's own idle state)
   if (loadingPreviewHoldEndMs && now >= loadingPreviewHoldEndMs) {
@@ -10172,17 +10168,7 @@ function updateLoadingPreviewAnimation() {
   const speedMs = playMode === 'Count'
     ? Math.max((cfg.loadingMinTimeMs || 0) / totalLaps, 1)
     : Math.max(safeTweenSpeedMs(cfg.loadingPreviewSpeedMs), 1)
-  // Startup: the single pass is paced by the REAL loading progress (the stage-weighted progress, never ahead of the Min Loading Time clock), smoothed (time constant 250 ms) so a stage that finishes in one step does not
-  // jump the animation; it therefore starts with the loading and reaches its last pose as loading completes, however long that takes. After the loading screen the lap clock is used as before.
-  let lapT
-  if (startupPhase) {
-    const dtMs = Math.min(Math.max(now - lpAnimLastMs, 0), 1000)
-    lpAnimLastMs = now
-    lpAnimT += (loadingProgressNow(true) - lpAnimT) * (1 - Math.exp(-dtMs / 250))
-    lapT = lpAnimT >= 0.995 ? 1 : lpAnimT
-  } else {
-    lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / speedMs, 0, 1)
-  }
+  const lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / speedMs, 0, 1)
   // Easing Curve (2026-10-12): reshapes WHERE in the lap the pose sits, not
   // how long a lap lasts. The profile's own total is discarded here on
   // purpose -- Count mode's Min Loading Time / Count split must still hold --
@@ -10199,8 +10185,8 @@ function updateLoadingPreviewAnimation() {
   } else if (lapStyle === 'Oscillate') {
     const t = loadingPreviewDirection === 1 ? easedT : 1 - easedT
     values = lerpTweenSegments(segments, t)
-  } else if (startupPhase || cfg.loadingPreviewSequenceLoopTransition === false) {
-    values = lerpTweenSegments(segments, easedT) // (startup: one forward pass, no wrap back to frame 1) instant jump back to frame 1 between laps -- same forward pass every time, no wrap interpolation
+  } else if (cfg.loadingPreviewSequenceLoopTransition === false) {
+    values = lerpTweenSegments(segments, easedT) // instant jump back to frame 1 between laps -- same forward pass every time, no wrap interpolation
   } else {
     // Smooth wrap-back -- same cyclic-ring approach lerpLoopSequence()
     // used before this fix, generalized to WEIGHTED segments (a Hold's
@@ -12205,6 +12191,10 @@ const clickHoldPoseTriggers = Object.fromEntries([...CLICK_HOLD_KEYS, ...LEGACY_
 const OFFSET_LINEAR_CURVE = [{ x: 0, y: 0 }, { x: 1, y: 1 }]
 function parseOffsetAxisCurves(t, p) {
   if (!t.offsetAxis) t.offsetAxis = { cursor: {}, camera: {} }
+  if (!t.cursorClampCurveParsed) t.cursorClampCurveParsed = OFFSET_LINEAR_CURVE
+  if (!t.cursorClampRangeParsed) t.cursorClampRangeParsed = { min: 0, max: 0 }
+  try { t.cursorClampCurveParsed = JSON.parse(cfg[`${p}CursorClampCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.cursorClampRangeParsed = JSON.parse(cfg[`${p}CursorClampRange`]) } catch (e) { /* keep last-good value */ }
   ;[['cursor', 'CursorOffset'], ['camera', 'CameraOffset']].forEach(([bucket, prefix]) => {
     ;['X', 'Y', 'Z'].forEach((ax) => {
       const slot = t.offsetAxis[bucket][ax] || (t.offsetAxis[bucket][ax] = { curve: OFFSET_LINEAR_CURVE, range: { min: 0, max: 0 } })
@@ -12657,6 +12647,29 @@ function handXYDist(hand) {
 // (right+up only, then all 3) -- every caller reads a plain `{x,y,z}`
 // object regardless of mode; XYZ Offset mode has no Z control of its
 // own, so its own `z` is always 0.
+// Clamp Distance from Cursor (2026-10-17, direct request: "a minimum distance from the cursor for every hand ... if offset to cursor is for a click hold, with a minimum distance clamp the hand will stay at the minimum distance
+// even if I continue holding my click"). The offset vector above is shortened (never redirected) so the hand does not END closer to the cursor than its minimum distance, measured the way every click-function distance is
+// (screen space, world units at the field plane - cursorDistXY()). The minimum for a hand is the Min..Max range through the Curve, over the same nearest -> farthest on-screen-hand domain as the other Cursor Offset curves.
+// The start point is the hand's REST position plus its accumulated offset (hand._customOffsetAccum, the earlier laps of a held loop / earlier functions), so: lap after lap the hand closes in until it reaches the minimum, and
+// from then on every lap adds nothing - it stays at the minimum for as long as the click is held. It does not depend on the offset it produces (same reason the Distance Curve measures from the rest position), so the live
+// ramp and both bake paths read the identical value. A hand that is ALREADY closer than its minimum (the cursor came to it) is only stopped from moving closer, it is not pushed away. Moving away from the cursor is never limited.
+const _clampBase = new THREE.Vector3(), _clampPt = new THREE.Vector3()
+function clampOffsetFromCursor(hand, p, trig, off) {
+  if (!cfg[`${p}CursorClampEnabled`] || !trig || !trig.cursorClampRangeParsed) return off
+  const rng = trig.cursorClampRangeParsed
+  if (!(rng.min > 0 || rng.max > 0)) return off // the default 0..0 range: no minimum
+  const dmin = curveByRestDomain(p, handRestDist(hand), trig.cursorClampCurveParsed || OFFSET_LINEAR_CURVE, rng)
+  if (!(dmin > 0)) return off
+  _clampBase.copy(handRestPoint(hand))
+  const acc = hand._customOffsetAccum
+  if (acc) _clampBase.addScaledVector(_offsetRightVec, acc.x).addScaledVector(_offsetUpVec, acc.y).addScaledVector(_offsetForwardVec, acc.z)
+  const target = Math.min(dmin, cursorDistXY(_clampBase))
+  const distAt = (k) => cursorDistXY(_clampPt.copy(_clampBase).addScaledVector(_offsetRightVec, off.x * k).addScaledVector(_offsetUpVec, off.y * k).addScaledVector(_offsetForwardVec, off.z * k))
+  if (distAt(1) >= target) return off
+  let lo = 0, hi = 1 // distAt(lo) >= target, distAt(hi) < target
+  for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; if (distAt(mid) >= target) lo = mid; else hi = mid }
+  return { x: off.x * lo, y: off.y * lo, z: off.z * lo }
+}
 function computeOffsetXY(hand, p) {
   if (cfg[`${p}OffsetMode`] === 'Cursor Offset') {
     // CORRECTED 2026-10-01, direct report: "the offset cursor is the
@@ -12708,7 +12721,7 @@ function computeOffsetXY(hand, p) {
       exY = evalOffsetAxisSlot(axisSlots.Y, handDist, p)
       exZ = evalOffsetAxisSlot(axisSlots.Z, handDist, p)
     }
-    return { x: (rightComp / len3) * (dist + exX), y: (upComp / len3) * (dist + exY), z: (forwardComp / len3) * (dist + exZ) }
+    return clampOffsetFromCursor(hand, p, trig, { x: (rightComp / len3) * (dist + exX), y: (upComp / len3) * (dist + exY), z: (forwardComp / len3) * (dist + exZ) })
   }
   if (cfg[`${p}OffsetMode`] === 'Hand Axes Offset') {
     // Hand Axes Offset (2026-10-04, direct request: "a 3rd mode. It will use
@@ -16456,6 +16469,11 @@ function buildClickHoldPoseWidgets(p) {
   const cursorOffsetRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurveRange"]`)
   if (cursorOffsetCurveRow) buildGenericCurveWidget(cursorOffsetCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Offset Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (cursorOffsetRangeRow) buildGenericRangeBarWidget(cursorOffsetRangeRow, { trackMin: -50, trackMax: 50, unit: 'wu', defaultValue: { min: -50, max: 50 } })
+  // Clamp Distance from Cursor (2026-10-17): curve + Min / Max range bar
+  const clampCurveRow = document.querySelector(`.dp-row[data-key="${p}CursorClampCurve"]`)
+  const clampRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorClampRange"]`)
+  if (clampCurveRow) buildGenericCurveWidget(clampCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Minimum Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (clampRangeRow) buildGenericRangeBarWidget(clampRangeRow, { trackMin: 0, trackMax: 200, unit: 'wu', defaultValue: { min: 0, max: 0 } })
 }
 // Runs now, not back up near the other widgets' own setup calls (parse-
 // ArmLengthConfig()/buildWristSplayWidgets() etc.) -- this needs
@@ -16528,6 +16546,11 @@ function buildClickPoseWidgets(p) {
   const cursorOffsetRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurveRange"]`)
   if (cursorOffsetCurveRow) buildGenericCurveWidget(cursorOffsetCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Offset Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (cursorOffsetRangeRow) buildGenericRangeBarWidget(cursorOffsetRangeRow, { trackMin: -50, trackMax: 50, unit: 'wu', defaultValue: { min: -50, max: 50 } })
+  // Clamp Distance from Cursor (2026-10-17): curve + Min / Max range bar
+  const clampCurveRow = document.querySelector(`.dp-row[data-key="${p}CursorClampCurve"]`)
+  const clampRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorClampRange"]`)
+  if (clampCurveRow) buildGenericCurveWidget(clampCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Minimum Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (clampRangeRow) buildGenericRangeBarWidget(clampRangeRow, { trackMin: 0, trackMax: 200, unit: 'wu', defaultValue: { min: 0, max: 0 } })
 }
 // -----------------------------------------------------------------------
 // Custom Click Functions (Phase 4) -- runtime-created pose triggers, both
@@ -17633,6 +17656,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   // template, but filled in now while touching this same object anyway.
   OffsetEnabled: false, OffsetX: 0, OffsetY: 0, OffsetMode: 'XYZ Offset', CursorOffsetDistance: 0,
   CursorOffsetDistanceCurveEnabled: false, CursorOffsetDistanceCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetDistanceCurveRange: '{"min":-50,"max":50}',
+  CursorClampEnabled: false, CursorClampCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorClampRange: '{"min":0,"max":0}',
   OffsetZ: 0, CameraOffsetEnabled: false, CameraOffsetXEnabled: true, CameraOffsetYEnabled: true, CameraOffsetZEnabled: true,
   CursorOffsetXCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetXRange: '{"min":0,"max":0}',
   CameraOffsetXCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CameraOffsetXRange: '{"min":0,"max":10}',
@@ -18285,6 +18309,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'EasingCurveEnabled', 'EasingCurve', 'RetransitionEasingCurveEnabled', 'RetransitionEasingCurve',
   'OffsetEnabled', 'OffsetMode', 'OffsetX', 'OffsetY', 'CursorOffsetDistance',
   'CursorOffsetDistanceCurveEnabled', 'CursorOffsetDistanceCurve', 'CursorOffsetDistanceCurveRange',
+  'CursorClampEnabled', 'CursorClampCurve', 'CursorClampRange',
   'OffsetZ', 'CursorOffsetXCurve', 'CursorOffsetXRange', 'CursorOffsetYCurve', 'CursorOffsetYRange', 'CursorOffsetZCurve', 'CursorOffsetZRange',
   'CameraOffsetEnabled', 'CameraOffsetXEnabled', 'CameraOffsetYEnabled', 'CameraOffsetZEnabled', 'CameraOffsetXCurve', 'CameraOffsetXRange', 'CameraOffsetYCurve', 'CameraOffsetYRange', 'CameraOffsetZCurve', 'CameraOffsetZRange',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
@@ -19476,6 +19501,17 @@ function updateOffsetRotationVisibility(p) {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = offsetOn && cursorMode && cursorCurveOn ? '' : 'none'
   })
+  const clampEnabledRow = document.querySelector(`.dp-row[data-key="${p}CursorClampEnabled"]`)
+  if (clampEnabledRow) {
+    const showClamp = offsetOn && cursorMode ? '' : 'none'
+    const clampGroupEl = clampEnabledRow.classList.contains('dp-group-gate-row') ? clampEnabledRow.closest('.dp-group') : null // wrapped into its own group yet?
+    if (clampGroupEl) clampGroupEl.style.display = showClamp
+    else clampEnabledRow.style.display = showClamp
+    ;['CursorClampCurve', 'CursorClampRange'].forEach((suffix) => {
+      const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+      if (row) row.style.display = showClamp
+    })
+  }
   const rotationOn = !!cfg[`${p}RotationEnabled`]
   ;['RotationX', 'RotationY', 'RotationZ'].forEach((suffix) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
@@ -19557,7 +19593,10 @@ function wrapClickFunctionGatedSubgroups(p) {
   // subgroup treatment as every other on/off curve below ("provide an
   // on off checkbox for each").
   wrapGatedSubgroup(`${p}EasingCurveEnabled`, [`${p}EasingCurve`], 'Easing')
-  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetLoopRetransition`, `${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetVisibleOnly`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
+  const offsetGroup = wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetLoopRetransition`, `${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetVisibleOnly`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
+  // Clamp Distance from Cursor: a toggleable group inside Offset (shown in Cursor Offset mode only, see updateOffsetRotationVisibility())
+  const clampGroup = wrapGatedSubgroup(`${p}CursorClampEnabled`, [`${p}CursorClampRange`, `${p}CursorClampCurve`], 'Clamp Distance from Cursor')
+  if (offsetGroup && clampGroup) offsetGroup.querySelector(':scope > .dp-group-body').appendChild(clampGroup)
   // "Offset To Camera" (2026-10-02) -- its own mandatory gated subgroup,
   // independent of (and stackable with) "Offset" above.
   wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetLoopRetransition`, `${p}CameraOffsetVisibleOnly`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
