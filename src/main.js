@@ -1529,58 +1529,87 @@ const _roV = new THREE.Vector3()
 // ---- Pairwise render-order support (2026-10-11) ----
 // Each hand's K = RO_NEIGHBOURS nearest hands in screen-space XY, as unique pairs: roPairLo[t] < roPairHi[t], t < the returned count.
 let roPairLo = null, roPairHi = null
+// 2026-10-18: only hands that can be seen (_onScr !== false) take part, the grid is a counting-sorted typed array, and the K nearest are kept in a small insertion buffer. The previous version projected and searched EVERY hand; the
+// off-screen ones (behind or far off to the side of the camera) stretched the bounding box, made the cells huge and crowded, and the ring search sorted whole candidate lists: 72 ms of a 141 ms frame at 3025 hands (measured).
+// A hand that is not on screen is not drawn, so its place in the order does not matter; it simply has no pairs (and ends up in layer 0).
+let roAct = null, roCellStart = null, roCellFill = null, roCellItems = null, roCellOfA = null
+const roBD = new Float64Array(64), roBI = new Int32Array(64)
 function roKnnPairs(n) {
   const cw = renderer.domElement.clientWidth || window.innerWidth, ch = renderer.domElement.clientHeight || window.innerHeight
   if (!roSX || roSX.length !== n) { roSX = new Float64Array(n); roSY = new Float64Array(n); roSR = new Float64Array(n); roIndeg = new Int32Array(n); roHead = new Int32Array(n); roDone = new Uint8Array(n) }
-  const K = Math.min(RO_NEIGHBOURS, n - 1)
+  const K = Math.min(RO_NEIGHBOURS, n - 1, 64)
   if (!roPairLo || roPairLo.length < n * Math.max(K, 1)) { roPairLo = new Int32Array(n * Math.max(K, 1)); roPairHi = new Int32Array(n * Math.max(K, 1)) }
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
+  if (!roAct || roAct.length < n) { roAct = new Int32Array(n); roCellOfA = new Int32Array(n); roCellItems = new Int32Array(n) }
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, m = 0
   for (let i = 0; i < n; i++) {
     const h = hands[i]
+    if (h._curlSkip) continue // outside every camera's view (see updateFingerCurlSkip()): not drawn, so its place in the order is irrelevant
     _roV.copy(handBoundsCenterLocal).multiplyScalar(h.clone.scale.x).applyQuaternion(alignQuat).applyQuaternion(h.wrapper.quaternion).add(h.wrapper.position)
     _roV.project(camera)
     const sx = (_roV.x * 0.5 + 0.5) * cw, sy = (-_roV.y * 0.5 + 0.5) * ch
     roSX[i] = sx; roSY[i] = sy
+    roAct[m++] = i
     if (sx < minX) minX = sx
     if (sx > maxX) maxX = sx
     if (sy < minY) minY = sy
     if (sy > maxY) maxY = sy
   }
-  if (K <= 0) return 0
+  if (K <= 0 || m < 2) return 0
+  const Km = Math.min(K, m - 1)
   // grid cell sized for ~2 hands per cell on average, so a ring search finds the neighbours within a couple of rings
-  const cell = Math.max(Math.sqrt(Math.max((maxX - minX) * (maxY - minY), 1) * 2 / Math.max(n, 1)), 2)
-  const maxRing = Math.ceil(Math.max(maxX - minX, maxY - minY) / cell) + 2
-  const grid = new Map()
-  const cxOf = (i) => Math.floor((roSX[i] - minX) / cell), cyOf = (i) => Math.floor((roSY[i] - minY) / cell)
-  const keyOf = (cx, cy) => (cx + 1000) * 200003 + (cy + 1000)
-  for (let i = 0; i < n; i++) { const k = keyOf(cxOf(i), cyOf(i)); const arr = grid.get(k); if (arr) arr.push(i); else grid.set(k, [i]) }
+  let cell = Math.max(Math.sqrt(Math.max((maxX - minX) * (maxY - minY), 1) * 2 / m), 2)
+  let gw = Math.floor((maxX - minX) / cell) + 1, gh = Math.floor((maxY - minY) / cell) + 1
+  while (gw * gh > 4 * m + 1024) { cell *= 1.5; gw = Math.floor((maxX - minX) / cell) + 1; gh = Math.floor((maxY - minY) / cell) + 1 }
+  const cells = gw * gh
+  if (!roCellStart || roCellStart.length < cells + 1) { roCellStart = new Int32Array(cells + 1); roCellFill = new Int32Array(cells + 1) }
+  roCellStart.fill(0, 0, cells + 1)
+  for (let a = 0; a < m; a++) {
+    const i = roAct[a]
+    const cx = Math.min(Math.floor((roSX[i] - minX) / cell), gw - 1), cy = Math.min(Math.floor((roSY[i] - minY) / cell), gh - 1)
+    const c = cy * gw + cx
+    roCellOfA[a] = c
+    roCellStart[c + 1]++
+  }
+  for (let c = 0; c < cells; c++) roCellStart[c + 1] += roCellStart[c]
+  for (let c = 0; c < cells; c++) roCellFill[c] = roCellStart[c]
+  for (let a = 0; a < m; a++) roCellItems[roCellFill[roCellOfA[a]]++] = roAct[a]
+  const maxRing = Math.max(gw, gh) + 1
   const pairSeen = new Set()
-  const candD = [], candI = []
-  let count = 0
-  for (let i = 0; i < n; i++) {
-    const cx = cxOf(i), cy = cyOf(i)
-    candD.length = 0; candI.length = 0
-    for (let r = 0; r <= maxRing; r++) {
-      for (let dx = -r; dx <= r; dx++) for (let dy = -r; dy <= r; dy++) {
-        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue
-        const arr = grid.get(keyOf(cx + dx, cy + dy))
-        if (!arr) continue
-        for (let q = 0; q < arr.length; q++) {
-          const j = arr[q]
-          if (j === i) continue
-          const ddx = roSX[i] - roSX[j], ddy = roSY[i] - roSY[j]
-          candD.push(ddx * ddx + ddy * ddy); candI.push(j)
-        }
-      }
-      if (candI.length >= K) {
-        // done once the K-th nearest is closer than the unsearched region (everything outside r rings is at least r*cell away)
-        const sorted = candD.slice().sort((x, y) => x - y)
-        if (sorted[K - 1] <= (r * cell) * (r * cell)) break
+  let count = 0, cnt = 0, curI = 0, curX = 0, curY = 0
+  const scan = (gx, gy) => {
+    const c = gy * gw + gx
+    for (let q = roCellStart[c], qe = roCellStart[c + 1]; q < qe; q++) {
+      const j = roCellItems[q]
+      if (j === curI) continue
+      const ddx = curX - roSX[j], ddy = curY - roSY[j], d = ddx * ddx + ddy * ddy
+      if (cnt < Km) {
+        let p = cnt++
+        while (p > 0 && roBD[p - 1] > d) { roBD[p] = roBD[p - 1]; roBI[p] = roBI[p - 1]; p-- }
+        roBD[p] = d; roBI[p] = j
+      } else if (d < roBD[Km - 1]) {
+        let p = Km - 1
+        while (p > 0 && roBD[p - 1] > d) { roBD[p] = roBD[p - 1]; roBI[p] = roBI[p - 1]; p-- }
+        roBD[p] = d; roBI[p] = j
       }
     }
-    const order = candI.map((_, t) => t).sort((x, y) => candD[x] - candD[y])
-    for (let t = 0; t < Math.min(K, order.length); t++) {
-      const j = candI[order[t]]
+  }
+  for (let a = 0; a < m; a++) {
+    const i = roAct[a], c0 = roCellOfA[a]
+    const cx = c0 % gw, cy = (c0 - cx) / gw
+    curI = i; curX = roSX[i]; curY = roSY[i]; cnt = 0
+    for (let r = 0; r <= maxRing; r++) {
+      const x0 = cx - r, x1 = cx + r, y0 = cy - r, y1 = cy + r
+      const gy0 = Math.max(y0, 0), gy1 = Math.min(y1, gh - 1)
+      for (let gy = gy0; gy <= gy1; gy++) {
+        if (gy === y0 || gy === y1) { for (let gx = Math.max(x0, 0), ge = Math.min(x1, gw - 1); gx <= ge; gx++) scan(gx, gy) }
+        else { if (x0 >= 0) scan(x0, gy); if (x1 < gw) scan(x1, gy) }
+      }
+      // done once the Km-th nearest is closer than the unsearched region (everything outside r rings is at least r*cell away), or the whole grid has been covered
+      if (cnt >= Km && roBD[Km - 1] <= (r * cell) * (r * cell)) break
+      if (x0 <= 0 && y0 <= 0 && x1 >= gw - 1 && y1 >= gh - 1) break
+    }
+    for (let t = 0; t < cnt; t++) {
+      const j = roBI[t]
       const lo = i < j ? i : j, hi = i < j ? j : i
       const key = lo * n + hi
       if (pairSeen.has(key)) continue
@@ -1849,6 +1878,7 @@ function computeRenderOrderRanks() {
     if (!k || k.length !== n) k = roKeyArrs[id] = new Float64Array(n)
     for (let i = 0; i < n; i++) {
       const h = hands[i]
+      if (h._curlSkip) continue // not in any camera's view: no pairs, so its key is never compared (2026-10-18)
       roPointInto(h, p, _roNodeV)
       k[i] = m === 'z' ? _roNodeV.z * camSign : m === 'cur' ? -cursorDistXY(_roNodeV) : m === 'cur3' ? -_roNodeV.distanceTo(cursorTarget) : -cameraDistXYOfNode(h, p)
     }
@@ -21605,8 +21635,12 @@ function animate(dt, now) {
       updateResponsiveVelocity(nowVirtual()) // Cursor Tracking > Responsive Velocity (cursor-speed effects)
       rvApplyArmTilt(armTrackOn || palmTrackOn)
       const __uroStart = performance.now()
-      updateRenderOrder()
-      applyFieldBounds()
+      // 2026-10-18: while the loading screen is up (the field is built / being warmed up behind it, nothing of it visible) the hand logic is skipped: with 3025 hands it took ~90 ms of every ~150 ms frame, which is what made the
+      // 2-hand loading preview run at 6 fps on the laptop. The first frame after fieldStarted does the idle repose of every hand in one go, then the loading screen hides.
+      if (fieldStarted || !hands.length) {
+        updateRenderOrder()
+        applyFieldBounds()
+      }
       checkStartupFloorHide()
       __frameProfiler.updateRenderOrderMs += performance.now() - __uroStart
       if (cfg.logPoseJumpsEnabled) detectPoseJumps()
