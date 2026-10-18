@@ -4159,7 +4159,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // each a no-op for the case the other one handles.
   // RULE: any group the host builds at runtime and keeps its own bookkeeping for (a list in cfg, registered keys / trigger state, saved values) must be torn down here when the delete tool removes it - the tool only
   // removes the DOM node, so without a cleanup the group comes back on the next load (a Multi Trigger did, 2026-10-16). If Undo must rebuild it, also list it in deleteUsesSnapshot below and reconcile it in undoApplyExtra.
-  onGroupDeleted: (target) => { cleanupDeletedMultiTriggerGroups(target); cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target); cleanupDeletedVelocityGroup(target) },
+  onGroupDeleted: (target) => { cleanupDeletedMultiTriggerGroups(target); cleanupDeletedOnReleaseGroups(target); cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target); cleanupDeletedVelocityGroup(target) },
   deleteUsesSnapshot: (target) => !!(target && target.querySelector && (target.dataset.multiTriggerPrefix || target.querySelector('.dp-group[data-multi-trigger-prefix]')) && !target.dataset.customFunctionFamily), // Multi Trigger groups: Undo rebuilds them through undoApplyExtra
   // Real bug found live 2026-09-24: Custom Click Functions' own tab-
   // dependent visibility (Touch Point Count hidden on Desktop, a
@@ -13722,7 +13722,21 @@ function snapshotOffsetRotationAccumForRetransition(hand, chp) {
   // the cursor moved during a long hold/tween.
   chp.retransitionFromSplayDeg = hand.currentSplayDeg
 }
+// ---- On Release (2026-10-17, direct request) ----
+// Every custom Click+Hold function can carry an "On Release" group: a fire-and-forget pose-kind function (prefix `${id}Rel`, built through the same registerMultiTriggerTrigger() machinery a Multi Trigger uses, so it has the
+// same Mode / Single Pose / Sequence + loop, Offset, Rotation, curves and Start Time Curve controls) that is triggered, for each hand, when that hand's hold has finished winding down. The hold's own Tween Stop still runs first.
+// It REPLACES the hold's Retransition: with On Release on, the hold never retransitions; whatever the hand does afterwards is the On Release function's own Retransition (the two Retransition toggles exclude each other, see
+// retransitionExclusion()). Only a base custom hold function has one (not a Multi Trigger sub-trigger), and the static hold keys do not, so `${p}RelEnabled` is simply undefined for them.
+function onReleaseOn(p) { return cfg[`${p}RelEnabled`] === true && !!clickPoseTriggers[`${p}Rel`] }
+function beginOnRelease(hand, chp, p, values, now) {
+  if (values) chp.lastAppliedValues = values
+  chp.phase = 'awaitingRelease'
+  chp.releasePending = false
+  logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'hold finished -> On Release begins')
+  triggerClickPose(`${p}Rel`, new Set([hand])) // schedules the On Release claim for this hand (its Start Time Curve delay applies); the hand keeps its pose until that claim commits
+}
 function beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, liveDistRange, now) {
+  if (onReleaseOn(p)) { chp.releasePending = false; beginOnRelease(hand, chp, p, values, now); return } // the sequence ran to its natural end after the release: On Release takes over instead of the retransition
   chp.retransitionStart = values
   chp.retransitionStartTime = now
   // Retransition Start Time Curve On/Off (2026-09-27) -- off means no
@@ -14333,6 +14347,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     applyOffsetRotationToHand(hand, p, stopRamp) // continues the ramp the release interrupted (see stopRamp above); 0 when nothing was left to add
     if (tDecay >= 1) {
       bakeInFlightOffsetRotation(hand, p) // the stop is over: lock in the part of the ramp added while stopping, so a retransition (or a freeze) starts from the real total
+      if (onReleaseOn(p)) { beginOnRelease(hand, chp, p, values, now); return } // Tween Stop finished: On Release takes over instead of the retransition
       if (chp.stoppingFreezeAtEnd) {
         // "the hand will just stop where it is" -- Retransition off, Tween
         // Stop decay just finished. Logged BEFORE the phase change, same
@@ -14359,6 +14374,13 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       snapshotOffsetRotationAccumForRetransition(hand, chp)
       logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'Tween Stop decay finished -> retransition begins')
     }
+  } else if (chp.phase === 'awaitingRelease') {
+    // On Release (2026-10-17): this hand's hold is over and its On Release function has been scheduled for it (beginOnRelease). Until that function commits (which force-idles this phase through releaseHandFromOtherFunctions)
+    // the hand keeps showing the pose it ended on. If the On Release function never claims it (Start Distance Curve / Skip If Same Pose left it out, or the function was switched off meanwhile) the hand simply goes idle.
+    const relCp = hand._cp && hand._cp[`${p}Rel`]
+    if (!relCp || (relCp.phase === 'idle' && !relCp.pendingClaimAt)) { chp.phase = 'idle'; return }
+    applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
+    applyOffsetRotationToHand(hand, p, 0)
   } else if (chp.phase === 'retransition') {
     // Tween mode's own dedicated Retransition Speed (direct request --
     // see makeClickHoldPoseGroup()'s own comment) -- `chp.retransitionIsTween`
@@ -14611,7 +14633,7 @@ function endClickHoldPose(p) {
     // Pose) UNLESS Tween Stop Delay is also on, in which case the
     // deceleration below still needs to run before freezing -- see the
     // `tweenStopDelayOn` branch just below.
-    const retransitionOff = cfg[`${p}RetransitionEnabled`] === false
+    const retransitionOff = cfg[`${p}RetransitionEnabled`] === false && !onReleaseOn(p) // On Release (2026-10-17) replaces the retransition: the hand winds down exactly as with Retransition on, then hands over to the On Release function (beginOnRelease)
     const tweenStopDelayOn = chp.retransitionIsTween && !!cfg[`${p}TweenStopDelayEnabled`]
     if (retransitionOff && !tweenStopDelayOn) return
     // Tween Stop Off (Sequence mode only, replacing the old 2-value
@@ -14730,6 +14752,7 @@ function endClickHoldPose(p) {
     // CORRECTED 2026-09-27 -- same reasoning as the 'stopping' branch
     // above, for the direct-to-retransition path (no Tween Stop Delay).
     bakeInFlightOffsetRotation(hand, p)
+    if (onReleaseOn(p)) { beginOnRelease(hand, chp, p, chp.lastAppliedValues, now); return } // On Release replaces the retransition (no Tween Stop Delay path)
     chp.retransitionStart = chp.lastAppliedValues || { ...poseDefaultValues }
     chp.retransitionStartTime = now
     // Trigger All Hands (used to bypass this per-hand stagger entirely)
@@ -16826,6 +16849,7 @@ function cleanupDeletedCustomClickFunctionGroup(target) {
   // Save, so (a) each Save kept carrying values for functions that no longer exist (the saved file had values for 27 functions with 26 listed), (b) every Use / Reset still applied them, and (c) a new
   // function that got the deleted one's number back (the next number is max id + 1 after a reload) started with its old values.
   forgetControlsWithPrefix(id)
+  unregisterMultiTriggerRuntime(`${id}Rel`) // its On Release function (2026-10-17)
   delete customFunctionPendingGroup[id]
   persistCustomClickFunctionIds()
   const keys = kind === 'hold' ? CLICK_HOLD_KEYS : CLICK_POSE_KEYS
@@ -17253,6 +17277,7 @@ async function renderCustomClickFunctionGroup(id, title, kind, family, yielder) 
   // always re-showed Touch Point Count even for a plain 'Click' function)
   // so Type-specific visibility is re-applied right after.
   const enabledCtrl = controls.find((c) => c.key === `${id}Enabled`)
+  if (kind === 'hold') { const rtCtrl = controls.find((c) => c.key === `${id}RetransitionEnabled`); if (rtCtrl) { const rtBase = rtCtrl.onChange; rtCtrl.onChange = (v) => { if (rtBase) rtBase(v); retransitionExclusion(id, 'parent') } } } // On Release (2026-10-17)
   if (enabledCtrl) {
     const baseOnChange = enabledCtrl.onChange
     enabledCtrl.onChange = () => { if (baseOnChange) baseOnChange(); updateCustomFunctionTypeVisibility(id) }
@@ -17294,6 +17319,7 @@ async function renderCustomClickFunctionGroup(id, title, kind, family, yielder) 
     // finds no "Multi Trigger" group yet to move into place after
     // Retransition.
     { const mt = profAgg('setupMultiTriggerGroupForFunction', () => setupMultiTriggerGroupForFunction(id, 'hold', yielder)); if (yielder) await mt }
+    { const orl = profAgg('setupOnReleaseGroupForFunction', () => setupOnReleaseGroupForFunction(id, yielder)); if (yielder) await orl } // On Release (2026-10-17)
   } else {
     profAgg('parseClickPoseConfig', () => parseClickPoseConfig(id))
     profAgg('buildClickPoseWidgets', () => buildClickPoseWidgets(id))
@@ -17569,7 +17595,7 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   // Multi Trigger last, as in Click Offset Test (2026-10-04, direct request "fix my
   // group setting order"): it was missing from this list, so hold-kind
   // functions rendered it ABOVE every row instead of at the bottom.
-  { type: 'group', title: 'Retransition' }, { type: 'group', title: 'Tween Stop' }, { type: 'group', title: 'Multi Trigger' }
+  { type: 'group', title: 'Retransition' }, { type: 'group', title: 'Tween Stop' }, { type: 'group', title: 'On Release' }, { type: 'group', title: 'Multi Trigger' }
 ]
 // Applies the reference renames + order to ONE function -- called
 // unconditionally at the end of renderCustomClickFunctionGroup() (both a
@@ -18310,7 +18336,7 @@ function buildMultiTriggerControlsForPrefix(prefix, title, kind) {
 // once for custom click functions generally (see this same file's
 // `lastRestoredValues`/devPanel.js fix) -- a real visitor must be able
 // to fire every trigger correctly with no panel ever built.
-async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, seedFromId, yielder) {
+async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, seedFromId, yielder, controlsHook) {
   if (kind === 'hold') {
     if (!CLICK_HOLD_KEYS.includes(prefix)) CLICK_HOLD_KEYS.push(prefix)
     if (!clickHoldPoseTriggers[prefix]) {
@@ -18346,6 +18372,7 @@ async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kin
     }
   }
   const controls = buildMultiTriggerControlsForPrefix(prefix, title, kind)
+  if (controlsHook) controlsHook(controls) // On Release (2026-10-17): lets its caller adjust this prefix's controls (labels, exclusion with the hold's own Retransition) before they are registered
   // seedFromId (2026-10-04, direct request "when i add a trigger in the multi
   // trigger group, the new trigger settings will be a duplicate of the
   // settings of the base click function"): only passed by a freshly ADDED
@@ -18401,6 +18428,57 @@ async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kin
 // state gets rebuilt from scratch each load (renderDynamicGroup()'s own
 // DOM/CLICK_POSE_KEYS registration is pure runtime state, gone on every
 // reload -- see restoreCustomClickFunctions()'s own matching comment).
+// ---- On Release group (2026-10-17): see onReleaseOn() ----
+// The hold's own Retransition and the On Release function's Retransition replace each other: turning either one on turns the other off (and switching On Release on turns the hold's off when its own is on).
+// The hold never retransitions while On Release is on (the runtime ignores its toggle then); the toggle exclusion just keeps the panel from showing two contradictory "on"s. Ignored while a saved state is being applied.
+function retransitionExclusion(id, from) {
+  if (isApplyingPanelState()) return
+  const rel = `${id}Rel`
+  const off = (key, owner) => {
+    if (cfg[key] === false) return
+    cfg[key] = false
+    try { syncValue(key, false) } catch (e) { /* no panel */ }
+    updateSingleTimingGateVisibility(owner)
+  }
+  if (from === 'parent') { if (cfg[`${id}RetransitionEnabled`] !== false) off(`${rel}RetransitionEnabled`, rel) }
+  else if (from === 'rel') { if (cfg[`${rel}RetransitionEnabled`] !== false) off(`${id}RetransitionEnabled`, id) }
+  else if (from === 'enabled') { if (cfg[`${rel}Enabled`] === true && cfg[`${rel}RetransitionEnabled`] !== false) off(`${id}RetransitionEnabled`, id) }
+}
+function onReleaseControlsHook(id) {
+  return (controls) => {
+    const rel = `${id}Rel`
+    const en = controls.find((c) => c.key === `${rel}Enabled`)
+    if (en) { const base = en.onChange; en.label = 'On Release (On/Off)'; en.onChange = (v) => { if (base) base(v); retransitionExclusion(id, 'enabled') } }
+    const rt = controls.find((c) => c.key === `${rel}RetransitionEnabled`)
+    if (rt) { const base = rt.onChange; rt.onChange = (v) => { if (base) base(v); retransitionExclusion(id, 'rel') } }
+  }
+}
+async function setupOnReleaseGroupForFunction(id, yielder) {
+  const rel = `${id}Rel`
+  const enabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+  const functionBody = enabledRow ? enabledRow.parentElement : null
+  // A saved layout may already have made an empty ghost "On Release" group here (the same nested-dynamic-group risk the Multi Trigger wrapper clears).
+  if (functionBody) functionBody.querySelectorAll(':scope > .dp-group[data-key="On Release"]').forEach((g) => g.remove())
+  const r = registerMultiTriggerTrigger(rel, 'On Release', functionBody, null, 'pose', undefined, yielder, onReleaseControlsHook(id))
+  if (yielder) await r
+  const g = functionBody ? functionBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${rel}"]`) : null
+  if (g) {
+    g.dataset.onReleaseFor = id
+    // Sits just above the Multi Trigger group (below Tween Stop), not at the very top of the function.
+    const mt = functionBody.querySelector(':scope > .dp-group[data-key="Multi Trigger"]')
+    if (mt && g.nextElementSibling !== mt) functionBody.insertBefore(g, mt)
+  }
+}
+// Deleting the On Release group with the panel's delete tool only removes its panel group; switch the function off too, or it would keep firing with no UI left to turn it off (the same gap the static click triggers had).
+function cleanupDeletedOnReleaseGroups(target) {
+  if (!target || !target.classList || !target.classList.contains('dp-group')) return
+  const groups = (target.dataset.onReleaseFor ? [target] : []).concat(Array.from(target.querySelectorAll('.dp-group[data-on-release-for]')))
+  groups.forEach((g) => {
+    const key = `${g.dataset.onReleaseFor}RelEnabled`
+    cfg[key] = false
+    try { syncValue(key, false) } catch (e) { /* no panel */ }
+  })
+}
 async function setupMultiTriggerGroupForFunction(id, kind, yielder) {
   const mtControls = [
     { key: `${id}MultiTriggerEnabled`, label: 'Multi Trigger (On/Off)', type: 'checkbox', def: false, onChange: () => updateMultiTriggerGroupVisibility(id) },
