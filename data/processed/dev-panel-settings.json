@@ -65350,14 +65350,14 @@
     {
       "key": "New Group (9)",
       "collapsed": false,
-      "locked": false,
+      "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "Pause Button",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -65424,7 +65424,7 @@
           "group": {
             "key": "Background",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -65842,7 +65842,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -65853,7 +65853,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
