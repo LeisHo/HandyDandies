@@ -19548,7 +19548,7 @@
       "custom50SequenceHoldMs": 0,
       "custom50TransitionSpeedMs": 400,
       "custom50EasingCurveEnabled": true,
-      "custom50EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2017283777068691,\"y\":0.03989588419596357}},{\"x\":0.4991710896684101,\"y\":1,\"h2\":{\"x\":-0.18972018710373761,\"y\":-0.013437652587890647},\"h1\":{\"x\":0.21544480438513497,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3143245150521897,\"y\":0}}]",
+      "custom50EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.37421737288059015,\"y\":0}},{\"x\":0.4991710896684101,\"y\":1,\"h2\":{\"x\":-0.18972018710373761,\"y\":-0.013437652587890647},\"h1\":{\"x\":0.21544480438513497,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3143245150521897,\"y\":0}}]",
       "custom50RetransitionEasingCurveEnabled": true,
       "custom50RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.23964978413029608,\"y\":0}},{\"x\":0.5124307467467473,\"y\":0.8108333587646485,\"h1\":{\"x\":0.29082322045636977,\"y\":0.006666692097981763},\"h2\":{\"x\":-0.2057668995242647,\"y\":-0.013333384195963527}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.40809763422326306,\"y\":0}}]",
       "custom50SpeedCurveEnabled": true,
@@ -38566,7 +38566,7 @@
         }
       ],
       "cameraX": -3.422222222222221,
-      "cameraY": 6.297638758282252e-13,
+      "cameraY": 7.20877597684788e-13,
       "cameraZ": 495.9881938061244,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -41041,7 +41041,7 @@
       "custom50SequenceHoldMs": 0,
       "custom50TransitionSpeedMs": 400,
       "custom50EasingCurveEnabled": true,
-      "custom50EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2017283777068691,\"y\":0.03989588419596357}},{\"x\":0.4991710896684101,\"y\":1,\"h2\":{\"x\":-0.18972018710373761,\"y\":-0.013437652587890647},\"h1\":{\"x\":0.21544480438513497,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3143245150521897,\"y\":0}}]",
+      "custom50EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.37421737288059015,\"y\":0}},{\"x\":0.4991710896684101,\"y\":1,\"h2\":{\"x\":-0.18972018710373761,\"y\":-0.013437652587890647},\"h1\":{\"x\":0.21544480438513497,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3143245150521897,\"y\":0}}]",
       "custom50RetransitionEasingCurveEnabled": true,
       "custom50RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.23964978413029608,\"y\":0}},{\"x\":0.5124307467467473,\"y\":0.8108333587646485,\"h1\":{\"x\":0.29082322045636977,\"y\":0.006666692097981763},\"h2\":{\"x\":-0.2057668995242647,\"y\":-0.013333384195963527}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.40809763422326306,\"y\":0}}]",
       "custom50SpeedCurveEnabled": true,
@@ -62534,7 +62534,7 @@
       "custom50SequenceHoldMs": 0,
       "custom50TransitionSpeedMs": 400,
       "custom50EasingCurveEnabled": true,
-      "custom50EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2017283777068691,\"y\":0.03989588419596357}},{\"x\":0.4991710896684101,\"y\":1,\"h2\":{\"x\":-0.18972018710373761,\"y\":-0.013437652587890647},\"h1\":{\"x\":0.21544480438513497,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3143245150521897,\"y\":0}}]",
+      "custom50EasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.37421737288059015,\"y\":0}},{\"x\":0.4991710896684101,\"y\":1,\"h2\":{\"x\":-0.18972018710373761,\"y\":-0.013437652587890647},\"h1\":{\"x\":0.21544480438513497,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3143245150521897,\"y\":0}}]",
       "custom50RetransitionEasingCurveEnabled": true,
       "custom50RetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.23964978413029608,\"y\":0}},{\"x\":0.5124307467467473,\"y\":0.8108333587646485,\"h1\":{\"x\":0.29082322045636977,\"y\":0.006666692097981763},\"h2\":{\"x\":-0.2057668995242647,\"y\":-0.013333384195963527}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.40809763422326306,\"y\":0}}]",
       "custom50SpeedCurveEnabled": true,
@@ -66645,7 +66645,7 @@
                 "group": {
                   "key": "Responsive Velocity",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -66676,7 +66676,7 @@
                       "group": {
                         "key": "Displacement Start Time Curve",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -66703,7 +66703,7 @@
                       "group": {
                         "key": "Displacement Speed Curve",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -66730,7 +66730,7 @@
                       "group": {
                         "key": "Retransition",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -66741,7 +66741,7 @@
                             "group": {
                               "key": "Retransition Speed Curve",
                               "collapsed": true,
-                              "locked": true,
+                              "locked": false,
                               "items": [
                                 {
                                   "type": "row",
@@ -66768,7 +66768,7 @@
                             "group": {
                               "key": "Retransition Start Time Curve",
                               "collapsed": true,
-                              "locked": true,
+                              "locked": false,
                               "items": [
                                 {
                                   "type": "row",
@@ -66795,7 +66795,7 @@
                             "group": {
                               "key": "Retransition Easing Curve",
                               "collapsed": true,
-                              "locked": true,
+                              "locked": false,
                               "items": [
                                 {
                                   "type": "row",
@@ -66818,7 +66818,7 @@
                       "group": {
                         "key": "Easing",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -66839,7 +66839,7 @@
                       "group": {
                         "key": "Displacement Angle to Velocity 1",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -66870,7 +66870,7 @@
                             "group": {
                               "key": "Displacement Angle Curve",
                               "collapsed": true,
-                              "locked": true,
+                              "locked": false,
                               "items": [
                                 {
                                   "type": "row",
@@ -66892,7 +66892,7 @@
                             "group": {
                               "key": "Velocity Arm Rotation",
                               "collapsed": true,
-                              "locked": true,
+                              "locked": false,
                               "items": [
                                 {
                                   "type": "row",
@@ -66924,7 +66924,7 @@
                             "group": {
                               "key": "Velocity Wrist Splay",
                               "collapsed": true,
-                              "locked": true,
+                              "locked": false,
                               "items": [
                                 {
                                   "type": "row",
@@ -66956,7 +66956,7 @@
                             "group": {
                               "key": "Velocity Wrist Crop",
                               "collapsed": true,
-                              "locked": true,
+                              "locked": false,
                               "items": [
                                 {
                                   "type": "row",
@@ -66988,7 +66988,7 @@
                             "group": {
                               "key": "Velocity Finger Curl",
                               "collapsed": true,
-                              "locked": true,
+                              "locked": false,
                               "items": [
                                 {
                                   "type": "row",
@@ -67095,7 +67095,7 @@
           "group": {
             "key": "Custom Click Function 29",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -67105,7 +67105,7 @@
           "group": {
             "key": "Custom Click Function 28",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -67115,7 +67115,7 @@
           "group": {
             "key": "Custom Click Function 19",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -67136,7 +67136,7 @@
                 "group": {
                   "key": "35 FT - 1 - CH Copy",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [],
                   "settings": []
                 }
@@ -67146,7 +67146,7 @@
                 "group": {
                   "key": "35 FT - Copy",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [],
                   "settings": []
                 }
@@ -67156,7 +67156,7 @@
                 "group": {
                   "key": "35 FT - 3 - C Copy",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [],
                   "settings": []
                 }
@@ -67166,7 +67166,7 @@
                 "group": {
                   "key": "35 FT - 3 - CH Copy",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [],
                   "settings": []
                 }
@@ -67176,7 +67176,7 @@
                 "group": {
                   "key": "35 FT - 1 - C Copy",
                   "collapsed": false,
-                  "locked": true,
+                  "locked": false,
                   "items": [],
                   "settings": []
                 }
@@ -67186,7 +67186,7 @@
                 "group": {
                   "key": "35 FT - 2 - CH Copy",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [],
                   "settings": []
                 }
@@ -67196,7 +67196,7 @@
                 "group": {
                   "key": "20 FT - 1 - C Copy",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [],
                   "settings": []
                 }
@@ -67206,7 +67206,7 @@
                 "group": {
                   "key": "20 FT - R - CH Copy",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [],
                   "settings": []
                 }
@@ -67216,7 +67216,7 @@
                 "group": {
                   "key": "20 FT - 3 - C Copy",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [],
                   "settings": []
                 }
@@ -67226,7 +67226,7 @@
                 "group": {
                   "key": "20 FT - 3 - CH Copy",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [],
                   "settings": []
                 }
@@ -72663,8 +72663,8 @@
     "mobile": {
       "left": 20,
       "top": 30.011905670166016,
-      "width": 397.8571472167969,
-      "height": 597.9464111328125
+      "width": 404.71429443359375,
+      "height": 604.0416870117188
     }
   }
 }
