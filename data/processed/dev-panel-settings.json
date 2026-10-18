@@ -666,14 +666,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -68.09999999999998,
-      "loadingPreviewRotationY": 180,
+      "loadingPreviewRotationX": -67.76155881846027,
+      "loadingPreviewRotationY": 179.78594228721997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043754,
+      "loadingPreviewCameraZoom": 1279.5949475713567,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -17486,7 +17486,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -22159,14 +22159,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -68.09999999999998,
-      "loadingPreviewRotationY": 180,
+      "loadingPreviewRotationX": -67.76155881846027,
+      "loadingPreviewRotationY": 179.78594228721997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043754,
+      "loadingPreviewCameraZoom": 1279.5949475713567,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -38566,8 +38566,8 @@
         }
       ],
       "cameraX": -3.422222222222221,
-      "cameraY": 5.386501539716624e-13,
-      "cameraZ": 495.9881938061237,
+      "cameraY": 6.297638758282252e-13,
+      "cameraZ": 495.9881938061244,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -38979,7 +38979,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -43652,14 +43652,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -68.09999999999998,
-      "loadingPreviewRotationY": 180,
+      "loadingPreviewRotationX": -67.76155881846027,
+      "loadingPreviewRotationY": 179.78594228721997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043754,
+      "loadingPreviewCameraZoom": 1279.5949475713567,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -60472,7 +60472,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 1,
+      "pixelRatio": 2,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -64813,7 +64813,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -65522,8 +65522,8 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
-      "locked": false,
+      "collapsed": true,
+      "locked": true,
       "items": [
         {
           "type": "row",
@@ -65534,7 +65534,7 @@
           "group": {
             "key": "Field Layout",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -65605,7 +65605,7 @@
                 "group": {
                   "key": "Hand Position Min X Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65631,7 +65631,7 @@
                 "group": {
                   "key": "Hand Position Max X Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65657,7 +65657,7 @@
                 "group": {
                   "key": "Hand Position Min Y Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65683,7 +65683,7 @@
                 "group": {
                   "key": "Hand Position Max Y Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65709,7 +65709,7 @@
                 "group": {
                   "key": "Hand Position Min Z Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65735,7 +65735,7 @@
                 "group": {
                   "key": "Hand Position Max Z Curve",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65761,7 +65761,7 @@
                 "group": {
                   "key": "Render Order",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -65798,7 +65798,7 @@
           "group": {
             "key": "Render Order",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -65820,7 +65820,7 @@
           "group": {
             "key": "Outline",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -65877,7 +65877,7 @@
           "group": {
             "key": "Pose",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -65892,7 +65892,7 @@
                 "group": {
                   "key": "New Group (8)",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65919,7 +65919,7 @@
                 "group": {
                   "key": "Whole-Hand Rotation & Thumb",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65961,7 +65961,7 @@
                 "group": {
                   "key": "Wrist",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66003,7 +66003,7 @@
                 "group": {
                   "key": "New Group (6)",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66055,7 +66055,7 @@
                 "group": {
                   "key": "Index",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66117,7 +66117,7 @@
                 "group": {
                   "key": "Middle",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66179,7 +66179,7 @@
                 "group": {
                   "key": "Ring",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66241,7 +66241,7 @@
                 "group": {
                   "key": "Pinky",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66303,7 +66303,7 @@
                 "group": {
                   "key": "Whole-Hand Rotation at Base",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66337,7 +66337,7 @@
           "group": {
             "key": "Tween",
             "collapsed": false,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -66359,7 +66359,7 @@
           "group": {
             "key": "Cursor Tracking",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -66382,7 +66382,7 @@
                 "group": {
                   "key": "Responsive Arm Rotation",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66454,7 +66454,7 @@
                 "group": {
                   "key": "New Group (3)",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66516,7 +66516,7 @@
                 "group": {
                   "key": "Responsive Wrist Splay",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66583,7 +66583,7 @@
                 "group": {
                   "key": "New Group (4)",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66645,7 +66645,7 @@
                 "group": {
                   "key": "Responsive Velocity",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -66676,7 +66676,7 @@
                       "group": {
                         "key": "Displacement Start Time Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -66703,7 +66703,7 @@
                       "group": {
                         "key": "Displacement Speed Curve",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -66730,7 +66730,7 @@
                       "group": {
                         "key": "Retransition",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -66741,7 +66741,7 @@
                             "group": {
                               "key": "Retransition Speed Curve",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -66768,7 +66768,7 @@
                             "group": {
                               "key": "Retransition Start Time Curve",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -66795,7 +66795,7 @@
                             "group": {
                               "key": "Retransition Easing Curve",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -66818,7 +66818,7 @@
                       "group": {
                         "key": "Easing",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -66839,7 +66839,7 @@
                       "group": {
                         "key": "Displacement Angle to Velocity 1",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -66870,7 +66870,7 @@
                             "group": {
                               "key": "Displacement Angle Curve",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -66892,7 +66892,7 @@
                             "group": {
                               "key": "Velocity Arm Rotation",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -66924,7 +66924,7 @@
                             "group": {
                               "key": "Velocity Wrist Splay",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -66956,7 +66956,7 @@
                             "group": {
                               "key": "Velocity Wrist Crop",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -66988,7 +66988,7 @@
                             "group": {
                               "key": "Velocity Finger Curl",
                               "collapsed": true,
-                              "locked": false,
+                              "locked": true,
                               "items": [
                                 {
                                   "type": "row",
@@ -67056,7 +67056,7 @@
           "group": {
             "key": "Small Scale Models",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -67075,8 +67075,8 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
-      "locked": false,
+      "collapsed": false,
+      "locked": true,
       "items": [
         {
           "type": "row",
@@ -67095,7 +67095,7 @@
           "group": {
             "key": "Custom Click Function 29",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [],
             "settings": []
           }
@@ -67105,7 +67105,7 @@
           "group": {
             "key": "Custom Click Function 28",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [],
             "settings": []
           }
@@ -67115,7 +67115,7 @@
           "group": {
             "key": "Custom Click Function 19",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [],
             "settings": []
           }
@@ -67129,14 +67129,14 @@
           "group": {
             "key": "New Group (16)",
             "collapsed": false,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "group",
                 "group": {
                   "key": "35 FT - 1 - CH Copy",
                   "collapsed": false,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -67146,7 +67146,7 @@
                 "group": {
                   "key": "35 FT - Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -67156,7 +67156,7 @@
                 "group": {
                   "key": "35 FT - 3 - C Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -67166,7 +67166,7 @@
                 "group": {
                   "key": "35 FT - 3 - CH Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -67176,7 +67176,7 @@
                 "group": {
                   "key": "35 FT - 1 - C Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -67186,7 +67186,7 @@
                 "group": {
                   "key": "35 FT - 2 - CH Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -67196,7 +67196,7 @@
                 "group": {
                   "key": "20 FT - 1 - C Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -67206,7 +67206,7 @@
                 "group": {
                   "key": "20 FT - R - CH Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -67216,7 +67216,7 @@
                 "group": {
                   "key": "20 FT - 3 - C Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -67226,7 +67226,7 @@
                 "group": {
                   "key": "20 FT - 3 - CH Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -72663,8 +72663,8 @@
     "mobile": {
       "left": 20,
       "top": 30.011905670166016,
-      "width": 396.5297546386719,
-      "height": 594.8988037109375
+      "width": 397.8571472167969,
+      "height": 597.9464111328125
     }
   }
 }
