@@ -36,7 +36,7 @@ function safeRefreshMultiSelectOptions(key) {
 // Every dropdown that lists the saved tween sequences: the Loading Tween Sequence, and the Sequence / Chain rows of EVERY click function (the Starting State one, custom functions, their Multi Triggers).
 // Found by the rows that exist right now instead of a hard-coded key list, which missed the loading preview and every custom function (2026-10-15, direct report: an imported tween did not show up in them).
 function refreshAllTweenSequenceSelectors() {
-  const keys = new Set(['loadingPreviewTweenSelector', 'dcHoldTweenSelector', 'rcTweenSelector', 'chpTweenSelector', 'rchpTweenSelector', 'clickTweenSelector', 'dblclickTweenSelector'])
+  const keys = new Set(['loadingPreviewTweenSelector', 'loadingPreviewEndSequence', 'dcHoldTweenSelector', 'rcTweenSelector', 'chpTweenSelector', 'rchpTweenSelector', 'clickTweenSelector', 'dblclickTweenSelector'])
   const chains = new Set()
   document.querySelectorAll('.dp-row[data-key]').forEach((row) => {
     const k = row.dataset.key
@@ -386,6 +386,10 @@ let loadingPreviewAnchorActive = false
 // shared profile code is reused unchanged. Declared up here, not next to its
 // functions: the restore can call its onChange at top level (TDZ gotcha).
 let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: null, speedRangeParsed: null }
+// Loading Preview End Sequence (2026-10-18): state + its own easing trig, declared up here (the restore can reach the onChange handlers at top level - TDZ). lpLastValues / lpHand2LastValues = the last pose applied to each preview hand.
+let loadingPreviewEndEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], speedRangeParsed: null }
+let lpLastValues = null, lpHand2LastValues = null
+const endSeq = { phase: 'off', finished: false, lapAtBegin: 0, timer: 0, seq: null, tr1: null, tr2: null, lapIndex: 1, lapStartMs: 0, holdEndMs: 0, dir: 1, lapStyle: 'Loop', total: 1, speedMs: 1000, pauseEndMs: 0, retStartMs: 0, retDur: 0, from1: null, from2: null }
 const loadingPreviewAnchor = new THREE.Vector3()
 const _loadingPreviewBase = new THREE.Vector3(), _loadingPreviewV2 = new THREE.Vector3()
 // Two-hand tween: the base position applyLoadingPreviewPose() gave the main hand (before the Pose Offset), and whether it was HANDO's exact pivots (see there) - updateLoadingPreviewHand2() needs both for the mirror plane.
@@ -1400,6 +1404,11 @@ function tryStartField() {
       }
       return
     }
+  }
+  // End Sequence (2026-10-18): hold the reveal (and with it the whole startup sequence) until the loading animation has finished its lap and the End Sequence has played.
+  if (endSeqShouldRun()) {
+    if (endSeq.phase === 'off') startEndSequence()
+    if (endSeq.phase !== 'done') return
   }
   fieldStarted = true
   logStartupTiming('fieldStarted = true')
@@ -2764,6 +2773,9 @@ const DEV_GROUPS = [
       // Two-hand tween (2026-10-13): reads a HANDO "hando-two-hand-tween" export from the clipboard, adds its poses / second-hand poses / sequence, and selects the sequence as the loading animation. A sequence flagged twoHand
       // makes the preview render the second hand by itself (see updateLoadingPreviewHand2()).
       { key: 'loadingPreviewImportTwoHandBtn', label: 'Import Two-Hand Tween From Clipboard (HANDO)', type: 'button', onClick: (btn) => importTwoHandTween(btn) },
+      // Imported Two-Hand Tweens (2026-10-18, direct request): every import is saved here by name (importing the same name again overwrites its entry). Use selects it as the Loading Tween Sequence; Save adds the current
+      // Loading Tween Sequence under a name. An item points at a sequence in Saved Tween Sequences (its poses live in Saved Poses, as before).
+      { key: 'loadingPreviewTwoHandTweens', label: 'Imported Two-Hand Tweens', type: 'list-picker', def: [], itemLabel: 'Two-Hand Tween', placeAfter: 'loadingPreviewImportTwoHandBtn', isInUse: (item) => !!cfg.loadingPreviewTweenSelector && cfg.loadingPreviewTweenSelector === (item.sequence || item.name), captureCurrent: () => ({ sequence: cfg.loadingPreviewTweenSelector || '' }), onUse: (item) => useTwoHandTweenItem(item) },
       // Camera/Lighting selection for the loading preview's own SEPARATE
       // scene -- direct follow-up request ("allow selecting a Camera
       // setting and a Lighting setting for the chosen loading-preview
@@ -3008,6 +3020,26 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewProgressCropFlip', label: 'Crop From The Fingertip End (Off = From The Arm End)', type: 'checkbox', def: false },
       { key: 'loadingPreviewProgressCropRange', label: 'Min / Max Crop (%)', type: 'text', def: '{"min":0,"max":100}' },
       { key: 'loadingPreviewProgressCropCurve', label: 'Crop Curve (Loading Progress -> Crop Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]' },
+      // End Sequence (2026-10-18, direct request): when the loading is complete the loading animation finishes its lap / count, the preview then plays this sequence, and only after it does the field start (the offset / sphere
+      // startup sequence). Same sub-groups as a click function set to a Sequence (Sequence, Sequence Mode, Easing, Retransition) minus the per-hand / distance ones. The rows are moved into a nested, toggleable "End Sequence" group
+      // by setupLoadingPreviewEndSequenceGroup(); see updateLoadingPreviewEndSequence() for how it plays.
+      { key: 'loadingPreviewEndEnabled', label: 'End Sequence On/Off', type: 'checkbox', def: false, onChange: () => updateLoadingPreviewEndGroupVisibility() },
+      { key: 'loadingPreviewEndSequence', label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      { key: 'loadingPreviewEndReverse', label: 'Reverse Sequence', type: 'checkbox', def: false },
+      { key: 'loadingPreviewEndGlide', label: 'Glide To Pose 1', type: 'checkbox', def: true },
+      { key: 'loadingPreviewEndGlideScale', label: 'First Transition Time Scale (x)', type: 'slider', min: 0.1, max: 5, step: 0.05, def: 1 },
+      { key: 'loadingPreviewEndSpeedMs', label: 'Animation Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 1500 },
+      { key: 'loadingPreviewEndCount', label: 'Sequence Count', type: 'slider', min: 1, max: 50, step: 1, def: 1 },
+      { key: 'loadingPreviewEndCountMode', label: 'Sequence Count Mode - Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Loop', 'Oscillate'] },
+      { key: 'loadingPreviewEndLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
+      { key: 'loadingPreviewEndHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
+      { key: 'loadingPreviewEndEasingEnabled', label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateLoadingPreviewEndGroupVisibility() },
+      { key: 'loadingPreviewEndEasingCurve', label: 'Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseLoadingPreviewEndEasingConfig() },
+      { key: 'loadingPreviewEndPauseMs', label: 'Pause Duration At Sequence End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
+      { key: 'loadingPreviewEndRetransitionEnabled', label: 'Retransition On/Off', type: 'checkbox', def: false, onChange: () => updateLoadingPreviewEndGroupVisibility() },
+      { key: 'loadingPreviewEndRetransitionSpeedMs', label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 25000, step: 10, def: 600 },
+      { key: 'loadingPreviewEndRetransitionEasingEnabled', label: 'Retransition Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateLoadingPreviewEndGroupVisibility() },
+      { key: 'loadingPreviewEndRetransitionEasingCurve', label: 'Retransition Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseLoadingPreviewEndEasingConfig() },
       { key: 'loadingPreviewCameraEditMode', label: 'Loading Preview Camera Edit Mode', type: 'checkbox', def: false, onChange: (v) => { if (loadingPreviewOrbitControls) loadingPreviewOrbitControls.enabled = v; if (loadingPreviewCanvas) loadingPreviewCanvas.style.pointerEvents = v ? 'auto' : 'none' } }
     ]
   },
@@ -4157,11 +4189,14 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
     safeRefreshSelectOptions('loadingPreviewModelId')
+    safeRefreshSelectOptions('loadingPreviewEndSequence')
+    safeRefreshSelectOptions('loadingPreviewEndCountMode')
     safeRefreshSelectOptions('distCurveXOrigin')
     updateLoadingPreviewLightTypeRows()
     safeRefreshSelectOptions('loadingPreviewKeyLightType')
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
     prof('setupLoadingPreviewProgressCropGroup', setupLoadingPreviewProgressCropGroup)
+    prof('setupLoadingPreviewEndSequenceGroup', setupLoadingPreviewEndSequenceGroup)
     prof('setupLoadingPreviewLayoutGroup', setupLoadingPreviewLayoutGroup)
     try { await setupResponsiveVelocity() } catch (e) { console.error('Responsive Velocity setup failed', e) }
     exclusiveTriggersReady = true // from here on a user turning a click function on / changing its trigger switches an overlapping one off
@@ -9024,6 +9059,13 @@ async function importTwoHandTween(btn) {
   cfg.savedTweenSequences = sequences
   syncValue('savedTweenSequences', sequences)
   refreshAllTweenSequenceSelectors()
+  // Imported Two-Hand Tweens picker (2026-10-18): one entry per imported sequence, by name; the same name again overwrites its entry (keeping its group).
+  {
+    const items = (cfg.loadingPreviewTwoHandTweens || []).slice()
+    incomingSeqs.forEach((q) => { const i = items.findIndex((x) => x.name === q.name); const it = { name: q.name, sequence: q.name }; if (i >= 0) items[i] = { ...items[i], ...it }; else items.push(it) })
+    cfg.loadingPreviewTwoHandTweens = items
+    syncValue('loadingPreviewTwoHandTweens', items)
+  }
   const pick = incomingSeqs[incomingSeqs.length - 1].name
   cfg.loadingPreviewTweenSelector = pick
   syncValue('loadingPreviewTweenSelector', pick)
@@ -9031,6 +9073,15 @@ async function importTwoHandTween(btn) {
   loadingPreviewLapIndex = 1; loadingPreviewLapStartMs = performance.now(); loadingPreviewHoldEndMs = 0; loadingPreviewDirection = 1; loadingPreviewSequenceDone = false; loadingPreviewNoSequenceLogged = false
   logLoadingPreview('imported two-hand tween "' + pick + '": ' + mainPoses.length + ' poses + ' + hand2Poses.length + ' second-hand poses; selected as the loading animation')
   flash('Imported + selected "' + pick + '"')
+}
+// Use on an Imported Two-Hand Tweens item: selects its sequence as the Loading Tween Sequence and restarts the preview animation on it.
+function useTwoHandTweenItem(item) {
+  const pick = (item && (item.sequence || item.name)) || ''
+  if (!pick || !(cfg.savedTweenSequences || []).some((q) => q.name === pick)) { logLoadingPreview('two-hand tween "' + pick + '" is not in Saved Tween Sequences any more -- nothing selected'); return }
+  cfg.loadingPreviewTweenSelector = pick
+  syncValue('loadingPreviewTweenSelector', pick)
+  loadingPreviewLapIndex = 1; loadingPreviewLapStartMs = performance.now(); loadingPreviewHoldEndMs = 0; loadingPreviewDirection = 1; loadingPreviewSequenceDone = false; loadingPreviewNoSequenceLogged = false
+  logLoadingPreview('selected two-hand tween "' + pick + '" as the loading animation')
 }
 function ensureLoadingPreviewHand2(seq) {
   const need = !!(seq && seq.twoHand && loadingPreviewScene && loadingPreviewHand && lpSourceRoot())
@@ -9060,10 +9111,12 @@ function ensureLoadingPreviewHand2(seq) {
 const _lp2U = new THREE.Matrix4(), _lp2Pivot = new THREE.Matrix4(), _lp2Tmp = new THREE.Matrix4(), _lp2A = new THREE.Matrix4(), _lp2Ai = new THREE.Matrix4(), _lp2Mir = new THREE.Matrix4(), _lp2Final = new THREE.Matrix4()
 const _lp2Rh = new THREE.Quaternion(), _lp2Anchor = new THREE.Vector3()
 const _lp2Q = new THREE.Quaternion(), _lp2Base = new THREE.Quaternion(), _lp2V = new THREE.Vector3(), _lp2V2 = new THREE.Vector3(), _lp2S = new THREE.Vector3(), _lp2Eul = new THREE.Euler()
-function updateLoadingPreviewHand2(seq, lapStyle, t) {
+function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride) {
   const hand2 = loadingPreviewHand2
   if (!hand2 || !hand2.skinnedMesh || !loadingPreviewHand || !seq) return
   const cfg2 = seq.hand2 || {}
+  let values = valuesOverride || null // the End Sequence supplies the pose itself
+  if (!values) {
   // the second hand's own pose list (or the main list when it is told to mirror the main hand's pose)
   const entries2 = (cfg2.mirrorMainHandPose || !(seq.tweenPosesHand2 && seq.tweenPosesHand2.length)) ? (seq.tweenPoses || []) : seq.tweenPosesHand2
   const aIdx = entries2.findIndex((e) => typeof e === 'string' && e)
@@ -9072,7 +9125,6 @@ function updateLoadingPreviewHand2(seq, lapStyle, t) {
   if (!anchor2) return
   const segs2 = resolveTweenSegmentsWithAnchor(anchor2, entries2.slice(aIdx + 1))
   const last2 = segs2.length > 0 ? segs2[segs2.length - 1].poseB : anchor2
-  let values
   if (segs2.length === 0) values = anchor2
   else if (lapStyle === 'Oscillate') values = lerpTweenSegments(segs2, loadingPreviewDirection === 1 ? t : 1 - t)
   else if (cfg.loadingPreviewSequenceLoopTransition === false) values = lerpTweenSegments(segs2, t)
@@ -9081,6 +9133,8 @@ function updateLoadingPreviewHand2(seq, lapStyle, t) {
     const totalW = ring.reduce((sum, sg) => sum + sg.weight, 0)
     values = lerpLoopSegments(ring, (loadingPreviewLapIndex - 1 + t) * totalW)
   }
+  }
+  lpHand2LastValues = values
   const V = {}
   POSE_PRESET_KEYS.forEach((k) => { V[k] = values[k] !== undefined ? values[k] : POSE_KEY_DEFAULTS[k] })
   // --- placement ---
@@ -10013,6 +10067,7 @@ function repositionLoadingPreview() {
 // both would route through.
 function applyLoadingPreviewPose(item) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh) return
+  lpLastValues = item // the End Sequence glides from whatever pose is showing
   const values = {}
   POSE_PRESET_KEYS.forEach((k) => { values[k] = item[k] !== undefined ? item[k] : POSE_KEY_DEFAULTS[k] })
   // CORRECTED 2026-09-19 -- loadingPreviewRotationX/Y/Z (the dev-panel
@@ -10232,6 +10287,9 @@ function setupLoadingPreviewEasingGroup() {
 // the selected sequence's own poses, nothing else -- no default-pose
 // anchor at either end.
 function updateLoadingPreviewAnimation() {
+  if (endSeq.phase !== 'off' && endSeq.phase !== 'done') {
+    try { if (updateLoadingPreviewEndSequence()) return } catch (err) { console.error('End Sequence frame threw -- ending it:', err); endSeqFinish('error: ' + (err && err.message)) }
+  }
   const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewTweenSelector)
   ensureLoadingPreviewHand2(seq) // adds / removes the second hand according to the selected sequence
   const rawEntries = seq ? (seq.tweenPoses || []) : []
@@ -10346,6 +10404,208 @@ function updateLoadingPreviewAnimation() {
   }
 }
 
+// ---- Loading Preview: End Sequence (2026-10-18, direct request) ----
+// "When the loading has completed, complete the loading animation sequence till its end. Then transition into the End Sequence selected. Then only after the end sequence does the starting sequence (offset / sphere) begin."
+// tryStartField() holds the reveal back (fieldStarted stays false, so nothing of the field logic starts) while endSeq.phase is not 'off' / 'done':
+//   wait    - the loading animation keeps playing until its current lap ends (or its Count is used up);
+//   play    - the End Sequence (Glide To Pose 1 -> its poses, Count / Loop / Oscillate laps, Easing) on the preview hand(s);
+//   pause   - Pause Duration At Sequence End;
+//   retrans - Retransition back to the default pose (optional);
+//   done    - endSeqFinish() lets tryStartField() carry on: the loading screen hides and the startup sequence begins.
+// A failure anywhere ends the sequence instead of holding the page: every error path and a safety timer call endSeqFinish().
+function parseLoadingPreviewEndEasingConfig() {
+  try { loadingPreviewEndEasingTrig.easingCurveParsed = JSON.parse(cfg.loadingPreviewEndEasingCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { loadingPreviewEndEasingTrig.retransitionEasingCurveParsed = JSON.parse(cfg.loadingPreviewEndRetransitionEasingCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+}
+const LP_END_GROUP_KEY = 'Loading Preview > End Sequence'
+const LP_END_SUBGROUPS = [
+  { key: LP_END_GROUP_KEY + ' > Sequence', title: 'Sequence', rows: ['loadingPreviewEndSequence', 'loadingPreviewEndReverse', 'loadingPreviewEndGlide', 'loadingPreviewEndGlideScale', 'loadingPreviewEndSpeedMs'] },
+  { key: LP_END_GROUP_KEY + ' > Sequence Mode', title: 'Sequence Mode', rows: ['loadingPreviewEndCount', 'loadingPreviewEndCountMode', 'loadingPreviewEndLoopTransition', 'loadingPreviewEndHoldMs'] },
+  { key: LP_END_GROUP_KEY + ' > Easing', title: 'Easing', rows: ['loadingPreviewEndEasingEnabled', 'loadingPreviewEndEasingCurve'], gate: 'loadingPreviewEndEasingEnabled' },
+  { key: LP_END_GROUP_KEY + ' > Retransition', title: 'Retransition', rows: ['loadingPreviewEndRetransitionEnabled', 'loadingPreviewEndRetransitionSpeedMs', 'loadingPreviewEndRetransitionEasingEnabled', 'loadingPreviewEndRetransitionEasingCurve'], gate: 'loadingPreviewEndRetransitionEnabled' }
+]
+function updateLoadingPreviewEndGroupVisibility() {
+  if (!document.getElementById('dpStartupStyle')) { const st = document.createElement('style'); st.id = 'dpStartupStyle'; st.textContent = '.dp-startup-off > * { display: none !important }'; document.head.appendChild(st) }
+  const toggle = (key, off) => { const g = document.querySelector('.dp-group[data-key="' + key + '"]'); const b = g && g.querySelector(':scope > .dp-group-body'); if (b) b.classList.toggle('dp-startup-off', off) }
+  toggle(LP_END_GROUP_KEY, !cfg.loadingPreviewEndEnabled)
+  toggle(LP_END_GROUP_KEY + ' > Easing', !cfg.loadingPreviewEndEasingEnabled)
+  toggle(LP_END_GROUP_KEY + ' > Retransition', !cfg.loadingPreviewEndRetransitionEnabled)
+  const rEase = document.querySelector('.dp-row[data-key="loadingPreviewEndRetransitionEasingCurve"]')
+  if (rEase) rEase.style.display = cfg.loadingPreviewEndRetransitionEasingEnabled ? '' : 'none'
+}
+function setupLoadingPreviewEndSequenceGroup() {
+  parseLoadingPreviewEndEasingConfig()
+  const lpGroup = document.querySelector('.dp-group[data-key="Loading Preview"]')
+  if (!lpGroup) return
+  const lpBody = lpGroup.querySelector(':scope > .dp-group-body')
+  let g = document.querySelector('.dp-group[data-key="' + LP_END_GROUP_KEY + '"]')
+  if (!g) {
+    g = createGroupElement('End Sequence')
+    g.dataset.key = LP_END_GROUP_KEY // unique internal key (a bare title could be adopted by an unrelated group by the saved layout)
+    lpBody.appendChild(g)
+  }
+  const gb = g.querySelector(':scope > .dp-group-body')
+  LP_END_SUBGROUPS.forEach((sp) => {
+    let sg = document.querySelector('.dp-group[data-key="' + sp.key + '"]')
+    if (!sg) { sg = createGroupElement(sp.title); sg.dataset.key = sp.key; gb.appendChild(sg) }
+    const sb = sg.querySelector(':scope > .dp-group-body')
+    sp.rows.forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row && row.parentElement === lpBody) sb.appendChild(row) })
+  })
+  const pauseRow = document.querySelector('.dp-row[data-key="loadingPreviewEndPauseMs"]')
+  if (pauseRow && pauseRow.parentElement === lpBody) gb.appendChild(pauseRow)
+  const gateRow = document.querySelector('.dp-row[data-key="loadingPreviewEndEnabled"]')
+  if (gateRow && gateRow.parentElement === lpBody) gb.appendChild(gateRow)
+  ;['loadingPreviewEndEasingCurve', 'loadingPreviewEndRetransitionEasingCurve'].forEach((k) => {
+    const row = document.querySelector('.dp-row[data-key="' + k + '"]')
+    if (row && !row.querySelector('svg')) buildGenericCurveWidget(row, { caption: 'X: Progress (0-100%)  ·  Y: Speed (0 = Slowest, 1 = Fastest)', defaultPoints: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] })
+  })
+  gateGroupHeader(LP_END_GROUP_KEY, 'loadingPreviewEndEnabled')
+  LP_END_SUBGROUPS.forEach((sp) => { if (sp.gate) gateGroupHeader(sp.key, sp.gate) })
+  updateLoadingPreviewEndGroupVisibility()
+}
+// false when the loading animation itself cannot play (no sequence selected / its first pose missing): there is no lap to wait for then.
+function lpLoadingAnimPlayable() {
+  const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewTweenSelector)
+  const entries = seq ? (seq.tweenPoses || []) : []
+  const idx = entries.findIndex((e) => typeof e === 'string' && e)
+  return idx >= 0 && (cfg.savedPoses || []).some((p) => p.name === entries[idx])
+}
+function lpEndSeqObj() { return (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewEndSequence) || null }
+function endSeqShouldRun() { return !!cfg.loadingPreviewEnabled && !!cfg.loadingPreviewEndEnabled && !endSeq.finished && !!loadingPreviewRenderer && !!loadingPreviewHand && !!lpEndSeqObj() }
+function endSeqHolding() { return endSeq.phase !== 'off' && endSeq.phase !== 'done' }
+function startEndSequence() {
+  parseLoadingPreviewEndEasingConfig()
+  endSeq.phase = 'wait'
+  endSeq.lapAtBegin = loadingPreviewLapIndex
+  const speed = Math.max(cfg.loadingPreviewEndSpeedMs || 0, 1), laps = Math.max(cfg.loadingPreviewEndCount || 1, 1)
+  // Safety net (a judgment call, not a measurement): twice a generous estimate of the whole thing plus 3 s, so a bug or a stalled loop can never keep the loading screen up forever.
+  const est = Math.max(cfg.loadingPreviewSpeedMs || 0, 1) + (cfg.loadingPreviewSequenceHoldMs || 0) + (speed * 3 + (cfg.loadingPreviewEndHoldMs || 0)) * laps + (cfg.loadingPreviewEndPauseMs || 0) + (cfg.loadingPreviewEndRetransitionEnabled ? (cfg.loadingPreviewEndRetransitionSpeedMs || 0) : 0)
+  endSeq.timer = setTimeout(() => endSeqFinish('safety timer'), 2 * est + 3000)
+  logLoadingPreview('End Sequence: loading is complete -- finishing the loading animation first')
+}
+function endSeqFinish(reason) {
+  if (endSeq.phase === 'done') return
+  clearTimeout(endSeq.timer)
+  endSeq.phase = 'done'
+  endSeq.finished = true
+  logLoadingPreview('End Sequence finished (' + reason + ') -- the field starts')
+  tryStartField()
+}
+function lpEndEntries(seqObj, second) {
+  const raw = second ? (((seqObj.hand2 && seqObj.hand2.mirrorMainHandPose) || !(seqObj.tweenPosesHand2 && seqObj.tweenPosesHand2.length)) ? (seqObj.tweenPoses || []) : seqObj.tweenPosesHand2) : (seqObj.tweenPoses || [])
+  return cfg.loadingPreviewEndReverse ? raw.slice().reverse() : raw
+}
+// One hand's pieces of the End Sequence. Lap 1 starts from the pose the hand is in right now: with Glide To Pose 1 on it first glides to pose 1 (First Transition Time Scale x one segment), off = the current pose acts as pose 1.
+// Later laps run the sequence itself (a closing segment back to pose 1 when more laps follow and Loop Transition is on, as the loading preview does).
+function lpEndBuildTrack(entries, startValues, totalLaps, lapStyle) {
+  const idx = entries.findIndex((e) => typeof e === 'string' && e)
+  if (idx < 0) return null
+  const m = (cfg.savedPoses || []).filter((p) => p.name === entries[idx])
+  const anchor = m[m.length - 1]
+  if (!anchor) return null
+  const rest = entries.slice(idx + 1)
+  const glide = cfg.loadingPreviewEndGlide !== false
+  const k = Math.max(cfg.loadingPreviewEndGlideScale ?? 1, 0.01)
+  const plain = resolveTweenSegmentsWithAnchor(anchor, rest)
+  const last = plain.length ? plain[plain.length - 1].poseB : anchor
+  const ringMode = totalLaps > 1 && lapStyle === 'Loop' && cfg.loadingPreviewEndLoopTransition !== false
+  const lapSegs = ringMode ? plain.concat([{ poseA: last, poseB: anchor, weight: 1 }]) : plain
+  const sum = (a) => a.reduce((s, x) => s + x.weight, 0)
+  let lap1Segs
+  if (!startValues) lap1Segs = lapSegs
+  else if (glide) lap1Segs = [{ poseA: startValues, poseB: anchor, weight: k }].concat(lapSegs)
+  else {
+    const s2 = resolveTweenSegmentsWithAnchor(startValues, rest)
+    lap1Segs = ringMode ? s2.concat([{ poseA: s2.length ? s2[s2.length - 1].poseB : startValues, poseB: anchor, weight: 1 }]) : s2
+  }
+  return { anchor, plain, lapSegs, lap1Segs, Wlap: sum(lapSegs), W1: sum(lap1Segs), ringMode }
+}
+function lpEndValues(tr, lapIndex, eased, lapStyle, dir) {
+  if (lapIndex === 1) return tr.lap1Segs.length ? lerpTweenSegments(tr.lap1Segs, eased) : tr.anchor
+  if (lapStyle === 'Oscillate') return tr.plain.length ? lerpTweenSegments(tr.plain, dir === 1 ? eased : 1 - eased) : tr.anchor
+  const segs = tr.ringMode ? tr.lapSegs : tr.plain
+  return segs.length ? lerpTweenSegments(segs, eased) : tr.anchor
+}
+function endSeqKeepCrop() {
+  const rt = lpRealTimeCropPct()
+  if (rt !== null) { updateLoadingPreviewWristClip(rt); if (loadingPreviewHand2) updateHand2WristClip(rt) }
+}
+function endSeqBeginPlay(now) {
+  const seq = lpEndSeqObj()
+  if (!seq) { endSeqFinish('sequence not found'); return }
+  ensureLoadingPreviewHand2(seq) // adds / removes the second hand for this sequence
+  endSeq.seq = seq
+  endSeq.lapStyle = cfg.loadingPreviewEndCountMode === 'Oscillate' ? 'Oscillate' : 'Loop'
+  endSeq.total = Math.max(Math.round(cfg.loadingPreviewEndCount || 1), 1)
+  endSeq.speedMs = Math.max(cfg.loadingPreviewEndSpeedMs || 0, 1)
+  endSeq.tr1 = lpEndBuildTrack(lpEndEntries(seq, false), lpLastValues, endSeq.total, endSeq.lapStyle)
+  endSeq.tr2 = loadingPreviewHand2 ? lpEndBuildTrack(lpEndEntries(seq, true), lpHand2LastValues, endSeq.total, endSeq.lapStyle) : null
+  if (!endSeq.tr1) { endSeqFinish('first pose not in Saved Poses -- skipped'); return }
+  endSeq.lapIndex = 1; endSeq.lapStartMs = now; endSeq.holdEndMs = 0; endSeq.dir = 1
+  endSeq.phase = 'play'
+  logLoadingPreview('End Sequence: playing "' + seq.name + '" (' + endSeq.total + ' x ' + endSeq.lapStyle + ', ' + endSeq.speedMs + 'ms per pass, glide ' + (cfg.loadingPreviewEndGlide !== false ? 'on' : 'off') + ')')
+}
+function endSeqPlayFrame(now) {
+  const tr1 = endSeq.tr1
+  if (endSeq.holdEndMs) {
+    if (now < endSeq.holdEndMs) { endSeqKeepCrop(); return true }
+    endSeq.holdEndMs = 0; endSeq.lapStartMs = now
+    if (endSeq.lapStyle === 'Oscillate') endSeq.dir *= -1
+  }
+  const unit = tr1.Wlap > 0 ? endSeq.speedMs / tr1.Wlap : endSeq.speedMs
+  const lapDur = Math.max(endSeq.lapIndex === 1 ? unit * tr1.W1 : endSeq.speedMs, 1)
+  const lapT = THREE.MathUtils.clamp((now - endSeq.lapStartMs) / lapDur, 0, 1)
+  const eased = cfg.loadingPreviewEndEasingEnabled ? easingProfilePAt(getEasingProfile('loadingPreviewEnd', true, loadingPreviewEndEasingTrig), lapT) : lapT
+  applyLoadingPreviewPose(lpEndValues(tr1, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir))
+  if (endSeq.tr2 && loadingPreviewHand2) updateLoadingPreviewHand2(endSeq.seq, endSeq.lapStyle, eased, lpEndValues(endSeq.tr2, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir))
+  if (lapT >= 1) {
+    logLoadingPreview('End Sequence: pass ' + endSeq.lapIndex + ' of ' + endSeq.total + ' complete')
+    endSeq.lapIndex++
+    if (endSeq.lapIndex > endSeq.total) {
+      const pauseMs = Math.max(cfg.loadingPreviewEndPauseMs || 0, 0)
+      if (pauseMs > 0) { endSeq.phase = 'pause'; endSeq.pauseEndMs = now + pauseMs } else endSeqAfterPause(now)
+    } else if ((cfg.loadingPreviewEndHoldMs || 0) > 0) {
+      endSeq.holdEndMs = now + cfg.loadingPreviewEndHoldMs
+    } else {
+      endSeq.lapStartMs = now
+      if (endSeq.lapStyle === 'Oscillate') endSeq.dir *= -1
+    }
+  }
+  return true
+}
+function endSeqAfterPause(now) {
+  const dur = Math.max(cfg.loadingPreviewEndRetransitionSpeedMs || 0, 0)
+  if (cfg.loadingPreviewEndRetransitionEnabled && dur > 0 && lpLastValues) {
+    endSeq.from1 = lpLastValues; endSeq.from2 = lpHand2LastValues
+    endSeq.retStartMs = now; endSeq.retDur = dur
+    endSeq.phase = 'retrans'
+    return
+  }
+  endSeqFinish('complete')
+}
+function endSeqRetransFrame(now) {
+  const u = THREE.MathUtils.clamp((now - endSeq.retStartMs) / endSeq.retDur, 0, 1)
+  const e = cfg.loadingPreviewEndRetransitionEasingEnabled ? easingProfilePAt(getEasingProfile('loadingPreviewEnd', true, loadingPreviewEndEasingTrig, true), u) : u
+  applyLoadingPreviewPose(lerpPoseValues(endSeq.from1, poseDefaultValues, e))
+  if (loadingPreviewHand2 && endSeq.from2) updateLoadingPreviewHand2(endSeq.seq, endSeq.lapStyle, e, lerpPoseValues(endSeq.from2, poseDefaultValues, e))
+  if (u >= 1) endSeqFinish('complete')
+  return true
+}
+// Called at the top of every loading-preview animation frame while an End Sequence is under way; true = this frame's pose has been driven here (the normal loading animation is skipped), false = the loading animation
+// carries on (still waiting for its lap to end).
+function updateLoadingPreviewEndSequence() {
+  const now = performance.now()
+  if (endSeq.phase === 'wait') {
+    if (!(loadingPreviewSequenceDone || loadingPreviewLapIndex > endSeq.lapAtBegin || !lpLoadingAnimPlayable())) return false
+    loadingPreviewHoldEndMs = 0
+    endSeqBeginPlay(now)
+    if (endSeq.phase !== 'play') return false
+  }
+  if (endSeq.phase === 'play') return endSeqPlayFrame(now)
+  if (endSeq.phase === 'pause') { endSeqKeepCrop(); if (now >= endSeq.pauseEndMs) endSeqAfterPause(now); return true }
+  if (endSeq.phase === 'retrans') return endSeqRetransFrame(now)
+  return false
+}
 // Whole-Hand Rotation X/Y/Z -- changes `cloneBaseQuat` only (a single
 // shared quaternion, applied to every hand's own `clone.quaternion` every
 // frame alongside the arm-length position update below -- see
@@ -21833,9 +22093,9 @@ function animate(dt, now) {
     const __pausedRenderIntervalMs = 1000 / Math.max(1, cfg.pausedRenderFps ?? 15)
     const __pausedSafetyNetIntervalMs = 2000
     const __sinceLastPausedRender = __nowForRender - lastPausedRenderMs
-    const __shouldRenderThisFrame = !isPaused
+    const __shouldRenderThisFrame = !endSeqHolding() && (!isPaused
       || (sceneNeedsRedraw && __sinceLastPausedRender >= __pausedRenderIntervalMs)
-      || __sinceLastPausedRender >= __pausedSafetyNetIntervalMs
+      || __sinceLastPausedRender >= __pausedSafetyNetIntervalMs)
     if (__shouldRenderThisFrame) {
       if (isPaused) { lastPausedRenderMs = __nowForRender; sceneNeedsRedraw = false }
       const __renderStart = performance.now()
