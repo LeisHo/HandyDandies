@@ -552,6 +552,7 @@ const loadingPreviewLogEntries = []
 let loadingPreviewLogEl = null
 const _loadingPreviewLogFlushFlag = { scheduled: false }
 let loadingPreviewFirstFrameLogged = false
+let lpFpsFrames = 0, lpFpsWindowStart = 0, lpFpsLastFrameAt = 0, lpFpsWorstMs = 0 // Loading Preview frame-rate log window (2026-10-17), see lpNoteRenderedFrame()
 // Pose Jump Log (2026-10-04, direct request after "why is there a flash after the 2nd click"):
 // finds one-frame pops on the user's own machine. Declared here because
 // buildPoseJumpLogWidget() is called at module top level.
@@ -3963,6 +3964,8 @@ const DEV_GROUPS = [
       // entries are untouched either way (this is not a 4th clear
       // button).
       { key: 'pauseLogsBtn', label: 'Pause Logs', type: 'button', onClick: (btn) => toggleLogsPaused(btn) },
+      // Added 2026-10-17, direct request: "an Export Logs button below the Pause button. It exports all the logs that are active as a json file." See exportDebugLogs() for what counts as active.
+      { key: 'exportLogsBtn', label: 'Export Logs', type: 'button', placeAfter: 'pauseLogsBtn', onClick: (btn) => exportDebugLogs(btn) },
       // Debug > Snapshot (2026-10-11, direct request): one button takes a single log of THIS moment (replaces the previous snapshot, it is not a running log); the checkboxes pick what goes in it.
       { key: 'snapshotCursor', label: 'Snapshot: Cursor Position', type: 'checkbox', def: true },
       { key: 'snapshotMouse', label: 'Snapshot: Mouse Tracking', type: 'checkbox', def: true },
@@ -5710,6 +5713,46 @@ function copyAllDebugLogs(btn) {
     flash('Copy failed')
   }
 }
+// "Export Logs" (2026-10-17): downloads every ACTIVE log as one JSON file. A log is active when it is being recorded: the Mouse Tracking Log and the Loading Preview Log have no switch (always recording);
+// the Hand Behaviour Log is active with "Log Hand Behaviour" or its Detailed option, the Frame Rate Log with "Log Frame Rate Drops" or "Log Frame Profile", the Pose Jump Log with "Log Pose Jumps", the Render Reordering Log with
+// "Log Render Reordering"; the Snapshot only once one has been taken. Logs that are switched off are listed under "inactive" and not exported. Entries are the log lines, oldest first, exactly as the panel shows them.
+function exportDebugLogs(btn) {
+  const flash = (msg) => { if (!btn) return; const orig = btn.dataset.origText || btn.textContent; btn.dataset.origText = orig; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1200) }
+  const defs = [
+    ['mouseTracking', 'Mouse Tracking Log', true, mouseTrackingLogEntries],
+    ['handBehaviour', 'Hand Behaviour Log', !!(cfg.logHandBehaviourEnabled || cfg.logHandBehaviourDetailedEnabled), handBehaviourLogEntries],
+    ['frameRate', 'Frame Rate Log', !!(cfg.logFrameRateDropsEnabled || cfg.logFrameProfileEnabled), frameRateLogEntries],
+    ['loadingPreview', 'Loading Preview Log', true, loadingPreviewLogEntries],
+    ['poseJumps', 'Pose Jump Log', !!cfg.logPoseJumpsEnabled, poseJumpLogEntries],
+    ['renderReordering', 'Render Reordering Log', !!cfg.logRenderReorderEnabled, renderReorderLogEntries],
+    ['snapshot', 'Snapshot', !!snapshotText, snapshotText ? snapshotText.split('\n') : []]
+  ]
+  const logs = {}, inactive = []
+  defs.forEach(([key, title, active, entries]) => {
+    if (active) logs[key] = { title, entryCount: entries.length, entries: entries.slice() }
+    else inactive.push(title)
+  })
+  const payload = {
+    app: 'Handy Dandies',
+    exportedAt: new Date().toISOString(),
+    page: { url: location.href, device: realDeviceClass(), viewport: [window.innerWidth, window.innerHeight], pixelRatio: window.devicePixelRatio, hands: hands.length },
+    logsPaused,
+    loadingProgress: (() => { try { return +loadingProgressNow(true).toFixed(3) } catch (e) { return null } })(),
+    activeLogs: Object.keys(logs),
+    inactive,
+    logs
+  }
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `handy-dandies-logs-${new Date().toISOString().replace(/[:.]/g, '-')}.json`
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+  flash(`Exported ${Object.keys(logs).length} logs`)
+}
 // Same widget shape as buildHandBehaviourLogWidget() directly above --
 // Copy/Save/Clear + a scrolling `<pre>`, appended to the SAME "Debug"
 // group body.
@@ -5780,7 +5823,26 @@ function appendLoadingPreviewLogLine(line) {
   scheduleLogDomFlush(_loadingPreviewLogFlushFlag, () => loadingPreviewLogEl, loadingPreviewLogEntries)
 }
 function logLoadingPreview(text) {
-  appendLoadingPreviewLogLine(`[${new Date().toLocaleTimeString()}] +${Math.round(performance.now() - pageLoadStartMs)}ms ${text}`)
+  // 2026-10-17, direct request: every line carries how much of the REAL loading is done (the "Use Real-Time Loading Progress" figure, loadingProgressNow(true): model, settings, hands built, warm-up). 100% once the field is revealed.
+  // This can be called very early in startup, before the state loadingProgressNow() reads has been declared (a temporal-dead-zone ReferenceError), hence the try: those first lines read "--%".
+  let pct = '--'
+  try { pct = Math.round(loadingProgressNow(true) * 100) } catch (e) { /* not available yet this early in startup */ }
+  appendLoadingPreviewLogLine(`[${new Date().toLocaleTimeString()}] +${Math.round(performance.now() - pageLoadStartMs)}ms loaded ${pct}% ${text}`)
+}
+// Frame rate of the Loading Preview animation (2026-10-17, direct request): called after each rendered preview frame; once per `intervalMs` it logs the frames per second, the average frame time and the worst gap between two frames
+// in that window. The loading screen logs every second; the live preview (Show Loading Preview) every 5 s so it cannot push the startup lines out of the 300-line log. A window that spans a hidden tab shows a large worst gap.
+function lpNoteRenderedFrame(intervalMs) {
+  const now = performance.now()
+  if (lpFpsWindowStart === 0) { lpFpsWindowStart = now; lpFpsLastFrameAt = now; lpFpsFrames = 0; lpFpsWorstMs = 0; return }
+  lpFpsFrames++
+  const dt = now - lpFpsLastFrameAt
+  lpFpsLastFrameAt = now
+  if (dt > lpFpsWorstMs) lpFpsWorstMs = dt
+  const elapsed = now - lpFpsWindowStart
+  if (elapsed >= intervalMs) {
+    logLoadingPreview(`preview animation ${(lpFpsFrames / (elapsed / 1000)).toFixed(1)} fps (average frame ${(elapsed / lpFpsFrames).toFixed(1)} ms, worst gap ${Math.round(lpFpsWorstMs)} ms, ${lpFpsFrames} frames in ${(elapsed / 1000).toFixed(1)} s)`)
+    lpFpsWindowStart = now; lpFpsFrames = 0; lpFpsWorstMs = 0
+  }
 }
 function clearLoadingPreviewLog() {
   loadingPreviewLogEntries.length = 0
@@ -9696,6 +9758,7 @@ function convertHandoLightingPreset(rawItem) {
 let loadingPreviewLiveRafId = null
 function startLoadingPreviewLiveLoop() {
   if (loadingPreviewLiveRafId !== null) return // already running
+  lpFpsWindowStart = 0 // a fresh frame-rate window for this run of the live loop
   logLoadingPreview('live render loop started')
   const tick = () => {
     if (!lpLiveOn() || !loadingPreviewRenderer) {
@@ -9709,6 +9772,7 @@ function startLoadingPreviewLiveLoop() {
       updateLoadingPreviewProgressCrop()
       syncLoadingPreviewCameraFromOrbit()
       loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
+      lpNoteRenderedFrame(5000)
     } catch (err) {
       console.error('Loading Preview (live) frame threw -- disabling for this session:', err)
       logLoadingPreview(`live frame THREW -- disabled for this session: ${err && err.message}`)
@@ -21565,6 +21629,7 @@ function animate(dt, now) {
         syncLoadingPreviewCameraFromOrbit()
         loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera)
         if (!loadingPreviewFirstFrameLogged) { loadingPreviewFirstFrameLogged = true; logLoadingPreview('first loading-screen preview frame rendered') }
+        lpNoteRenderedFrame(1000)
       } catch (lpErr) {
         console.error('Loading Preview frame threw -- disabling it for this session:', lpErr)
         logLoadingPreview(`loading-screen frame THREW -- preview disabled: ${lpErr && lpErr.message}`)
