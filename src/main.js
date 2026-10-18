@@ -3160,6 +3160,8 @@ const DEV_GROUPS = [
       // control's original Debug-group declaration, now removed, for the
       // full "rolling window model" derivation).
       { key: 'multiClickWindowMs', label: 'Rolling Click Window -- Max Gap Between Successive Clicks (Ms)', type: 'slider', min: 50, max: 600, step: 10, def: 200 },
+      // 2026-10-17, direct request: where X = 0 sits on every distance curve (closest hand vs distance 0). "Each Curve Default" changes nothing; see distOriginMode().
+      { key: 'distCurveXOrigin', label: 'Distance Curve X Origin (All Distance Curves)', type: 'select', def: 'Each Curve Default', options: () => ['Each Curve Default', 'Closest Hand', 'True Zero'], placeAfter: 'multiClickWindowMs' },
       { key: 'addCustomClickFunctionBtn', label: '+ Add Click Function', type: 'button', onClick: () => addCustomClickFunction() },
       // Mobile-only Zoom/Scroll gesture types (direct request 2026-09-22)
       // -- shared detection thresholds, not per-function, since the raw
@@ -4104,6 +4106,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
     safeRefreshSelectOptions('loadingPreviewModelId')
+    safeRefreshSelectOptions('distCurveXOrigin')
     updateLoadingPreviewLightTypeRows()
     safeRefreshSelectOptions('loadingPreviewKeyLightType')
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
@@ -4804,7 +4807,7 @@ function startSphereSequence(retrigger, ignoreStartDistance) {
     if (!isOnScreen(hands[i].basePosition)) continue // only visible sphere points take part
     let cap = 1
     if (cfg[SPHERE_FN + 'StartDistanceCurveEnabled'] && !ignoreStartDistance) {
-      const c = computeTweenFractionCap(dist[i], cfg[SPHERE_FN + 'StartDistanceMin'], cfg[SPHERE_FN + 'StartDistanceMax'], trig.startDistanceCurveParsed)
+      const c = computeTweenFractionCap(dist[i], cfg[SPHERE_FN + 'StartDistanceMin'], cfg[SPHERE_FN + 'StartDistanceMax'], trig.startDistanceCurveParsed, vMin)
       if (c === null) continue // outside the eligible range: this sphere never spawns
       cap = c
     }
@@ -10461,6 +10464,15 @@ function curveMirrorY(points) {
     return np
   })
 }
+// ---- Distance Curve X Origin (2026-10-17, direct request) ----
+// Where X = 0 sits on every curve whose X axis is a hand's distance from the cursor: the closest hand's distance ("Closest Hand") or the distance 0 itself ("True Zero"). One global setting, distCurveXOrigin,
+// with a third value that keeps every curve exactly as it was: "Each Curve Default" (the field-wide curves already put the closest hand at 0; Start Distance Curve and Responsive Velocity use a true-distance scale).
+// 0 = each curve's own default, 1 = closest hand, 2 = true zero.
+function distOriginMode() { const m = cfg.distCurveXOrigin; return m === 'Closest Hand' ? 1 : (m === 'True Zero' ? 2 : 0) }
+// X for the curves that normalise against the field's nearest..farthest hand: (d - nearest) / (farthest - nearest) normally (nearest = 0), or d / farthest under True Zero (0 = distance 0, 1 = the farthest hand). Beyond 1 is extrapolated by the curve.
+function normFieldDist(d, min, range) { return distOriginMode() === 2 ? Math.max(d / Math.max(min + range, 1e-6), 0) : Math.max((d - min) / range, 0) }
+// The closest hand's distance on the scale a click function measures (the startup function reads its frozen click point instead of the live cursor).
+function nearestFor(hand, p) { const k = p === STARTUP_FN ? hand._startupClick : null; return k ? k.min : xyFieldMinDist }
 function evaluateArmLengthCurve(points, x) {
   if (!points || points.length === 0) return 1
   if (points.length === 1) return points[0].y
@@ -10528,7 +10540,7 @@ function computeArmLengthT(hand, distanceToCursor, minLiveDist, liveDistRange) {
   // same as every other Responsive-* feature this same round gates the
   // same way (Wrist Splay, the new Responsive Arm Rotation).
   if (!trackingActiveFor('Crop') || !cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
-  const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
+  const normDist = normFieldDist(distanceToCursor, minLiveDist, liveDistRange) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(armLengthCurveParsed, normDist), 0, 1)
   const minT = armLengthRangeParsed.min / 100, maxT = armLengthRangeParsed.max / 100
   return minT + (maxT - minT) * curveY
@@ -10585,7 +10597,7 @@ function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistR
   // comment; same "Responsive-* falls back to its static default while
   // Tracking Enabled is off" treatment.
   if (!trackingActiveFor('Splay') || !cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
-  const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
+  const normDist = normFieldDist(distanceToCursor, minLiveDist, liveDistRange) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(wristSplayCurveParsed, normDist), 0, 1)
   const { min, max } = wristSplayRangeParsed
   return min + (max - min) * curveY
@@ -10611,7 +10623,7 @@ let rvReconcileBusy = false, rvUiQueued = false
 let rvTrail = [] // the cursor's track since the trigger point (screen px), the Path Line the distance curves measure from
 let rvTrigPx = 0, rvTrigPy = 0, rvTrigWas = false // the Trigger Cursor: where the cursor was (screen px) the moment its speed first reached the Min Velocity
 const rvJsonCache = new Map()
-const _rvR = new THREE.Vector3(), _rvU = new THREE.Vector3(), _rvP = new THREE.Vector3(), _rvD = new THREE.Vector3(), _rvAxis = new THREE.Vector3(), _rvQ = new THREE.Quaternion(), _rvQi = new THREE.Quaternion(), _rvLocal = new THREE.Vector3(), _rvHP = new THREE.Vector3()
+const _rvR = new THREE.Vector3(), _rvU = new THREE.Vector3(), _rvP = new THREE.Vector3(), _rvD = new THREE.Vector3(), _rvAxis = new THREE.Vector3(), _rvQ = new THREE.Quaternion(), _rvQi = new THREE.Quaternion(), _rvLocal = new THREE.Vector3(), _rvHP = new THREE.Vector3(), _rvHP2 = new THREE.Vector3()
 function rvJson(raw, fallback) {
   if (typeof raw !== 'string') return fallback
   let hit = rvJsonCache.get(raw)
@@ -11052,6 +11064,19 @@ function updateResponsiveVelocity(nowMs) {
       kAng: `${S}AngleCurve`, kDD: `${S}DisplacementDistCurve`, kD: `${S}DisplacementCurve`, kA: `${S}ArmCurve`, kAD: `${S}ArmDistCurve`, kS: `${S}SplayCurve`, kSD: `${S}SplayDistCurve`, kC: `${S}CropCurve`, kCD: `${S}CropDistCurve`, kL: `${S}CurlCurve`, kLD: `${S}CurlDistCurve`
     }
   })
+  // Distance Curve X Origin = Closest Hand (2026-10-17): the distance curves' X = (distance - the closest hand's distance) / Max Trigger Distance, the closest hand measured the same way as the hand itself (from the Trigger Cursor, the live cursor, or the
+  // Path Line, each worked out only when used). Every other setting leaves these at 0, which is the old "distance / Max Trigger Distance".
+  let rvNearT = 0, rvNearL = 0, rvNearP = null
+  const rvClosest = trigActive && distOriginMode() === 1
+  if (rvClosest) {
+    rvNearT = Infinity; rvNearL = Infinity
+    for (let hi = 0; hi < hands.length; hi++) {
+      _rvHP.copy(hands[hi].basePosition || hands[hi].wrapper.position).project(camera)
+      const sx = (_rvHP.x + 1) * 0.5 * W, sy = (1 - _rvHP.y) * 0.5 * H
+      rvNearT = Math.min(rvNearT, Math.hypot(sx - rvTrigPx, sy - rvTrigPy) * unitsPerPx)
+      rvNearL = Math.min(rvNearL, Math.hypot(sx - px, sy - py) * unitsPerPx)
+    }
+  }
   let any = false
   for (let hi = 0; hi < hands.length; hi++) {
     const hand = hands[hi]
@@ -11071,8 +11096,8 @@ function updateResponsiveVelocity(nowMs) {
     const distT = Math.hypot((_rvHP.x + 1) * 0.5 * W - rvTrigPx, (1 - _rvHP.y) * 0.5 * H - rvTrigPy) * unitsPerPx
     // 2026-10-17, direct request: the X axis of every distance curve runs to the Max Trigger Distance of the velocity that is triggering (D, from the Trigger Distance Curve), not the global Max of the range.
     const dMax = D > 0 ? D : dr.max
-    const nd = dMax > 0 ? THREE.MathUtils.clamp(distT / dMax, 0, 1) : 0
-    const ndLive = dMax > 0 ? THREE.MathUtils.clamp(dist / dMax, 0, 1) : 0
+    const nd = dMax > 0 ? THREE.MathUtils.clamp((distT - rvNearT) / dMax, 0, 1) : 0
+    const ndLive = dMax > 0 ? THREE.MathUtils.clamp((dist - rvNearL) / dMax, 0, 1) : 0
     let ndPath = -1 // this hand's distance from the cursor path, worked out once, at its onset
     const dispSum = hand._rvDisp.set(0, 0, 0), tiltSum = hand._rvTilt.set(0, 0, 0)
     let splay = 0, crop = 0, live = false
@@ -11091,7 +11116,17 @@ function updateResponsiveVelocity(nowMs) {
       else if (distMode === 2) ndU = ndLive
       else {
         if (startOnset) {
-          if (ndPath < 0) { const dpx = rvPathDistPx((_rvHP.x + 1) * 0.5 * W, (1 - _rvHP.y) * 0.5 * H, px, py); ndPath = dMax > 0 ? THREE.MathUtils.clamp((dpx * unitsPerPx) / dMax, 0, 1) : 0 }
+          if (ndPath < 0) {
+            if (rvClosest && rvNearP === null) { // nearest hand to the Path Line, once per frame
+              rvNearP = Infinity
+              for (let hj = 0; hj < hands.length; hj++) {
+                _rvHP2.copy(hands[hj].basePosition || hands[hj].wrapper.position).project(camera)
+                rvNearP = Math.min(rvNearP, rvPathDistPx((_rvHP2.x + 1) * 0.5 * W, (1 - _rvHP2.y) * 0.5 * H, px, py) * unitsPerPx)
+              }
+            }
+            const dpx = rvPathDistPx((_rvHP.x + 1) * 0.5 * W, (1 - _rvHP.y) * 0.5 * H, px, py)
+            ndPath = dMax > 0 ? THREE.MathUtils.clamp((dpx * unitsPerPx - (rvNearP || 0)) / dMax, 0, 1) : 0
+          }
           st.ndPath = ndPath
         }
         ndU = st.ndPath !== undefined ? st.ndPath : nd
@@ -12729,13 +12764,13 @@ const _cameraOffsetWorld = new THREE.Vector3()
 // that one stored value is used by the live ramp and by every bake that frame, so nothing snaps at a bake.
 function captureCameraOffsetNorm(hand, p) {
   const vis = cfg[`${p}CameraOffsetVisibleOnly`] !== false // Visible Hands Only: on = visible-hands domain, off = all hands
-  return Math.max((handXYDist(hand) - (vis ? xyFieldMinDist : xyAllMinDist)) / (vis ? xyFieldDistRange : xyAllDistRange), 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
+  return normFieldDist(handXYDist(hand), vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
 }
 // Rotation Curves: the same normalised distance as Offset To Camera (nearest .. farthest hand), read once per frame by refreshLiveDistanceState() into the hand's state for this function.
 function rotationCurvesOn(p) { return !!(cfg[`${p}RotationXCurveEnabled`] || cfg[`${p}RotationYCurveEnabled`] || cfg[`${p}RotationZCurveEnabled`]) }
 function captureRotationNorm(hand, p) {
   const vis = cfg[`${p}RotationCurveVisibleOnly`] !== false
-  return Math.max((handXYDist(hand) - (vis ? xyFieldMinDist : xyAllMinDist)) / (vis ? xyFieldDistRange : xyAllDistRange), 0)
+  return normFieldDist(handXYDist(hand), vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange)
 }
 const _rotDeg = { x: 0, y: 0, z: 0 }
 // The Rotation X / Y / Z in degrees for this hand (full amount, before the ramp): an axis with its curve on takes Min..Max by the curve at the hand's distance, otherwise its slider.
@@ -13472,7 +13507,7 @@ function curveByRestDomain(p, dist, curveParsed, rangeParsed) {
   return computeStartDelayMs(dist, vis ? restFieldMinDist : restAllMinDist, vis ? restFieldDistRange : restAllDistRange, curveParsed, rangeParsed)
 }
 function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed) {
-  const normDist = Math.max((distanceToCursor - minLiveDist) / liveDistRange, 0) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
+  const normDist = normFieldDist(distanceToCursor, minLiveDist, liveDistRange) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
   return rangeParsed.min + (rangeParsed.max - rangeParsed.min) * curveY
 }
@@ -13488,7 +13523,8 @@ function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curve
 // the curve's own raw 0-1 Y value directly as the tween-amount fraction
 // (no separate range-rescale needed here, unlike computeStartDelayMs()
 // above -- Y already IS the final fraction).
-function computeTweenFractionCap(distanceToCursor, distMin, distMax, curveParsed) {
+function computeTweenFractionCap(distanceToCursor, distMin, distMax, curveParsed, nearestDist = 0) {
+  if (distOriginMode() === 1) distanceToCursor = Math.max(distanceToCursor - nearestDist, 0) // Closest Hand: Min / Max then bound the distance measured from the closest hand
   if (distanceToCursor < distMin || distanceToCursor > distMax) return null
   const range = Math.max(distMax - distMin, 0.001)
   const normDist = THREE.MathUtils.clamp((distanceToCursor - distMin) / range, 0, 1)
@@ -13845,7 +13881,7 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
   if (cfg[`${p}CameraOffsetEnabled`]) st.frozenOffsetNorm = captureCameraOffsetNorm(hand, p)
   if (rotationCurvesOn(p)) st.rotationNorm = captureRotationNorm(hand, p)
   if (cfg[`${p}StartDistanceCurveEnabled`]) {
-    const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
+    const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, nearestFor(hand, p))
     if (cap !== null) st.frozenTweenFractionCap = cap // out of range keeps the last cap rather than snapping
   }
   // Rates. Animation Speed Curve -> tempo of the forward / loop / lap clocks (nominal speed = the value at commit).
@@ -13926,7 +13962,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     let tweenFractionCap = 1
     let eligible = true
     if (cfg[`${p}StartDistanceCurveEnabled`]) {
-      const cap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
+      const cap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, nearestFor(hand, p))
       if (cap === null) eligible = false
       else tweenFractionCap = cap
     }
@@ -15451,7 +15487,7 @@ function triggerClickPose(p, onlyHands = null) {
     // curve here.
     let tweenFractionCap = 1
     if (cfg[`${p}StartDistanceCurveEnabled`] && !(p === STARTUP_FN && startupIgnoreStartDistance)) {
-      const cap = computeTweenFractionCap(dists[i], cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed)
+      const cap = computeTweenFractionCap(dists[i], cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, minD)
       if (cap === null) return // outside the eligible range -- this hand never triggers
       tweenFractionCap = cap
     }
@@ -19591,6 +19627,7 @@ updateLoadingPreviewSequenceVisibility()
 // 'chpTargetPose' succeeds every time, 'rchpTargetPose' throws every
 // time, even called alone) -- this must never take down the whole page.
 safeRefreshSelectOptions('chpTargetPose')
+safeRefreshSelectOptions('distCurveXOrigin')
 safeRefreshSelectOptions('rchpTargetPose')
 safeRefreshSelectOptions('clickTargetPose')
 safeRefreshSelectOptions('dblclickTargetPose')
@@ -21215,7 +21252,7 @@ function animate(dt, now) {
               const distToCursor = armRotUseDepth ? hand._trk.distanceTo(_trackTargetArm) : hand._trkXY
               const armVis = cfg.armRotationVisibleOnly !== false
               const range = armRotUseDepth ? Math.max(cursorDistMaxD - cursorDistMinD, 1e-6) : (armVis ? trkXYFieldRange : trkXYAllRange)
-              const normDist = (distToCursor - (armRotUseDepth ? cursorDistMinD : (armVis ? trkXYFieldMin : trkXYAllMin))) / range
+              const normDist = normFieldDist(distToCursor, armRotUseDepth ? cursorDistMinD : (armVis ? trkXYFieldMin : trkXYAllMin), range)
               // The curve's height (0..1) picks a PERCENT between Min % and Max % of the full 'face the cursor' swing (2026-10-11).
               const armCurveY = (armRotationCurveParsed && armRotationCurveParsed.length) ? THREE.MathUtils.clamp(evaluateArmLengthCurve(armRotationCurveParsed, normDist), 0, 1) : 1
               responsiveness = THREE.MathUtils.clamp((armRotationRangeParsed.min + (armRotationRangeParsed.max - armRotationRangeParsed.min) * armCurveY) / 100, 0, 1)
@@ -21252,7 +21289,7 @@ function animate(dt, now) {
             const distToCursor = palmUseDepth ? hand._trk.distanceTo(_trackTargetPalm) : hand._trkXY
             const palmVis = cfg.palmRotationVisibleOnly !== false
             const range = palmUseDepth ? Math.max(palmDistMaxD - palmDistMinD, 1e-6) : (palmVis ? trkXYFieldRange : trkXYAllRange)
-            const normDist = (distToCursor - (palmUseDepth ? palmDistMinD : (palmVis ? trkXYFieldMin : trkXYAllMin))) / range
+            const normDist = normFieldDist(distToCursor, palmUseDepth ? palmDistMinD : (palmVis ? trkXYFieldMin : trkXYAllMin), range)
             const responsiveness = palmFacesCursorDistanceCurveParsed && palmFacesCursorDistanceCurveParsed.length
               ? evaluateArmLengthCurve(palmFacesCursorDistanceCurveParsed, normDist)
               : 1
