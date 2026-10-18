@@ -2685,8 +2685,8 @@ const DEV_GROUPS = [
       // `min:0.02, max:1, step:0.01, def:1` convention as every other
       // damping slider in this file.
       // Arm Rotation fine-tune (2026-10-11, direct request, like Palm Face Rotation): extra degrees about the mesh X / Y axes on top of the cursor swing.
-      { key: 'armRotationOffsetX', label: 'Arm Rotation X (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
-      { key: 'armRotationOffsetY', label: 'Arm Rotation Y (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
+      { key: 'armRotationOffsetX', label: 'Arm Rotation X (Deg, Hand Model Axes)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
+      { key: 'armRotationOffsetY', label: 'Arm Rotation Y (Deg, Hand Model Axes)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
       { key: 'armRotationDamping', label: 'Arm Rotation Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
       // REDEFINED 2026-09-14 (see computeRadialRollDeg()'s own comment
       // for the full account and the user's own exact reference points):
@@ -2710,7 +2710,7 @@ const DEV_GROUPS = [
       // crop plane's own normal (see computeRollQuat()'s own comment for
       // why that axis) -- CLAUDE.md 12n, "feel/response curves are
       // sliders, not constants."
-      { key: 'palmFaceRotationOffset', label: 'Palm Face Rotation (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
+      { key: 'palmFaceRotationOffset', label: 'Palm Face Rotation (Deg, About The Forearm Axis)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
       // Palm Faces Cursor Distance Curve -- direct spec item 2026-09-24
       // ("provide a curve graph input group... so I can set it such that
       // the further the hand, the less it is responsive to the palm
@@ -2945,9 +2945,9 @@ const DEV_GROUPS = [
       // so a rebuild always snaps back to the dropdown's own camera,
       // exactly as before -- orbiting never overrides it unless the user
       // explicitly re-Saves via the list-picker's own Save button.
-      { key: 'loadingPreviewRotationX', label: 'Loading Preview Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
-      { key: 'loadingPreviewRotationY', label: 'Loading Preview Yaw (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
-      { key: 'loadingPreviewRotationZ', label: 'Loading Preview Roll (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewRotationX', label: 'Loading Preview Pitch (Deg, Orbit Elevation Around The Hand)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewRotationY', label: 'Loading Preview Yaw (Deg, Orbit Around The Hand)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewRotationZ', label: 'Loading Preview Roll (Deg, About The View Axis)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       { key: 'loadingPreviewOffsetX', label: 'Loading Preview Offset X (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       { key: 'loadingPreviewOffsetY', label: 'Loading Preview Offset Y (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       // Direct request 2026-09-20 ("provide Loading Preview Offset Z...
@@ -3278,8 +3278,8 @@ const DEV_GROUPS = [
       { key: 'tipTwistPinky', label: 'Pinky Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -3, onChange: () => applyCurl('pinky') },
       { key: 'midTwistPinky', label: 'Pinky 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'baseTwistPinky', label: 'Pinky Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
-      { key: 'wristBend', label: 'Wrist Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
-      { key: 'wristSplay', label: 'Wrist Splay (Deg)', type: 'slider', min: -30, max: 30, step: 1, def: -1, onChange: () => applyWristPose() },
+      { key: 'wristBend', label: 'Wrist Bend (Deg, Wrist Bone X Axis)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'wristSplay', label: 'Wrist Splay (Deg, Wrist Bone Z Axis)', type: 'slider', min: -30, max: 30, step: 1, def: -1, onChange: () => applyWristPose() },
       // Ported from HANDO (direct request: "check Hando. I added a wrist
       // rotation slider... make sure we can take those imports etc"). Same
       // local-Y rotation on the shared `rHand` bone HANDO's own comment
@@ -3295,19 +3295,19 @@ const DEV_GROUPS = [
       // unlike the camera/lighting HANDO-import path, this bone-local
       // rotation isn't affected by the alignQuat difference between the 2
       // projects).
-      { key: 'wristRotation', label: 'Wrist Rotation (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0, lockRange: true, onChange: () => applyWristPose() },
+      { key: 'wristRotation', label: 'Wrist Rotation (Deg, Wrist Bone Y Axis)', type: 'slider', min: -360, max: 360, step: 1, def: 0, lockRange: true, onChange: () => applyWristPose() },
       // IK rig only (see IK RIG above): HANDO's forearm joints. The sliders exist for every model so poses carry the values, but only the IK rig reads them.
-      { key: 'elbowBend', label: 'Elbow Bend (Deg)', type: 'slider', min: -10, max: 150, step: 1, def: 0, onChange: () => applyWristPose() },
-      { key: 'elbowSideBend', label: 'Elbow Side Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
-      { key: 'forearmTwist', label: 'Forearm Twist (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
-      { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
-      { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
-      { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'elbowBend', label: 'Elbow Bend (Deg, Elbow Bone Z Axis)', type: 'slider', min: -10, max: 150, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'elbowSideBend', label: 'Elbow Side Bend (Deg, Elbow Bone X Axis)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'forearmTwist', label: 'Forearm Twist (Deg, Forearm Bone Y Axis)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg, Hand Model Axes)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg, Hand Model Axes)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg, Hand Model Axes)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       // Whole-Hand Rotation at Base (ported from HANDO, 2026-10-11): turns the whole hand around the BASE OF THE ARM (the forearm root bone) about the hand
       // MODEL'S OWN local X/Y/Z axes, applied after Whole-Hand Rotation (so it rotates with it). Same -180..180 range as HANDO. See computeBaseRotationQuat().
-      { key: 'baseRotationX', label: 'Base Rotation X (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
-      { key: 'baseRotationY', label: 'Base Rotation Y (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
-      { key: 'baseRotationZ', label: 'Base Rotation Z (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'baseRotationX', label: 'Base Rotation X (Deg, Hand Model Axes, Around The Arm Base)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'baseRotationY', label: 'Base Rotation Y (Deg, Hand Model Axes, Around The Arm Base)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'baseRotationZ', label: 'Base Rotation Z (Deg, Hand Model Axes, Around The Arm Base)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       // Ported from HANDO's own "Pose Offset X/Y/Z" + "Pose Scale" sliders
       // (direct request -- see POSE_PRESET_KEYS's own comment for the full
       // account). Deliberately scoped to ACTIVE pose transitions only
@@ -3573,9 +3573,9 @@ const DEV_GROUPS = [
       // Camera orientation (2026-10-11, direct request: "provide camera yaw roll pitch sliders"). Turn the camera IN PLACE (its position and distance to the pan target stay put):
       // Yaw turns it left/right about the world Y axis, Pitch tilts it up/down, Roll spins it about its own view axis (Euler order YXZ, the usual first-person camera). 0/0/0 looks straight
       // down -Z with +Y up. Two-way bound like the position sliders: dragging the view, a Saved Camera or Default updates them (syncCameraPanelFromLive()).
-      { key: 'cameraYaw', label: 'Camera Yaw (Deg)', type: 'slider', min: -180, max: 180, step: 0.5, def: 1.464, perDevice: true, onChange: () => applyCameraOrientation() },
-      { key: 'cameraPitch', label: 'Camera Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 0.5, def: -2.946, perDevice: true, onChange: () => applyCameraOrientation() },
-      { key: 'cameraRoll', label: 'Camera Roll (Deg)', type: 'slider', min: -180, max: 180, step: 0.5, def: 0, perDevice: true, onChange: () => applyCameraOrientation() },
+      { key: 'cameraYaw', label: 'Camera Yaw (Deg, About World Up)', type: 'slider', min: -180, max: 180, step: 0.5, def: 1.464, perDevice: true, onChange: () => applyCameraOrientation() },
+      { key: 'cameraPitch', label: 'Camera Pitch (Deg, About The Camera X Axis)', type: 'slider', min: -89, max: 89, step: 0.5, def: -2.946, perDevice: true, onChange: () => applyCameraOrientation() },
+      { key: 'cameraRoll', label: 'Camera Roll (Deg, About The View Axis)', type: 'slider', min: -180, max: 180, step: 0.5, def: 0, perDevice: true, onChange: () => applyCameraOrientation() },
       // The Default camera of this set of settings (2026-10-15): Default on a Saved Camera stores the full view here (position, field of view, zoom, roll AND the pan target), so it is saved with every dev setting, comes back on load and on Use, and marks the right item. Hidden bookkeeping row.
       { key: 'cameraDefaultPreset', label: 'Default Camera (internal)', type: 'text', def: '', perDevice: true }, // per device (2026-10-16): the Default set on the Mobile tab is Mobile's own and never replaces Desktop's
       // Direct 2-way binding with scroll/pinch zoom, same pattern as the
@@ -3642,8 +3642,8 @@ const DEV_GROUPS = [
       { key: 'lockCameraPreviewPan', label: 'Lock Camera Pan', type: 'checkbox', def: false, onChange: (v) => withActiveCameraPreview((pc) => { pc.locks.pan = v; applyCameraPreviewLockState() }) },
       { key: 'lockCameraPreviewZoom', label: 'Lock Camera Zoom', type: 'checkbox', def: false, onChange: (v) => withActiveCameraPreview((pc) => { pc.locks.zoom = v; applyCameraPreviewLockState() }) },
       { key: 'lockCameraPreviewRotate', label: 'Lock Camera Rotate', type: 'checkbox', def: false, onChange: (v) => withActiveCameraPreview((pc) => { pc.locks.rotate = v; applyCameraPreviewLockState() }) },
-      { key: 'cameraPreviewYaw', label: 'Camera Yaw (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => withActiveCameraPreview((pc) => setSphericalFor(pc.camera, pc.controls, { yaw: v })) },
-      { key: 'cameraPreviewPitch', label: 'Camera Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => withActiveCameraPreview((pc) => setSphericalFor(pc.camera, pc.controls, { pitch: v })) },
+      { key: 'cameraPreviewYaw', label: 'Camera Yaw (Deg, Orbit Around The Target)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => withActiveCameraPreview((pc) => setSphericalFor(pc.camera, pc.controls, { yaw: v })) },
+      { key: 'cameraPreviewPitch', label: 'Camera Pitch (Deg, Orbit Around The Target)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => withActiveCameraPreview((pc) => setSphericalFor(pc.camera, pc.controls, { pitch: v })) },
       // Same list-picker shape as Saved Cameras above. A preview's own pan target is not stored: Use always pivots on world (0,0,0)
       // (HANDYSET's documented design), unlike Saved Cameras, which stores its target.
       { key: 'savedCameraPreviews', label: 'Saved Preview Cameras', type: 'list-picker', def: [], itemLabel: 'Preview Camera', exportable: true, importable: true, captureCurrent: () => captureCameraPreviewFromLive(), onUse: (item) => applyCameraPreviewPreset(item) },
@@ -7743,8 +7743,8 @@ function offsetExtraControls(p, parseFn) {
   rows.push({ key: `${p}RotationCurveXOrigin`, label: 'Rotation Curves: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] })
   ;['X', 'Y', 'Z'].forEach((ax) => {
     rows.push({ key: `${p}Rotation${ax}CurveEnabled`, label: `Rotation Curve ${ax} On/Off`, type: 'checkbox', def: false })
-    rows.push({ key: `${p}Rotation${ax}Curve`, label: `Rotation ${ax} Curve (Distance From Cursor -> Rotation)`, type: 'text', def: linear, onChange: () => parseFn(p) })
-    rows.push({ key: `${p}Rotation${ax}CurveRange`, label: `Rotation ${ax} Min / Max (Deg)`, type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
+    rows.push({ key: `${p}Rotation${ax}Curve`, label: `Rotation ${ax} Curve (Distance From Cursor -> Rotation, Axes Follow Rotation Mode)`, type: 'text', def: linear, onChange: () => parseFn(p) })
+    rows.push({ key: `${p}Rotation${ax}CurveRange`, label: `Rotation ${ax} Min / Max (Deg, Axes Follow Rotation Mode)`, type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
   })
   // Retransition Between Loops (2026-10-14): see loopLapProgress(). One checkbox per group so each can be set on its own.
   rows.push({ key: `${p}OffsetLoopRetransition`, label: 'Offset: Retransition Between Loops', type: 'checkbox', def: false })
@@ -7827,15 +7827,15 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickHoldConfig(p) },
       ...offsetExtraControls(p, parseClickHoldConfig),
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
-      { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
-      { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
-      { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationX`, label: 'Rotation X (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationY`, label: 'Rotation Y (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationZ`, label: 'Rotation Z (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationLoopRetransition`, label: 'Rotation: Retransition Between Loops', type: 'checkbox', def: false },
       // Rotation Mode (2026-10-14, direct request - replaces the separate Rotation at Base group): where the Rotation turns the hand about.
       //  Rotation at Base - the arm base, in the model's own X / Y / Z (like a pose's Whole-Hand Rotation at Base).
       //  Rotation at Crop - the crop point = the first arm bone crossing the wrist-crop surface, in the model's own X / Y / Z.
       //  Rotation Around Cursor - the cursor (where it was when the function fired), in WORLD X / Y / Z.
-      { key: `${p}RotationMode`, label: 'Rotation Mode', type: 'select', def: 'Rotation at Crop', options: () => ['Rotation at Base', 'Rotation at Crop', 'Rotation Around Cursor'] },
+      { key: `${p}RotationMode`, label: 'Rotation Mode', type: 'select', def: 'Rotation at Crop', options: () => [{ value: 'Rotation at Base', text: 'Rotation at Base (Hand Model Axes)' }, { value: 'Rotation at Crop', text: 'Rotation at Crop (Hand Model Axes)' }, { value: 'Rotation Around Cursor', text: 'Rotation Around Cursor (World Axes)' }] },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       // Skip If Same Pose (2026-10-06, direct request). Single Pose mode only: when on, a hand that is
       // ALREADY in this function's target pose is left alone by this trigger; with Multi Trigger it moves
@@ -8238,15 +8238,15 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickPoseConfig(p) },
       ...offsetExtraControls(p, parseClickPoseConfig),
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
-      { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
-      { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
-      { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationX`, label: 'Rotation X (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationY`, label: 'Rotation Y (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationZ`, label: 'Rotation Z (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationLoopRetransition`, label: 'Rotation: Retransition Between Loops', type: 'checkbox', def: false },
       // Rotation Mode (2026-10-14, direct request - replaces the separate Rotation at Base group): where the Rotation turns the hand about.
       //  Rotation at Base - the arm base, in the model's own X / Y / Z (like a pose's Whole-Hand Rotation at Base).
       //  Rotation at Crop - the crop point = the first arm bone crossing the wrist-crop surface, in the model's own X / Y / Z.
       //  Rotation Around Cursor - the cursor (where it was when the function fired), in WORLD X / Y / Z.
-      { key: `${p}RotationMode`, label: 'Rotation Mode', type: 'select', def: 'Rotation at Crop', options: () => ['Rotation at Base', 'Rotation at Crop', 'Rotation Around Cursor'] },
+      { key: `${p}RotationMode`, label: 'Rotation Mode', type: 'select', def: 'Rotation at Crop', options: () => [{ value: 'Rotation at Base', text: 'Rotation at Base (Hand Model Axes)' }, { value: 'Rotation at Crop', text: 'Rotation at Crop (Hand Model Axes)' }, { value: 'Rotation Around Cursor', text: 'Rotation Around Cursor (World Axes)' }] },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       // Skip If Same Pose (2026-10-06, direct request). Single Pose mode only: when on, a hand that is
       // ALREADY in this function's target pose is left alone by this trigger; with Multi Trigger it moves
@@ -10848,16 +10848,16 @@ function rvSetControls(S) {
   ]
   return [
     { key: `${S}Enabled`, label: 'On/Off', type: 'checkbox', def: true, ...pd },
-    { key: `${S}Angle`, label: 'Displacement Angle (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0, ...pd },
+    { key: `${S}Angle`, label: 'Displacement Angle (Deg, Camera Screen Plane, 0 = Away From The Cursor Path)', type: 'slider', min: -360, max: 360, step: 1, def: 0, ...pd },
     { key: `${S}DisplacementRange`, label: 'Min / Max Displacement (World Units)', type: 'text', def: '{"min":0,"max":5}', ...pd },
     { key: `${S}DisplacementCurve`, label: 'Displacement Curve (Velocity -> Displacement)', type: 'text', def: RV_LIN, ...pd },
     { key: `${S}DisplacementDistCurve`, label: 'Displacement Distance Curve (Distance -> Scaler)', type: 'text', def: RV_FLAT1, ...pd },
     { key: `${S}DisplacementDistCurveXOrigin`, label: 'Displacement Distance Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'], ...pd },
-    { key: `${S}TriggerAngleRange`, label: 'Min / Max Trigger Angle (Deg)', type: 'text', def: '{"min":0,"max":0}', ...pd },
+    { key: `${S}TriggerAngleRange`, label: 'Min / Max Trigger Angle (Deg, Camera Screen Plane)', type: 'text', def: '{"min":0,"max":0}', ...pd },
     { key: `${S}AngleCurveEnabled`, label: 'On/Off', type: 'checkbox', def: false, ...pd },
     { key: `${S}AngleCurveRange`, label: 'Min / Max Displacement Angle (Deg)', type: 'text', def: '{"min":0,"max":180}', ...pd },
     { key: `${S}AngleCurve`, label: 'Displacement Angle Curve (Trigger Angle -> Displacement Angle)', type: 'text', def: RV_LIN, ...pd },
-    ...effect('Arm', '{"min":0,"max":12}', 'Rotation', 'Deg'),
+    ...effect('Arm', '{"min":0,"max":12}', 'Rotation (World-Space Tilt Toward Displacement)', 'Deg'),
     ...effect('Splay', '{"min":0,"max":25}', 'Splay', 'Deg'),
     ...effect('Crop', '{"min":0,"max":0.4}', 'Crop', '0-1'),
     // Pose Transition (2026-10-17, direct request; replaces Finger Curl - the keys keep the Curl names so the saved layout and values stay attached): the hand blends toward ONE target pose by the curve's progress (X: velocity, Y: 0 = no change, 1 = the target pose).
@@ -10909,7 +10909,7 @@ function rvRegisterSet(prefix, title, mainBody, beforeEl) {
   rvRangeRow(`${S}TriggerAngleRange`, { trackMin: 0, trackMax: 180, unit: 'deg', defaultValue: { min: 0, max: 0 } })
   rvRangeRow(`${S}AngleCurveRange`, { trackMin: -360, trackMax: 360, unit: 'deg', defaultValue: { min: 0, max: 180 } })
   rvCurveRow(`${S}AngleCurve`, 'X: Hand Angle To The Cursor Path (Min -> Max Trigger Angle)  ·  Y: Displacement Angle (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
-  const effects = [['Arm', 'Velocity Arm Rotation', 'Rotation', 60, 'deg', 1, { min: 0, max: 12 }], ['Splay', 'Velocity Wrist Splay', 'Splay', 90, 'deg', 1, { min: 0, max: 25 }], ['Crop', 'Velocity Wrist Crop', 'Crop', 1, '', 2, { min: 0, max: 0.4 }], ['Curl', 'Velocity Finger Curl', 'Pose Transition', 200, '%', 0, { min: 0, max: 40 }]]
+  const effects = [['Arm', 'Velocity Arm Rotation', 'Rotation (World-Space Tilt Toward Displacement)', 60, 'deg', 1, { min: 0, max: 12 }], ['Splay', 'Velocity Wrist Splay', 'Splay', 90, 'deg', 1, { min: 0, max: 25 }], ['Crop', 'Velocity Wrist Crop', 'Crop', 1, '', 2, { min: 0, max: 0.4 }], ['Curl', 'Velocity Finger Curl', 'Pose Transition', 200, '%', 0, { min: 0, max: 40 }]]
   effects.forEach(([name, , label, trackMax, unit, decimals, defVal]) => {
     if (name !== 'Curl') rvRangeRow(`${S}${name}Range`, { trackMin: name === 'Arm' || name === 'Splay' ? -trackMax : 0, trackMax, unit: unit || 'x', decimals, defaultValue: defVal })
     rvCurveRow(`${S}${name}Curve`, RV_CURVE_X_VELOCITY + (name === 'Curl' ? '  ·  Y: Progress To The Target Pose (0 = No Change, 1 = The Target Pose)' : `  ·  Y: ${label} (0 = Min, 1 = Max)`), [{ x: 0, y: 0 }, { x: 1, y: 1 }])
@@ -16601,7 +16601,7 @@ function buildOffsetAxisWidgets(p) {
   ;['X', 'Y', 'Z'].forEach((ax) => {
     const curveRow = document.querySelector(`.dp-row[data-key="${p}Rotation${ax}Curve"]`)
     const rangeRow = document.querySelector(`.dp-row[data-key="${p}Rotation${ax}CurveRange"]`)
-    if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand, Live)  ·  Y: Rotation Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+    if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand, Live)  ·  Y: Rotation Fraction (0=Min, 1=Max)  ·  Axes Follow Rotation Mode (Hand Model Axes, or World Axes for Around Cursor)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
     if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: -360, trackMax: 360, unit: 'deg', defaultValue: { min: 0, max: 0 } })
   })
   const cursorCaption = 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Offset Fraction (0=Min, 1=Max)'
