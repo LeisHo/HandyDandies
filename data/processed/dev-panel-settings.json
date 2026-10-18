@@ -647,7 +647,7 @@
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 1100,
       "loadingPreviewEasingCurveEnabled": true,
-      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0.5}]",
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4562103709998403,\"y\":0}}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -21818,7 +21818,7 @@
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 1100,
       "loadingPreviewEasingCurveEnabled": true,
-      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0.5}]",
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4562103709998403,\"y\":0}}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -42989,7 +42989,7 @@
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 1100,
       "loadingPreviewEasingCurveEnabled": true,
-      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0.5}]",
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4562103709998403,\"y\":0}}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -64130,7 +64130,7 @@
           "group": {
             "key": "Background",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -64152,7 +64152,7 @@
           "group": {
             "key": "Loading Preview",
             "collapsed": false,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -64182,8 +64182,8 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
-                  "locked": false,
+                  "collapsed": true,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -64264,8 +64264,8 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": false,
-                  "locked": false,
+                  "collapsed": true,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -64327,7 +64327,7 @@
                 "group": {
                   "key": "New Group",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -64394,7 +64394,7 @@
                 "group": {
                   "key": "Loading Preview > Text",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -64461,7 +64461,7 @@
                 "group": {
                   "key": "Loading Preview > Layout",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -64482,7 +64482,7 @@
                 "group": {
                   "key": "Loading Preview > Progress Crop",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -64510,20 +64510,17 @@
                 }
               },
               {
+                "type": "row",
+                "key": "loadingPreviewEasingCurve"
+              },
+              {
                 "type": "group",
                 "group": {
                   "key": "Easing",
-                  "collapsed": true,
-                  "locked": false,
-                  "items": [
-                    {
-                      "type": "row",
-                      "key": "loadingPreviewEasingCurve"
-                    }
-                  ],
-                  "settings": [
-                    "loadingPreviewEasingCurve"
-                  ]
+                  "collapsed": false,
+                  "locked": true,
+                  "items": [],
+                  "settings": []
                 }
               }
             ],
@@ -64539,7 +64536,8 @@
               "loadingPreviewPosX",
               "loadingPreviewPosY",
               "loadingPreviewLayout",
-              "loadingPreviewAnimScalePct"
+              "loadingPreviewAnimScalePct",
+              "loadingPreviewEasingCurve"
             ]
           }
         }
@@ -70011,7 +70009,7 @@
       "custom19RetransitionDistCurveEnabled": false,
       "custom19RetransitionScalerEnabled": false,
       "custom19MultiTriggerEnabled": false,
-      "loadingPreviewTextFont": true,
+      "loadingPreviewTextFont": false,
       "custom37Enabled": false,
       "custom37TouchPointCount": false,
       "custom37ClickCount": false,
@@ -71559,7 +71557,10 @@
       "custom54Trig1RotationZCurveEnabled": false,
       "loadingPreviewHand2ExtraY": true,
       "loadingPreviewHand2ExtraZ": true,
-      "loadingPreviewHand2ExtraX": true
+      "loadingPreviewHand2ExtraX": true,
+      "loadingPreviewTextEnabled": false,
+      "loadingPreviewTextColor": false,
+      "loadingPreviewEasingCurveEnabled": true
     },
     "landscape": {}
   },
@@ -71574,8 +71575,8 @@
     "mobile": {
       "left": 20,
       "top": 30.011905670166016,
-      "width": 393.1011962890625,
-      "height": 593.375
+      "width": 396.5297546386719,
+      "height": 594.8988037109375
     }
   }
 }
