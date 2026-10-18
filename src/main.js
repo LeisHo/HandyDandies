@@ -3970,6 +3970,8 @@ const DEV_GROUPS = [
       { key: 'pauseLogsBtn', label: 'Pause Logs', type: 'button', onClick: (btn) => toggleLogsPaused(btn) },
       // Added 2026-10-17, direct request: "an Export Logs button below the Pause button. It exports all the logs that are active as a json file." See exportDebugLogs() for what counts as active.
       { key: 'exportLogsBtn', label: 'Export Logs', type: 'button', placeAfter: 'pauseLogsBtn', onClick: (btn) => exportDebugLogs(btn) },
+      // Added 2026-10-17, direct request: a checkbox under Export Logs that puts the same export on screen as a corner button next to Pause / Reset, so a log can be exported outside dev mode. A normal saved setting, read in every mode (see setupExportLogsUiButton()).
+      { key: 'exportLogsUiButton', label: 'ADD UI BUTTON', type: 'checkbox', def: false, placeAfter: 'exportLogsBtn', onChange: () => applyExportLogsButtonStyle() },
       // Debug > Snapshot (2026-10-11, direct request): one button takes a single log of THIS moment (replaces the previous snapshot, it is not a running log); the checkboxes pick what goes in it.
       { key: 'snapshotCursor', label: 'Snapshot: Cursor Position', type: 'checkbox', def: true },
       { key: 'snapshotMouse', label: 'Snapshot: Mouse Tracking', type: 'checkbox', def: true },
@@ -5017,7 +5019,7 @@ function fireStartupHandOffset(ignoreStartDistance) {
 // eligibility / delays) was measured from the wrong place (looked offset / mirrored). Take the cursor from the pointerdown itself, first in line (this listener is registered before every other pointerdown listener).
 window.addEventListener('pointerdown', (e) => {
   if (window.VisibilityTickLoop && window.VisibilityTickLoop.isPaused()) return
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   cursorNDC.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1)
   lastPointerClientX = e.clientX
   lastPointerClientY = e.clientY
@@ -5025,7 +5027,7 @@ window.addEventListener('pointerdown', (e) => {
 }, true)
 window.addEventListener('pointerdown', (e) => {
   if (e.button !== 0) return
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   if (!hands.length || !fieldRevealed) return
   if (sphereSeqActive()) {
     startupConsumeActive = true
@@ -14907,7 +14909,7 @@ function endClickHoldPose(p) {
 // triggers, so a hand can never get stuck mid-transition forever with no
 // way to reach it.
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   // CORRECTED 2026-09-30 -- see isClickHoldChainContinuation()'s own
   // comment (declared further below, but a plain function declaration is
   // hoisted, and this callback only ever runs on a real later pointerdown
@@ -15731,7 +15733,7 @@ let leftPointerDown = false
 window.addEventListener('pointerdown', (e) => { if (e.button === 0) leftPointerDown = true })
 window.addEventListener('pointerup', (e) => { if (e.button === 0) leftPointerDown = false })
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   if (e.button !== 0) return
   // This exact pointerup was releasing a Click-Hold-Pose hold, not a
   // standalone click -- see lastPointerupWasHoldRelease's own comment
@@ -15833,7 +15835,7 @@ window.addEventListener('pointerup', (e) => {
 let rightClickPoseClickCount = 0
 let rightClickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   if (e.button !== 2) return
   if (lastPointerupWasRchpHoldRelease) return
   triggerClickPose('rc')
@@ -15940,7 +15942,7 @@ function isClickHoldChainContinuation(now) {
   return now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs
 }
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   if (e.button !== 0) return
   const now = performance.now()
   if (isClickHoldChainContinuation(now)) {
@@ -18971,7 +18973,7 @@ function endCustomHoldFunctions(type, ordinal = 1) {
 // (a deliberate "repeat rate," not a one-shot-per-page-load limit).
 let scrollTriggerTimer = null
 window.addEventListener('wheel', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   if (scrollTriggerTimer) return
   triggerCustomPoseFunctions('Scroll')
   scrollTriggerTimer = setTimeout(() => { scrollTriggerTimer = null }, cfg.multiClickWindowMs)
@@ -20715,7 +20717,7 @@ function setPaused(v) {
 // `?dev=1` one -- this is why its own click handler is wired here,
 // unconditionally, rather than via a DEV_GROUPS onClick. Excluded from
 // every click-hold-pose/click-pose/click-count-chain gesture listener
-// via `.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')` (see those listeners' own
+// via `.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')` (see those listeners' own
 // guard, main.js) -- clicking it only ever calls setPaused(), never a
 // cursor-tracking-driven pose/tween trigger.
 function updatePauseButtonIcon() {
@@ -20768,6 +20770,7 @@ function applyPauseButtonStyle() {
     rb.style.opacity = btn.style.opacity
   }
   applyColorPresetButtonStyle()
+  applyExportLogsButtonStyle()
 }
 // Reset (direct request 2026-10-04: "a reset button next to the pause
 // button that resets all hands back to default position and pose").
@@ -21012,6 +21015,30 @@ function setupColorPresetUi() {
   applyColorPresetButtonStyle()
 }
 setupColorPresetUi()
+// Export Logs UI button (2026-10-17): the fourth corner button, right of Color Presets, same look as the others (the Pause Button group's settings). Shown only while "ADD UI BUTTON" (Debug > Export Logs) is on; works in every mode because the logs record without the panel.
+function applyExportLogsButtonStyle() {
+  const btn = document.getElementById('exportLogsButton')
+  if (!btn) return
+  const on = !!cfg.exportLogsUiButton
+  btn.style.display = on ? 'flex' : 'none'
+  if (!on) return
+  const st = colorPresetBtnStyle(), x = (cfg.pauseBtnXOffset ?? 12) + (st.size + 8) * 3
+  btn.style.left = x + 'px'; btn.style.top = (cfg.pauseBtnYOffset ?? 12) + 'px'
+  btn.style.width = st.size + 'px'; btn.style.height = st.size + 'px'
+  btn.style.fontSize = (cfg.pauseBtnIconSize ?? 18) + 'px'
+  btn.style.borderRadius = st.radius; btn.style.borderWidth = st.bw; btn.style.borderStyle = 'solid'; btn.style.borderColor = st.border
+  btn.style.background = st.bg; btn.style.color = st.fg; btn.style.opacity = (cfg.pauseBtnOpacity ?? 100) / 100
+}
+function setupExportLogsUiButton() {
+  if (document.getElementById('exportLogsButton')) return
+  const btn = document.createElement('button')
+  btn.id = 'exportLogsButton'; btn.type = 'button'; btn.setAttribute('aria-label', 'Export logs'); btn.title = 'Export logs (JSON)'; btn.textContent = '\u2193'
+  btn.style.cssText = 'position:fixed;z-index:100001;padding:0;margin:0;display:none;align-items:center;justify-content:center;cursor:pointer;line-height:1;user-select:none;-webkit-tap-highlight-color:transparent'
+  document.body.appendChild(btn)
+  btn.addEventListener('click', (e) => { e.stopPropagation(); exportDebugLogs(btn) })
+  applyExportLogsButtonStyle()
+}
+setupExportLogsUiButton()
 // Both Saved Tween Sequences' new "Edit" button acts on the list-
 // picker's own currently-SELECTED row -- same convention as Saved Poses'
 // own "Default" button (getSelectedSavedPoseItem()), just scoped to this
