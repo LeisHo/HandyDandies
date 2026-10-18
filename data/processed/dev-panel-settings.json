@@ -62617,7 +62617,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > Text",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -64260,7 +64260,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -66642,9 +66642,9 @@
     "pauseBtnBorderColor": false,
     "bgColor": false,
     "loadingPreviewShowLive": true,
-    "loadingPreviewEnabled": true,
+    "loadingPreviewEnabled": false,
     "loadingPreviewCameraEditMode": true,
-    "loadingMinTimeMs": true,
+    "loadingMinTimeMs": false,
     "loadingPreviewRotationX": true,
     "loadingPreviewRotationY": true,
     "loadingPreviewRotationZ": true,
@@ -66656,13 +66656,13 @@
     "loadingPreviewTweenSelector": true,
     "loadingPreviewCameraSelector": true,
     "loadingPreviewLightingSelector": true,
-    "loadingPreviewSequenceMode": true,
+    "loadingPreviewSequenceMode": false,
     "loadingPreviewSequenceCountMode": true,
     "loadingPreviewSequenceCount": true,
     "loadingPreviewSpeedMs": true,
     "loadingPreviewSize": true,
-    "loadingPreviewSequenceHoldMs": true,
-    "loadingPreviewSequenceLoopTransition": true,
+    "loadingPreviewSequenceHoldMs": false,
+    "loadingPreviewSequenceLoopTransition": false,
     "renderOrderMode": true,
     "renderOrderFallback": false,
     "renderOrderFallback2": false,
@@ -67378,7 +67378,20 @@
     "custom54TweenStopDelayMs": true,
     "custom54TweenStopDelayCurveEnabled": true,
     "custom54MultiTriggerEnabled": true,
-    "custom54Type": true
+    "custom54Type": true,
+    "loadingPreviewModelId": false,
+    "loadingPreviewRealTimeLoading": false,
+    "loadingPreviewHand2ExtraY": false,
+    "loadingPreviewHand2ExtraZ": false,
+    "loadingPreviewHand2ExtraX": false,
+    "loadingPreviewTextEnabled": false,
+    "loadingPreviewTextColor": false,
+    "loadingPreviewTextFont": false,
+    "loadingPreviewLayoutOnMobile": false,
+    "loadingPreviewProgressCropEnabled": false,
+    "loadingPreviewProgressCropFlip": false,
+    "loadingPreviewProgressCropRealtime": false,
+    "loadingPreviewEasingCurveEnabled": false
   },
   "devIndependence": {
     "mobile": {
