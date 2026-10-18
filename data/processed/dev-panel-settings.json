@@ -648,7 +648,7 @@
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 1100,
-      "loadingPreviewEasingCurveEnabled": true,
+      "loadingPreviewEasingCurveEnabled": false,
       "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4562103709998403,\"y\":0}}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
@@ -38671,7 +38671,7 @@
         }
       ],
       "cameraX": -3.422222222222221,
-      "cameraY": 8.119913195413508e-13,
+      "cameraY": 9.031050413979138e-13,
       "cameraZ": 495.9881938061244,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -43846,7 +43846,7 @@
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 1100,
-      "loadingPreviewEasingCurveEnabled": true,
+      "loadingPreviewEasingCurveEnabled": false,
       "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4562103709998403,\"y\":0}}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
@@ -72976,8 +72976,8 @@
     "mobile": {
       "left": 20,
       "top": 154.21429443359375,
-      "width": 397.8571472167969,
-      "height": 35.52381134033203
+      "width": 404.71429443359375,
+      "height": 478.16668701171875
     }
   }
 }
