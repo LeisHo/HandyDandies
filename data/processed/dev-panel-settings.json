@@ -66076,7 +66076,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -66129,7 +66129,7 @@
           "type": "group",
           "group": {
             "key": "New Group (16)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
