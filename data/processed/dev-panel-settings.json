@@ -635,9 +635,9 @@
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
-      "loadingPreviewSpeedMs": 1050,
-      "loadingPreviewEasingCurveEnabled": false,
-      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
+      "loadingPreviewSpeedMs": 1100,
+      "loadingPreviewEasingCurveEnabled": true,
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0.5}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -743,6 +743,7 @@
       ],
       "holdConfirmMs": 400,
       "multiClickWindowMs": 540,
+      "distCurveXOrigin": "Each Curve Default",
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
       "thumbCurl": 75,
@@ -17044,7 +17045,7 @@
         }
       ],
       "cameraX": 1.5625001668540408,
-      "cameraY": 4.3881104154134403e-13,
+      "cameraY": 4.569970465086822e-13,
       "cameraZ": 197.9876688948102,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -21213,9 +21214,9 @@
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
-      "loadingPreviewSpeedMs": 1050,
-      "loadingPreviewEasingCurveEnabled": false,
-      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
+      "loadingPreviewSpeedMs": 1100,
+      "loadingPreviewEasingCurveEnabled": true,
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0.5}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -21321,6 +21322,7 @@
       ],
       "holdConfirmMs": 400,
       "multiClickWindowMs": 540,
+      "distCurveXOrigin": "Each Curve Default",
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
       "thumbCurl": 75,
@@ -41791,9 +41793,9 @@
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
-      "loadingPreviewSpeedMs": 1050,
-      "loadingPreviewEasingCurveEnabled": false,
-      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
+      "loadingPreviewSpeedMs": 1100,
+      "loadingPreviewEasingCurveEnabled": true,
+      "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0.5}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
       "loadingPreviewHand2ExtraZ": 0,
@@ -41899,6 +41901,7 @@
       ],
       "holdConfirmMs": 400,
       "multiClickWindowMs": 540,
+      "distCurveXOrigin": "Each Curve Default",
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
       "thumbCurl": 75,
@@ -62276,7 +62279,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -62372,7 +62375,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -62403,7 +62406,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -62614,7 +62617,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > Text",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -62769,7 +62772,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -64303,6 +64306,10 @@
           }
         },
         {
+          "type": "row",
+          "key": "distCurveXOrigin"
+        },
+        {
           "type": "group",
           "group": {
             "key": "New Group (16)",
@@ -64434,6 +64441,7 @@
         "holdConfirmMs",
         "multiClickWindowMs",
         "customFunctionSelector",
+        "distCurveXOrigin",
         "addCustomClickFunctionBtn",
         "zoomGestureThresholdPx",
         "scrollGestureThresholdPx",
@@ -69734,8 +69742,8 @@
     "desktop": {
       "left": 85.59375,
       "top": 100.78125,
-      "width": 480.765625,
-      "height": 621.1875
+      "width": 484.765625,
+      "height": 623.1875
     },
     "mobile": {
       "left": 20,
