@@ -2611,6 +2611,7 @@ const DEV_GROUPS = [
       { key: 'armRotationEnabled', label: 'Responsive Arm Rotation (Master On/Off)', type: 'checkbox', def: true, perDevice: true },
       // Visible Hands Only (2026-10-11): on = the Distance Curve's x = 1 is the farthest hand ON SCREEN (off-screen hands are extrapolated); off = the farthest of ALL hands.
       { key: 'armRotationVisibleOnly', label: 'Arm Rotation Curve: Visible Hands Only', type: 'checkbox', def: true, perDevice: true },
+      { key: 'armRotationXOrigin', label: 'Arm Rotation Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'], perDevice: true },
       // Use Cursor Target Depth (2026-10-11, direct request): on = aim at / measure to the 3D cursor target (depth from Cursor Target Depth); off = screen XY only.
       { key: 'armRotationUseDepth', label: 'Arm Rotation Uses Cursor Target Depth', type: 'checkbox', def: true, perDevice: true },
       { key: 'armRotationTargetDepth', label: 'Arm Rotation Cursor Target Depth (World Units Z)', type: 'slider', min: -300, max: 300, step: 0.1, def: 60.6, defMobile: 89.7, defLandscape: 40.8, perDevice: true },
@@ -2660,6 +2661,7 @@ const DEV_GROUPS = [
       // until opted in.
       { key: 'palmFacesCursor', label: 'Palm Faces Cursor', type: 'checkbox', def: true, perDevice: true },
       { key: 'palmRotationVisibleOnly', label: 'Palm Rotation Curve: Visible Hands Only', type: 'checkbox', def: true, perDevice: true },
+      { key: 'palmRotationXOrigin', label: 'Palm Rotation Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'], perDevice: true },
       // The palm angle itself is already a screen-XY compass; this only switches the distance its Palm Rotation Distance Curve reads.
       { key: 'palmRotationUseDepth', label: 'Palm Rotation Uses Cursor Target Depth', type: 'checkbox', def: true, perDevice: true },
       { key: 'palmRotationTargetDepth', label: 'Palm Rotation Cursor Target Depth (World Units Z)', type: 'slider', min: -300, max: 300, step: 0.1, def: 60.6, defMobile: 89.7, defLandscape: 40.8, perDevice: true },
@@ -3402,6 +3404,7 @@ const DEV_GROUPS = [
       { key: 'armLengthDamping', label: 'Wrist Cropping Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
       { key: 'armLengthUseDepth', label: 'Wrist Cropping Uses Cursor Target Depth', type: 'checkbox', def: true },
       { key: 'armLengthVisibleOnly', label: 'Wrist Cropping Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: 'armLengthXOrigin', label: 'Wrist Cropping Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: 'armLengthTargetDepth', label: 'Wrist Cropping Cursor Target Depth (World Units Z)', type: 'slider', min: -300, max: 300, step: 0.1, def: 60.6, defMobile: 89.7, defLandscape: 40.8, perDevice: true }
     ]
   },
@@ -3441,6 +3444,7 @@ const DEV_GROUPS = [
     controls: [
       { key: 'wristSplayResponsiveEnabled', label: 'Responsive Wrist Splay (Master On/Off)', type: 'checkbox', def: true },
       { key: 'wristSplayVisibleOnly', label: 'Wrist Splay Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: 'wristSplayXOrigin', label: 'Wrist Splay Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       // PERFORMANCE (2026-09-16): the idle-repose block this gates is the
       // confirmed sustained frame-cost bottleneck (see updateRenderOrder()'s
       // own comment) -- measured 25-42ms/frame at 240 hands, dominating the
@@ -4752,7 +4756,7 @@ function startupFnControls() {
 // The sphere sequence's borrowed click-function controls: Animation Speed Curve, Easing, Start Time Curve and Start Distance Curve (the pose-kind factory's own rows, so they match the click functions exactly). The Start
 // Time Curve starts OFF here (the spec: with nothing turned on, every sphere just pops in at the click).
 function sphereFnControls() {
-  const keep = /^(SpeedCurveEnabled|SpeedCurveVisibleOnly|SpeedCurve|SpeedCurveRange|EasingCurveEnabled|EasingCurve|StartTimeCurveEnabled|StartTimeCurveVisibleOnly|StartTimeCurve|StartTimeRange|StartDistanceCurveEnabled|StartDistanceMin|StartDistanceMax|StartDistanceCurve)$/
+  const keep = /^(SpeedCurveEnabled|SpeedCurveVisibleOnly|SpeedCurveXOrigin|SpeedCurve|SpeedCurveRange|EasingCurveEnabled|EasingCurve|StartTimeCurveEnabled|StartTimeCurveVisibleOnly|StartTimeCurveXOrigin|StartTimeCurve|StartTimeRange|StartDistanceCurveEnabled|StartDistanceMin|StartDistanceMax|StartDistanceXOrigin|StartDistanceCurve)$/
   return makeClickPoseGroup(SPHERE_FN, 'Field Grid Sphere Sequence', {}).controls
     .filter((c) => keep.test(c.key.slice(SPHERE_FN.length)))
     .map((c) => (c.key === SPHERE_FN + 'StartTimeCurveEnabled' ? { ...c, def: false } : c))
@@ -4810,12 +4814,12 @@ function startSphereSequence(retrigger, ignoreStartDistance) {
     if (!isOnScreen(hands[i].basePosition)) continue // only visible sphere points take part
     let cap = 1
     if (cfg[SPHERE_FN + 'StartDistanceCurveEnabled'] && !ignoreStartDistance) {
-      const c = computeTweenFractionCap(dist[i], cfg[SPHERE_FN + 'StartDistanceMin'], cfg[SPHERE_FN + 'StartDistanceMax'], trig.startDistanceCurveParsed, vMin)
+      const c = computeTweenFractionCap(dist[i], cfg[SPHERE_FN + 'StartDistanceMin'], cfg[SPHERE_FN + 'StartDistanceMax'], trig.startDistanceCurveParsed, vMin, SPHERE_FN + 'StartDistanceXOrigin')
       if (c === null) continue // outside the eligible range: this sphere never spawns
       cap = c
     }
-    const delay = cfg[SPHERE_FN + 'StartTimeCurveEnabled'] ? computeStartDelayMs(dist[i], stMin, stRange, trig.startCurveParsed, trig.startRangeParsed) : 0
-    const dur = cfg[SPHERE_FN + 'SpeedCurveEnabled'] ? computeStartDelayMs(dist[i], spMin, spRange, trig.speedCurveParsed, trig.speedRangeParsed) : (cfg.sphereSeqDurationMs ?? 1000)
+    const delay = cfg[SPHERE_FN + 'StartTimeCurveEnabled'] ? computeStartDelayMs(dist[i], stMin, stRange, trig.startCurveParsed, trig.startRangeParsed, SPHERE_FN + 'StartTimeCurveXOrigin') : 0
+    const dur = cfg[SPHERE_FN + 'SpeedCurveEnabled'] ? computeStartDelayMs(dist[i], spMin, spRange, trig.speedCurveParsed, trig.speedRangeParsed, SPHERE_FN + 'SpeedCurveXOrigin') : (cfg.sphereSeqDurationMs ?? 1000)
     sphereOn[i] = 1; sphereStart[i] = now + delay; sphereDur[i] = Math.max(dur, 1); sphereCap[i] = cap
   }
   sphereMesh.material.color.set(cfg.sphereColor || '#d9a98f')
@@ -7686,6 +7690,7 @@ function offsetExtraControls(p, parseFn) {
   rows.push({ key: `${p}CursorClampRange`, label: 'Clamp Min / Max Distance From Cursor (World Units)', type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
   rows.push({ key: `${p}CameraOffsetEnabled`, label: 'Offset To Camera On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) })
   rows.push({ key: `${p}CameraOffsetVisibleOnly`, label: 'Offset To Camera Curves: Visible Hands Only', type: 'checkbox', def: true }) // see the other Visible Hands Only rows
+  rows.push({ key: `${p}CameraOffsetXOrigin`, label: 'Offset To Camera Curves: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] })
   ;['X', 'Y', 'Z'].forEach((ax) => {
     // Per-axis on/off (2026-10-04, direct request) -- default ON so
     // turning the group on behaves exactly as it did before these existed.
@@ -7696,6 +7701,7 @@ function offsetExtraControls(p, parseFn) {
   // Rotation Curve X / Y / Z (2026-10-14, direct request): per axis, the Rotation amount follows the hand's distance from the cursor - curve X = distance, curve Y = 0..1 between this axis' Min and Max (degrees). With an axis' curve off,
   // that axis keeps its plain Rotation slider.
   rows.push({ key: `${p}RotationCurveVisibleOnly`, label: 'Rotation Curves: Visible Hands Only', type: 'checkbox', def: true })
+  rows.push({ key: `${p}RotationCurveXOrigin`, label: 'Rotation Curves: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] })
   ;['X', 'Y', 'Z'].forEach((ax) => {
     rows.push({ key: `${p}Rotation${ax}CurveEnabled`, label: `Rotation Curve ${ax} On/Off`, type: 'checkbox', def: false })
     rows.push({ key: `${p}Rotation${ax}Curve`, label: `Rotation ${ax} Curve (Distance From Cursor -> Rotation)`, type: 'text', def: linear, onChange: () => parseFn(p) })
@@ -7777,6 +7783,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}CursorOffsetDistanceCurveEnabled`, label: 'Cursor Offset Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}CursorOffsetVisibleOnly`, label: 'Cursor Offset Curves: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}CursorOffsetXOrigin`, label: 'Cursor Offset Curves: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}CursorOffsetDistanceCurve`, label: 'Cursor Offset Distance Curve (Distance -> Offset)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickHoldConfig(p) },
       ...offsetExtraControls(p, parseClickHoldConfig),
@@ -7931,6 +7938,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}SpeedCurveEnabled`, label: 'Animation Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}SpeedCurveVisibleOnly`, label: 'Animation Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}SpeedCurveXOrigin`, label: 'Animation Speed Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}SpeedCurve`, label: 'Animation Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}SpeedCurveRange`, label: 'Min / Max Speed (Ms)', type: 'text', def: '{"min":500,"max":1500}', onChange: () => parseClickHoldConfig(p) },
       // Start Time Curve on/off -- direct spec item ("Start Time Curve
@@ -7941,6 +7949,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartTimeCurveEnabled`, label: 'Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}StartTimeCurveVisibleOnly`, label: 'Start Time Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}StartTimeCurveXOrigin`, label: 'Start Time Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}StartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       // Start Distance Curve -- direct spec item (2026-09-27): "add a
@@ -7965,6 +7974,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartDistanceCurveEnabled`, label: 'Start Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}StartDistanceMin`, label: 'Start Distance Min (World Units)', type: 'slider', min: 0, max: 200, step: 1, def: 0 },
       { key: `${p}StartDistanceMax`, label: 'Start Distance Max (World Units)', type: 'slider', min: 0, max: 200, step: 1, def: 100 },
+      { key: `${p}StartDistanceXOrigin`, label: 'Start Distance Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}StartDistanceCurve`, label: 'Start Distance Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       // Retransition on/off -- direct spec item ("Retransition on/off
       // [NEW behavioral gate]"). Off = the hand stays at its end pose
@@ -7991,6 +8001,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}RetransitionSpeedCurveEnabled`, label: 'Retransition Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}RetransitionSpeedCurveVisibleOnly`, label: 'Retransition Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}RetransitionSpeedCurveXOrigin`, label: 'Retransition Speed Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":25000}', onChange: () => parseClickHoldConfig(p) },
       // Retransition Distance Curve (2026-10-13, direct request): the retransition TIME follows the hand model's actual distance from the camera position (X: nearest -> farthest hand = 0..1, Y: Min..Max time). When on it
@@ -8010,6 +8021,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}RetransitionStartTimeCurveEnabled`, label: 'Retransition Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}RetransitionStartTimeCurveVisibleOnly`, label: 'Retransition Start Time Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}RetransitionStartTimeCurveXOrigin`, label: 'Retransition Start Time Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}RetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}RetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       // Tween mode's own dedicated retransition trio -- direct request
@@ -8094,6 +8106,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}TweenStopStartTimeCurveEnabled`, label: 'Tween Stop Start Time Curve On/Off', type: 'checkbox', def: false, onChange: () => updateTweenStopGateVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}TweenStopStartTimeCurveVisibleOnly`, label: 'Tween Stop Start Time Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}TweenStopStartTimeCurveXOrigin`, label: 'Tween Stop Start Time Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}TweenStopStartTimeCurve`, label: 'Tween Stop Start Time Curve (Distance -> Start Time)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenStopStartTimeRange`, label: 'Tween Stop Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenStopDelayEnabled`, label: 'Tween Stop Delay On/Off', type: 'checkbox', def: false, onChange: () => updateTweenStopGateVisibility(p) },
@@ -8101,6 +8114,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}TweenStopDelayCurveEnabled`, label: 'Tween Stop Delay Curve On/Off', type: 'checkbox', def: false, onChange: () => updateTweenStopGateVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}TweenStopDelayCurveVisibleOnly`, label: 'Tween Stop Delay Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}TweenStopDelayCurveXOrigin`, label: 'Tween Stop Delay Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}TweenStopDelayCurve`, label: 'Tween Stop Delay Curve (Distance -> Delay)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       { key: `${p}TweenStopDelayRange`, label: 'Tween Stop Min / Max Delay (Ms)', type: 'text', def: '{"min":0,"max":2000}', onChange: () => parseClickHoldConfig(p) }
     ])
@@ -8180,6 +8194,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}CursorOffsetDistanceCurveEnabled`, label: 'Cursor Offset Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}CursorOffsetVisibleOnly`, label: 'Cursor Offset Curves: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}CursorOffsetXOrigin`, label: 'Cursor Offset Curves: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}CursorOffsetDistanceCurve`, label: 'Cursor Offset Distance Curve (Distance -> Offset)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickPoseConfig(p) },
       ...offsetExtraControls(p, parseClickPoseConfig),
@@ -8290,11 +8305,13 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}SpeedCurveEnabled`, label: 'Animation Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}SpeedCurveVisibleOnly`, label: 'Animation Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}SpeedCurveXOrigin`, label: 'Animation Speed Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}SpeedCurve`, label: 'Animation Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}SpeedCurveRange`, label: 'Min / Max Speed (Ms)', type: 'text', def: '{"min":500,"max":1500}', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}StartTimeCurveEnabled`, label: 'Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}StartTimeCurveVisibleOnly`, label: 'Start Time Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}StartTimeCurveXOrigin`, label: 'Start Time Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}StartTimeCurve`, label: 'Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.startTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}StartTimeRange`, label: 'Min / Max Start Time (Ms)', type: 'text', def: defaults.startTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) },
       // Start Distance Curve -- direct spec item (2026-09-27), same
@@ -8303,6 +8320,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartDistanceCurveEnabled`, label: 'Start Distance Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}StartDistanceMin`, label: 'Start Distance Min (World Units)', type: 'slider', min: 0, max: 200, step: 1, def: 0 },
       { key: `${p}StartDistanceMax`, label: 'Start Distance Max (World Units)', type: 'slider', min: 0, max: 200, step: 1, def: 100 },
+      { key: `${p}StartDistanceXOrigin`, label: 'Start Distance Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}StartDistanceCurve`, label: 'Start Distance Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}PauseDurationMs`, label: 'Pause Duration At Tween End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: defaults.pauseDurationMs ?? 500 },
       { key: `${p}RetransitionEnabled`, label: 'Retransition On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
@@ -8314,6 +8332,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}RetransitionSpeedCurveEnabled`, label: 'Retransition Speed Curve On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}RetransitionSpeedCurveVisibleOnly`, label: 'Retransition Speed Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}RetransitionSpeedCurveXOrigin`, label: 'Retransition Speed Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}RetransitionSpeedCurve`, label: 'Retransition Speed Curve (Distance -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RetransitionSpeedCurveRange`, label: 'Retransition Min / Max Speed (Ms)', type: 'text', def: '{"min":50,"max":25000}', onChange: () => parseClickPoseConfig(p) },
       // Retransition Distance Curve: see the hold-kind factory's matching comment.
@@ -8339,6 +8358,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}RetransitionStartTimeCurveEnabled`, label: 'Retransition Start Time Curve On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       // Visible Hands Only (2026-10-11): on = this curve's X axis runs from the nearest to the farthest hand ON SCREEN (hands past that read x > 1 and are extrapolated); off = nearest to farthest of ALL hands.
       { key: `${p}RetransitionStartTimeCurveVisibleOnly`, label: 'Retransition Start Time Curve: Visible Hands Only', type: 'checkbox', def: true },
+      { key: `${p}RetransitionStartTimeCurveXOrigin`, label: 'Retransition Start Time Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}RetransitionStartTimeCurve`, label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: defaults.retransitionStartTimeCurve ?? '[{"x":0,"y":0},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}RetransitionStartTimeRange`, label: 'Retransition Min / Max Start Time (Ms)', type: 'text', def: defaults.retransitionStartTimeRange ?? '{"min":0,"max":300}', onChange: () => parseClickPoseConfig(p) }
     ])
@@ -10520,7 +10540,10 @@ function curveMirrorY(points) {
 // 0 = each curve's own default, 1 = closest hand, 2 = true zero.
 function distOriginMode() { const m = cfg.distCurveXOrigin; return m === 'Closest Hand' ? 1 : (m === 'True Zero' ? 2 : 0) }
 // X for the curves that normalise against the field's nearest..farthest hand: (d - nearest) / (farthest - nearest) normally (nearest = 0), or d / farthest under True Zero (0 = distance 0, 1 = the farthest hand). Beyond 1 is extrapolated by the curve.
-function normFieldDist(d, min, range) { return distOriginMode() === 2 ? Math.max(d / Math.max(min + range, 1e-6), 0) : Math.max((d - min) / range, 0) }
+// Per-curve override (2026-10-17, direct request: one dropdown per curve editor): `key` is the cfg key of that curve editor's own "X Axis Origin" dropdown. "Closest Hand" / "True Zero" win; "Global Setting" (the default) defers to the
+// global distCurveXOrigin above, whose own default keeps every curve as it was. Returns 0 = the curve's own default, 1 = closest hand, 2 = true zero.
+function originModeFor(key) { const v = key ? cfg[key] : undefined; return v === 'Closest Hand' ? 1 : (v === 'True Zero' ? 2 : distOriginMode()) }
+function normFieldDist(d, min, range, key) { return originModeFor(key) === 2 ? Math.max(d / Math.max(min + range, 1e-6), 0) : Math.max((d - min) / range, 0) }
 // The closest hand's distance on the scale a click function measures (the startup function reads its frozen click point instead of the live cursor).
 function nearestFor(hand, p) { const k = p === STARTUP_FN ? hand._startupClick : null; return k ? k.min : xyFieldMinDist }
 function evaluateArmLengthCurve(points, x) {
@@ -10590,7 +10613,7 @@ function computeArmLengthT(hand, distanceToCursor, minLiveDist, liveDistRange) {
   // same as every other Responsive-* feature this same round gates the
   // same way (Wrist Splay, the new Responsive Arm Rotation).
   if (!trackingActiveFor('Crop') || !cfg.reactiveArmLengthEnabled) return cfg.hideWrist / 100
-  const normDist = normFieldDist(distanceToCursor, minLiveDist, liveDistRange) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
+  const normDist = normFieldDist(distanceToCursor, minLiveDist, liveDistRange, 'armLengthXOrigin') // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(armLengthCurveParsed, normDist), 0, 1)
   const minT = armLengthRangeParsed.min / 100, maxT = armLengthRangeParsed.max / 100
   return minT + (maxT - minT) * curveY
@@ -10647,7 +10670,7 @@ function computeResponsiveWristSplayDeg(distanceToCursor, minLiveDist, liveDistR
   // comment; same "Responsive-* falls back to its static default while
   // Tracking Enabled is off" treatment.
   if (!trackingActiveFor('Splay') || !cfg.wristSplayReactiveEnabled) return cfg.wristSplayDefault
-  const normDist = normFieldDist(distanceToCursor, minLiveDist, liveDistRange) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
+  const normDist = normFieldDist(distanceToCursor, minLiveDist, liveDistRange, 'wristSplayXOrigin') // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(wristSplayCurveParsed, normDist), 0, 1)
   const { min, max } = wristSplayRangeParsed
   return min + (max - min) * curveY
@@ -10687,6 +10710,9 @@ function rvJson(raw, fallback) {
 }
 function rvNum(key, fb) { const v = cfg[key]; return typeof v === 'number' && isFinite(v) ? v : fb }
 function rvRange(key, fbMin, fbMax) { const r = rvJson(cfg[key], null); return r && typeof r.min === 'number' && typeof r.max === 'number' ? r : { min: fbMin, max: fbMax } }
+// Per-curve X Axis Origin for a Responsive Velocity distance curve (2026-10-17): the curve's own dropdown is `curveKey + 'XOrigin'`. Closest Hand reads the x measured from the closest hand; True Zero and Global Setting with the global
+// at its default keep this feature's own default (distance 0 -> 0), so only Closest Hand differs.
+function rvPickX(originKey, zeroX, closestX) { return originModeFor(originKey) === 1 ? closestX : zeroX }
 function rvCurveY(key, x) { // curve height 0..1 at x (0..1); an unreadable curve counts as the identity line
   const pts = rvJson(cfg[key], null)
   const xc = THREE.MathUtils.clamp(x, 0, 1)
@@ -10735,19 +10761,23 @@ function rvSharedControls() {
     { key: 'rvStartTimeEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
     { key: 'rvStartTimeRange', label: 'Min / Max Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', ...pd },
     { key: 'rvStartTimeCurve', label: 'Displacement Start Time Curve (Distance -> Start Time)', type: 'text', def: RV_LIN, ...pd },
+    { key: 'rvStartTimeCurveXOrigin', label: 'Displacement Start Time Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'], ...pd },
     // Displacement Speed Curve
     { key: 'rvSpeedEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
     { key: 'rvSpeedRange', label: 'Min / Max Displacement Speed (Ms)', type: 'text', def: '{"min":150,"max":600}', ...pd },
     { key: 'rvSpeedCurve', label: 'Displacement Speed Curve (Distance -> Duration)', type: 'text', def: RV_LIN, ...pd },
+    { key: 'rvSpeedCurveXOrigin', label: 'Displacement Speed Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'], ...pd },
     // Retransition
     { key: 'rvRetransitionEnabled', label: 'On/Off', type: 'checkbox', def: true, ...pd },
     { key: 'rvRetransitionSpeedMs', label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 3000, step: 10, def: 400, ...pd },
     { key: 'rvRetransitionSpeedCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
     { key: 'rvRetransitionSpeedRange', label: 'Min / Max Retransition Speed (Ms)', type: 'text', def: '{"min":100,"max":1000}', ...pd },
     { key: 'rvRetransitionSpeedCurve', label: 'Retransition Speed Curve (Distance -> Duration)', type: 'text', def: RV_LIN, ...pd },
+    { key: 'rvRetransitionSpeedCurveXOrigin', label: 'Retransition Speed Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'], ...pd },
     { key: 'rvRetransitionStartTimeCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
     { key: 'rvRetransitionStartTimeRange', label: 'Min / Max Retransition Start Time (Ms)', type: 'text', def: '{"min":0,"max":300}', ...pd },
     { key: 'rvRetransitionStartTimeCurve', label: 'Retransition Start Time Curve (Distance -> Start Time)', type: 'text', def: RV_LIN, ...pd },
+    { key: 'rvRetransitionStartTimeCurveXOrigin', label: 'Retransition Start Time Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'], ...pd },
     { key: 'rvRetransitionEasingCurveEnabled', label: 'On/Off', type: 'checkbox', def: false, ...pd },
     { key: 'rvRetransitionEasingCurve', label: 'Retransition Easing Curve (Progress -> Retransition Speed)', type: 'text', def: RV_FLAT_HALF, ...pd },
     // Easing
@@ -10774,7 +10804,8 @@ function rvSetControls(S) {
     { key: `${S}${name}Enabled`, label: 'On/Off', type: 'checkbox', def: false, ...pd },
     { key: `${S}${name}Range`, label: `Min / Max ${label} (${unit})`, type: 'text', def: defRange, ...pd },
     { key: `${S}${name}Curve`, label: `${label} Curve (Velocity -> ${label})`, type: 'text', def: RV_LIN, ...pd },
-    { key: `${S}${name}DistCurve`, label: `${label} Distance Curve (Distance -> Scaler)`, type: 'text', def: RV_FLAT1, ...pd }
+    { key: `${S}${name}DistCurve`, label: `${label} Distance Curve (Distance -> Scaler)`, type: 'text', def: RV_FLAT1, ...pd },
+    { key: `${S}${name}DistCurveXOrigin`, label: `${label} Distance Curve: X Axis Origin`, type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'], ...pd }
   ]
   return [
     { key: `${S}Enabled`, label: 'On/Off', type: 'checkbox', def: true, ...pd },
@@ -10782,6 +10813,7 @@ function rvSetControls(S) {
     { key: `${S}DisplacementRange`, label: 'Min / Max Displacement (World Units)', type: 'text', def: '{"min":0,"max":5}', ...pd },
     { key: `${S}DisplacementCurve`, label: 'Displacement Curve (Velocity -> Displacement)', type: 'text', def: RV_LIN, ...pd },
     { key: `${S}DisplacementDistCurve`, label: 'Displacement Distance Curve (Distance -> Scaler)', type: 'text', def: RV_FLAT1, ...pd },
+    { key: `${S}DisplacementDistCurveXOrigin`, label: 'Displacement Distance Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'], ...pd },
     { key: `${S}TriggerAngleRange`, label: 'Min / Max Trigger Angle (Deg)', type: 'text', def: '{"min":0,"max":0}', ...pd },
     { key: `${S}AngleCurveEnabled`, label: 'On/Off', type: 'checkbox', def: false, ...pd },
     { key: `${S}AngleCurveRange`, label: 'Min / Max Displacement Angle (Deg)', type: 'text', def: '{"min":0,"max":180}', ...pd },
@@ -10793,7 +10825,8 @@ function rvSetControls(S) {
     { key: `${S}CurlEnabled`, label: 'On/Off', type: 'checkbox', def: false, ...pd },
     { key: `${S}CurlTargetPose`, label: 'Target Pose', type: 'select', def: '', options: rvPoseOptions, ...pd },
     { key: `${S}CurlCurve`, label: 'Pose Transition Curve (Velocity -> Progress To Target Pose)', type: 'text', def: RV_LIN, ...pd },
-    { key: `${S}CurlDistCurve`, label: 'Pose Transition Distance Curve (Distance -> Scaler)', type: 'text', def: RV_FLAT1, ...pd }
+    { key: `${S}CurlDistCurve`, label: 'Pose Transition Distance Curve (Distance -> Scaler)', type: 'text', def: RV_FLAT1, ...pd },
+    { key: `${S}CurlDistCurveXOrigin`, label: 'Pose Transition Distance Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'], ...pd }
   ]
 }
 function rvQueueUi() {
@@ -10844,7 +10877,7 @@ function rvRegisterSet(prefix, title, mainBody, beforeEl) {
     rvCurveRow(`${S}${name}DistCurve`, RV_CURVE_X_DIST + `  ·  Y: ${label} Scaler (0 - 1)`, [{ x: 0, y: 1 }, { x: 1, y: 1 }])
   })
   wrapGatedSubgroup(`${S}AngleCurveEnabled`, [`${S}AngleCurveRange`, `${S}AngleCurve`], 'Displacement Angle Curve')
-  effects.forEach(([name, subTitle]) => wrapGatedSubgroup(`${S}${name}Enabled`, [name === 'Curl' ? `${S}CurlTargetPose` : `${S}${name}Range`, `${S}${name}Curve`, `${S}${name}DistCurve`], subTitle))
+  effects.forEach(([name, subTitle]) => wrapGatedSubgroup(`${S}${name}Enabled`, [name === 'Curl' ? `${S}CurlTargetPose` : `${S}${name}Range`, `${S}${name}Curve`, `${S}${name}DistCurve`, `${S}${name}DistCurveXOrigin`], subTitle))
   rvGateHeader(g, `${S}Enabled`)
   g.classList.add('collapsed')
   g.querySelectorAll('.dp-group').forEach((sg) => sg.classList.add('collapsed'))
@@ -10883,11 +10916,11 @@ async function setupResponsiveVelocity() {
   rvCurveRow('rvRetransitionStartTimeCurve', RV_CURVE_X_DIST + '  ·  Y: Retransition Start Time (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
   rvCurveRow('rvRetransitionEasingCurve', 'X: Retransition Progress  ·  Y: Retransition Speed (0 = slowest, 1 = fastest; the total time stays the Retransition Speed)', [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }])
   rvCurveRow('rvEasingCurve', 'X: Displacement Progress  ·  Y: Displacement Speed (0 = slowest, 1 = fastest; the total time stays the Displacement Speed)', [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }])
-  wrapGatedSubgroup('rvStartTimeEnabled', ['rvStartTimeRange', 'rvStartTimeCurve'], 'Displacement Start Time Curve')
-  wrapGatedSubgroup('rvSpeedEnabled', ['rvSpeedRange', 'rvSpeedCurve'], 'Displacement Speed Curve')
-  wrapGatedSubgroup('rvRetransitionEnabled', ['rvRetransitionSpeedMs', 'rvRetransitionSpeedCurveEnabled', 'rvRetransitionSpeedRange', 'rvRetransitionSpeedCurve', 'rvRetransitionStartTimeCurveEnabled', 'rvRetransitionStartTimeRange', 'rvRetransitionStartTimeCurve', 'rvRetransitionEasingCurveEnabled', 'rvRetransitionEasingCurve'], 'Retransition')
-  wrapGatedSubgroup('rvRetransitionSpeedCurveEnabled', ['rvRetransitionSpeedRange', 'rvRetransitionSpeedCurve'], 'Retransition Speed Curve')
-  wrapGatedSubgroup('rvRetransitionStartTimeCurveEnabled', ['rvRetransitionStartTimeRange', 'rvRetransitionStartTimeCurve'], 'Retransition Start Time Curve')
+  wrapGatedSubgroup('rvStartTimeEnabled', ['rvStartTimeRange', 'rvStartTimeCurve', 'rvStartTimeCurveXOrigin'], 'Displacement Start Time Curve')
+  wrapGatedSubgroup('rvSpeedEnabled', ['rvSpeedRange', 'rvSpeedCurve', 'rvSpeedCurveXOrigin'], 'Displacement Speed Curve')
+  wrapGatedSubgroup('rvRetransitionEnabled', ['rvRetransitionSpeedMs', 'rvRetransitionSpeedCurveEnabled', 'rvRetransitionSpeedRange', 'rvRetransitionSpeedCurve', 'rvRetransitionSpeedCurveXOrigin', 'rvRetransitionStartTimeCurveEnabled', 'rvRetransitionStartTimeRange', 'rvRetransitionStartTimeCurve', 'rvRetransitionStartTimeCurveXOrigin', 'rvRetransitionEasingCurveEnabled', 'rvRetransitionEasingCurve'], 'Retransition')
+  wrapGatedSubgroup('rvRetransitionSpeedCurveEnabled', ['rvRetransitionSpeedRange', 'rvRetransitionSpeedCurve', 'rvRetransitionSpeedCurveXOrigin'], 'Retransition Speed Curve')
+  wrapGatedSubgroup('rvRetransitionStartTimeCurveEnabled', ['rvRetransitionStartTimeRange', 'rvRetransitionStartTimeCurve', 'rvRetransitionStartTimeCurveXOrigin'], 'Retransition Start Time Curve')
   wrapGatedSubgroup('rvRetransitionEasingCurveEnabled', ['rvRetransitionEasingCurve'], 'Retransition Easing Curve')
   wrapGatedSubgroup('rvEasingCurveEnabled', ['rvEasingCurve'], 'Easing')
   rvGateHeader(g, 'rvEnabled')
@@ -11114,11 +11147,10 @@ function updateResponsiveVelocity(nowMs) {
       kAng: `${S}AngleCurve`, kDD: `${S}DisplacementDistCurve`, kD: `${S}DisplacementCurve`, kA: `${S}ArmCurve`, kAD: `${S}ArmDistCurve`, kS: `${S}SplayCurve`, kSD: `${S}SplayDistCurve`, kC: `${S}CropCurve`, kCD: `${S}CropDistCurve`, kL: `${S}CurlCurve`, kLD: `${S}CurlDistCurve`
     }
   })
-  // Distance Curve X Origin = Closest Hand (2026-10-17): the distance curves' X = (distance - the closest hand's distance) / Max Trigger Distance, the closest hand measured the same way as the hand itself (from the Trigger Cursor, the live cursor, or the
-  // Path Line, each worked out only when used). Every other setting leaves these at 0, which is the old "distance / Max Trigger Distance".
+  // X Axis Origin (2026-10-17): every distance curve has its own dropdown. A curve set to Closest Hand reads x = (distance - the closest hand's distance) / Max Trigger Distance; the closest hand is measured the same way as the hand itself (from
+  // the Trigger Cursor, the live cursor, or the Path Line). Both versions of x are computed for each hand and each curve picks its own with rvPickX(); True Zero (and Global Setting at its default) is the feature's own distance 0 -> 0.
   let rvNearT = 0, rvNearL = 0, rvNearP = null
-  const rvClosest = trigActive && distOriginMode() === 1
-  if (rvClosest) {
+  if (trigActive) {
     rvNearT = Infinity; rvNearL = Infinity
     for (let hi = 0; hi < hands.length; hi++) {
       _rvHP.copy(hands[hi].basePosition || hands[hi].wrapper.position).project(camera)
@@ -11146,9 +11178,11 @@ function updateResponsiveVelocity(nowMs) {
     const distT = Math.hypot((_rvHP.x + 1) * 0.5 * W - rvTrigPx, (1 - _rvHP.y) * 0.5 * H - rvTrigPy) * unitsPerPx
     // 2026-10-17, direct request: the X axis of every distance curve runs to the Max Trigger Distance of the velocity that is triggering (D, from the Trigger Distance Curve), not the global Max of the range.
     const dMax = D > 0 ? D : dr.max
-    const nd = dMax > 0 ? THREE.MathUtils.clamp((distT - rvNearT) / dMax, 0, 1) : 0
-    const ndLive = dMax > 0 ? THREE.MathUtils.clamp((dist - rvNearL) / dMax, 0, 1) : 0
-    let ndPath = -1 // this hand's distance from the cursor path, worked out once, at its onset
+    const nd = dMax > 0 ? THREE.MathUtils.clamp(distT / dMax, 0, 1) : 0
+    const ndC = dMax > 0 ? THREE.MathUtils.clamp((distT - rvNearT) / dMax, 0, 1) : 0 // from the closest hand
+    const ndLive = dMax > 0 ? THREE.MathUtils.clamp(dist / dMax, 0, 1) : 0
+    const ndLiveC = dMax > 0 ? THREE.MathUtils.clamp((dist - rvNearL) / dMax, 0, 1) : 0
+    let ndPath = -1, ndPathC = -1 // this hand's distance from the cursor path, worked out once, at its onset
     const dispSum = hand._rvDisp.set(0, 0, 0), tiltSum = hand._rvTilt.set(0, 0, 0)
     let splay = 0, crop = 0, live = false
     const pl = hand._rvPL || (hand._rvPL = []) // [target pose, weight, ...] of the Pose Transitions in play this frame
@@ -11156,18 +11190,18 @@ function updateResponsiveVelocity(nowMs) {
     for (let si = 0; si < sets.length; si++) {
       const c = sets[si]
       let st = rv.s[c.S]
-      if (!st) st = rv.s[c.S] = { p: 0, wasTrig: false, onAt: 0, delay: 0, dur: 0, offAt: 0, rdelay: 0, rdur: 0, phase: 0, armed: true, nd: 0, disp: 0, arm: 0, splay: 0, crop: 0, curl: 0, ceil: 100, wx: 0, wy: 0, wz: 0 }
+      if (!st) st = rv.s[c.S] = { p: 0, wasTrig: false, onAt: 0, delay: 0, dur: 0, offAt: 0, rdelay: 0, rdur: 0, phase: 0, armed: true, nd: 0, ndC: 0, disp: 0, arm: 0, splay: 0, crop: 0, curl: 0, ceil: 100, wx: 0, wy: 0, wz: 0 }
       const angleOk = (c.trig.min === 0 && c.trig.max === 0) || (angAbs >= c.trig.min && angAbs <= c.trig.max)
       const trig = trigActive && c.on && dist <= D && angleOk
       // x of every distance curve for this set (see Distance Measured From). Path Line is fixed when the cursor passes the hand, so the speeds, start times and scalers stay put as the cursor moves on.
       const startOnset = trig && st.armed !== false // a (new) trigger: the hand is triggered after having stopped being triggered since its last one
-      let ndU
-      if (distMode === 1) ndU = nd
-      else if (distMode === 2) ndU = ndLive
+      let ndU, ndUC
+      if (distMode === 1) { ndU = nd; ndUC = ndC }
+      else if (distMode === 2) { ndU = ndLive; ndUC = ndLiveC }
       else {
         if (startOnset) {
           if (ndPath < 0) {
-            if (rvClosest && rvNearP === null) { // nearest hand to the Path Line, once per frame
+            if (rvNearP === null) { // nearest hand to the Path Line, once per frame
               rvNearP = Infinity
               for (let hj = 0; hj < hands.length; hj++) {
                 _rvHP2.copy(hands[hj].basePosition || hands[hj].wrapper.position).project(camera)
@@ -11175,11 +11209,13 @@ function updateResponsiveVelocity(nowMs) {
               }
             }
             const dpx = rvPathDistPx((_rvHP.x + 1) * 0.5 * W, (1 - _rvHP.y) * 0.5 * H, px, py)
-            ndPath = dMax > 0 ? THREE.MathUtils.clamp((dpx * unitsPerPx - (rvNearP || 0)) / dMax, 0, 1) : 0
+            ndPath = dMax > 0 ? THREE.MathUtils.clamp((dpx * unitsPerPx) / dMax, 0, 1) : 0
+            ndPathC = dMax > 0 ? THREE.MathUtils.clamp((dpx * unitsPerPx - rvNearP) / dMax, 0, 1) : 0
           }
-          st.ndPath = ndPath
+          st.ndPath = ndPath; st.ndPathC = ndPathC
         }
         ndU = st.ndPath !== undefined ? st.ndPath : nd
+        ndUC = st.ndPathC !== undefined ? st.ndPathC : ndC
       }
       if (startOnset) {
         // Everything about the effect - direction, amounts, distance x, speeds - is fixed at the moment the hand is triggered (direct request: "its speed and etc is determined fully by the moment it gets triggered"). The cursor moving on, or staying inside the
@@ -11193,25 +11229,25 @@ function updateResponsiveVelocity(nowMs) {
         const ax = -rvDirY * side, ay = rvDirX * side // unit vector away from the path (screen px, y down)
         const dx = ax * ct + rvDirX * sn, dy = ay * ct + rvDirY * sn
         st.wx = _rvR.x * dx - _rvU.x * dy; st.wy = _rvR.y * dx - _rvU.y * dy; st.wz = _rvR.z * dx - _rvU.z * dy
-        const dsc = rvCurveY(c.kDD, ndU)
+        const dsc = rvCurveY(c.kDD, rvPickX(c.kDD + 'XOrigin', ndU, ndUC))
         st.disp = rvLerp(c.disp, rvCurveY(c.kD, vn)) * dsc
-        st.arm = c.arm ? rvLerp(c.arm, rvCurveY(c.kA, vn)) * rvCurveY(c.kAD, ndU) : 0
-        st.splay = c.splay ? rvLerp(c.splay, rvCurveY(c.kS, vn)) * rvCurveY(c.kSD, ndU) : 0
-        st.crop = c.crop ? rvLerp(c.crop, rvCurveY(c.kC, vn)) * rvCurveY(c.kCD, ndU) : 0
-        st.curl = c.curl ? rvCurveY(c.kL, vn) * rvCurveY(c.kLD, ndU) : 0 // progress toward the target pose (0..1), fixed at the onset like the other amounts
-        st.nd = ndU
+        st.arm = c.arm ? rvLerp(c.arm, rvCurveY(c.kA, vn)) * rvCurveY(c.kAD, rvPickX(c.kAD + 'XOrigin', ndU, ndUC)) : 0
+        st.splay = c.splay ? rvLerp(c.splay, rvCurveY(c.kS, vn)) * rvCurveY(c.kSD, rvPickX(c.kSD + 'XOrigin', ndU, ndUC)) : 0
+        st.crop = c.crop ? rvLerp(c.crop, rvCurveY(c.kC, vn)) * rvCurveY(c.kCD, rvPickX(c.kCD + 'XOrigin', ndU, ndUC)) : 0
+        st.curl = c.curl ? rvCurveY(c.kL, vn) * rvCurveY(c.kLD, rvPickX(c.kLD + 'XOrigin', ndU, ndUC)) : 0 // progress toward the target pose (0..1), fixed at the onset like the other amounts
+        st.nd = ndU; st.ndC = ndUC
       }
       // Sequence (2026-10-15, direct request: hands already triggered finish their sequence even when the cursor has moved away). A hand that is triggered starts an onset: its start delay, then progress 0 -> 1 over
       // the Displacement Speed (phase 1), which nothing the cursor does afterwards can interrupt. When the progress reaches 1 it turns into the retransition by itself (phase 2: its start delay, then 1 -> 0 over the
       // Retransition Speed). The live test (distance / angle / velocity) only decides WHETHER a hand is triggered; a hand has to stop being triggered once before it can be triggered again, and a new trigger starts a new onset from the current progress.
-      if (startOnset) { st.phase = 1; st.armed = false; st.onAt = nowMs; st.delay = startOn ? rvLerp(startR, rvCurveY('rvStartTimeCurve', ndU)) : 0; st.dur = speedOn ? rvLerp(speedR, rvCurveY('rvSpeedCurve', ndU)) : 0 }
+      if (startOnset) { st.phase = 1; st.armed = false; st.onAt = nowMs; st.delay = startOn ? rvLerp(startR, rvCurveY('rvStartTimeCurve', rvPickX('rvStartTimeCurveXOrigin', ndU, ndUC))) : 0; st.dur = speedOn ? rvLerp(speedR, rvCurveY('rvSpeedCurve', rvPickX('rvSpeedCurveXOrigin', ndU, ndUC))) : 0 }
       if (!trig) st.armed = true
       if (st.phase === 1) {
         if (nowMs - st.onAt >= st.delay) st.p = st.dur > 0 ? Math.min(1, st.p + dt / st.dur) : 1
         if (st.p >= 1) {
           st.p = 1; st.phase = 2; st.offAt = nowMs
-          st.rdelay = retOn && retStartCurveOn ? rvLerp(retStartR, rvCurveY('rvRetransitionStartTimeCurve', st.nd)) : 0
-          st.rdur = retSpeedCurveOn ? rvLerp(retSpeedR, rvCurveY('rvRetransitionSpeedCurve', st.nd)) : retFlatMs
+          st.rdelay = retOn && retStartCurveOn ? rvLerp(retStartR, rvCurveY('rvRetransitionStartTimeCurve', rvPickX('rvRetransitionStartTimeCurveXOrigin', st.nd, st.ndC ?? st.nd))) : 0
+          st.rdur = retSpeedCurveOn ? rvLerp(retSpeedR, rvCurveY('rvRetransitionSpeedCurve', rvPickX('rvRetransitionSpeedCurveXOrigin', st.nd, st.ndC ?? st.nd))) : retFlatMs
           if (!retOn) { st.p = 0; st.phase = 0 }
         }
       } else if (st.phase === 2) {
@@ -12841,13 +12877,13 @@ const _cameraOffsetWorld = new THREE.Vector3()
 // that one stored value is used by the live ramp and by every bake that frame, so nothing snaps at a bake.
 function captureCameraOffsetNorm(hand, p) {
   const vis = cfg[`${p}CameraOffsetVisibleOnly`] !== false // Visible Hands Only: on = visible-hands domain, off = all hands
-  return normFieldDist(handXYDist(hand), vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
+  return normFieldDist(handXYDist(hand), vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange, `${p}CameraOffsetXOrigin`) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
 }
 // Rotation Curves: the same normalised distance as Offset To Camera (nearest .. farthest hand), read once per frame by refreshLiveDistanceState() into the hand's state for this function.
 function rotationCurvesOn(p) { return !!(cfg[`${p}RotationXCurveEnabled`] || cfg[`${p}RotationYCurveEnabled`] || cfg[`${p}RotationZCurveEnabled`]) }
 function captureRotationNorm(hand, p) {
   const vis = cfg[`${p}RotationCurveVisibleOnly`] !== false
-  return normFieldDist(handXYDist(hand), vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange)
+  return normFieldDist(handXYDist(hand), vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange, `${p}RotationCurveXOrigin`)
 }
 const _rotDeg = { x: 0, y: 0, z: 0 }
 // The Rotation X / Y / Z in degrees for this hand (full amount, before the ramp): an axis with its curve on takes Min..Max by the curve at the hand's distance, otherwise its slider.
@@ -13576,15 +13612,15 @@ function loopPoseValuesBeyondLap(p, chp, trig, elapsedSegments) {
 // on = hands that are on screen, off = all hands. xy = current-position screen distance (every click-function curve).
 function curveByDomain(p, flag, dist, curveParsed, rangeParsed) {
   const vis = cfg[`${p}${flag}`] !== false
-  return computeStartDelayMs(dist, vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange, curveParsed, rangeParsed)
+  return computeStartDelayMs(dist, vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange, curveParsed, rangeParsed, `${p}${flag.replace('VisibleOnly', 'XOrigin')}`)
 }
 // Cursor Offset measures from the REST position, so it uses the rest domain.
 function curveByRestDomain(p, dist, curveParsed, rangeParsed) {
   const vis = cfg[`${p}CursorOffsetVisibleOnly`] !== false
-  return computeStartDelayMs(dist, vis ? restFieldMinDist : restAllMinDist, vis ? restFieldDistRange : restAllDistRange, curveParsed, rangeParsed)
+  return computeStartDelayMs(dist, vis ? restFieldMinDist : restAllMinDist, vis ? restFieldDistRange : restAllDistRange, curveParsed, rangeParsed, `${p}CursorOffsetXOrigin`)
 }
-function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed) {
-  const normDist = normFieldDist(distanceToCursor, minLiveDist, liveDistRange) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
+function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curveParsed, rangeParsed, originKey) {
+  const normDist = normFieldDist(distanceToCursor, minLiveDist, liveDistRange, originKey) // > 1 for hands beyond the farthest on-screen hand (extrapolated)
   const curveY = THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, normDist), 0, 1)
   return rangeParsed.min + (rangeParsed.max - rangeParsed.min) * curveY
 }
@@ -13600,8 +13636,8 @@ function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curve
 // the curve's own raw 0-1 Y value directly as the tween-amount fraction
 // (no separate range-rescale needed here, unlike computeStartDelayMs()
 // above -- Y already IS the final fraction).
-function computeTweenFractionCap(distanceToCursor, distMin, distMax, curveParsed, nearestDist = 0) {
-  if (distOriginMode() === 1) distanceToCursor = Math.max(distanceToCursor - nearestDist, 0) // Closest Hand: Min / Max then bound the distance measured from the closest hand
+function computeTweenFractionCap(distanceToCursor, distMin, distMax, curveParsed, nearestDist = 0, originKey) {
+  if (originModeFor(originKey) === 1) distanceToCursor = Math.max(distanceToCursor - nearestDist, 0) // Closest Hand: Min / Max then bound the distance measured from the closest hand
   if (distanceToCursor < distMin || distanceToCursor > distMax) return null
   const range = Math.max(distMax - distMin, 0.001)
   const normDist = THREE.MathUtils.clamp((distanceToCursor - distMin) / range, 0, 1)
@@ -13948,7 +13984,7 @@ function curveByDomainFor(hand, p, flag, curveParsed, rangeParsed) {
   const k = p === STARTUP_FN ? hand._startupClick : null
   if (!k) return curveByDomain(p, flag, handXYDist(hand), curveParsed, rangeParsed)
   const vis = cfg[`${p}${flag}`] !== false
-  return computeStartDelayMs(k.dist, vis ? k.min : k.minAll, vis ? k.range : k.rangeAll, curveParsed, rangeParsed)
+  return computeStartDelayMs(k.dist, vis ? k.min : k.minAll, vis ? k.range : k.rangeAll, curveParsed, rangeParsed, `${p}${flag.replace('VisibleOnly', 'XOrigin')}`)
 }
 function handDistFor(hand, p) { return (p === STARTUP_FN && hand._startupClick) ? hand._startupClick.dist : handXYDist(hand) }
 function liveTempo(nominalMs, liveMs) {
@@ -13972,7 +14008,7 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
   if (cfg[`${p}CameraOffsetEnabled`]) st.frozenOffsetNorm = captureCameraOffsetNorm(hand, p)
   if (rotationCurvesOn(p)) st.rotationNorm = captureRotationNorm(hand, p)
   if (cfg[`${p}StartDistanceCurveEnabled`]) {
-    const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, nearestFor(hand, p))
+    const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, nearestFor(hand, p), `${p}StartDistanceXOrigin`)
     if (cap !== null) st.frozenTweenFractionCap = cap // out of range keeps the last cap rather than snapping
   }
   // Rates. Animation Speed Curve -> tempo of the forward / loop / lap clocks (nominal speed = the value at commit).
@@ -14053,7 +14089,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     let tweenFractionCap = 1
     let eligible = true
     if (cfg[`${p}StartDistanceCurveEnabled`]) {
-      const cap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, nearestFor(hand, p))
+      const cap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, nearestFor(hand, p), `${p}StartDistanceXOrigin`)
       if (cap === null) eligible = false
       else tweenFractionCap = cap
     }
@@ -15587,7 +15623,7 @@ function triggerClickPose(p, onlyHands = null) {
     // curve here.
     let tweenFractionCap = 1
     if (cfg[`${p}StartDistanceCurveEnabled`] && !(p === STARTUP_FN && startupIgnoreStartDistance)) {
-      const cap = computeTweenFractionCap(dists[i], cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, minD)
+      const cap = computeTweenFractionCap(dists[i], cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, minD, `${p}StartDistanceXOrigin`)
       if (cap === null) return // outside the eligible range -- this hand never triggers
       tweenFractionCap = cap
     }
@@ -18316,10 +18352,10 @@ function placeLoadingPreviewLightingRows() {
 }
 function placeDepthControlsInFeatureGroups() {
   const plan = [
-    ['armRotationEnabled', ['armRotationVisibleOnly', 'armRotationUseDepth', 'armRotationTargetDepth']],
-    ['palmFacesCursor', ['palmRotationVisibleOnly', 'palmRotationUseDepth', 'palmRotationTargetDepth']],
-    ['cropWristEnabled', ['armLengthVisibleOnly', 'armLengthUseDepth', 'armLengthTargetDepth']],
-    ['wristSplayResponsiveEnabled', ['wristSplayVisibleOnly', 'wristSplayUseDepth', 'wristSplayTargetDepth']]
+    ['armRotationEnabled', ['armRotationVisibleOnly', 'armRotationXOrigin', 'armRotationUseDepth', 'armRotationTargetDepth']],
+    ['palmFacesCursor', ['palmRotationVisibleOnly', 'palmRotationXOrigin', 'palmRotationUseDepth', 'palmRotationTargetDepth']],
+    ['cropWristEnabled', ['armLengthVisibleOnly', 'armLengthXOrigin', 'armLengthUseDepth', 'armLengthTargetDepth']],
+    ['wristSplayResponsiveEnabled', ['wristSplayVisibleOnly', 'wristSplayXOrigin', 'wristSplayUseDepth', 'wristSplayTargetDepth']]
   ]
   plan.forEach(([anchorKey, keys]) => {
     const anchor = document.querySelector('.dp-row[data-key="' + anchorKey + '"]')
@@ -18377,12 +18413,12 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'OffsetZ', 'CursorOffsetXCurve', 'CursorOffsetXRange', 'CursorOffsetYCurve', 'CursorOffsetYRange', 'CursorOffsetZCurve', 'CursorOffsetZRange',
   'CameraOffsetEnabled', 'CameraOffsetXEnabled', 'CameraOffsetYEnabled', 'CameraOffsetZEnabled', 'CameraOffsetXCurve', 'CameraOffsetXRange', 'CameraOffsetYCurve', 'CameraOffsetYRange', 'CameraOffsetZCurve', 'CameraOffsetZRange',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
-  'OffsetLoopRetransition', 'CameraOffsetLoopRetransition', 'RotationLoopRetransition', 'RotationMode', 'RotationCurveVisibleOnly',
+  'OffsetLoopRetransition', 'CameraOffsetLoopRetransition', 'RotationLoopRetransition', 'RotationMode', 'RotationCurveVisibleOnly', 'RotationCurveXOrigin',
   'RotationXCurveEnabled', 'RotationXCurve', 'RotationXCurveRange', 'RotationYCurveEnabled', 'RotationYCurve', 'RotationYCurveRange', 'RotationZCurveEnabled', 'RotationZCurve', 'RotationZCurveRange',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
-  'SpeedCurveVisibleOnly', 'StartTimeCurveVisibleOnly', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopDelayCurveVisibleOnly', 'CameraOffsetVisibleOnly', 'CursorOffsetVisibleOnly',
+  'SpeedCurveVisibleOnly', 'SpeedCurveXOrigin', 'StartTimeCurveVisibleOnly', 'StartTimeCurveXOrigin', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionSpeedCurveXOrigin', 'RetransitionStartTimeCurveVisibleOnly', 'RetransitionStartTimeCurveXOrigin', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveXOrigin', 'TweenStopDelayCurveVisibleOnly', 'TweenStopDelayCurveXOrigin', 'CameraOffsetVisibleOnly', 'CameraOffsetXOrigin', 'CursorOffsetVisibleOnly', 'CursorOffsetXOrigin',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
-  'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceCurve',
+  'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceXOrigin', 'StartDistanceCurve',
   'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
   'RetransitionDistCurveEnabled', 'RetransitionDistCurve', 'RetransitionDistRange',
   'RetransitionScalerEnabled', 'RetransitionScalerCurve', 'RetransitionScalerMulRange', 'RetransitionScalerDistRange',
@@ -19304,6 +19340,7 @@ function updateSingleTimingGateVisibility(p) {
   const startDistanceOn = !!cfg[`${p}StartDistanceCurveEnabled`]
   setRow('StartDistanceMin', startDistanceOn)
   setRow('StartDistanceMax', startDistanceOn)
+  setRow('StartDistanceXOrigin', startDistanceOn)
   setRow('StartDistanceCurve', startDistanceOn)
   // Easing Curve (2026-10-02) -- also NOT Mode-gated, same reasoning as
   // Start Distance Curve directly above: it reshapes the forward
@@ -19492,12 +19529,12 @@ function wrapTweenStopGroup(p) {
   // called anywhere in this file) rather than deleted, per this
   // project's own "nothing gets deleted by default" convention.
   const g = wrapGatedSubgroup(`${p}TweenStopEnabled`, [
-    `${p}TweenStopStartTimeCurveEnabled`, `${p}TweenStopStartTimeCurveVisibleOnly`, `${p}TweenStopStartTimeCurve`, `${p}TweenStopStartTimeRange`,
-    `${p}TweenStopDelayEnabled`, `${p}TweenStopDelayMs`, `${p}TweenStopDelayCurveEnabled`, `${p}TweenStopDelayCurveVisibleOnly`, `${p}TweenStopDelayCurve`, `${p}TweenStopDelayRange`
+    `${p}TweenStopStartTimeCurveEnabled`, `${p}TweenStopStartTimeCurveVisibleOnly`, `${p}TweenStopStartTimeCurveXOrigin`, `${p}TweenStopStartTimeCurve`, `${p}TweenStopStartTimeRange`,
+    `${p}TweenStopDelayEnabled`, `${p}TweenStopDelayMs`, `${p}TweenStopDelayCurveEnabled`, `${p}TweenStopDelayCurveVisibleOnly`, `${p}TweenStopDelayCurveXOrigin`, `${p}TweenStopDelayCurve`, `${p}TweenStopDelayRange`
   ], 'Tween Stop')
   if (!g) return
-  wrapGatedSubgroup(`${p}TweenStopStartTimeCurveEnabled`, [`${p}TweenStopStartTimeCurveVisibleOnly`, `${p}TweenStopStartTimeCurve`, `${p}TweenStopStartTimeRange`], 'Tween Stop Start Time Curve')
-  wrapGatedSubgroup(`${p}TweenStopDelayEnabled`, [`${p}TweenStopDelayMs`, `${p}TweenStopDelayCurveEnabled`, `${p}TweenStopDelayCurveVisibleOnly`, `${p}TweenStopDelayCurve`, `${p}TweenStopDelayRange`], 'Tween Stop Delay')
+  wrapGatedSubgroup(`${p}TweenStopStartTimeCurveEnabled`, [`${p}TweenStopStartTimeCurveVisibleOnly`, `${p}TweenStopStartTimeCurveXOrigin`, `${p}TweenStopStartTimeCurve`, `${p}TweenStopStartTimeRange`], 'Tween Stop Start Time Curve')
+  wrapGatedSubgroup(`${p}TweenStopDelayEnabled`, [`${p}TweenStopDelayMs`, `${p}TweenStopDelayCurveEnabled`, `${p}TweenStopDelayCurveVisibleOnly`, `${p}TweenStopDelayCurveXOrigin`, `${p}TweenStopDelayCurve`, `${p}TweenStopDelayRange`], 'Tween Stop Delay')
 }
 // Sequence Mode - Count/Loop/Oscillate's own visibility, for the 5
 // fire-and-forget triggers only (click/dblclick/rc/tripleClick/
@@ -19657,30 +19694,30 @@ function wrapClickFunctionGatedSubgroups(p) {
   // subgroup treatment as every other on/off curve below ("provide an
   // on off checkbox for each").
   wrapGatedSubgroup(`${p}EasingCurveEnabled`, [`${p}EasingCurve`], 'Easing')
-  const offsetGroup = wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetLoopRetransition`, `${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetVisibleOnly`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
+  const offsetGroup = wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetLoopRetransition`, `${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetVisibleOnly`, `${p}CursorOffsetXOrigin`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
   // Clamp Distance from Cursor: a toggleable group inside Offset (shown in Cursor Offset mode only, see updateOffsetRotationVisibility())
   const clampGroup = wrapGatedSubgroup(`${p}CursorClampEnabled`, [`${p}CursorClampRange`, `${p}CursorClampCurve`], 'Clamp Distance from Cursor')
   if (offsetGroup && clampGroup) offsetGroup.querySelector(':scope > .dp-group-body').appendChild(clampGroup)
   // "Offset To Camera" (2026-10-02) -- its own mandatory gated subgroup,
   // independent of (and stackable with) "Offset" above.
-  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetLoopRetransition`, `${p}CameraOffsetVisibleOnly`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
-  const rotationGroup = wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationMode`, `${p}RotationLoopRetransition`, `${p}RotationCurveVisibleOnly`, `${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
+  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetLoopRetransition`, `${p}CameraOffsetVisibleOnly`, `${p}CameraOffsetXOrigin`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
+  const rotationGroup = wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationMode`, `${p}RotationLoopRetransition`, `${p}RotationCurveVisibleOnly`, `${p}RotationCurveXOrigin`, `${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
   // Rotation Curve X / Y / Z: one toggleable group per axis inside Rotation (titles carry the axis so the three have distinct keys)
   ;['X', 'Y', 'Z'].forEach((ax) => {
     const axisGroup = wrapGatedSubgroup(`${p}Rotation${ax}CurveEnabled`, [`${p}Rotation${ax}Curve`, `${p}Rotation${ax}CurveRange`], `Rotation Curve ${ax}`)
     if (rotationGroup && axisGroup) rotationGroup.querySelector(':scope > .dp-group-body').appendChild(axisGroup)
   })
-  wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurveVisibleOnly`, `${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
+  wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurveVisibleOnly`, `${p}SpeedCurveXOrigin`, `${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
   // start-time curve (no enable toggle of its own -- see
   // updateSingleTimingGateVisibility()'s own comment) nests inside this
   // SAME "Start Time Curve" group too, no-op for a pose-kind `p`.
-  wrapGatedSubgroup(`${p}StartTimeCurveEnabled`, [`${p}StartTimeCurveVisibleOnly`, `${p}StartTimeCurve`, `${p}StartTimeRange`, `${p}TweenStartTimeCurve`, `${p}TweenStartTimeRange`], 'Start Time Curve')
+  wrapGatedSubgroup(`${p}StartTimeCurveEnabled`, [`${p}StartTimeCurveVisibleOnly`, `${p}StartTimeCurveXOrigin`, `${p}StartTimeCurve`, `${p}StartTimeRange`, `${p}TweenStartTimeCurve`, `${p}TweenStartTimeRange`], 'Start Time Curve')
   // Start Distance Curve -- direct spec item (2026-09-27), same shared
   // subgroup for both Single Pose and Tween mode (this curve isn't
   // Mode-gated at all -- see updateSingleTimingGateVisibility()'s own
   // comment).
-  wrapGatedSubgroup(`${p}StartDistanceCurveEnabled`, [`${p}StartDistanceMin`, `${p}StartDistanceMax`, `${p}StartDistanceCurve`], 'Start Distance Curve')
+  wrapGatedSubgroup(`${p}StartDistanceCurveEnabled`, [`${p}StartDistanceMin`, `${p}StartDistanceMax`, `${p}StartDistanceXOrigin`, `${p}StartDistanceCurve`], 'Start Distance Curve')
   // CORRECTED 2026-09-24 (item 7, "duplicate Retransition settings"): the
   // Tween-mode retransition trio (hold-kind only -- a no-op/silently
   // skipped for a pose-kind `p`, whose own rows with these suffixes don't
@@ -19694,7 +19731,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   // heading -- RetransitionEnabled itself still governs both regardless
   // of mode, preserving the 2026-09-22 request.
   wrapGatedSubgroup(`${p}RetransitionEnabled`, [
-    `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
+    `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurveXOrigin`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurveXOrigin`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
     `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`,
     `${p}RetransitionEasingCurveEnabled`, `${p}RetransitionEasingCurve`,
     `${p}RetransitionDistCurveEnabled`, `${p}RetransitionDistCurve`, `${p}RetransitionDistRange`,
@@ -19714,11 +19751,11 @@ function wrapClickFunctionGatedSubgroups(p) {
   // these 2 new subgroups inside Retransition rather than as top-level
   // siblings of it. Order matters: these must run AFTER the outer
   // Retransition wrap, never before.
-  wrapGatedSubgroup(`${p}RetransitionSpeedCurveEnabled`, [`${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`], 'Retransition Speed Curve')
+  wrapGatedSubgroup(`${p}RetransitionSpeedCurveEnabled`, [`${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurveXOrigin`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`], 'Retransition Speed Curve')
   wrapGatedSubgroup(`${p}RetransitionEasingCurveEnabled`, [`${p}RetransitionEasingCurve`], 'Retransition Easing Curve')
   wrapGatedSubgroup(`${p}RetransitionDistCurveEnabled`, [`${p}RetransitionDistCurve`, `${p}RetransitionDistRange`], 'Retransition Distance Curve')
   wrapGatedSubgroup(`${p}RetransitionScalerEnabled`, [`${p}RetransitionScalerCurve`, `${p}RetransitionScalerMulRange`, `${p}RetransitionScalerDistRange`], 'Retransition Distance Scaler')
-  wrapGatedSubgroup(`${p}RetransitionStartTimeCurveEnabled`, [`${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`], 'Retransition Start Time Curve')
+  wrapGatedSubgroup(`${p}RetransitionStartTimeCurveEnabled`, [`${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurveXOrigin`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`], 'Retransition Start Time Curve')
   // Hold-kind only -- fire-and-forget triggers have no Tween Stop fields.
   // Must run AFTER the wraps above (harmless either order, since Tween
   // Stop's own rows are untouched by them) and BEFORE the caller's own
@@ -19809,6 +19846,7 @@ updateLoadingPreviewSequenceVisibility()
 // time, even called alone) -- this must never take down the whole page.
 safeRefreshSelectOptions('chpTargetPose')
 safeRefreshSelectOptions('distCurveXOrigin')
+;['armRotationXOrigin', 'palmRotationXOrigin', 'armLengthXOrigin', 'wristSplayXOrigin'].forEach((k) => safeRefreshSelectOptions(k))
 safeRefreshSelectOptions('rchpTargetPose')
 safeRefreshSelectOptions('clickTargetPose')
 safeRefreshSelectOptions('dblclickTargetPose')
@@ -21433,7 +21471,7 @@ function animate(dt, now) {
               const distToCursor = armRotUseDepth ? hand._trk.distanceTo(_trackTargetArm) : hand._trkXY
               const armVis = cfg.armRotationVisibleOnly !== false
               const range = armRotUseDepth ? Math.max(cursorDistMaxD - cursorDistMinD, 1e-6) : (armVis ? trkXYFieldRange : trkXYAllRange)
-              const normDist = normFieldDist(distToCursor, armRotUseDepth ? cursorDistMinD : (armVis ? trkXYFieldMin : trkXYAllMin), range)
+              const normDist = normFieldDist(distToCursor, armRotUseDepth ? cursorDistMinD : (armVis ? trkXYFieldMin : trkXYAllMin), range, 'armRotationXOrigin')
               // The curve's height (0..1) picks a PERCENT between Min % and Max % of the full 'face the cursor' swing (2026-10-11).
               const armCurveY = (armRotationCurveParsed && armRotationCurveParsed.length) ? THREE.MathUtils.clamp(evaluateArmLengthCurve(armRotationCurveParsed, normDist), 0, 1) : 1
               responsiveness = THREE.MathUtils.clamp((armRotationRangeParsed.min + (armRotationRangeParsed.max - armRotationRangeParsed.min) * armCurveY) / 100, 0, 1)
@@ -21470,7 +21508,7 @@ function animate(dt, now) {
             const distToCursor = palmUseDepth ? hand._trk.distanceTo(_trackTargetPalm) : hand._trkXY
             const palmVis = cfg.palmRotationVisibleOnly !== false
             const range = palmUseDepth ? Math.max(palmDistMaxD - palmDistMinD, 1e-6) : (palmVis ? trkXYFieldRange : trkXYAllRange)
-            const normDist = normFieldDist(distToCursor, palmUseDepth ? palmDistMinD : (palmVis ? trkXYFieldMin : trkXYAllMin), range)
+            const normDist = normFieldDist(distToCursor, palmUseDepth ? palmDistMinD : (palmVis ? trkXYFieldMin : trkXYAllMin), range, 'palmRotationXOrigin')
             const responsiveness = palmFacesCursorDistanceCurveParsed && palmFacesCursorDistanceCurveParsed.length
               ? evaluateArmLengthCurve(palmFacesCursorDistanceCurveParsed, normDist)
               : 1
