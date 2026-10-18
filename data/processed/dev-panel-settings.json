@@ -17581,7 +17581,7 @@
       "logHandBehaviourEnabled": false,
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": true,
-      "frameRateDropThresholdFps": 15,
+      "frameRateDropThresholdFps": 10,
       "logFrameProfileEnabled": true,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
@@ -38752,7 +38752,7 @@
       "logHandBehaviourEnabled": false,
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": true,
-      "frameRateDropThresholdFps": 15,
+      "frameRateDropThresholdFps": 10,
       "logFrameProfileEnabled": true,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
@@ -59923,7 +59923,7 @@
       "logHandBehaviourEnabled": false,
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": true,
-      "frameRateDropThresholdFps": 15,
+      "frameRateDropThresholdFps": 10,
       "logFrameProfileEnabled": true,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
@@ -69202,7 +69202,14 @@
     "loadingPreviewProgressCropEnabled": false,
     "loadingPreviewProgressCropFlip": false,
     "loadingPreviewProgressCropRealtime": false,
-    "loadingPreviewEasingCurveEnabled": false
+    "loadingPreviewEasingCurveEnabled": false,
+    "snapshotCursor": false,
+    "snapshotMouse": false,
+    "snapshotHandBehaviour": false,
+    "snapshotFrameRate": false,
+    "snapshotPoseJumps": false,
+    "snapshotRenderOrder": false,
+    "snapshotTrackingPoints": false
   },
   "devIndependence": {
     "mobile": {
