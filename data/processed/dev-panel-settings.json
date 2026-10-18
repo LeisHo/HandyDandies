@@ -64287,8 +64287,8 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
-      "locked": false,
+      "collapsed": true,
+      "locked": true,
       "items": [
         {
           "type": "row",
@@ -64307,7 +64307,7 @@
           "group": {
             "key": "Custom Click Function 29",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [],
             "settings": []
           }
@@ -64317,7 +64317,7 @@
           "group": {
             "key": "Custom Click Function 28",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [],
             "settings": []
           }
@@ -64327,7 +64327,7 @@
           "group": {
             "key": "Custom Click Function 19",
             "collapsed": true,
-            "locked": false,
+            "locked": true,
             "items": [],
             "settings": []
           }
@@ -64337,14 +64337,14 @@
           "group": {
             "key": "New Group (16)",
             "collapsed": false,
-            "locked": false,
+            "locked": true,
             "items": [
               {
                 "type": "group",
                 "group": {
                   "key": "35 FT - 1 - C Copy",
                   "collapsed": false,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -64354,7 +64354,7 @@
                 "group": {
                   "key": "35 FT - 1 - CH Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -64364,7 +64364,7 @@
                 "group": {
                   "key": "35 FT - Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -64374,7 +64374,7 @@
                 "group": {
                   "key": "35 FT - 3 - C Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -64384,7 +64384,7 @@
                 "group": {
                   "key": "35 FT - 3 - CH Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -64394,7 +64394,7 @@
                 "group": {
                   "key": "35 FT - 2 - CH Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -64404,7 +64404,7 @@
                 "group": {
                   "key": "20 FT - 1 - C Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -64414,7 +64414,7 @@
                 "group": {
                   "key": "20 FT - R - CH Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -64424,7 +64424,7 @@
                 "group": {
                   "key": "20 FT - 3 - C Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -64434,7 +64434,7 @@
                 "group": {
                   "key": "20 FT - 3 - CH Copy",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [],
                   "settings": []
                 }
@@ -69769,9 +69769,9 @@
     },
     "mobile": {
       "left": 20,
-      "top": 282.202392578125,
-      "width": 379.38690185546875,
-      "height": 504.31549072265625
+      "top": 280.6785888671875,
+      "width": 382.81549072265625,
+      "height": 505.83929443359375
     }
   }
 }
