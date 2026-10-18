@@ -65445,8 +65445,8 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
-            "locked": false,
+            "collapsed": true,
+            "locked": true,
             "items": [
               {
                 "type": "row",
@@ -65477,7 +65477,7 @@
                 "group": {
                   "key": "New Group (7)",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65569,7 +65569,7 @@
                 "group": {
                   "key": "New Group (5)",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65631,7 +65631,7 @@
                 "group": {
                   "key": "New Group",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65698,7 +65698,7 @@
                 "group": {
                   "key": "Loading Preview > Text",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65762,7 +65762,7 @@
                 "group": {
                   "key": "Loading Preview > Layout",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65779,7 +65779,7 @@
                 "group": {
                   "key": "Loading Preview > Progress Crop",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "row",
@@ -65807,17 +65807,20 @@
                 }
               },
               {
-                "type": "row",
-                "key": "loadingPreviewEasingCurve"
-              },
-              {
                 "type": "group",
                 "group": {
                   "key": "Easing",
                   "collapsed": true,
-                  "locked": false,
-                  "items": [],
-                  "settings": []
+                  "locked": true,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewEasingCurve"
+                    }
+                  ],
+                  "settings": [
+                    "loadingPreviewEasingCurve"
+                  ]
                 }
               }
             ],
@@ -65830,8 +65833,7 @@
               "loadingMinTimeMs",
               "loadingPreviewPosX",
               "loadingPreviewPosY",
-              "loadingPreviewLayout",
-              "loadingPreviewEasingCurve"
+              "loadingPreviewLayout"
             ]
           }
         }
