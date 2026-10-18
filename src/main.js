@@ -3325,6 +3325,11 @@ const DEV_GROUPS = [
       { key: 'poseOffsetX', label: 'Pose Offset X (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
       { key: 'poseOffsetY', label: 'Pose Offset Y (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
       { key: 'poseOffsetZ', label: 'Pose Offset Z (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
+      // Pose Local Offset X/Y/Z (2026-10-18, ported from HANDO, direct request: "3 more offset sliders ... XYZ, but in the hand model's local axes"): the Pose Offset above, but along the hand MESH's own axes - they turn with the pose's
+      // Whole-Hand Rotation and Rotation at Base. See applyPoseOffsetToPosition().
+      { key: 'poseLocalOffsetX', label: 'Pose Local Offset X (World Units, Hand Axes)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
+      { key: 'poseLocalOffsetY', label: 'Pose Local Offset Y (World Units, Hand Axes)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
+      { key: 'poseLocalOffsetZ', label: 'Pose Local Offset Z (World Units, Hand Axes)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
       { key: 'poseScale', label: 'Pose Scale (x)', type: 'slider', min: 0.1, max: 3, step: 0.05, def: 1, onChange: () => { cloneBaseVersion++ } },
       // Direct user request: import poses exported from HANDO (identical
       // rig/bone names, same Pose-slider set) and preview them without
@@ -7606,7 +7611,7 @@ const POSE_PRESET_KEYS = [
   // applied). `|| 0`/`?? 1` fallbacks throughout cover a pose saved
   // before these keys existed, or imported from a HANDO version that
   // predates them -- same convention as baseOnlyCurl*'s own comment.
-  'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseScale',
+  'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseLocalOffsetX', 'poseLocalOffsetY', 'poseLocalOffsetZ', 'poseScale',
   // IK rig (2026-10-16, ported from HANDO's pose set; see IK RIG above): a 0 default is a no-op for every other model, which never reads them.
   'thumbBaseSplay', 'midTwistThumb', 'baseTwistThumb', 'midTwistIndex', 'baseTwistIndex', 'midTwistMiddle', 'baseTwistMiddle', 'midTwistRing', 'baseTwistRing', 'midTwistPinky', 'baseTwistPinky',
   'elbowBend', 'elbowSideBend', 'forearmTwist'
@@ -12659,6 +12664,7 @@ const _poseOffsetRightVec = new THREE.Vector3()
 const _poseOffsetUpVec = new THREE.Vector3()
 const _poseOffsetTowardCameraVec = new THREE.Vector3()
 const _poseOffsetZeroVec = new THREE.Vector3()
+const _poseLocalOffsetVec = new THREE.Vector3(), _poseLocalAxesQ = new THREE.Quaternion(), _poseLocalAxesEuler = new THREE.Euler(), _poseLocalAxesRb = new THREE.Quaternion()
 // Position only -- kept separate from scale (below) so a caller that
 // doesn't yet have a valid base position (see applyPoseValuesToHand()'s
 // own `hand.basePosition` guard) can skip JUST the position write
@@ -12674,6 +12680,16 @@ function applyPoseOffsetToPosition(positionTarget, basePosition, cam, values) {
     positionTarget.position.addScaledVector(_poseOffsetRightVec, ox)
     positionTarget.position.addScaledVector(_poseOffsetUpVec, oy)
     positionTarget.position.addScaledVector(_poseOffsetTowardCameraVec, oz)
+  }
+  // Pose Local Offset X/Y/Z: the vector is in the hand mesh's own axes; the hand's orientation for this pose (alignQuat * Whole-Hand Rotation * Rotation at Base - what the clone's quaternion is set to) takes it to world.
+  // Not scaled by Pose Scale, like the world offset; a plain translation, so it stacks with it in any order. Own scratch quaternions: computeBaseQuatFromValues() leaves _poseBaseRb for its callers' arm-base pivot.
+  const lx = values.poseLocalOffsetX || 0, ly = values.poseLocalOffsetY || 0, lz = values.poseLocalOffsetZ || 0
+  if (lx || ly || lz) {
+    _poseLocalAxesEuler.set(THREE.MathUtils.degToRad(values.modelRotX || 0), THREE.MathUtils.degToRad(values.modelRotY || 0), THREE.MathUtils.degToRad(values.modelRotZ || 0))
+    _poseLocalAxesQ.setFromEuler(_poseLocalAxesEuler)
+    _poseLocalAxesQ.multiply(computeBaseRotationQuat(values.baseRotationX || 0, values.baseRotationY || 0, values.baseRotationZ || 0, _poseLocalAxesRb)).premultiply(alignQuat)
+    _poseLocalOffsetVec.set(lx, ly, lz).applyQuaternion(_poseLocalAxesQ)
+    positionTarget.position.add(_poseLocalOffsetVec)
   }
 }
 function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
@@ -13534,9 +13550,9 @@ function remapGlideProgress(u, N, k) {
 }
 // STACKING ON THE DEFAULT (2026-10-11, direct request: "the rotation settings of the triggered pose or sequence should be applied ontop of the default pose. So if a pose has a rotation x value
 // of 180, that will be taken as 180 from the default position's own x rotation"). The rotation / position keys a saved pose or tween step carries are ADDED to the live default (the sliders, which
-// are the default pose): Whole-Hand Rotation X/Y/Z, Rotation at Base X/Y/Z and Pose Offset X/Y/Z are default + pose value (default X 84 and a pose with X 180 gives 264); Pose Scale multiplies.
+// are the default pose): Whole-Hand Rotation X/Y/Z, Rotation at Base X/Y/Z and Pose Offset X/Y/Z (and Pose Local Offset X/Y/Z) are default + pose value (default X 84 and a pose with X 180 gives 264); Pose Scale multiplies.
 // A pose that does not carry a key adds nothing (every pose saved before Rotation at Base existed has no Base Rotation). Only field hands use this; the previews keep absolute poses.
-const STACK_KEYS = ['modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ', 'poseOffsetX', 'poseOffsetY', 'poseOffsetZ']
+const STACK_KEYS = ['modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ', 'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseLocalOffsetX', 'poseLocalOffsetY', 'poseLocalOffsetZ']
 // cloneBaseVersion changes whenever any of the stacking sliders or the Default pose change (their onChange / onWholeHandRotationChange bump it), so it is the cache key.
 function currentStackSig() { return cloneBaseVersion }
 function stackOnDefault(item) {
