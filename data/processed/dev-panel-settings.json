@@ -22247,7 +22247,7 @@
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
       "loadingPreviewSpeedMs": 1100,
-      "loadingPreviewEasingCurveEnabled": true,
+      "loadingPreviewEasingCurveEnabled": false,
       "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4562103709998403,\"y\":0}}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
@@ -72293,9 +72293,9 @@
       "custom54Trig1TweenStopDelayCurveEnabled": false,
       "custom54Trig1TweenStopDelayCurveVisibleOnly": false,
       "custom54Type": false,
-      "loadingPreviewProgressCropEnabled": true,
-      "loadingPreviewProgressCropFlip": true,
-      "loadingPreviewProgressCropRealtime": true,
+      "loadingPreviewProgressCropEnabled": false,
+      "loadingPreviewProgressCropFlip": false,
+      "loadingPreviewProgressCropRealtime": false,
       "custom29OffsetLoopRetransition": false,
       "custom29CameraOffsetLoopRetransition": false,
       "custom29RotationMode": false,
@@ -72961,7 +72961,7 @@
       "loadingPreviewHand2ExtraX": true,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextColor": false,
-      "loadingPreviewEasingCurveEnabled": true
+      "loadingPreviewEasingCurveEnabled": false
     },
     "landscape": {}
   },
@@ -72975,9 +72975,9 @@
     },
     "mobile": {
       "left": 20,
-      "top": 154.21429443359375,
-      "width": 404.71429443359375,
-      "height": 478.16668701171875
+      "top": 176.2678680419922,
+      "width": 415,
+      "height": 482.73809814453125
     }
   }
 }
