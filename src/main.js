@@ -11650,6 +11650,91 @@ function attachCurveEditorExtras(row, svg, ctx) {
   sync()
   return { sync }
 }
+// Touch assist for the curve editors (2026-10-18, direct request: on mobile a double-tap meant to delete a node often ADDED one instead, and nodes / bezier handles took several tries to grab).
+// Why it happened: a node is a 16-unit transparent circle and a bezier handle a 7 px square, so a finger that lands a little off one hits the bare graph, whose click adds a node. This layer only acts on
+// TOUCH input (a mouse is unchanged) and only fills the gaps: a touch that lands on a node circle or a handle square is left to that element's own handler.
+//  - a touch on the bare graph within reach of a node or handle is passed to that node / handle as if it had hit it (grab + drag);
+//  - a tap never ADDS a node while it is within reach of an existing node or handle (delete / grab wins over add);
+//  - two quick taps near the same node delete it (own double-tap detection, so it does not depend on the browser's dblclick landing on the same tiny circle both times).
+// The radii are screen px and are judgment calls, not measurements: tune them here.
+const CURVE_TOUCH_POINT_RADIUS_PX = 30
+const CURVE_TOUCH_POINT_CORE_PX = 14 // inside this a node always wins over a handle
+const CURVE_TOUCH_HANDLE_RADIUS_PX = 26 // a bezier handle the user has made (real)
+const CURVE_TOUCH_PREVIEW_HANDLE_RADIUS_PX = 20 // the dim preview handle (grabbing it creates a handle), kept smaller so a tap meant for the node does not make one
+const CURVE_DOUBLE_TAP_MS = 400
+const CURVE_TAP_MAX_MOVE_PX = 12
+const CURVE_TAP_MAX_MS = 350
+function attachCurveTouchAssist(svg, api) {
+  // api: { points: () => [{ el, p }], handles: () => [{ el, p, kind, real }], remove: (p) => void, removable: (p) => boolean }
+  const st = { redispatching: false, suppressClickUntil: 0, lastTouchDownAt: 0, lastTap: null, down: null }
+  const center = (el) => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } }
+  function pick(x, y) {
+    let best = null, bestScore = Infinity
+    api.points().forEach((h) => {
+      const c = center(h.el), d = Math.hypot(x - c.x, y - c.y)
+      if (d > CURVE_TOUCH_POINT_RADIUS_PX) return
+      const score = d <= CURVE_TOUCH_POINT_CORE_PX ? d / 1000 - 1 : d / CURVE_TOUCH_POINT_RADIUS_PX
+      if (score < bestScore) { bestScore = score; best = { el: h.el, p: h.p, kind: 'point' } }
+    })
+    api.handles().forEach((h) => {
+      const c = center(h.el), d = Math.hypot(x - c.x, y - c.y), r = h.real ? CURVE_TOUCH_HANDLE_RADIUS_PX : CURVE_TOUCH_PREVIEW_HANDLE_RADIUS_PX
+      if (d > r) return
+      const score = d / r
+      if (score < bestScore) { bestScore = score; best = { el: h.el, p: h.p, kind: 'handle' } }
+    })
+    return best
+  }
+  function onUp(e) {
+    window.removeEventListener('pointerup', onUp)
+    window.removeEventListener('pointercancel', onUp)
+    const d = st.down
+    st.down = null
+    if (!d || e.type === 'pointercancel') return
+    const now = performance.now()
+    const isTap = Math.hypot(e.clientX - d.x, e.clientY - d.y) <= CURVE_TAP_MAX_MOVE_PX && now - d.t <= CURVE_TAP_MAX_MS
+    if (!isTap || !d.p) { st.lastTap = null; return }
+    const prev = st.lastTap
+    if (prev && prev.p === d.p && now - prev.t <= CURVE_DOUBLE_TAP_MS) {
+      st.lastTap = null
+      if (api.removable(d.p)) { st.suppressClickUntil = now + 600; api.remove(d.p) }
+      return
+    }
+    st.lastTap = { p: d.p, t: now }
+  }
+  svg.addEventListener('pointerdown', (e) => {
+    if (st.redispatching || e.pointerType !== 'touch' || !e.isPrimary) return
+    const now = performance.now()
+    st.lastTouchDownAt = now
+    const onPoint = api.points().find((h) => h.el === e.target)
+    const onHandle = api.handles().find((h) => h.el === e.target)
+    let tapPoint = null
+    if (onPoint) tapPoint = onPoint.p
+    else if (!onHandle) {
+      const hit = pick(e.clientX, e.clientY)
+      if (hit) {
+        if (hit.kind === 'point') tapPoint = hit.p
+        st.redispatching = true
+        try {
+          hit.el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, clientX: e.clientX, clientY: e.clientY, pointerId: e.pointerId, pointerType: 'touch', isPrimary: true, button: 0, buttons: 1 }))
+        } finally { st.redispatching = false }
+        e.stopPropagation()
+        e.preventDefault()
+      }
+    }
+    st.down = { x: e.clientX, y: e.clientY, t: now, p: tapPoint }
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onUp)
+  }, true)
+  return {
+    // true when the click that follows a touch must NOT add a node
+    blocksAdd(clickEv) {
+      const now = performance.now()
+      if (now < st.suppressClickUntil) return true
+      if (!(clickEv.pointerType === 'touch' || now - st.lastTouchDownAt < 800)) return false
+      return !!pick(clickEv.clientX, clickEv.clientY)
+    }
+  }
+}
 function buildArmLengthCurveWidget(row) {
   const input = row.querySelector('.dp-text-input')
   if (!input) return
@@ -11727,6 +11812,7 @@ function buildArmLengthCurveWidget(row) {
   const CURVE_SAMPLES = 48
   let handleEls = []
   let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
+  let pointHits = [], allHandleHits = [] // every node circle / every handle square (real or preview), rebuilt by redraw(): the touch assist (attachCurveTouchAssist) looks here
   // Same bezier-handle mechanism as buildGenericCurveWidget() -- see that
   // function's own comment for the full gesture/data-format account.
   const HANDLE_REMOVE_THRESHOLD_PX = 6
@@ -11768,6 +11854,8 @@ function buildArmLengthCurveWidget(row) {
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
     handleHits = []
+    pointHits = []
+    allHandleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -11790,6 +11878,7 @@ function buildArmLengthCurveWidget(row) {
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
         if (isReal) handleHits.push({ marker, p, i, kind })
+        allHandleHits.push({ el: marker, p, kind, real: isReal })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -11798,6 +11887,7 @@ function buildArmLengthCurveWidget(row) {
       hit.setAttribute('cx', px.x); hit.setAttribute('cy', px.y); hit.setAttribute('r', CURVE_HIT_RADIUS_PX)
       hit.setAttribute('fill', 'transparent')
       Object.assign(hit.style, { cursor: 'grab' })
+      pointHits.push({ el: hit, p })
       let dragged = false
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
@@ -11836,13 +11926,7 @@ function buildArmLengthCurveWidget(row) {
         window.addEventListener('pointermove', onMove)
         window.addEventListener('pointerup', onUp)
       })
-      function deletePointIfRemovable() {
-        if (points.length > 2 && i !== 0 && i !== points.length - 1) {
-          points.splice(points.indexOf(p), 1)
-          redraw()
-          commitPoints()
-        }
-      }
+      function deletePointIfRemovable() { removePointObj(p) }
       hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
         deletePointIfRemovable()
@@ -11867,8 +11951,17 @@ function buildArmLengthCurveWidget(row) {
       circles.push(dot)
     })
   }
+  function pointRemovable(p) { const idx = points.indexOf(p); return points.length > 2 && idx > 0 && idx < points.length - 1 }
+  function removePointObj(p) {
+    if (!pointRemovable(p)) return
+    points.splice(points.indexOf(p), 1)
+    redraw()
+    commitPoints()
+  }
+  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable })
   svg.addEventListener('click', (clickEv) => {
     if (clickEv.target.tagName === 'circle') return
+    if (touchAssist.blocksAdd(clickEv)) return // a tap near a node / handle grabs or deletes it, it never adds one
     const rect = svg.getBoundingClientRect()
     const np = fromPx(clickEv.clientX - rect.left, clickEv.clientY - rect.top)
     if (np.x <= 0 || np.x >= 1) return // keep the domain-spanning endpoints unique
@@ -12055,6 +12148,7 @@ function buildWristSplayCurveWidget(row) {
   const CURVE_SAMPLES = 48
   let handleEls = []
   let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
+  let pointHits = [], allHandleHits = [] // every node circle / every handle square (real or preview), rebuilt by redraw(): the touch assist (attachCurveTouchAssist) looks here
   const HANDLE_REMOVE_THRESHOLD_PX = 6
   const CURVE_HIT_RADIUS_PX = 16
   function startHandleDrag(p, i, kind, downEv) {
@@ -12094,6 +12188,8 @@ function buildWristSplayCurveWidget(row) {
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
     handleHits = []
+    pointHits = []
+    allHandleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -12116,6 +12212,7 @@ function buildWristSplayCurveWidget(row) {
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
         if (isReal) handleHits.push({ marker, p, i, kind })
+        allHandleHits.push({ el: marker, p, kind, real: isReal })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -12124,6 +12221,7 @@ function buildWristSplayCurveWidget(row) {
       hit.setAttribute('cx', px.x); hit.setAttribute('cy', px.y); hit.setAttribute('r', CURVE_HIT_RADIUS_PX)
       hit.setAttribute('fill', 'transparent')
       Object.assign(hit.style, { cursor: 'grab' })
+      pointHits.push({ el: hit, p })
       let dragged = false
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
@@ -12162,13 +12260,7 @@ function buildWristSplayCurveWidget(row) {
         window.addEventListener('pointermove', onMove)
         window.addEventListener('pointerup', onUp)
       })
-      function deletePointIfRemovable() {
-        if (points.length > 2 && i !== 0 && i !== points.length - 1) {
-          points.splice(points.indexOf(p), 1)
-          redraw()
-          commitPoints()
-        }
-      }
+      function deletePointIfRemovable() { removePointObj(p) }
       hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
         deletePointIfRemovable()
@@ -12188,8 +12280,17 @@ function buildWristSplayCurveWidget(row) {
       circles.push(dot)
     })
   }
+  function pointRemovable(p) { const idx = points.indexOf(p); return points.length > 2 && idx > 0 && idx < points.length - 1 }
+  function removePointObj(p) {
+    if (!pointRemovable(p)) return
+    points.splice(points.indexOf(p), 1)
+    redraw()
+    commitPoints()
+  }
+  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable })
   svg.addEventListener('click', (clickEv) => {
     if (clickEv.target.tagName === 'circle') return
+    if (touchAssist.blocksAdd(clickEv)) return // a tap near a node / handle grabs or deletes it, it never adds one
     const rect = svg.getBoundingClientRect()
     const np = fromPx(clickEv.clientX - rect.left, clickEv.clientY - rect.top)
     if (np.x <= 0 || np.x >= 1) return
@@ -16286,6 +16387,7 @@ function buildGenericCurveWidget(row, opts) {
   const CURVE_SAMPLES = 48
   let handleEls = []
   let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
+  let pointHits = [], allHandleHits = [] // every node circle / every handle square (real or preview), rebuilt by redraw(): the touch assist (attachCurveTouchAssist) looks here
   // Bezier curve handles (direct spec item, this widget only -- the
   // project-specific Arm Length/Wrist Splay curve widgets are deliberately
   // separate copies, per their own comments, and are NOT extended here).
@@ -16347,6 +16449,8 @@ function buildGenericCurveWidget(row, opts) {
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
     handleHits = []
+    pointHits = []
+    allHandleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -16379,6 +16483,7 @@ function buildGenericCurveWidget(row, opts) {
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
         if (isReal) handleHits.push({ marker, p, i, kind })
+        allHandleHits.push({ el: marker, p, kind, real: isReal })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -16391,6 +16496,7 @@ function buildGenericCurveWidget(row, opts) {
       hit.setAttribute('cx', px.x); hit.setAttribute('cy', px.y); hit.setAttribute('r', CURVE_HIT_RADIUS_PX)
       hit.setAttribute('fill', 'transparent')
       Object.assign(hit.style, { cursor: 'grab' })
+      pointHits.push({ el: hit, p })
       let dragged = false
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
@@ -16429,13 +16535,7 @@ function buildGenericCurveWidget(row, opts) {
         window.addEventListener('pointermove', onMove)
         window.addEventListener('pointerup', onUp)
       })
-      function deletePointIfRemovable() {
-        if (points.length > 2 && i !== 0 && i !== points.length - 1) {
-          points.splice(points.indexOf(p), 1)
-          redraw()
-          commitPoints()
-        }
-      }
+      function deletePointIfRemovable() { removePointObj(p) }
       hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
         deletePointIfRemovable()
@@ -16455,8 +16555,17 @@ function buildGenericCurveWidget(row, opts) {
       circles.push(dot)
     })
   }
+  function pointRemovable(p) { const idx = points.indexOf(p); return points.length > 2 && idx > 0 && idx < points.length - 1 }
+  function removePointObj(p) {
+    if (!pointRemovable(p)) return
+    points.splice(points.indexOf(p), 1)
+    redraw()
+    commitPoints()
+  }
+  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable })
   svg.addEventListener('click', (clickEv) => {
     if (clickEv.target.tagName === 'circle') return
+    if (touchAssist.blocksAdd(clickEv)) return // a tap near a node / handle grabs or deletes it, it never adds one
     const rect = svg.getBoundingClientRect()
     const np = fromPx(clickEv.clientX - rect.left, clickEv.clientY - rect.top)
     if (np.x <= 0 || np.x >= 1) return
