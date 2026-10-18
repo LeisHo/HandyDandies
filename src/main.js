@@ -11,7 +11,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=92'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=93'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -2060,9 +2060,16 @@ function renestSubgroupRows(parentTitle, spec) {
   const body = fl && fl.querySelector(':scope > .dp-group-body')
   if (!body) return null
   let g = body.querySelector(':scope > .dp-group[data-key="' + spec.title + '"]')
-  if (!g) { g = createGroupElement(spec.title); body.appendChild(g) }
+  const flat = spec.keys.map((k) => body.querySelector(':scope > .dp-row[data-key="' + k + '"]')).filter(Boolean)
+  // 2026-10-18, direct report: "an empty Render Order group in Hand Field ... i moved the real group outside of it". This used to CREATE the group whenever it was missing, so once the user moved the real group out, an empty copy came back
+  // on every load (and a Save recorded it). The group is now created only when there are flat rows to put in it, and an EMPTY copy here is removed when a real one (with rows) lives elsewhere.
+  if (g && !flat.length && !g.querySelector('.dp-row')) {
+    const real = Array.from(document.querySelectorAll('.dp-group[data-key="' + spec.title + '"]')).find((x) => x !== g && x.querySelector('.dp-row'))
+    if (real) { g.remove(); return null }
+  }
+  if (!g) { if (!flat.length) return null; g = createGroupElement(spec.title); body.appendChild(g) }
   const gb = g.querySelector(':scope > .dp-group-body')
-  spec.keys.forEach((k) => { const row = body.querySelector(':scope > .dp-row[data-key="' + k + '"]'); if (row) gb.appendChild(row) })
+  flat.forEach((row) => gb.appendChild(row))
   return gb
 }
 function renestRenderOrderRows() {
@@ -17027,6 +17034,9 @@ function persistCustomClickFunctionIds() {
         if (parents.length) entry.parent = parents
         else delete entry.parent
         entry.collapsed = g.classList.contains('collapsed')
+        // The drag order (2026-10-18, direct report: "click function group order never saves, it reverts on refresh"). The saved list is in creation order and restore builds each function at the TOP of its group, so the order the user
+        // dragged them into was never recorded and every reload gave newest-first again. ord = this function's place among the function groups that share its container (0 = top), see the restore side.
+        entry.ord = Array.from(g.parentElement.children).filter((c) => c.dataset && c.dataset.customFunctionId).indexOf(g)
         { const t = cfg[`${entry.id}Type`]; if (t) entry.kind = kindForCustomFunctionType(t) } // never save a kind that disagrees with the function's Type
         // Every nested group (Offset, Rotation, Retransition ..., and a Multi Trigger's own) by its path inside this function; cv = 2 marks "recorded by this version" (older saves carried a stale function-level flag only).
         entry.sub = {}
@@ -18070,6 +18080,26 @@ async function restoreCustomClickFunctions() {
       }
       container.appendChild(fg)
     })
+    // Put the function groups back in the order they were saved in (see persistCustomClickFunctionIds()'s ord). They are re-placed into the slots the function groups already occupy, so groups the user made keep their positions.
+    // A function with no saved ord (added since the last save) counts as the top, which is where a new function is built. Nothing is reordered when no entry has an ord (a layout saved before this existed).
+    {
+      const ordOf = new Map(saved.filter((e) => e && e.id && Number.isFinite(e.ord)).map((e) => [e.id, e.ord]))
+      if (ordOf.size) {
+        const containers = new Set([anchorBody])
+        anchorBody.querySelectorAll('.dp-group[data-custom-function-id]').forEach((fg) => { if (fg.parentElement) containers.add(fg.parentElement) })
+        containers.forEach((container) => {
+          const kids = Array.from(container.children)
+          const fgs = kids.filter((k) => k.dataset && k.dataset.customFunctionId)
+          if (fgs.length < 2) return
+          const ordFor = (k) => (ordOf.has(k.dataset.customFunctionId) ? ordOf.get(k.dataset.customFunctionId) : -1)
+          const sorted = fgs.slice().sort((a, b) => ordFor(a) - ordFor(b))
+          const slots = new Set(fgs)
+          let n = 0
+          const placed = kids.map((k) => (slots.has(k) ? sorted[n++] : k))
+          placed.forEach((k) => container.appendChild(k))
+        })
+      }
+    }
     applyTextOverrides()
     saved.forEach((entry) => {
       const fg = entry && entry.id && anchorBody.querySelector(`.dp-group[data-custom-function-id="${entry.id}"]`)
@@ -18875,7 +18905,7 @@ async function reconcileMultiTriggers(id, wantJson) {
 // next click after that -- direct spec wording ("if there are none, when
 // i add one, its the tween for the 2nd click. The next one added will be
 // the 3rd").
-function addMultiTriggerTrigger(id, kind) {
+async function addMultiTriggerTrigger(id, kind) {
   let triggers = []
   try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
   if (!Array.isArray(triggers)) triggers = []
@@ -18900,7 +18930,13 @@ function addMultiTriggerTrigger(id, kind) {
   const realMtGroup = functionBody ? functionBody.querySelector(':scope > .dp-group[data-key="Multi Trigger"]') : null
   const mtBody = realMtGroup ? realMtGroup.querySelector(':scope > .dp-group-body') : null
   const addBtnRow = mtBody ? mtBody.querySelector(':scope > .dp-multi-trigger-add-row') : null
-  registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, id)
+  await registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, id)
+  // The new trigger starts fully collapsed: its group and every subgroup in it (2026-10-18, direct request: "by default set the group and its subgroups as all collapsed, it is currently all expanded"). Only this "+ Add Trigger" path;
+  // a trigger restored on page load keeps its own saved open / closed state.
+  if (mtBody) {
+    const ng = mtBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${prefix}"]`)
+    if (ng) { ng.classList.add('collapsed'); ng.querySelectorAll('.dp-group').forEach((sg) => sg.classList.add('collapsed')) }
+  }
   saveCurrentSettings()
 }
 // Reads the LIVE DOM order of this function's own trigger sub-groups and
