@@ -7614,6 +7614,11 @@ function offsetExtraControls(p, parseFn) {
     rows.push({ key: `${p}CursorOffset${ax}Curve`, label: `Cursor Offset ${ax} Curve (Distance -> Offset)`, type: 'text', def: linear, onChange: () => parseFn(p) })
     rows.push({ key: `${p}CursorOffset${ax}Range`, label: `Cursor Offset ${ax} Min / Max (World Units)`, type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
   })
+  // Clamp Distance from Cursor (2026-10-17, direct request): Cursor Offset mode only. A minimum distance from the cursor for every hand; Min = the minimum for the nearest hand ON SCREEN, Max = the minimum for the
+  // farthest hand on screen, the Curve shapes the steps in between (same nearest -> farthest domain as the Cursor Offset curves, "Visible Hands Only" included). See clampOffsetFromCursor().
+  rows.push({ key: `${p}CursorClampEnabled`, label: 'Clamp Distance From Cursor On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) })
+  rows.push({ key: `${p}CursorClampCurve`, label: 'Clamp Distance Curve (Distance From Cursor -> Minimum Distance)', type: 'text', def: linear, onChange: () => parseFn(p) })
+  rows.push({ key: `${p}CursorClampRange`, label: 'Clamp Min / Max Distance From Cursor (World Units)', type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
   rows.push({ key: `${p}CameraOffsetEnabled`, label: 'Offset To Camera On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) })
   rows.push({ key: `${p}CameraOffsetVisibleOnly`, label: 'Offset To Camera Curves: Visible Hands Only', type: 'checkbox', def: true }) // see the other Visible Hands Only rows
   ;['X', 'Y', 'Z'].forEach((ax) => {
@@ -12151,6 +12156,10 @@ const clickHoldPoseTriggers = Object.fromEntries([...CLICK_HOLD_KEYS, ...LEGACY_
 const OFFSET_LINEAR_CURVE = [{ x: 0, y: 0 }, { x: 1, y: 1 }]
 function parseOffsetAxisCurves(t, p) {
   if (!t.offsetAxis) t.offsetAxis = { cursor: {}, camera: {} }
+  if (!t.cursorClampCurveParsed) t.cursorClampCurveParsed = OFFSET_LINEAR_CURVE
+  if (!t.cursorClampRangeParsed) t.cursorClampRangeParsed = { min: 0, max: 0 }
+  try { t.cursorClampCurveParsed = JSON.parse(cfg[`${p}CursorClampCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.cursorClampRangeParsed = JSON.parse(cfg[`${p}CursorClampRange`]) } catch (e) { /* keep last-good value */ }
   ;[['cursor', 'CursorOffset'], ['camera', 'CameraOffset']].forEach(([bucket, prefix]) => {
     ;['X', 'Y', 'Z'].forEach((ax) => {
       const slot = t.offsetAxis[bucket][ax] || (t.offsetAxis[bucket][ax] = { curve: OFFSET_LINEAR_CURVE, range: { min: 0, max: 0 } })
@@ -12603,6 +12612,29 @@ function handXYDist(hand) {
 // (right+up only, then all 3) -- every caller reads a plain `{x,y,z}`
 // object regardless of mode; XYZ Offset mode has no Z control of its
 // own, so its own `z` is always 0.
+// Clamp Distance from Cursor (2026-10-17, direct request: "a minimum distance from the cursor for every hand ... if offset to cursor is for a click hold, with a minimum distance clamp the hand will stay at the minimum distance
+// even if I continue holding my click"). The offset vector above is shortened (never redirected) so the hand does not END closer to the cursor than its minimum distance, measured the way every click-function distance is
+// (screen space, world units at the field plane - cursorDistXY()). The minimum for a hand is the Min..Max range through the Curve, over the same nearest -> farthest on-screen-hand domain as the other Cursor Offset curves.
+// The start point is the hand's REST position plus its accumulated offset (hand._customOffsetAccum, the earlier laps of a held loop / earlier functions), so: lap after lap the hand closes in until it reaches the minimum, and
+// from then on every lap adds nothing - it stays at the minimum for as long as the click is held. It does not depend on the offset it produces (same reason the Distance Curve measures from the rest position), so the live
+// ramp and both bake paths read the identical value. A hand that is ALREADY closer than its minimum (the cursor came to it) is only stopped from moving closer, it is not pushed away. Moving away from the cursor is never limited.
+const _clampBase = new THREE.Vector3(), _clampPt = new THREE.Vector3()
+function clampOffsetFromCursor(hand, p, trig, off) {
+  if (!cfg[`${p}CursorClampEnabled`] || !trig || !trig.cursorClampRangeParsed) return off
+  const rng = trig.cursorClampRangeParsed
+  if (!(rng.min > 0 || rng.max > 0)) return off // the default 0..0 range: no minimum
+  const dmin = curveByRestDomain(p, handRestDist(hand), trig.cursorClampCurveParsed || OFFSET_LINEAR_CURVE, rng)
+  if (!(dmin > 0)) return off
+  _clampBase.copy(handRestPoint(hand))
+  const acc = hand._customOffsetAccum
+  if (acc) _clampBase.addScaledVector(_offsetRightVec, acc.x).addScaledVector(_offsetUpVec, acc.y).addScaledVector(_offsetForwardVec, acc.z)
+  const target = Math.min(dmin, cursorDistXY(_clampBase))
+  const distAt = (k) => cursorDistXY(_clampPt.copy(_clampBase).addScaledVector(_offsetRightVec, off.x * k).addScaledVector(_offsetUpVec, off.y * k).addScaledVector(_offsetForwardVec, off.z * k))
+  if (distAt(1) >= target) return off
+  let lo = 0, hi = 1 // distAt(lo) >= target, distAt(hi) < target
+  for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; if (distAt(mid) >= target) lo = mid; else hi = mid }
+  return { x: off.x * lo, y: off.y * lo, z: off.z * lo }
+}
 function computeOffsetXY(hand, p) {
   if (cfg[`${p}OffsetMode`] === 'Cursor Offset') {
     // CORRECTED 2026-10-01, direct report: "the offset cursor is the
@@ -12654,7 +12686,7 @@ function computeOffsetXY(hand, p) {
       exY = evalOffsetAxisSlot(axisSlots.Y, handDist, p)
       exZ = evalOffsetAxisSlot(axisSlots.Z, handDist, p)
     }
-    return { x: (rightComp / len3) * (dist + exX), y: (upComp / len3) * (dist + exY), z: (forwardComp / len3) * (dist + exZ) }
+    return clampOffsetFromCursor(hand, p, trig, { x: (rightComp / len3) * (dist + exX), y: (upComp / len3) * (dist + exY), z: (forwardComp / len3) * (dist + exZ) })
   }
   if (cfg[`${p}OffsetMode`] === 'Hand Axes Offset') {
     // Hand Axes Offset (2026-10-04, direct request: "a 3rd mode. It will use
@@ -16378,6 +16410,11 @@ function buildClickHoldPoseWidgets(p) {
   const cursorOffsetRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurveRange"]`)
   if (cursorOffsetCurveRow) buildGenericCurveWidget(cursorOffsetCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Offset Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (cursorOffsetRangeRow) buildGenericRangeBarWidget(cursorOffsetRangeRow, { trackMin: -50, trackMax: 50, unit: 'wu', defaultValue: { min: -50, max: 50 } })
+  // Clamp Distance from Cursor (2026-10-17): curve + Min / Max range bar
+  const clampCurveRow = document.querySelector(`.dp-row[data-key="${p}CursorClampCurve"]`)
+  const clampRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorClampRange"]`)
+  if (clampCurveRow) buildGenericCurveWidget(clampCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Minimum Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (clampRangeRow) buildGenericRangeBarWidget(clampRangeRow, { trackMin: 0, trackMax: 200, unit: 'wu', defaultValue: { min: 0, max: 0 } })
 }
 // Runs now, not back up near the other widgets' own setup calls (parse-
 // ArmLengthConfig()/buildWristSplayWidgets() etc.) -- this needs
@@ -16450,6 +16487,11 @@ function buildClickPoseWidgets(p) {
   const cursorOffsetRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorOffsetDistanceCurveRange"]`)
   if (cursorOffsetCurveRow) buildGenericCurveWidget(cursorOffsetCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Offset Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   if (cursorOffsetRangeRow) buildGenericRangeBarWidget(cursorOffsetRangeRow, { trackMin: -50, trackMax: 50, unit: 'wu', defaultValue: { min: -50, max: 50 } })
+  // Clamp Distance from Cursor (2026-10-17): curve + Min / Max range bar
+  const clampCurveRow = document.querySelector(`.dp-row[data-key="${p}CursorClampCurve"]`)
+  const clampRangeRow = document.querySelector(`.dp-row[data-key="${p}CursorClampRange"]`)
+  if (clampCurveRow) buildGenericCurveWidget(clampCurveRow, { caption: 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Minimum Distance Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (clampRangeRow) buildGenericRangeBarWidget(clampRangeRow, { trackMin: 0, trackMax: 200, unit: 'wu', defaultValue: { min: 0, max: 0 } })
 }
 // -----------------------------------------------------------------------
 // Custom Click Functions (Phase 4) -- runtime-created pose triggers, both
@@ -17552,6 +17594,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   // template, but filled in now while touching this same object anyway.
   OffsetEnabled: false, OffsetX: 0, OffsetY: 0, OffsetMode: 'XYZ Offset', CursorOffsetDistance: 0,
   CursorOffsetDistanceCurveEnabled: false, CursorOffsetDistanceCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetDistanceCurveRange: '{"min":-50,"max":50}',
+  CursorClampEnabled: false, CursorClampCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorClampRange: '{"min":0,"max":0}',
   OffsetZ: 0, CameraOffsetEnabled: false, CameraOffsetXEnabled: true, CameraOffsetYEnabled: true, CameraOffsetZEnabled: true,
   CursorOffsetXCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CursorOffsetXRange: '{"min":0,"max":0}',
   CameraOffsetXCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', CameraOffsetXRange: '{"min":0,"max":10}',
@@ -18204,6 +18247,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'EasingCurveEnabled', 'EasingCurve', 'RetransitionEasingCurveEnabled', 'RetransitionEasingCurve',
   'OffsetEnabled', 'OffsetMode', 'OffsetX', 'OffsetY', 'CursorOffsetDistance',
   'CursorOffsetDistanceCurveEnabled', 'CursorOffsetDistanceCurve', 'CursorOffsetDistanceCurveRange',
+  'CursorClampEnabled', 'CursorClampCurve', 'CursorClampRange',
   'OffsetZ', 'CursorOffsetXCurve', 'CursorOffsetXRange', 'CursorOffsetYCurve', 'CursorOffsetYRange', 'CursorOffsetZCurve', 'CursorOffsetZRange',
   'CameraOffsetEnabled', 'CameraOffsetXEnabled', 'CameraOffsetYEnabled', 'CameraOffsetZEnabled', 'CameraOffsetXCurve', 'CameraOffsetXRange', 'CameraOffsetYCurve', 'CameraOffsetYRange', 'CameraOffsetZCurve', 'CameraOffsetZRange',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
@@ -19343,6 +19387,17 @@ function updateOffsetRotationVisibility(p) {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
     if (row) row.style.display = offsetOn && cursorMode && cursorCurveOn ? '' : 'none'
   })
+  const clampEnabledRow = document.querySelector(`.dp-row[data-key="${p}CursorClampEnabled"]`)
+  if (clampEnabledRow) {
+    const showClamp = offsetOn && cursorMode ? '' : 'none'
+    const clampGroupEl = clampEnabledRow.classList.contains('dp-group-gate-row') ? clampEnabledRow.closest('.dp-group') : null // wrapped into its own group yet?
+    if (clampGroupEl) clampGroupEl.style.display = showClamp
+    else clampEnabledRow.style.display = showClamp
+    ;['CursorClampCurve', 'CursorClampRange'].forEach((suffix) => {
+      const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
+      if (row) row.style.display = showClamp
+    })
+  }
   const rotationOn = !!cfg[`${p}RotationEnabled`]
   ;['RotationX', 'RotationY', 'RotationZ'].forEach((suffix) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${suffix}"]`)
@@ -19424,7 +19479,10 @@ function wrapClickFunctionGatedSubgroups(p) {
   // subgroup treatment as every other on/off curve below ("provide an
   // on off checkbox for each").
   wrapGatedSubgroup(`${p}EasingCurveEnabled`, [`${p}EasingCurve`], 'Easing')
-  wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetLoopRetransition`, `${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetVisibleOnly`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
+  const offsetGroup = wrapGatedSubgroup(`${p}OffsetEnabled`, [`${p}OffsetLoopRetransition`, `${p}OffsetMode`, `${p}OffsetX`, `${p}OffsetY`, `${p}OffsetZ`, `${p}CursorOffsetDistance`, `${p}CursorOffsetDistanceCurveEnabled`, `${p}CursorOffsetVisibleOnly`, `${p}CursorOffsetDistanceCurve`, `${p}CursorOffsetDistanceCurveRange`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CursorOffset${ax}Curve`, `${p}CursorOffset${ax}Range`])], 'Offset')
+  // Clamp Distance from Cursor: a toggleable group inside Offset (shown in Cursor Offset mode only, see updateOffsetRotationVisibility())
+  const clampGroup = wrapGatedSubgroup(`${p}CursorClampEnabled`, [`${p}CursorClampRange`, `${p}CursorClampCurve`], 'Clamp Distance from Cursor')
+  if (offsetGroup && clampGroup) offsetGroup.querySelector(':scope > .dp-group-body').appendChild(clampGroup)
   // "Offset To Camera" (2026-10-02) -- its own mandatory gated subgroup,
   // independent of (and stackable with) "Offset" above.
   wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetLoopRetransition`, `${p}CameraOffsetVisibleOnly`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
