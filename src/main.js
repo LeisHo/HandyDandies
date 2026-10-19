@@ -313,6 +313,7 @@ const cameraPreviews = []
 let activeCameraPreviewId = null
 let cameraPreviewIdCounter = 0
 let cameraPreviewEngineReady = false // flipped true at the end of the Camera Preview engine block, once camera/controls/renderer exist
+let sceneNeedsRedraw = true // render-on-demand dirty flag (see setPaused()/animate()); declared HERE because devPanel's onAnyValueChange hook sets it during the startup restore, long before the old declaration far below ran (TDZ ReferenceError in the console, 2026-10-19)
 let cameraPreviewRedrawPending = false // read by animate() -> sceneNeedsRedraw, because that flag is declared far below this block
 let cameraPreviewStartupChecked = false // one-shot in animate(): creates the first panel if a saved On/Off=checked was restored before the engine was ready
 const _cameraPreviewRendererSize = new THREE.Vector2()
@@ -476,6 +477,7 @@ let sphereStage = 2 // 0 = waiting for the first click (floor only, hands hidden
 let sphereMesh = null, sphereOn = null, sphereStart = null, sphereDur = null, sphereCap = null, sphereDone = null // sphereDone[i] = 1 once sphere i has reached its target scale and position (Wait For All Spheres)
 const sphereParseCache = new Map()
 const STARTUP_FN = 'startupFn' // Hand Offset On Startup: a built-in, hidden-trigger pose-kind click function (prefix startupFn)
+let startupEarlyClick = false // a left click made after the field started but before the reveal finished (2026-10-19): remembered and applied by finalizeReveal() instead of being dropped
 let startupHandOffsetStage = 0, startupConsumeActive = false, startupConsumeUntil = 0 // 0 = waiting for the first click, 1 = the startup transition has been fired
 let sphereClickCount = 0, sphereKeepForHands = false // Field Grid Sphere Sequence: clicks that triggered spheres so far (Maximum Clicks); true while the spheres stay on screen until their own hand finishes its sequence
 let startupHandClickCount = 0, startupIgnoreStartDistance = false // Hand Offset On Startup: clicks that triggered hands so far (Maximum Clicks); true only while the over-the-limit click triggers every remaining hand
@@ -1481,6 +1483,7 @@ function finalizeReveal() {
   loadingEl.classList.add('hidden')
   updateLoadingPreviewText()
   document.body.classList.add('hd-revealed') // shows the Pause / Reset / Color Presets buttons (style.css hides them until now)
+  if (startupEarlyClick) { startupEarlyClick = false; setTimeout(() => { try { onStartupPointerDown({ button: 0, target: null }) } catch (err) { console.error('early startup click replay failed', err) } }, 0) } // the click that came too early
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
   // to disappear too) -- hide it UNLESS the live-preview toggle wants it
@@ -5125,10 +5128,11 @@ window.addEventListener('pointerdown', (e) => {
   lastPointerClientY = e.clientY
   try { updateCursorTarget() } catch (err) { /* scene not built yet */ }
 }, true)
-window.addEventListener('pointerdown', (e) => {
+function onStartupPointerDown(e) {
   if (e.button !== 0) return
   if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
-  if (!hands.length || !fieldRevealed) return
+  // The field has started but its reveal (two painted frames, which can take seconds on a big field) is not finished: the startup sequence cannot begin under the loading screen, so remember the click and replay it at the reveal.
+  if (!hands.length || !fieldRevealed) { if (hands.length && fieldStarted) startupEarlyClick = true; return }
   if (sphereSeqActive()) {
     startupConsumeActive = true
     advanceSphereSequence() // Field Grid Sphere Sequence comes first
@@ -5147,7 +5151,8 @@ window.addEventListener('pointerdown', (e) => {
   }
   // Wait For All Hands: the click is consumed until every visible hand has finished its own startup sequence.
   if (cfg.startupHandWaitForAll && !allVisibleHandsFinished()) startupConsumeActive = true
-}, true)
+}
+window.addEventListener('pointerdown', onStartupPointerDown, true)
 window.addEventListener('pointerup', () => {
   if (!startupConsumeActive) return
   startupConsumeActive = false
@@ -21336,7 +21341,7 @@ let lastPausedRenderMs = 0
 // point of this fix. A ~2000ms safety-net backstop (see animate()) still
 // forces an occasional redraw regardless, in case some future change
 // mutates the scene without going through either trigger above.
-let sceneNeedsRedraw = true
+// (sceneNeedsRedraw is declared in the early-state block at the top of the file)
 function nowVirtual() { return performance.now() - pauseOffsetMs }
 function setPaused(v) {
   if (v === isPaused) return
