@@ -355,72 +355,6 @@
       "loadingPreviewCameraSelector": "LOADING - 6 - DESKTOP - -65",
       "loadingPreviewSavedLighting": [
         {
-          "name": "3 Tone - SideFront",
-          "keyAzimuth": 17.010857122769437,
-          "keyElevation": 27.190029901779756,
-          "keyTargetHeight": -100,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "2 Tone - Direct Pink",
-          "keyAzimuth": 78.70865048866568,
-          "keyElevation": 79.67096630799902,
-          "keyTargetHeight": 106,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "2 Tone - Flabbehind",
-          "keyAzimuth": 280.9410677209048,
-          "keyElevation": -6.826531558878648,
-          "keyTargetHeight": -100,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "LOADING",
-          "keyAzimuth": 356.21319163101424,
-          "keyElevation": 3.2318502030355973,
-          "keyTargetHeight": 106,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "LOADING HANDS",
-          "keyAzimuth": 52,
-          "keyElevation": 0,
-          "keyTargetHeight": 106,
-          "keyIntensity": 3.6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "Loading Preview Lighting 6",
-          "keyAzimuth": 71,
-          "keyElevation": -29.999999999999996,
-          "keyTargetHeight": -100,
-          "keyIntensity": 5.1,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
           "name": "LOADING 1",
           "keyAzimuth": 30,
           "keyElevation": 12.999999999999998,
@@ -484,14 +418,27 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "LOADING 6 -65",
+          "keyAzimuth": 331,
+          "keyElevation": 29.999999999999996,
+          "keyTargetHeight": 395,
+          "keyIntensity": 6,
+          "keyColor": "#ffffff",
+          "keyLightType": "Directional",
+          "keyDistance": 4,
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
-      "loadingPreviewLightingSelector": "LOADING 3",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewLightingSelector": "LOADING 6 -65",
+      "loadingPreviewKeyAzimuth": 331,
+      "loadingPreviewKeyElevation": 29.999999999999996,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 395,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -16127,72 +16074,6 @@
       "loadingPreviewCameraSelector": "LOADING 4 - MOBILE",
       "loadingPreviewSavedLighting": [
         {
-          "name": "3 Tone - SideFront",
-          "keyAzimuth": 17.010857122769437,
-          "keyElevation": 27.190029901779756,
-          "keyTargetHeight": -100,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "2 Tone - Direct Pink",
-          "keyAzimuth": 78.70865048866568,
-          "keyElevation": 79.67096630799902,
-          "keyTargetHeight": 106,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "2 Tone - Flabbehind",
-          "keyAzimuth": 280.9410677209048,
-          "keyElevation": -6.826531558878648,
-          "keyTargetHeight": -100,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "LOADING",
-          "keyAzimuth": 356.21319163101424,
-          "keyElevation": 3.2318502030355973,
-          "keyTargetHeight": 106,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "LOADING HANDS",
-          "keyAzimuth": 52,
-          "keyElevation": 0,
-          "keyTargetHeight": 106,
-          "keyIntensity": 3.6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "Loading Preview Lighting 6",
-          "keyAzimuth": 71,
-          "keyElevation": -29.999999999999996,
-          "keyTargetHeight": -100,
-          "keyIntensity": 5.1,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
           "name": "LOADING 1",
           "keyAzimuth": 30,
           "keyElevation": 12.999999999999998,
@@ -16256,14 +16137,27 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "LOADING 6 -65",
+          "keyAzimuth": 331,
+          "keyElevation": 29.999999999999996,
+          "keyTargetHeight": 395,
+          "keyIntensity": 6,
+          "keyColor": "#ffffff",
+          "keyLightType": "Directional",
+          "keyDistance": 4,
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 3",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 331,
+      "loadingPreviewKeyElevation": 29.999999999999996,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 395,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -31899,72 +31793,6 @@
       "loadingPreviewCameraSelector": "LOADING - 6 - DESKTOP - -65",
       "loadingPreviewSavedLighting": [
         {
-          "name": "3 Tone - SideFront",
-          "keyAzimuth": 17.010857122769437,
-          "keyElevation": 27.190029901779756,
-          "keyTargetHeight": -100,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "2 Tone - Direct Pink",
-          "keyAzimuth": 78.70865048866568,
-          "keyElevation": 79.67096630799902,
-          "keyTargetHeight": 106,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "2 Tone - Flabbehind",
-          "keyAzimuth": 280.9410677209048,
-          "keyElevation": -6.826531558878648,
-          "keyTargetHeight": -100,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "LOADING",
-          "keyAzimuth": 356.21319163101424,
-          "keyElevation": 3.2318502030355973,
-          "keyTargetHeight": 106,
-          "keyIntensity": 6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "LOADING HANDS",
-          "keyAzimuth": 52,
-          "keyElevation": 0,
-          "keyTargetHeight": 106,
-          "keyIntensity": 3.6,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
-          "name": "Loading Preview Lighting 6",
-          "keyAzimuth": 71,
-          "keyElevation": -29.999999999999996,
-          "keyTargetHeight": -100,
-          "keyIntensity": 5.1,
-          "keyColor": "#ffffff",
-          "ambientIntensity": 0,
-          "ambientSkyColor": "#ffffff",
-          "ambientGroundColor": "#3a2f2a"
-        },
-        {
           "name": "LOADING 1",
           "keyAzimuth": 30,
           "keyElevation": 12.999999999999998,
@@ -32028,14 +31856,27 @@
           "ambientIntensity": 0,
           "ambientSkyColor": "#ffffff",
           "ambientGroundColor": "#3a2f2a"
+        },
+        {
+          "name": "LOADING 6 -65",
+          "keyAzimuth": 331,
+          "keyElevation": 29.999999999999996,
+          "keyTargetHeight": 395,
+          "keyIntensity": 6,
+          "keyColor": "#ffffff",
+          "keyLightType": "Directional",
+          "keyDistance": 4,
+          "ambientIntensity": 0,
+          "ambientSkyColor": "#ffffff",
+          "ambientGroundColor": "#3a2f2a"
         }
       ],
-      "loadingPreviewLightingSelector": "LOADING 3",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewLightingSelector": "LOADING 6 -65",
+      "loadingPreviewKeyAzimuth": 331,
+      "loadingPreviewKeyElevation": 29.999999999999996,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 395,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -48164,7 +48005,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -49325,7 +49166,7 @@
           "type": "group",
           "group": {
             "key": "Tween",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
