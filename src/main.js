@@ -10408,6 +10408,9 @@ function setupLoadingPreviewEasingGroup() {
 // the selected sequence's own poses, nothing else -- no default-pose
 // anchor at either end.
 function updateLoadingPreviewAnimation() {
+  // The End Sequence is over but the loading screen is still up until the field has painted (finalizeReveal): hold the hand on the pose the End Sequence ended on instead of falling back into the normal loading animation,
+  // which restarted from its first pose for that last half second (2026-10-19, direct report). Only the Real Time Loading wrist crop keeps following. (The live preview resets the End Sequence itself, and runs after the reveal.)
+  if (endSeq.phase === 'done' && !fieldRevealed) { endSeqKeepCrop(); return }
   if (endSeq.phase !== 'off' && endSeq.phase !== 'done') {
     try { if (updateLoadingPreviewEndSequence()) return } catch (err) { console.error('End Sequence frame threw -- ending it:', err); endSeqFinish('error: ' + (err && err.message)) }
   }
