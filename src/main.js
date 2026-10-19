@@ -10669,7 +10669,7 @@ function endSeqFinish(reason) {
   clearTimeout(endSeq.timer)
   endSeq.phase = 'done'
   endSeq.finished = true
-  logLoadingPreview('End Sequence finished (' + reason + ') -- the field starts')
+  logLoadingPreview('End Sequence finished (' + reason + ') -- ' + (fieldStarted ? 'the live preview starts its loading cycle again' : 'the field starts'))
   tryStartField()
 }
 function lpEndEntries(seqObj, second) {
@@ -10786,7 +10786,9 @@ function endSeqReset() {
 // The main loading animation runs for Min Loading Time (its crop follows lpLiveCycle.progress, 0 -> 1 over that time), then the End Sequence is started exactly as at the real startup (it first finishes the main animation's current
 // lap), and when it is done everything starts over. With the End Sequence off nothing changes: the live preview just keeps looping as before.
 function lpLiveCycleStep(now) {
-  const on = lpLiveOn() && !!cfg.loadingPreviewEndEnabled && !!lpEndSeqObj() && !!loadingPreviewHand
+  // The cycle (progress 0 -> 100 % over Min Loading Time, the loading animation finished on its last pose, then the End Sequence if it is on, then again) runs for any playable loading animation, so the Progress Crop / Real Time Loading
+  // crop loops in the live preview with or without the End Sequence (2026-10-19, direct report: the live preview did not loop the progressive crop).
+  const on = lpLiveOn() && !!loadingPreviewHand && ((!!cfg.loadingPreviewEndEnabled && !!lpEndSeqObj()) || lpLoadingAnimPlayable())
   if (!on) { lpLiveCycle.active = false; return }
   if (!lpLiveCycle.active) { lpLiveCycle.active = true; lpLiveCycle.t0 = now; lpLiveCycle.progress = 0; endSeqReset(); lpRestartMainAnimation(now); logLoadingPreview('live preview: running the loading cycle (main animation for Min Loading Time, then the End Sequence, then again)') }
   const minMs = Math.max(cfg.loadingMinTimeMs || 0, 1)
@@ -22402,7 +22404,7 @@ function animate(dt, now) {
     const __pausedRenderIntervalMs = 1000 / Math.max(1, cfg.pausedRenderFps ?? 15)
     const __pausedSafetyNetIntervalMs = 2000
     const __sinceLastPausedRender = __nowForRender - lastPausedRenderMs
-    const __shouldRenderThisFrame = !endSeqHolding() && (!isPaused
+    const __shouldRenderThisFrame = !(endSeqHolding() && !fieldStarted) && (!isPaused
       || (sceneNeedsRedraw && __sinceLastPausedRender >= __pausedRenderIntervalMs)
       || __sinceLastPausedRender >= __pausedSafetyNetIntervalMs)
     if (__shouldRenderThisFrame) {
