@@ -566,6 +566,33 @@ body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:n
   border: 1px solid #3a3a4a; border-radius: 4px; padding: 3px 4px; font-size: var(--dp-body-font-size, 11px);
 }
 .dp-multi-select-row .dp-action-button { flex: 0 0 auto; }
+/* Collapsible grouped dropdown (buildGroupedDropdown, 2026-10-19) -- an
+   alternative to the plain native <select> above for a row whose options
+   are grouped; panel renders IN-FLOW directly below the trigger, never
+   floating/absolutely-positioned, so it can't be clipped by the dev
+   panel's own scrollable ancestors. .dp-grouped-dropdown-body indenting
+   itself (not just its direct -option children) is what makes nesting
+   compound correctly at any depth, since a body nests inside another
+   body one level per subgroup. */
+.dp-multi-select-row .dp-grouped-dropdown { flex: 1 1 auto; min-width: 0; }
+.dp-grouped-dropdown { display: flex; flex-direction: column; }
+.dp-grouped-dropdown-trigger {
+  width: 100%; text-align: left; background: #0f0f18; color: var(--dp-text-color, #e8e8f0);
+  border: 1px solid #3a3a4a; border-radius: 4px; padding: 3px 4px; font-size: var(--dp-body-font-size, 11px);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;
+}
+.dp-grouped-dropdown-panel {
+  margin-top: 2px; background: #0f0f18; border: 1px solid #3a3a4a; border-radius: 4px;
+  max-height: 220px; overflow-y: auto;
+}
+.dp-grouped-dropdown-option, .dp-grouped-dropdown-header {
+  padding: 3px 6px; font-size: var(--dp-body-font-size, 11px); color: var(--dp-text-color, #e8e8f0);
+  cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dp-grouped-dropdown-option:hover, .dp-grouped-dropdown-header:hover { background: #24243a; }
+.dp-grouped-dropdown-header { display: flex; gap: 4px; align-items: center; font-weight: 600; }
+.dp-grouped-dropdown-header .arrow { flex: 0 0 auto; font-size: 9px; }
+.dp-grouped-dropdown-body { padding-left: 14px; }
 .dp-ms-row-handle { flex: 0 0 auto; cursor: grab; color: #666; touch-action: none; padding: 0 2px; }
 .dp-ms-row-handle:active { cursor: grabbing; }
 .dp-multi-select-row.dp-dragging { opacity: .4; }

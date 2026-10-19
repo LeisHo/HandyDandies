@@ -562,6 +562,7 @@ function renderListPickerItemRow(entry, item) {
     checkbox.addEventListener('change', () => {
       if (checkbox.checked) entry.exportChecked.add(item)
       else entry.exportChecked.delete(item)
+      refreshExportCheckboxAncestors(row, entry)
     })
     row.appendChild(checkbox)
   }
@@ -668,9 +669,56 @@ function renameListPickerGroup(entry, path) {
   commit(entry.ctrl, entry.items)
   renderListPickerRows(entry)
 }
+// Group-level export checkbox (direct request 2026-10-19: "provide the
+// left side checkboxes for all groups as well. so i can select a group,
+// then export the whole group"). A group has no export state of its own
+// -- it's purely a derived tri-state view over every descendant item's
+// own entry.exportChecked membership (recursive, same path-prefix match
+// the group-delete cascade below now uses), so there's nothing new to
+// persist. Ported from the canonical TEMPLATE_DEV_PANEL.html (built there
+// first, live-verified with real PointerEvents, then adapted here via
+// HANDO's own already-ported version of the same feature).
+function lpItemsUnderGroup(entry, path) {
+  const prefix = path + LP_GROUP_PATH_SEP
+  return entry.items.filter((it) => it.group === path || (it.group && it.group.startsWith(prefix)))
+}
+function refreshGroupExportCheckbox(groupEl, entry) {
+  const cb = groupEl.querySelector(':scope > .dp-lp-group-header > .dp-lp-group-export-checkbox')
+  if (!cb) return
+  const items = lpItemsUnderGroup(entry, groupEl.__groupName)
+  const checkedCount = items.filter((it) => entry.exportChecked.has(it)).length
+  cb.indeterminate = checkedCount > 0 && checkedCount < items.length
+  cb.checked = items.length > 0 && checkedCount === items.length
+}
+// Walks every ANCESTOR group of a row/group that just changed (never the
+// element itself) so a parent's tri-state stays correct no matter how
+// deep the edit happened.
+function refreshExportCheckboxAncestors(el2, entry) {
+  let g = el2.parentElement ? el2.parentElement.closest('.dp-lp-group') : null
+  while (g) {
+    refreshGroupExportCheckbox(g, entry)
+    g = g.parentElement ? g.parentElement.closest('.dp-lp-group') : null
+  }
+}
 function buildGroupHeader(entry, path) {
   const header = el('div', 'dp-lp-group-header')
   header.appendChild(el('span', 'dp-lp-group-handle', { textContent: '⠿' }))
+  if (entry.ctrl.exportable) {
+    const exportCb = el('input', 'dp-lp-export-checkbox dp-lp-group-export-checkbox', { type: 'checkbox' })
+    exportCb.addEventListener('click', (e) => e.stopPropagation())
+    exportCb.addEventListener('change', () => {
+      const items = lpItemsUnderGroup(entry, path)
+      items.forEach((it) => { if (exportCb.checked) entry.exportChecked.add(it); else entry.exportChecked.delete(it) })
+      const groupEl = header.closest('.dp-lp-group')
+      groupEl.querySelectorAll('.dp-list-picker-row').forEach((r) => {
+        const rowCb = r.querySelector('.dp-lp-export-checkbox')
+        if (rowCb) rowCb.checked = exportCb.checked
+      })
+      groupEl.querySelectorAll('.dp-lp-group').forEach((g) => refreshGroupExportCheckbox(g, entry))
+      refreshExportCheckboxAncestors(groupEl, entry)
+    })
+    header.appendChild(exportCb)
+  }
   header.appendChild(el('span', 'arrow', { textContent: '▼' }))
   if (entry.ctrl.itemToggle) {
     const gcb = el('input', 'dp-lp-group-toggle', { type: 'checkbox' })
@@ -695,13 +743,27 @@ function buildGroupHeader(entry, path) {
     // group's members WITHOUT re-rendering the picker, which would leave
     // such a closure silently stale (confirmed live: removing a group
     // right after dragging a NEW item into it left that item still
-    // assigned to the just-"removed" group). Exact-path match only --
-    // removing "Parent" ungroups just Parent's own direct items, never
-    // cascades into a "Parent/Child" subgroup's own members.
-    entry.items.forEach((it) => { if (it.group === path) delete it.group })
-    entry.pendingGroups = (entry.pendingGroups || []).filter((p) => p !== path)
-    entry.groupOrder = (entry.groupOrder || []).filter((p) => p !== path)
+    // assigned to the just-"removed" group).
+    // FIXED 2026-10-19 -- this used to be an EXACT-path match only
+    // ("removing 'Parent' ungroups just Parent's own direct items, never
+    // cascades into a 'Parent/Child' subgroup's own members"), the exact
+    // same bug already found and fixed in the canonical template/
+    // HANDYSET on 2026-10-11 ("I grouped some items in a new group. I
+    // deleted an existing group. My new group gets deleted, and all the
+    // items inside it are ungrouped again" -- a nested subgroup dragged
+    // into the one being deleted kept a dangling path like
+    // "GroupB/New Group" with no real top-level parent, which the next
+    // render silently resurrects as a bare, collapsed, functionally
+    // invisible wrapper). Found during this round's own cross-project
+    // port, not from a fresh live report here -- fixed proactively rather
+    // than waiting for the same bug to be independently rediscovered in
+    // this project too.
+    const prefix = path + LP_GROUP_PATH_SEP
+    entry.items.forEach((it) => { if (it.group === path || (it.group && it.group.startsWith(prefix))) delete it.group })
+    entry.pendingGroups = (entry.pendingGroups || []).filter((p) => p !== path && !p.startsWith(prefix))
+    entry.groupOrder = (entry.groupOrder || []).filter((p) => p !== path && !p.startsWith(prefix))
     entry.collapsedGroups.delete(path)
+    Array.from(entry.collapsedGroups).forEach((p) => { if (p.startsWith(prefix)) entry.collapsedGroups.delete(p) })
     commit(entry.ctrl, entry.items)
     renderListPickerRows(entry)
   })
@@ -848,9 +910,15 @@ function renderListPickerRows(entry) {
       t.subs[subName].items.forEach((item) => subBody.appendChild(renderListPickerItemRow(entry, item)))
       sg.appendChild(subBody)
       body.appendChild(sg)
+      // Group export checkboxes are purely derived (never persisted) --
+      // refreshGroupExportCheckbox() reads straight from entry.items/
+      // exportChecked (no DOM query), so this is safe on a still-
+      // detached subtree.
+      if (entry.ctrl.exportable) refreshGroupExportCheckbox(sg, entry)
     })
     g.appendChild(body)
     entry.listEl.appendChild(g)
+    if (entry.ctrl.exportable) refreshGroupExportCheckbox(g, entry)
   })
   refreshListPickerToggles(entry)
 }
@@ -895,6 +963,115 @@ function normalizeOptions(ctrl) {
     }
   })
   return { values, groupOf, textOf }
+}
+// Custom collapsible-group dropdown, an alternative to fillSelectOptions()'s
+// own native <optgroup> rendering above for a control whose options are
+// grouped -- direct request 2026-10-19: "if there are nested groups, show
+// the groups as expandable instances within the drop down itself... I
+// dont want each item in the drop down to have its group names in its
+// row." A native <optgroup> (this file's own pre-existing answer to an
+// EARLIER, related request -- see normalizeOptions()'s own comment above)
+// shows a real, visually distinct group label and never puts it in an
+// item's own text either, but it's not foldable -- this small custom
+// widget is: a trigger button showing just the selected VALUE's own
+// label, and a panel that expands in-flow directly below it when clicked
+// (never floating/absolutely-positioned, so it can't get clipped by the
+// dev panel's own scrollable ancestors). Ungrouped options always show;
+// each group starts COLLAPSED behind its own header -- tap to expand just
+// that group. Supports NESTED subgroups to any depth via the exact same
+// "/"-joined LP_GROUP_PATH_SEP convention the list-picker control already
+// uses. Same options contract as fillSelectOptions() (reuses
+// normalizeOptions(ctrl) directly, so both stay consistent -- same
+// TDZ-safe try/catch inside that shared helper, same "preserve current
+// value if still valid, else fall back to the first option" check here).
+// Returns { el, value, setValue } -- `value` is the resolved initial
+// value; `onSelect(value)` fires only for a real, later, user-driven
+// pick, never during construction or an external setValue() call.
+function buildGroupedDropdown(ctrl, initialValue, onSelect) {
+  const wrapper = el('div', 'dp-grouped-dropdown')
+  const trigger = el('button', 'dp-grouped-dropdown-trigger', { type: 'button' })
+  const panel = el('div', 'dp-grouped-dropdown-panel')
+  panel.hidden = true
+  wrapper.append(trigger, panel)
+
+  function labelFor(v, textOf) { return textOf.has(v) ? textOf.get(v) : v }
+  function setValue(v, textOf) {
+    wrapper.dataset.value = v || ''
+    trigger.textContent = v ? labelFor(v, textOf || normalizeOptions(ctrl).textOf) : '(none)'
+  }
+  function close() {
+    panel.hidden = true
+    document.removeEventListener('pointerdown', onOutsidePointerDown, true)
+  }
+  function onOutsidePointerDown(e) {
+    if (!wrapper.contains(e.target)) close()
+  }
+  function choose(v, textOf) {
+    setValue(v, textOf)
+    close()
+    onSelect(v)
+  }
+  // `node` = {items: [value,...], children: Map<leafSegment, node>} --
+  // recurses into children for nested subgroups, any depth.
+  function renderLevel(container, node, textOf) {
+    node.items.forEach((v) => {
+      const opt = el('div', 'dp-grouped-dropdown-option', { textContent: labelFor(v, textOf) })
+      opt.addEventListener('click', () => choose(v, textOf))
+      container.appendChild(opt)
+    })
+    node.children.forEach((childNode, leaf) => {
+      const arrow = el('span', 'arrow', { textContent: '▶' })
+      const header = el('div', 'dp-grouped-dropdown-header')
+      header.append(arrow, el('span', null, { textContent: leaf }))
+      const body = el('div', 'dp-grouped-dropdown-body')
+      body.hidden = true
+      header.addEventListener('click', (e) => {
+        e.stopPropagation()
+        body.hidden = !body.hidden
+        arrow.textContent = body.hidden ? '▶' : '▼'
+      })
+      renderLevel(body, childNode, textOf)
+      container.append(header, body)
+    })
+  }
+  function buildTree(values, groupOf) {
+    const root = { items: [], children: new Map() }
+    function ensureNode(segs) {
+      let node = root
+      segs.forEach((seg) => {
+        if (!node.children.has(seg)) node.children.set(seg, { items: [], children: new Map() })
+        node = node.children.get(seg)
+      })
+      return node
+    }
+    values.forEach((v) => {
+      const group = groupOf.get(v)
+      if (!group) { root.items.push(v); return }
+      ensureNode(group.split(LP_GROUP_PATH_SEP)).items.push(v)
+    })
+    return root
+  }
+  function renderPanel() {
+    panel.innerHTML = ''
+    const { values, groupOf, textOf } = normalizeOptions(ctrl)
+    renderLevel(panel, buildTree(values, groupOf), textOf)
+  }
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation()
+    if (panel.hidden) {
+      renderPanel()
+      panel.hidden = false
+      document.addEventListener('pointerdown', onOutsidePointerDown, true)
+    } else {
+      close()
+    }
+  })
+
+  const { values, textOf } = normalizeOptions(ctrl)
+  const resolved = values.includes(initialValue) ? initialValue : (values[0] || '')
+  setValue(resolved, textOf)
+
+  return { el: wrapper, value: resolved, setValue: (v) => setValue(v, normalizeOptions(ctrl).textOf) }
 }
 function fillSelectOptions(ctrl, select, preferredValue) {
   // `ctrl.options()` can be called from `displayValue()` during the
@@ -1049,19 +1226,23 @@ function renderMultiSelectRows(entry) {
       listEl.appendChild(rowEl)
       return
     }
-    const select = el('select')
-    values[i] = fillSelectOptions(ctrl, select, val)
-    select.addEventListener('change', () => {
-      values[i] = select.value
+    // Collapsible grouped dropdown (2026-10-19), replacing the plain
+    // native <select> this row used to build directly -- same reasoning
+    // as HANDO's own real precedent for this exact row shape (its own
+    // "Tween Poses (In Order)" multi-select rows), now generalized here
+    // to support nested groups too.
+    const dropdown = buildGroupedDropdown(ctrl, val, (v) => {
+      values[i] = v
       commit(ctrl, values.slice())
     })
+    values[i] = dropdown.value
     const removeBtn = el('button', 'dp-action-button', { type: 'button', textContent: 'Remove' })
     removeBtn.addEventListener('click', () => {
       values.splice(i, 1)
       commit(ctrl, values.slice())
       renderMultiSelectRows(entry)
     })
-    rowEl.append(handle, select, removeBtn)
+    rowEl.append(handle, dropdown.el, removeBtn)
     listEl.appendChild(rowEl)
   })
 }
@@ -1764,7 +1945,19 @@ function buildListPickerRow(ctrl, row) {
   }, () => syncListPickerFromDom(entry))
   setupReorder(listEl, 'dp-list-picker-row', 'dp-lp-row-handle',
     () => Array.from(listEl.querySelectorAll('.dp-lp-group-body, .dp-lp-ungrouped-body')),
-    () => syncListPickerFromDom(entry))
+    () => syncListPickerFromDom(entry), null, null, (item) => {
+      // Multi-select drag (direct request 2026-10-19: "if i select
+      // mulptiple items, then click and drag one of their icons to
+      // reorder, it will reorder all the selected items with it"). Only
+      // kicks in when the grabbed row's own item is itself part of a
+      // real (size > 1) multi-selection -- grabbing an UNselected row's
+      // handle while other rows happen to be selected still drags just
+      // that one row, matching how a plain click elsewhere already
+      // clears/reassigns the selection.
+      if (entry.multiSelected.size <= 1 || !entry.multiSelected.has(item.__item)) return [item]
+      const ordered = Array.from(listEl.querySelectorAll('.dp-list-picker-row'))
+      return ordered.filter((r) => entry.multiSelected.has(r.__item))
+    })
 }
 
 // Opens an inline rename editor in place of `displayEl`'s text (a group's
@@ -2293,8 +2486,20 @@ export function renderDynamicGroup(groupSpec) {
 // select rows, list-picker groups/rows, which have no analogous "other
 // type" to interleave with) omits it and keeps the original same-type-
 // only behavior, completely unaffected.
-function setupReorder(container, itemClass, handleClass, getTargets, onDrop, isLocked, siblingSelector) {
+// `getMoveGroup` (2026-10-19, list-picker rows only -- every other caller
+// omits it, so dragSet is always exactly [dragEl] there, making every
+// dragSet-based line below equivalent to the original single-item logic):
+// direct request "if i select multiple items, then click and drag one of
+// their icons to reorder, it will reorder all the selected items with
+// it." `dragEl` stays the single "anchor" the handle was grabbed on (used
+// for targets/locking exactly as before); `dragSet` is the full set that
+// actually moves, always including `dragEl`, in its captured relative DOM
+// order -- re-inserted in that same order on every crossing so a
+// multi-item drag never scrambles the selection's own ordering. Ported
+// from HANDO's own identical generalization of this shared function.
+function setupReorder(container, itemClass, handleClass, getTargets, onDrop, isLocked, siblingSelector, getMoveGroup) {
   let dragEl = null
+  let dragSet = []
   container.addEventListener('pointerdown', (e) => {
     const handle = e.target.closest('.' + handleClass)
     if (!handle) return
@@ -2306,7 +2511,9 @@ function setupReorder(container, itemClass, handleClass, getTargets, onDrop, isL
     if (isLocked && isLocked(item)) return
     e.preventDefault()
     dragEl = item
-    dragEl.classList.add('dp-dragging')
+    dragSet = (getMoveGroup ? getMoveGroup(item) : [item]).filter(Boolean)
+    if (!dragSet.includes(item)) dragSet.unshift(item)
+    dragSet.forEach((el) => el.classList.add('dp-dragging'))
     try { handle.setPointerCapture(e.pointerId) } catch (err) { /* best-effort only */ }
     const targets = getTargets ? getTargets(item) : [item.parentElement]
 
@@ -2343,20 +2550,25 @@ function setupReorder(container, itemClass, handleClass, getTargets, onDrop, isL
       // leaving the 2nd an unscoped `.dp-row` that matches anywhere in
       // the whole document, not just this container's direct children.
       const siblings = siblingSelector
-        ? Array.from(targetContainer.querySelectorAll(siblingSelector.split(',').map((s) => ':scope > ' + s.trim()).join(', '))).filter((c) => c !== dragEl)
-        : Array.from(targetContainer.children).filter((c) => c.classList.contains(itemClass) && c !== dragEl)
+        ? Array.from(targetContainer.querySelectorAll(siblingSelector.split(',').map((s) => ':scope > ' + s.trim()).join(', '))).filter((c) => !dragSet.includes(c))
+        : Array.from(targetContainer.children).filter((c) => c.classList.contains(itemClass) && !dragSet.includes(c))
       let placed = false
       for (const sib of siblings) {
         const r = sib.getBoundingClientRect()
-        if (ev.clientY < r.top + r.height / 2) { targetContainer.insertBefore(dragEl, sib); placed = true; break }
+        // Re-inserting dragSet in its captured relative order, one at a
+        // time, keeps that order intact: each subsequent insertBefore(el,
+        // sib) lands immediately after the previously-inserted element
+        // and before `sib` itself.
+        if (ev.clientY < r.top + r.height / 2) { dragSet.forEach((el) => targetContainer.insertBefore(el, sib)); placed = true; break }
       }
-      if (!placed) targetContainer.appendChild(dragEl)
+      if (!placed) dragSet.forEach((el) => targetContainer.appendChild(el))
     }
     function up(ev) {
       if (handle.hasPointerCapture(ev.pointerId)) handle.releasePointerCapture(ev.pointerId)
       const dropped = dragEl
-      if (dragEl) dragEl.classList.remove('dp-dragging')
+      dragSet.forEach((el) => el.classList.remove('dp-dragging'))
       dragEl = null
+      dragSet = []
       window.removeEventListener('pointermove', move)
       window.removeEventListener('pointerup', up)
       // Optional: lets a caller whose data model isn't just "DOM order" (the
