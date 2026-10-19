@@ -272,11 +272,15 @@
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - F",
+          "name": "2 Twids - 2H - F",
           "sequence": "Two-Hand Tween"
         },
         {
-          "name": "2 Twids",
+          "name": "2 Twids - 2H",
+          "sequence": "Two-Hand Tween"
+        },
+        {
+          "name": "2 T",
           "sequence": "Two-Hand Tween"
         }
       ],
@@ -22207,14 +22211,18 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 0,
-      "loadingPreviewTweenSelector": "Two-Hand Tween",
+      "loadingPreviewTweenSelector": "WAITING HORIZONTAL",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - F",
+          "name": "2 Twids - 2H - F",
           "sequence": "Two-Hand Tween"
         },
         {
-          "name": "2 Twids",
+          "name": "2 Twids - 2H",
+          "sequence": "Two-Hand Tween"
+        },
+        {
+          "name": "2 T",
           "sequence": "Two-Hand Tween"
         }
       ],
@@ -39346,7 +39354,7 @@
         }
       ],
       "cameraX": -3.422222222222221,
-      "cameraY": 9.942187632544766e-13,
+      "cameraY": 1.0853324851110394e-12,
       "cameraZ": 495.9881938061244,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -44148,11 +44156,15 @@
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - F",
+          "name": "2 Twids - 2H - F",
           "sequence": "Two-Hand Tween"
         },
         {
-          "name": "2 Twids",
+          "name": "2 Twids - 2H",
+          "sequence": "Two-Hand Tween"
+        },
+        {
+          "name": "2 T",
           "sequence": "Two-Hand Tween"
         }
       ],
@@ -74159,7 +74171,7 @@
       "left": 20,
       "top": 176.2678680419922,
       "width": 401.2857360839844,
-      "height": 490.3571472167969
+      "height": 494.9285888671875
     }
   }
 }
