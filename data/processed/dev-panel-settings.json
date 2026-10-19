@@ -267,7 +267,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingPreviewFloorEnabled": false,
       "loadingPreviewFloorZOffset": -1.35,
       "loadingMinTimeMs": 5000,
@@ -13590,7 +13590,8 @@
           "shoulderRotation": 0,
           "elbowBend": 18,
           "elbowSideBend": 10,
-          "forearmTwist": -14
+          "forearmTwist": -14,
+          "group": "2 TWIDS"
         },
         {
           "name": "2 TWIDS - F2 (2ND HAND)",
@@ -13682,15 +13683,6 @@
       "tweenPoses": [],
       "savedTweenSequences": [
         {
-          "name": "2 HANDS TWIDDLING",
-          "tweenPoses": [
-            "2 HAND TWIDDLING - 0",
-            "2 HAND TWIDDLING - 2.6",
-            "2 HAND TWIDDLING - 5",
-            "2 HAND TWIDDLING - 7.5"
-          ]
-        },
-        {
           "name": "WAVE",
           "tweenPoses": [
             "Wave 1 (NS)",
@@ -13700,7 +13692,8 @@
             "WAVE 5 (NS)",
             "WAVE 6 (NS)",
             "WAVE 5.5 (NS)"
-          ]
+          ],
+          "group": "WAVE"
         },
         {
           "name": "PALM FAN",
@@ -13845,7 +13838,8 @@
           "tweenPoses": [
             "2 TWIDS - 75",
             "2 TWIDS - F0",
-            "2 TWIDS - F1"
+            "2 TWIDS - F1",
+            "2 TWIDS - F2"
           ],
           "group": "2 TWIDS - 1ST HAND"
         },
@@ -13980,32 +13974,6 @@
             }
           ],
           "group": "LOADING/COUNTDOWN VERTICAL"
-        },
-        {
-          "name": "Wave",
-          "tweenPoses": [
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)",
-            "WAVE 3 (NS)",
-            "WAVE 4 (NS)",
-            "WAVE 5 (NS)",
-            "WAVE 6 (NS)",
-            "WAVE 5.5 (NS)",
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)"
-          ],
-          "group": "WAVE"
-        },
-        {
-          "name": "WAVE - NS",
-          "tweenPoses": [
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)",
-            "WAVE 3 (NS)",
-            "WAVE 5 (NS)",
-            "WAVE 6 (NS)"
-          ],
-          "group": "WAVE"
         },
         {
           "name": "COUNT R",
@@ -17583,7 +17551,7 @@
       "custom51Trig2RotationMode": "Rotation Around Cursor",
       "custom51Trig2TargetPose": "",
       "custom51Trig2SkipIfSamePose": false,
-      "custom51Trig2TweenSelector": "Wave",
+      "custom51Trig2TweenSelector": "WAVE",
       "custom51Trig2ReverseSequence": false,
       "custom51Trig2GlideToFirstPose": true,
       "custom51Trig2FirstGlideTimeScale": 2.45,
@@ -18035,7 +18003,7 @@
       "custom52Trig2RotationMode": "Rotation Around Cursor",
       "custom52Trig2TargetPose": "",
       "custom52Trig2SkipIfSamePose": false,
-      "custom52Trig2TweenSelector": "Wave",
+      "custom52Trig2TweenSelector": "WAVE",
       "custom52Trig2ReverseSequence": false,
       "custom52Trig2GlideToFirstPose": true,
       "custom52Trig2FirstGlideTimeScale": 2.45,
@@ -32321,7 +32289,8 @@
           "shoulderRotation": 0,
           "elbowBend": 18,
           "elbowSideBend": 10,
-          "forearmTwist": -14
+          "forearmTwist": -14,
+          "group": "2 TWIDS"
         },
         {
           "name": "2 TWIDS - F2 (2ND HAND)",
@@ -32413,15 +32382,6 @@
       "tweenPoses": [],
       "savedTweenSequences": [
         {
-          "name": "2 HANDS TWIDDLING",
-          "tweenPoses": [
-            "2 HAND TWIDDLING - 0",
-            "2 HAND TWIDDLING - 2.6",
-            "2 HAND TWIDDLING - 5",
-            "2 HAND TWIDDLING - 7.5"
-          ]
-        },
-        {
           "name": "WAVE",
           "tweenPoses": [
             "Wave 1 (NS)",
@@ -32431,7 +32391,8 @@
             "WAVE 5 (NS)",
             "WAVE 6 (NS)",
             "WAVE 5.5 (NS)"
-          ]
+          ],
+          "group": "WAVE"
         },
         {
           "name": "PALM FAN",
@@ -32576,7 +32537,8 @@
           "tweenPoses": [
             "2 TWIDS - 75",
             "2 TWIDS - F0",
-            "2 TWIDS - F1"
+            "2 TWIDS - F1",
+            "2 TWIDS - F2"
           ],
           "group": "2 TWIDS - 1ST HAND"
         },
@@ -32711,32 +32673,6 @@
             }
           ],
           "group": "LOADING/COUNTDOWN VERTICAL"
-        },
-        {
-          "name": "Wave",
-          "tweenPoses": [
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)",
-            "WAVE 3 (NS)",
-            "WAVE 4 (NS)",
-            "WAVE 5 (NS)",
-            "WAVE 6 (NS)",
-            "WAVE 5.5 (NS)",
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)"
-          ],
-          "group": "WAVE"
-        },
-        {
-          "name": "WAVE - NS",
-          "tweenPoses": [
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)",
-            "WAVE 3 (NS)",
-            "WAVE 5 (NS)",
-            "WAVE 6 (NS)"
-          ],
-          "group": "WAVE"
         },
         {
           "name": "COUNT R",
@@ -36314,7 +36250,7 @@
       "custom51Trig2RotationMode": "Rotation Around Cursor",
       "custom51Trig2TargetPose": "",
       "custom51Trig2SkipIfSamePose": false,
-      "custom51Trig2TweenSelector": "Wave",
+      "custom51Trig2TweenSelector": "WAVE",
       "custom51Trig2ReverseSequence": false,
       "custom51Trig2GlideToFirstPose": true,
       "custom51Trig2FirstGlideTimeScale": 2.45,
@@ -36766,7 +36702,7 @@
       "custom52Trig2RotationMode": "Rotation Around Cursor",
       "custom52Trig2TargetPose": "",
       "custom52Trig2SkipIfSamePose": false,
-      "custom52Trig2TweenSelector": "Wave",
+      "custom52Trig2TweenSelector": "WAVE",
       "custom52Trig2ReverseSequence": false,
       "custom52Trig2GlideToFirstPose": true,
       "custom52Trig2FirstGlideTimeScale": 2.45,
@@ -37729,7 +37665,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingPreviewFloorEnabled": false,
       "loadingPreviewFloorZOffset": -1.35,
       "loadingMinTimeMs": 5000,
@@ -51052,7 +50988,8 @@
           "shoulderRotation": 0,
           "elbowBend": 18,
           "elbowSideBend": 10,
-          "forearmTwist": -14
+          "forearmTwist": -14,
+          "group": "2 TWIDS"
         },
         {
           "name": "2 TWIDS - F2 (2ND HAND)",
@@ -51144,15 +51081,6 @@
       "tweenPoses": [],
       "savedTweenSequences": [
         {
-          "name": "2 HANDS TWIDDLING",
-          "tweenPoses": [
-            "2 HAND TWIDDLING - 0",
-            "2 HAND TWIDDLING - 2.6",
-            "2 HAND TWIDDLING - 5",
-            "2 HAND TWIDDLING - 7.5"
-          ]
-        },
-        {
           "name": "WAVE",
           "tweenPoses": [
             "Wave 1 (NS)",
@@ -51162,7 +51090,8 @@
             "WAVE 5 (NS)",
             "WAVE 6 (NS)",
             "WAVE 5.5 (NS)"
-          ]
+          ],
+          "group": "WAVE"
         },
         {
           "name": "PALM FAN",
@@ -51307,7 +51236,8 @@
           "tweenPoses": [
             "2 TWIDS - 75",
             "2 TWIDS - F0",
-            "2 TWIDS - F1"
+            "2 TWIDS - F1",
+            "2 TWIDS - F2"
           ],
           "group": "2 TWIDS - 1ST HAND"
         },
@@ -51442,32 +51372,6 @@
             }
           ],
           "group": "LOADING/COUNTDOWN VERTICAL"
-        },
-        {
-          "name": "Wave",
-          "tweenPoses": [
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)",
-            "WAVE 3 (NS)",
-            "WAVE 4 (NS)",
-            "WAVE 5 (NS)",
-            "WAVE 6 (NS)",
-            "WAVE 5.5 (NS)",
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)"
-          ],
-          "group": "WAVE"
-        },
-        {
-          "name": "WAVE - NS",
-          "tweenPoses": [
-            "Wave 1 (NS)",
-            "WAVE 2 (NS)",
-            "WAVE 3 (NS)",
-            "WAVE 5 (NS)",
-            "WAVE 6 (NS)"
-          ],
-          "group": "WAVE"
         },
         {
           "name": "COUNT R",
@@ -55045,7 +54949,7 @@
       "custom51Trig2RotationMode": "Rotation Around Cursor",
       "custom51Trig2TargetPose": "",
       "custom51Trig2SkipIfSamePose": false,
-      "custom51Trig2TweenSelector": "Wave",
+      "custom51Trig2TweenSelector": "WAVE",
       "custom51Trig2ReverseSequence": false,
       "custom51Trig2GlideToFirstPose": true,
       "custom51Trig2FirstGlideTimeScale": 2.45,
@@ -55497,7 +55401,7 @@
       "custom52Trig2RotationMode": "Rotation Around Cursor",
       "custom52Trig2TargetPose": "",
       "custom52Trig2SkipIfSamePose": false,
-      "custom52Trig2TweenSelector": "Wave",
+      "custom52Trig2TweenSelector": "WAVE",
       "custom52Trig2ReverseSequence": false,
       "custom52Trig2GlideToFirstPose": true,
       "custom52Trig2FirstGlideTimeScale": 2.45,
@@ -56856,7 +56760,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -56891,7 +56795,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -57249,7 +57153,7 @@
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -57403,7 +57307,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -58222,7 +58126,7 @@
           "type": "group",
           "group": {
             "key": "Tween",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
