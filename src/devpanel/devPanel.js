@@ -869,6 +869,12 @@ function renderListPickerRows(entry) {
     nodeFor(item.group).items.push(item)
   })
   ;(entry.pendingGroups || []).forEach((path) => { nodeFor(path) })
+  // Startup (2026-10-19, direct request: every item selector starts with ALL groups and nested groups collapsed): until the user first touches this picker, every group that exists - however it got here (the
+  // restore, a later host-driven refill, an import done by the code, empty groups) - is collapsed on every render. entry.userTouched is set by the first pointer press inside the picker.
+  if (!entry.userTouched) {
+    const addAll = (node, path) => node.kids.forEach((kid, seg) => { const p = path ? path + LP_GROUP_PATH_SEP + seg : seg; entry.collapsedGroups.add(p); addAll(kid, p) })
+    addAll(root, '')
+  }
   const topOrder = Array.from(root.kids.keys())
   // Re-sort top-level order by entry.groupOrder (added 2026-09-15, direct
   // request: "place the new group at the top of the list instead of the
@@ -1700,6 +1706,8 @@ function buildListPickerRow(ctrl, row) {
     lastPick: 'item' // 'item' | 'group': which kind the Rename button acts on
   }
   numEls[ctrl.key] = entry
+  // First press inside this picker ends its startup state (see renderListPickerRows): groups it gets later behave normally.
+  row.addEventListener('pointerdown', () => { entry.userTouched = true }, true)
 
   saveBtn.addEventListener('click', () => {
     const label = ctrl.itemLabel || 'Item'
