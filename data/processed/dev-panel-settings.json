@@ -14149,8 +14149,8 @@
         }
       ],
       "cameraX": 1.5625001668540397,
-      "cameraY": 5.931177203829529e-13,
-      "cameraZ": 0.5511601990296657,
+      "cameraY": 5.934179584706906e-13,
+      "cameraZ": 0.4838409275425015,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -56709,7 +56709,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -56805,7 +56805,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -57342,7 +57342,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -57353,7 +57353,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -57686,7 +57686,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -64515,8 +64515,8 @@
     "desktop": {
       "left": 122.375,
       "top": 69,
-      "width": 401.75,
-      "height": 575.3875122070312
+      "width": 404.95001220703125,
+      "height": 576.9874877929688
     }
   }
 }
