@@ -490,7 +490,7 @@
       "loadingPreviewEndReverse": false,
       "loadingPreviewEndGlide": true,
       "loadingPreviewEndGlideScale": 0.1,
-      "loadingPreviewEndSpeedMs": 2180,
+      "loadingPreviewEndSpeedMs": 1040,
       "loadingPreviewEndCount": 1,
       "loadingPreviewEndCountMode": "Loop",
       "loadingPreviewEndLoopTransition": false,
@@ -19200,7 +19200,7 @@
       "loadingPreviewEndReverse": false,
       "loadingPreviewEndGlide": true,
       "loadingPreviewEndGlideScale": 0.1,
-      "loadingPreviewEndSpeedMs": 2180,
+      "loadingPreviewEndSpeedMs": 1040,
       "loadingPreviewEndCount": 1,
       "loadingPreviewEndCountMode": "Loop",
       "loadingPreviewEndLoopTransition": false,
@@ -37910,7 +37910,7 @@
       "loadingPreviewEndReverse": false,
       "loadingPreviewEndGlide": true,
       "loadingPreviewEndGlideScale": 0.1,
-      "loadingPreviewEndSpeedMs": 2180,
+      "loadingPreviewEndSpeedMs": 1040,
       "loadingPreviewEndCount": 1,
       "loadingPreviewEndCountMode": "Loop",
       "loadingPreviewEndLoopTransition": false,
@@ -64508,9 +64508,9 @@
     },
     "mobile": {
       "left": 20,
-      "top": 397.83929443359375,
-      "width": 421.8571472167969,
-      "height": 372.6428527832031
+      "top": 516.1190795898438,
+      "width": 442.4285888671875,
+      "height": 263.4940490722656
     }
   }
 }
