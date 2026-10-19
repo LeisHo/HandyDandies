@@ -1165,19 +1165,21 @@ function lpSetupProgressCrop(h) {
     const wb = mesh.skeleton.getBoneByName('rHand'), tb = mesh.skeleton.getBoneByName('rMid3')
     if (wb && tb) { wb.getWorldPosition(_pcWrist).applyMatrix4(cloneInv); tb.getWorldPosition(_pcTip).applyMatrix4(cloneInv); if (_pcTip.y < _pcWrist.y) sgn = -1 }
     const uni = { value: new THREE.Vector4(0, 1, 0, 1e9) } // everything kept
+    const uniH = { value: new THREE.Vector4(0, 1, 0, 1e9) } // Hide Model plane (2026-10-19): the same kind of full-width plane, driven by the pose's Hide Model % (see lpApplyHideModel)
     const base = mesh.material.onBeforeCompile
     mesh.material.onBeforeCompile = function (shader, r) {
       if (base) base.call(this, shader, r)
       shader.uniforms.uProgressCropPlane = uni
+      shader.uniforms.uHideModelPlane = uniH
       shader.vertexShader = shader.vertexShader
         .replace('#include <common>', '#include <common>\nvarying vec3 vPcPos;')
         .replace('#include <project_vertex>', '#include <project_vertex>\nvPcPos = transformed;')
       shader.fragmentShader = shader.fragmentShader
-        .replace('#include <common>', '#include <common>\nvarying vec3 vPcPos;\nuniform vec4 uProgressCropPlane;')
-        .replace('void main() {', 'void main() {\nif (dot(vPcPos, uProgressCropPlane.xyz) + uProgressCropPlane.w < 0.0) discard;')
+        .replace('#include <common>', '#include <common>\nvarying vec3 vPcPos;\nuniform vec4 uProgressCropPlane;\nuniform vec4 uHideModelPlane;')
+        .replace('void main() {', 'void main() {\nif (dot(vPcPos, uProgressCropPlane.xyz) + uProgressCropPlane.w < 0.0) discard;\nif (dot(vPcPos, uHideModelPlane.xyz) + uHideModelPlane.w < 0.0) discard;')
     }
     mesh.material.needsUpdate = true
-    h.progressCrop = { uni, yMin, yMax, ext, wrist: _pcWrist.toArray(), tip: _pcTip.toArray(), sgn, fromClone: new THREE.Matrix4().copy(toClone).invert(), plane: new THREE.Plane() }
+    h.progressCrop = { uni, uniH, planeH: new THREE.Plane(), lastHide: -1, yMin, yMax, ext, wrist: _pcWrist.toArray(), tip: _pcTip.toArray(), sgn, fromClone: new THREE.Matrix4().copy(toClone).invert(), plane: new THREE.Plane() }
   } catch (e) { console.error('Progress Crop setup failed', e) }
 }
 function lpApplyProgressCrop(h, crop, flip) {
@@ -1191,6 +1193,22 @@ function lpApplyProgressCrop(h, crop, flip) {
   const thr = THREE.MathUtils.lerp(sMin - m, sMax + m, crop)
   pc.plane.set(_pcCorner.set(0, sg, 0), -thr).applyMatrix4(pc.fromClone) // the plane in the clone's frame -> the mesh's frame, where the vertex shader works
   pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
+}
+// Hide Model (HANDO `hideModel`, 2026-10-19): hides the model from the arm end up to pct % of its length along the hand's own Y axis, FULL WIDTH (a plane, like Progress Crop). It used to be done by stretching the Clipping Block,
+// but that block is only forearm-wide, so the palm / fingers (wider than the forearm) stayed visible whatever the value. 100 = the whole model.
+function lpApplyHideModel(h, pct) {
+  const pc = h && h.progressCrop
+  if (!pc) return
+  const p = THREE.MathUtils.clamp((typeof pct === 'number' ? pct : 0) / 100, 0, 1)
+  if (pc.lastHide === p) return
+  pc.lastHide = p
+  if (!(p > 0)) { pc.uniH.value.set(0, 1, 0, 1e9); return } // nothing hidden
+  if (p >= 1) { pc.uniH.value.set(0, 0, 0, -1); return } // everything hidden
+  const sg = pc.sgn // s = sg * y grows toward the fingertips: the arm end is hidden first
+  const sMin = sg > 0 ? pc.yMin : -pc.yMax, sMax = sg > 0 ? pc.yMax : -pc.yMin
+  const thr = THREE.MathUtils.lerp(sMin, sMax * 1.0 + (sMax - sMin) * 0.05, p) // up to a little past the fingertips at 100 %
+  pc.planeH.set(_pcCorner.set(0, sg, 0), -thr).applyMatrix4(pc.fromClone)
+  pc.uniH.value.set(pc.planeH.normal.x, pc.planeH.normal.y, pc.planeH.normal.z, pc.planeH.constant)
 }
 let lpCropLast = { progress: 0, crop: 0 }
 window.__lpCropDbg = { get cfg() { return cfg }, frame: (dt, now) => animate(dt, now), previewSeq: () => { const r = loadingPreviewHand && loadingPreviewHand.clipRig; return { done: loadingPreviewSequenceDone, lap: loadingPreviewLapIndex, cropT: r ? +(1 - (r.baseY - r.block.position.y) / r.topY0).toFixed(3) : (loadingPreviewHand && loadingPreviewHand.wristClipPlane ? +loadingPreviewHand.wristClipPlane.constant.toFixed(4) : null), progress: +loadingProgressNow(true).toFixed(3) } }, visibleHands: () => hands.filter((h) => h.wrapper.visible).length, poseSig: (i) => { const sk = hands[i].skinnedMesh.skeleton; return sk.bones.map((b) => b.quaternion.toArray().map((v) => +v.toFixed(5)).join(',')).join('|') }, reposeAll: () => applyAllFingerPoses(), warm: () => ({ stage: fieldWarmStage, idx: fieldWarmRevealIndex, batch: fieldWarmBatch, hands: hands.length }), update: () => updateLoadingPreviewProgressCrop(), progress: () => loadingProgressNow(), roCamDist: (i, node) => cameraDistXYOfNode(hands[i], node), roRanks: () => hands.map((h) => h._roRank), roRun: () => { updateScreenUnitsPerPx(); computeRenderOrderRanks() }, roN: () => hands.length, roHands: () => hands, roHit: (a, b) => roHandsIntersect(a, b), roHitInfo: () => { const m = roBuildHitModel(); return { segs: m.segs.length, radii: m.segs.map((x) => +x.r.toFixed(4)) } }, roFrame: () => { roFrameNo++; roHitMemo.clear() }, roCmp: (a, b) => roLastCmp(a, b), roPoint: (i, p) => { const v = new THREE.Vector3(); roPointInto(hands[i], p, v); return v.toArray() }, roSetRules: (obj) => { cfg.renderOrderRules = JSON.stringify(obj) }, previewModel: () => ({ id: cfg.loadingPreviewModelId, loaded: [...lpLoadedRoots.keys()], usingChosen: lpSourceRoot() !== modelRoot, verts: loadingPreviewHand && loadingPreviewHand.skinnedMesh ? loadingPreviewHand.skinnedMesh.geometry.attributes.position.count : null, hand: !!loadingPreviewHand }), camDefaultMatch: (it) => cameraItemMatchesDefault(it), camDefaultState: (dev) => cameraDefaultStateFor(dev), refreshMarks: () => refreshAllItemSelectorMarks(), applyLight: () => applyLoadingPreviewLightSliders(), lightInfo: () => ({ type: lpKeyLightType, dist: lpKeyDistance, dirVisible: loadingPreviewKeyLightRef && loadingPreviewKeyLightRef.visible, pointVisible: loadingPreviewPointLightRef && loadingPreviewPointLightRef.visible, pointIntensity: loadingPreviewPointLightRef && loadingPreviewPointLightRef.intensity, pointPos: loadingPreviewPointLightRef && loadingPreviewPointLightRef.position.toArray() }), render: () => { updateLoadingPreviewAnimation(); updateLoadingPreviewPointLight(); updateLoadingPreviewProgressCrop(); syncLoadingPreviewCameraFromOrbit(); loadingPreviewRenderer.render(loadingPreviewScene, loadingPreviewCamera); const gl = loadingPreviewRenderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return { w, h, px } }, state: () => ({ fieldStarted, fieldRevealed, fieldBuildDone, fieldBuildFrac, fieldWarmStage, modelMeasurementsReady, startupSettingsReady, hands: hands.length }) }
@@ -9281,6 +9299,8 @@ function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride) {
 function updateHand2WristClip(percent, hideModelPercent = 0) {
   const h = loadingPreviewHand2
   if (!h || !h.skinnedMesh) return
+  lpApplyHideModel(h, hideModelPercent) // Hide Model is its own full-width plane (see lpApplyHideModel)
+  hideModelPercent = 0
   if (h.clipRig) {
     setClipRigT(h.clipRig, percent / 100, hideModelPercent / 100)
     updateClipRigPlanes(h.clipRig)
@@ -10295,6 +10315,8 @@ function lpRealTimeCropPct() {
 }
 function updateLoadingPreviewWristClip(hideWristPercent, hideModelPercent = 0) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh || !loadingPreviewHand.wristClipPlane) return
+  lpApplyHideModel(loadingPreviewHand, hideModelPercent) // Hide Model is its own full-width plane (the wrist crop below only handles Hide Wrist)
+  hideModelPercent = 0
   if (loadingPreviewHand.clipRig) { // Clipping Block path (see makeClipRig)
     setClipRigT(loadingPreviewHand.clipRig, (typeof hideWristPercent === 'number' ? hideWristPercent : 100) / 100, (typeof hideModelPercent === 'number' ? hideModelPercent : 0) / 100)
     loadingPreviewHand.clone.updateMatrixWorld(true)
