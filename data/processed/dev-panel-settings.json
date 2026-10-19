@@ -267,7 +267,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -1090,7 +1090,7 @@
           "poseOffsetZ": 0,
           "poseLocalOffsetX": 0,
           "poseLocalOffsetY": 0,
-          "poseLocalOffsetZ": 280,
+          "poseLocalOffsetZ": 143.2,
           "poseScale": 1,
           "hideWrist": 0,
           "shoulderRaise": 3,
@@ -13743,41 +13743,6 @@
           "group": "2 TWIDS"
         },
         {
-          "name": "2 TWIDS - F",
-          "tweenPoses": [
-            "2 TWIDS - 75",
-            "2 TWIDS - F0",
-            "2 TWIDS - F1"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 75 (2ND HAND)",
-            "2 TWIDS - F0 (2ND HAND)",
-            "2 TWIDS - F1 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -73,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": 0.44822774048186503,
-            "y": 0.29523179295711777,
-            "z": 0.12358317309890328
-          },
-          "group": "2 TWIDS"
-        },
-        {
           "name": "Waiting Horizontal Tap",
           "tweenPoses": [
             "Waiting Horizontal Tap - 0",
@@ -13966,7 +13931,7 @@
           "group": "COUNT"
         },
         {
-          "name": "Two-Hand Tween",
+          "name": "2 TWIDS - F",
           "tweenPoses": [
             "2 TWIDS - 75",
             "2 TWIDS - F0",
@@ -13977,7 +13942,7 @@
             "2 TWIDS - F0 (2ND HAND)",
             "2 TWIDS - F1 (2ND HAND)"
           ],
-          "twoHand": false,
+          "twoHand": true,
           "hand2": {
             "mirrorMainHandPose": false,
             "hand2MirrorX": true,
@@ -14056,8 +14021,8 @@
         }
       ],
       "cameraX": 1.5625001668540401,
-      "cameraY": 5.91844401996211e-13,
-      "cameraZ": 0.9501086978894477,
+      "cameraY": 5.921750977352833e-13,
+      "cameraZ": 0.8647048857947848,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -14496,7 +14461,7 @@
       "startupFnCursorClampRange": "{\"min\":0,\"max\":0}",
       "startupFnOffsetLoopRetransition": false,
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "Waiting Horizontal Tap",
+      "startupFnTweenSelector": "FIST PALM + 30",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 3,
@@ -14552,7 +14517,7 @@
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
-      "sphereWaitForAll": false,
+      "sphereWaitForAll": true,
       "sphereMaxClicks": 2,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
@@ -19711,7 +19676,7 @@
           "poseOffsetZ": 0,
           "poseLocalOffsetX": 0,
           "poseLocalOffsetY": 0,
-          "poseLocalOffsetZ": 280,
+          "poseLocalOffsetZ": 143.2,
           "poseScale": 1,
           "hideWrist": 0,
           "shoulderRaise": 3,
@@ -32364,41 +32329,6 @@
           "group": "2 TWIDS"
         },
         {
-          "name": "2 TWIDS - F",
-          "tweenPoses": [
-            "2 TWIDS - 75",
-            "2 TWIDS - F0",
-            "2 TWIDS - F1"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 75 (2ND HAND)",
-            "2 TWIDS - F0 (2ND HAND)",
-            "2 TWIDS - F1 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -73,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": 0.44822774048186503,
-            "y": 0.29523179295711777,
-            "z": 0.12358317309890328
-          },
-          "group": "2 TWIDS"
-        },
-        {
           "name": "Waiting Horizontal Tap",
           "tweenPoses": [
             "Waiting Horizontal Tap - 0",
@@ -32587,7 +32517,7 @@
           "group": "COUNT"
         },
         {
-          "name": "Two-Hand Tween",
+          "name": "2 TWIDS - F",
           "tweenPoses": [
             "2 TWIDS - 75",
             "2 TWIDS - F0",
@@ -32598,7 +32528,7 @@
             "2 TWIDS - F0 (2ND HAND)",
             "2 TWIDS - F1 (2ND HAND)"
           ],
-          "twoHand": false,
+          "twoHand": true,
           "hand2": {
             "mirrorMainHandPose": false,
             "hand2MirrorX": true,
@@ -37509,7 +37439,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -38332,7 +38262,7 @@
           "poseOffsetZ": 0,
           "poseLocalOffsetX": 0,
           "poseLocalOffsetY": 0,
-          "poseLocalOffsetZ": 280,
+          "poseLocalOffsetZ": 143.2,
           "poseScale": 1,
           "hideWrist": 0,
           "shoulderRaise": 3,
@@ -50985,41 +50915,6 @@
           "group": "2 TWIDS"
         },
         {
-          "name": "2 TWIDS - F",
-          "tweenPoses": [
-            "2 TWIDS - 75",
-            "2 TWIDS - F0",
-            "2 TWIDS - F1"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 75 (2ND HAND)",
-            "2 TWIDS - F0 (2ND HAND)",
-            "2 TWIDS - F1 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -73,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": 0.44822774048186503,
-            "y": 0.29523179295711777,
-            "z": 0.12358317309890328
-          },
-          "group": "2 TWIDS"
-        },
-        {
           "name": "Waiting Horizontal Tap",
           "tweenPoses": [
             "Waiting Horizontal Tap - 0",
@@ -51208,7 +51103,7 @@
           "group": "COUNT"
         },
         {
-          "name": "Two-Hand Tween",
+          "name": "2 TWIDS - F",
           "tweenPoses": [
             "2 TWIDS - 75",
             "2 TWIDS - F0",
@@ -51219,7 +51114,7 @@
             "2 TWIDS - F0 (2ND HAND)",
             "2 TWIDS - F1 (2ND HAND)"
           ],
-          "twoHand": false,
+          "twoHand": true,
           "hand2": {
             "mirrorMainHandPose": false,
             "hand2MirrorX": true,
@@ -51738,7 +51633,7 @@
       "startupFnCursorClampRange": "{\"min\":0,\"max\":0}",
       "startupFnOffsetLoopRetransition": false,
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "Waiting Horizontal Tap",
+      "startupFnTweenSelector": "FIST PALM + 30",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 3,
@@ -51794,7 +51689,7 @@
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
-      "sphereWaitForAll": false,
+      "sphereWaitForAll": true,
       "sphereMaxClicks": 2,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
@@ -56526,7 +56421,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -56554,10 +56449,14 @@
                 "key": "loadingMinTimeMs"
               },
               {
+                "type": "row",
+                "key": "loadingPreviewSequenceLoopWrapScale"
+              },
+              {
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -56909,14 +56808,14 @@
                 "group": {
                   "key": "Loading Preview > End Sequence",
                   "collapsed": true,
-                  "locked": false,
+                  "locked": true,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence",
-                        "collapsed": true,
-                        "locked": false,
+                        "collapsed": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -56953,7 +56852,7 @@
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence Mode",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -56990,7 +56889,7 @@
                       "group": {
                         "key": "Loading Preview > End Sequence > Easing",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -57007,7 +56906,7 @@
                       "group": {
                         "key": "Loading Preview > End Sequence > Retransition",
                         "collapsed": true,
-                        "locked": false,
+                        "locked": true,
                         "items": [
                           {
                             "type": "row",
@@ -57038,10 +56937,6 @@
                     "loadingPreviewEndPauseMs"
                   ]
                 }
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewSequenceLoopWrapScale"
               }
             ],
             "settings": [
@@ -57051,10 +56946,10 @@
               "loadingPreviewRealTimeLoading",
               "loadingPreviewCameraEditMode",
               "loadingMinTimeMs",
+              "loadingPreviewSequenceLoopWrapScale",
               "loadingPreviewPosX",
               "loadingPreviewPosY",
-              "loadingPreviewLayout",
-              "loadingPreviewSequenceLoopWrapScale"
+              "loadingPreviewLayout"
             ]
           }
         }
@@ -57882,7 +57777,7 @@
           "type": "group",
           "group": {
             "key": "Tween",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -57904,7 +57799,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -59213,8 +59108,8 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
-      "locked": true,
+      "collapsed": false,
+      "locked": false,
       "items": [
         {
           "type": "row",
@@ -59232,19 +59127,31 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
-            "locked": true,
+            "collapsed": false,
+            "locked": false,
             "items": [
               {
                 "type": "row",
                 "key": "startupHandOffsetZ"
               },
               {
+                "type": "row",
+                "key": "startupFnTweenSpeedMs"
+              },
+              {
+                "type": "row",
+                "key": "startupHandMaxClicks"
+              },
+              {
+                "type": "row",
+                "key": "startupHandWaitForAll"
+              },
+              {
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59316,7 +59223,7 @@
                 "group": {
                   "key": "Startup > Retransition",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59327,7 +59234,7 @@
                       "group": {
                         "key": "Startup > Retransition Speed Curve",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -59359,7 +59266,7 @@
                       "group": {
                         "key": "Startup > Retransition Start Time Curve",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -59391,7 +59298,7 @@
                       "group": {
                         "key": "Startup > Retransition Easing Curve",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -59408,7 +59315,7 @@
                       "group": {
                         "key": "Startup > Retransition Distance Curve",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -59430,7 +59337,7 @@
                       "group": {
                         "key": "Startup > Retransition Distance Scaler",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -59460,10 +59367,6 @@
               },
               {
                 "type": "row",
-                "key": "startupFnTweenSpeedMs"
-              },
-              {
-                "type": "row",
                 "key": "startupFnTransitionSpeedMs"
               },
               {
@@ -59471,7 +59374,7 @@
                 "group": {
                   "key": "Startup > Easing",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59488,7 +59391,7 @@
                 "group": {
                   "key": "Startup > Animation Speed Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59520,7 +59423,7 @@
                 "group": {
                   "key": "Startup > Start Time Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59562,7 +59465,7 @@
                 "group": {
                   "key": "Startup > Start Distance Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59590,19 +59493,11 @@
                 }
               },
               {
-                "type": "row",
-                "key": "startupHandMaxClicks"
-              },
-              {
-                "type": "row",
-                "key": "startupHandWaitForAll"
-              },
-              {
                 "type": "group",
                 "group": {
                   "key": "Startup > Hand Z Offset Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59624,7 +59519,7 @@
                 "group": {
                   "key": "Startup > Hand Scale Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59687,9 +59582,9 @@
             "settings": [
               "startupHandOffsetZ",
               "startupFnTweenSpeedMs",
-              "startupFnTransitionSpeedMs",
               "startupHandMaxClicks",
               "startupHandWaitForAll",
+              "startupFnTransitionSpeedMs",
               "startupTrackArm",
               "startupTrackPalm",
               "startupTrackSplay",
@@ -59703,7 +59598,7 @@
           "group": {
             "key": "Field Grid Sphere Sequence",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [
               {
                 "type": "row",
@@ -59730,7 +59625,7 @@
                 "group": {
                   "key": "Sphere > Animation Speed Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59762,7 +59657,7 @@
                 "group": {
                   "key": "Sphere > Easing",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59779,7 +59674,7 @@
                 "group": {
                   "key": "Sphere > Start Time Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59811,7 +59706,7 @@
                 "group": {
                   "key": "Sphere > Start Distance Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59843,7 +59738,7 @@
                 "group": {
                   "key": "Sphere > Sphere Radius Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -59865,7 +59760,7 @@
                 "group": {
                   "key": "Sphere > Sphere Z Offset Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -64236,8 +64131,8 @@
     "desktop": {
       "left": 122.375,
       "top": 69,
-      "width": 553.7625122070312,
-      "height": 544.9874877929688
+      "width": 714.5499877929688,
+      "height": 568.9874877929688
     }
   }
 }
