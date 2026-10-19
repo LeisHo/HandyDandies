@@ -17644,6 +17644,9 @@
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
+      "showFrameRate": true,
+      "frameRateTextColor": "#ffebeb",
+      "frameRateRefreshMs": 500,
       "exportLogsUiButton": true,
       "snapshotCursor": true,
       "snapshotMouse": true,
@@ -38735,7 +38738,7 @@
         }
       ],
       "cameraX": -3.422222222222221,
-      "cameraY": 8.119913195413508e-13,
+      "cameraY": 9.031050413979138e-13,
       "cameraZ": 495.9881938061244,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -39275,6 +39278,9 @@
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
+      "showFrameRate": true,
+      "frameRateTextColor": "#ffebeb",
+      "frameRateRefreshMs": 500,
       "exportLogsUiButton": true,
       "snapshotCursor": true,
       "snapshotMouse": true,
@@ -60906,6 +60912,9 @@
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
+      "showFrameRate": true,
+      "frameRateTextColor": "#ffebeb",
+      "frameRateRefreshMs": 500,
       "exportLogsUiButton": true,
       "snapshotCursor": true,
       "snapshotMouse": true,
@@ -65227,7 +65236,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -65309,6 +65318,18 @@
         {
           "type": "row",
           "key": "exportLogsUiButton"
+        },
+        {
+          "type": "row",
+          "key": "showFrameRate"
+        },
+        {
+          "type": "row",
+          "key": "frameRateTextColor"
+        },
+        {
+          "type": "row",
+          "key": "frameRateRefreshMs"
         },
         {
           "type": "row",
@@ -65424,6 +65445,9 @@
         "pauseLogsBtn",
         "exportLogsBtn",
         "exportLogsUiButton",
+        "showFrameRate",
+        "frameRateTextColor",
+        "frameRateRefreshMs",
         "logFrameProfileEnabled",
         "logPoseJumpsEnabled",
         "poseJumpBoneThresholdDeg",
@@ -73223,7 +73247,7 @@
       "left": 20,
       "top": 176.2678680419922,
       "width": 394.4285888671875,
-      "height": 484.26190185546875
+      "height": 485.7857360839844
     }
   }
 }
