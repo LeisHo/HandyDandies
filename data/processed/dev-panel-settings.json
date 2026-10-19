@@ -464,14 +464,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65.00000000000001,
+      "loadingPreviewRotationX": -65,
       "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043628,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -14148,15 +14148,15 @@
           }
         }
       ],
-      "cameraX": 1.5625001668540397,
-      "cameraY": 5.934179584706906e-13,
-      "cameraZ": 0.4838409275425015,
+      "cameraX": 1.9534883720930232,
+      "cameraY": 2.041020698109996e-13,
+      "cameraZ": 245.9004898795015,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 1.5895405102726934,
+      "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.041020698109996e-13,\"cameraZ\":245.9004898795015,\"cameraFov\":20,\"cameraZoom\":121.5,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
+      "cameraZoom": 121.5,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -19178,14 +19178,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65.00000000000001,
+      "loadingPreviewRotationX": -65,
       "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043628,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -37892,14 +37892,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65.00000000000001,
+      "loadingPreviewRotationX": -65,
       "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043628,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -59090,7 +59090,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -59201,7 +59201,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -64515,8 +64515,8 @@
     "desktop": {
       "left": 122.375,
       "top": 69,
-      "width": 404.95001220703125,
-      "height": 576.9874877929688
+      "width": 408.1499938964844,
+      "height": 578.5875244140625
     }
   }
 }
