@@ -389,6 +389,9 @@ let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y
 // Loading Preview End Sequence (2026-10-18): state + its own easing trig, declared up here (the restore can reach the onChange handlers at top level - TDZ). lpLastValues / lpHand2LastValues = the last pose applied to each preview hand.
 let loadingPreviewEndEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], speedRangeParsed: null }
 let lpLastValues = null, lpHand2LastValues = null
+// Smooth loading (2026-10-18): loadingWarmMode = updateRenderOrder() is running behind the loading screen (only the first idle repose of the hands, in a time budget); fieldPreposeDeadline = the latest the reveal waits for it;
+// loadingPreviewBuiltRoot = the model the preview hand was cloned from (a restored model setting that resolves to the same one must not rebuild the preview).
+let loadingWarmMode = false, fieldPreposeDeadline = 0, loadingPreviewBuiltRoot = null
 // On-screen frame rate (Debug > Show Frame Rate, 2026-10-18): frames actually drawn since the last refresh.
 let frameRateDrawn = 0, frameRateWindowStart = 0, frameRateEl = null
 const endSeq = { phase: 'off', finished: false, lapAtBegin: 0, timer: 0, seq: null, tr1: null, tr2: null, lapIndex: 1, lapStartMs: 0, holdEndMs: 0, dir: 1, lapStyle: 'Loop', total: 1, speedMs: 1000, pauseEndMs: 0, retStartMs: 0, retDur: 0, from1: null, from2: null }
@@ -1406,6 +1409,12 @@ function tryStartField() {
       }
       return
     }
+  }
+  // Hands that have not had their first idle repose yet (it is spread over the warm-up frames, see animate()) would all do it in the first visible frame: wait a little for them, but never more than 2 s (a judgment call; a hidden tab
+  // does not tick animate() at all).
+  if (hands.length) {
+    if (!fieldPreposeDeadline) fieldPreposeDeadline = performance.now() + 2000
+    if (performance.now() < fieldPreposeDeadline && hands.some((h) => !h.everReposed)) { setTimeout(tryStartField, 50); return }
   }
   // End Sequence (2026-10-18): hold the reveal (and with it the whole startup sequence) until the loading animation has finished its lap and the End Sequence has played.
   if (endSeqShouldRun()) {
@@ -5928,6 +5937,7 @@ function lpNoteRenderedFrame(intervalMs) {
   const dt = now - lpFpsLastFrameAt
   lpFpsLastFrameAt = now
   if (dt > lpFpsWorstMs) lpFpsWorstMs = dt
+  if (dt > 100 && lpFpsFrames > 1) logLoadingPreview('freeze: ' + Math.round(dt) + ' ms between two preview frames' + (fieldWarmStage ? ' (field warm-up stage ' + fieldWarmStage + ')' : (fieldBuildStarted && !fieldBuildDone ? ' (field being built)' : '')) + (endSeq.phase !== 'off' && endSeq.phase !== 'done' ? ' (End Sequence ' + endSeq.phase + ')' : ''))
   const elapsed = now - lpFpsWindowStart
   if (elapsed >= intervalMs) {
     logLoadingPreview(`preview animation ${(lpFpsFrames / (elapsed / 1000)).toFixed(1)} fps (average frame ${(elapsed / lpFpsFrames).toFixed(1)} ms, worst gap ${Math.round(lpFpsWorstMs)} ms, ${lpFpsFrames} frames in ${(elapsed / 1000).toFixed(1)} s)`)
@@ -9335,6 +9345,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   if (lightingPreset) applyLoadingPreviewLighting(key, hemi, lightingPreset)
   syncLoadingPreviewLightSliders()
 
+  loadingPreviewBuiltRoot = lpSourceRoot()
   const clone = cloneSkeletal(lpSourceRoot())
   clone.quaternion.copy(alignQuat)
   const skinnedMesh = findSkinnedMesh(clone)
@@ -18605,6 +18616,8 @@ function onLoadingPreviewModelChanged() {
   const id = cfg.loadingPreviewModelId
   lpLoadPreviewModel(id).then(() => {
     if (cfg.loadingPreviewModelId !== id) return // changed again meanwhile
+    // The restored setting often resolves to the model the preview is already built from (the Hand model, when the saved local model is not on this device): rebuilding then only froze the loading hand for ~180 ms on a phone (measured in a log).
+    if (loadingPreviewBuiltRoot && lpSourceRoot() === loadingPreviewBuiltRoot) { logLoadingPreview('preview model setting resolves to the model already shown -- no rebuild'); return }
     // rebuild only a preview that is on screen (its canvas shown); otherwise the next build uses the new model
     if (loadingPreviewCanvas && loadingPreviewCanvas.style.display !== 'none') { logLoadingPreview('preview model changed -- rebuilding'); buildLoadingPreview(true) }
   })
@@ -22097,6 +22110,11 @@ function animate(dt, now) {
       if (fieldStarted || !hands.length) {
         updateRenderOrder()
         applyFieldBounds()
+      } else {
+        // Behind the loading screen (2026-10-18): the pre-passes plus the first idle repose of the hands in a time budget (no render-order ranks, nothing for a hand that is already posed), so the mass repose that used to
+        // land in ONE frame (a ~150 ms freeze at the end of the build, then again at the reveal) is spread over the warm-up frames.
+        loadingWarmMode = true
+        try { updateRenderOrder() } finally { loadingWarmMode = false }
       }
       checkStartupFloorHide()
       __frameProfiler.updateRenderOrderMs += performance.now() - __uroStart
@@ -22479,8 +22497,10 @@ function updateRenderOrder() {
     const rh = hands[ri], rlive = liveDistances[ri]
     rh.effectiveRenderOrder = (flashFixOn && rh.isOverlapping) ? rh.effectiveRenderOrder + (rlive - rh.effectiveRenderOrder) * REORDER_SMOOTHING : rlive
   }
-  computeRenderOrderRanks()
+  if (!loadingWarmMode) computeRenderOrderRanks()
+  const warmReposeDeadline = loadingWarmMode ? performance.now() + 6 : 0 // 6 ms: the same slice the field build uses (a judgment call, not a measurement)
   hands.forEach((hand, i) => {
+    if (loadingWarmMode && (hand.everReposed || performance.now() > warmReposeDeadline)) return
     const live = liveDistances[i]
     // Render order (2026-10-11): this hand's position in the per-frame sort (see computeRenderOrderRanks()).
     const roBase = hand._roRank || 0
