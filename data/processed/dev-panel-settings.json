@@ -267,17 +267,17 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 TWIDS",
-          "sequence": "2 TWIDS"
-        },
-        {
           "name": "2 TWIDS - F",
           "sequence": "2 TWIDS - F"
+        },
+        {
+          "name": "2 TWIDS",
+          "sequence": "2 TWIDS"
         }
       ],
       "loadingPreviewSavedCameras": [
@@ -490,14 +490,14 @@
       "loadingPreviewEndReverse": false,
       "loadingPreviewEndGlide": true,
       "loadingPreviewEndGlideScale": 0.1,
-      "loadingPreviewEndSpeedMs": 3970,
+      "loadingPreviewEndSpeedMs": 2180,
       "loadingPreviewEndCount": 1,
       "loadingPreviewEndCountMode": "Loop",
       "loadingPreviewEndLoopTransition": false,
       "loadingPreviewEndLoopWrapScale": 1,
       "loadingPreviewEndHoldMs": 0,
       "loadingPreviewEndEasingEnabled": true,
-      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.32161704669919344,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3215174748581101,\"y\":0}}]",
+      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0.4814582824707031,\"h1\":{\"x\":0.3306371343810372,\"y\":-0.4814582824707031}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3215174748581101,\"y\":0}}]",
       "loadingPreviewEndPauseMs": 0,
       "loadingPreviewEndRetransitionEnabled": false,
       "loadingPreviewEndRetransitionSpeedMs": 600,
@@ -3026,7 +3026,7 @@
           "midOnlyCurlIndex": 27,
           "tipOnlyCurlIndex": 22,
           "tipTwistIndex": 0,
-          "midTwistIndex": 15,
+          "midTwistIndex": 0,
           "baseTwistIndex": 0,
           "curlMiddle": 0,
           "splayMiddle": 28,
@@ -3036,7 +3036,7 @@
           "midOnlyCurlMiddle": 40,
           "tipOnlyCurlMiddle": 25,
           "tipTwistMiddle": 0,
-          "midTwistMiddle": 15,
+          "midTwistMiddle": 0,
           "baseTwistMiddle": 0,
           "curlRing": 0,
           "splayRing": 0,
@@ -3046,7 +3046,7 @@
           "midOnlyCurlRing": 35,
           "tipOnlyCurlRing": 12,
           "tipTwistRing": 0,
-          "midTwistRing": 15,
+          "midTwistRing": 0,
           "baseTwistRing": 0,
           "curlPinky": 0,
           "splayPinky": -15,
@@ -3156,7 +3156,7 @@
           "midOnlyCurlIndex": 25,
           "tipOnlyCurlIndex": 33,
           "tipTwistIndex": 0,
-          "midTwistIndex": 5,
+          "midTwistIndex": 0,
           "baseTwistIndex": 0,
           "curlMiddle": 0,
           "splayMiddle": 5,
@@ -3166,7 +3166,7 @@
           "midOnlyCurlMiddle": 32,
           "tipOnlyCurlMiddle": 40,
           "tipTwistMiddle": 0,
-          "midTwistMiddle": 5,
+          "midTwistMiddle": 0,
           "baseTwistMiddle": 0,
           "curlRing": 0,
           "splayRing": -8,
@@ -3176,7 +3176,7 @@
           "midOnlyCurlRing": 45,
           "tipOnlyCurlRing": 15,
           "tipTwistRing": 0,
-          "midTwistRing": 5,
+          "midTwistRing": 0,
           "baseTwistRing": 0,
           "curlPinky": 0,
           "splayPinky": -15,
@@ -13706,43 +13706,6 @@
           "group": "2 TWIDS - 1ST HAND"
         },
         {
-          "name": "2 TWIDS",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 0 (2ND HAND)",
-            "2 TWIDS - 25 (2ND HAND)",
-            "2 TWIDS - 50 (2ND HAND)",
-            "2 TWIDS - 75 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -73,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": 0.44822774048186503,
-            "y": 0.29523179295711777,
-            "z": 0.12358317309890328
-          },
-          "group": "2 TWIDS"
-        },
-        {
           "name": "Waiting Horizontal Tap",
           "tweenPoses": [
             "Waiting Horizontal Tap - 0",
@@ -14018,6 +13981,42 @@
             "FISH - 6"
           ],
           "group": "FISH"
+        },
+        {
+          "name": "2 TWIDS",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 0 (2ND HAND)",
+            "2 TWIDS - 25 (2ND HAND)",
+            "2 TWIDS - 50 (2ND HAND)",
+            "2 TWIDS - 75 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
         }
       ],
       "cameraX": 1.5625001668540401,
@@ -18858,12 +18857,12 @@
       "loadingPreviewTweenSelector": "2 Twids - 2H",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 TWIDS",
-          "sequence": "2 TWIDS"
-        },
-        {
           "name": "2 TWIDS - F",
           "sequence": "2 TWIDS - F"
+        },
+        {
+          "name": "2 TWIDS",
+          "sequence": "2 TWIDS"
         }
       ],
       "loadingPreviewSavedCameras": [
@@ -19076,14 +19075,14 @@
       "loadingPreviewEndReverse": false,
       "loadingPreviewEndGlide": true,
       "loadingPreviewEndGlideScale": 0.1,
-      "loadingPreviewEndSpeedMs": 3970,
+      "loadingPreviewEndSpeedMs": 2180,
       "loadingPreviewEndCount": 1,
       "loadingPreviewEndCountMode": "Loop",
       "loadingPreviewEndLoopTransition": false,
       "loadingPreviewEndLoopWrapScale": 1,
       "loadingPreviewEndHoldMs": 0,
       "loadingPreviewEndEasingEnabled": true,
-      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.32161704669919344,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3215174748581101,\"y\":0}}]",
+      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0.4814582824707031,\"h1\":{\"x\":0.3306371343810372,\"y\":-0.4814582824707031}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3215174748581101,\"y\":0}}]",
       "loadingPreviewEndPauseMs": 0,
       "loadingPreviewEndRetransitionEnabled": false,
       "loadingPreviewEndRetransitionSpeedMs": 600,
@@ -21612,7 +21611,7 @@
           "midOnlyCurlIndex": 27,
           "tipOnlyCurlIndex": 22,
           "tipTwistIndex": 0,
-          "midTwistIndex": 15,
+          "midTwistIndex": 0,
           "baseTwistIndex": 0,
           "curlMiddle": 0,
           "splayMiddle": 28,
@@ -21622,7 +21621,7 @@
           "midOnlyCurlMiddle": 40,
           "tipOnlyCurlMiddle": 25,
           "tipTwistMiddle": 0,
-          "midTwistMiddle": 15,
+          "midTwistMiddle": 0,
           "baseTwistMiddle": 0,
           "curlRing": 0,
           "splayRing": 0,
@@ -21632,7 +21631,7 @@
           "midOnlyCurlRing": 35,
           "tipOnlyCurlRing": 12,
           "tipTwistRing": 0,
-          "midTwistRing": 15,
+          "midTwistRing": 0,
           "baseTwistRing": 0,
           "curlPinky": 0,
           "splayPinky": -15,
@@ -21742,7 +21741,7 @@
           "midOnlyCurlIndex": 25,
           "tipOnlyCurlIndex": 33,
           "tipTwistIndex": 0,
-          "midTwistIndex": 5,
+          "midTwistIndex": 0,
           "baseTwistIndex": 0,
           "curlMiddle": 0,
           "splayMiddle": 5,
@@ -21752,7 +21751,7 @@
           "midOnlyCurlMiddle": 32,
           "tipOnlyCurlMiddle": 40,
           "tipTwistMiddle": 0,
-          "midTwistMiddle": 5,
+          "midTwistMiddle": 0,
           "baseTwistMiddle": 0,
           "curlRing": 0,
           "splayRing": -8,
@@ -21762,7 +21761,7 @@
           "midOnlyCurlRing": 45,
           "tipOnlyCurlRing": 15,
           "tipTwistRing": 0,
-          "midTwistRing": 5,
+          "midTwistRing": 0,
           "baseTwistRing": 0,
           "curlPinky": 0,
           "splayPinky": -15,
@@ -32292,43 +32291,6 @@
           "group": "2 TWIDS - 1ST HAND"
         },
         {
-          "name": "2 TWIDS",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 0 (2ND HAND)",
-            "2 TWIDS - 25 (2ND HAND)",
-            "2 TWIDS - 50 (2ND HAND)",
-            "2 TWIDS - 75 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -73,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": 0.44822774048186503,
-            "y": 0.29523179295711777,
-            "z": 0.12358317309890328
-          },
-          "group": "2 TWIDS"
-        },
-        {
           "name": "Waiting Horizontal Tap",
           "tweenPoses": [
             "Waiting Horizontal Tap - 0",
@@ -32604,6 +32566,42 @@
             "FISH - 6"
           ],
           "group": "FISH"
+        },
+        {
+          "name": "2 TWIDS",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 0 (2ND HAND)",
+            "2 TWIDS - 25 (2ND HAND)",
+            "2 TWIDS - 50 (2ND HAND)",
+            "2 TWIDS - 75 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
         }
       ],
       "cameraX": -3.422222222222221,
@@ -37439,17 +37437,17 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 TWIDS",
-          "sequence": "2 TWIDS"
-        },
-        {
           "name": "2 TWIDS - F",
           "sequence": "2 TWIDS - F"
+        },
+        {
+          "name": "2 TWIDS",
+          "sequence": "2 TWIDS"
         }
       ],
       "loadingPreviewSavedCameras": [
@@ -37662,14 +37660,14 @@
       "loadingPreviewEndReverse": false,
       "loadingPreviewEndGlide": true,
       "loadingPreviewEndGlideScale": 0.1,
-      "loadingPreviewEndSpeedMs": 3970,
+      "loadingPreviewEndSpeedMs": 2180,
       "loadingPreviewEndCount": 1,
       "loadingPreviewEndCountMode": "Loop",
       "loadingPreviewEndLoopTransition": false,
       "loadingPreviewEndLoopWrapScale": 1,
       "loadingPreviewEndHoldMs": 0,
       "loadingPreviewEndEasingEnabled": true,
-      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.32161704669919344,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3215174748581101,\"y\":0}}]",
+      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0.4814582824707031,\"h1\":{\"x\":0.3306371343810372,\"y\":-0.4814582824707031}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3215174748581101,\"y\":0}}]",
       "loadingPreviewEndPauseMs": 0,
       "loadingPreviewEndRetransitionEnabled": false,
       "loadingPreviewEndRetransitionSpeedMs": 600,
@@ -40198,7 +40196,7 @@
           "midOnlyCurlIndex": 27,
           "tipOnlyCurlIndex": 22,
           "tipTwistIndex": 0,
-          "midTwistIndex": 15,
+          "midTwistIndex": 0,
           "baseTwistIndex": 0,
           "curlMiddle": 0,
           "splayMiddle": 28,
@@ -40208,7 +40206,7 @@
           "midOnlyCurlMiddle": 40,
           "tipOnlyCurlMiddle": 25,
           "tipTwistMiddle": 0,
-          "midTwistMiddle": 15,
+          "midTwistMiddle": 0,
           "baseTwistMiddle": 0,
           "curlRing": 0,
           "splayRing": 0,
@@ -40218,7 +40216,7 @@
           "midOnlyCurlRing": 35,
           "tipOnlyCurlRing": 12,
           "tipTwistRing": 0,
-          "midTwistRing": 15,
+          "midTwistRing": 0,
           "baseTwistRing": 0,
           "curlPinky": 0,
           "splayPinky": -15,
@@ -40328,7 +40326,7 @@
           "midOnlyCurlIndex": 25,
           "tipOnlyCurlIndex": 33,
           "tipTwistIndex": 0,
-          "midTwistIndex": 5,
+          "midTwistIndex": 0,
           "baseTwistIndex": 0,
           "curlMiddle": 0,
           "splayMiddle": 5,
@@ -40338,7 +40336,7 @@
           "midOnlyCurlMiddle": 32,
           "tipOnlyCurlMiddle": 40,
           "tipTwistMiddle": 0,
-          "midTwistMiddle": 5,
+          "midTwistMiddle": 0,
           "baseTwistMiddle": 0,
           "curlRing": 0,
           "splayRing": -8,
@@ -40348,7 +40346,7 @@
           "midOnlyCurlRing": 45,
           "tipOnlyCurlRing": 15,
           "tipTwistRing": 0,
-          "midTwistRing": 5,
+          "midTwistRing": 0,
           "baseTwistRing": 0,
           "curlPinky": 0,
           "splayPinky": -15,
@@ -50878,43 +50876,6 @@
           "group": "2 TWIDS - 1ST HAND"
         },
         {
-          "name": "2 TWIDS",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 0 (2ND HAND)",
-            "2 TWIDS - 25 (2ND HAND)",
-            "2 TWIDS - 50 (2ND HAND)",
-            "2 TWIDS - 75 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -73,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": 0.44822774048186503,
-            "y": 0.29523179295711777,
-            "z": 0.12358317309890328
-          },
-          "group": "2 TWIDS"
-        },
-        {
           "name": "Waiting Horizontal Tap",
           "tweenPoses": [
             "Waiting Horizontal Tap - 0",
@@ -51190,6 +51151,42 @@
             "FISH - 6"
           ],
           "group": "FISH"
+        },
+        {
+          "name": "2 TWIDS",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 0 (2ND HAND)",
+            "2 TWIDS - 25 (2ND HAND)",
+            "2 TWIDS - 50 (2ND HAND)",
+            "2 TWIDS - 75 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
         }
       ],
       "cameraX": 6.6385295949156875,
@@ -56421,8 +56418,8 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
-            "locked": true,
+            "collapsed": false,
+            "locked": false,
             "items": [
               {
                 "type": "row",
@@ -56456,8 +56453,8 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
-                  "locked": true,
+                  "collapsed": false,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -56549,7 +56546,7 @@
                 "group": {
                   "key": "New Group (5)",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -56611,7 +56608,7 @@
                 "group": {
                   "key": "New Group",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -56678,7 +56675,7 @@
                 "group": {
                   "key": "Loading Preview > Text",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -56742,7 +56739,7 @@
                 "group": {
                   "key": "Loading Preview > Layout",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -56759,7 +56756,7 @@
                 "group": {
                   "key": "Loading Preview > Progress Crop",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -56791,7 +56788,7 @@
                 "group": {
                   "key": "Easing",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -56808,14 +56805,14 @@
                 "group": {
                   "key": "Loading Preview > End Sequence",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence",
-                        "collapsed": false,
-                        "locked": true,
+                        "collapsed": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -56848,11 +56845,15 @@
                       }
                     },
                     {
+                      "type": "row",
+                      "key": "loadingPreviewEndPauseMs"
+                    },
+                    {
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence Mode",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -56889,7 +56890,7 @@
                       "group": {
                         "key": "Loading Preview > End Sequence > Easing",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -56906,7 +56907,7 @@
                       "group": {
                         "key": "Loading Preview > End Sequence > Retransition",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -56927,10 +56928,6 @@
                           "loadingPreviewEndRetransitionEasingCurve"
                         ]
                       }
-                    },
-                    {
-                      "type": "row",
-                      "key": "loadingPreviewEndPauseMs"
                     }
                   ],
                   "settings": [
@@ -56958,7 +56955,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -57799,7 +57796,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -59108,7 +59105,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -59127,7 +59124,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -64131,8 +64128,8 @@
     "desktop": {
       "left": 122.375,
       "top": 69,
-      "width": 714.5499877929688,
-      "height": 568.9874877929688
+      "width": 392.1499938964844,
+      "height": 570.5875244140625
     }
   }
 }
