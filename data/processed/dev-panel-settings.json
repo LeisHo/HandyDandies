@@ -14146,9 +14146,9 @@
           }
         }
       ],
-      "cameraX": 1.9534883720930232,
-      "cameraY": 2.041020698109996e-13,
-      "cameraZ": 245.9004898795015,
+      "cameraX": 1.953488372093023,
+      "cameraY": 2.41656874146273e-13,
+      "cameraZ": 121.49224064861718,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -14593,7 +14593,7 @@
       "startupFnFirstGlideTimeScale": 3,
       "startupFnTweenSpeedMs": 3800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1000}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":579}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -33305,7 +33305,7 @@
       "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 5000,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1000}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":579}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -52017,7 +52017,7 @@
       "startupFnFirstGlideTimeScale": 3,
       "startupFnTweenSpeedMs": 3800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3221476094538043,\"y\":0}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1000}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":579}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -59505,7 +59505,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -59768,7 +59768,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -59800,7 +59800,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -64509,8 +64509,8 @@
     "desktop": {
       "left": 122.375,
       "top": 69,
-      "width": 420.95001220703125,
-      "height": 584.9874877929688
+      "width": 424.1499938964844,
+      "height": 586.5875244140625
     }
   }
 }
