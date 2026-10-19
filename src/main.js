@@ -403,6 +403,7 @@ const _loadingPreviewBase = new THREE.Vector3(), _loadingPreviewV2 = new THREE.V
 // Two-hand tween: the base position applyLoadingPreviewPose() gave the main hand (before the Pose Offset), and whether it was HANDO's exact pivots (see there) - updateLoadingPreviewHand2() needs both for the mirror plane.
 const _lpTwoHandBase = new THREE.Vector3(), _lpWholeRotQ = new THREE.Quaternion(), _lpPivotDelta = new THREE.Vector3()
 let lpTwoHandExact = false
+let lpHandoScaleCur = 0 // the selected two-hand sequence's HANDO world units per raw model unit (seq.handoScale), 0 when there is none: set by ensureLoadingPreviewHand2()
 // World-XY-only cursor distance for click-function settings (2026-10-04,
 // direct request: "for any click function settings that depend on distance
 // from cursor, the distance should only be based off of world XY vectors").
@@ -9164,6 +9165,7 @@ function useTwoHandTweenItem(item) {
 function ensureLoadingPreviewHand2(seq) {
   const need = !!(seq && seq.twoHand && loadingPreviewScene && loadingPreviewHand && lpSourceRoot())
   loadingPreviewTwoHandActive = need
+  lpHandoScaleCur = (need && seq.handoScale > 0) ? seq.handoScale : 0
   if (!need) {
     if (loadingPreviewHand2) {
       if (loadingPreviewScene) loadingPreviewScene.remove(loadingPreviewHand2.clone)
@@ -9252,9 +9254,9 @@ function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride) {
     // (A non-zero Pose Offset on the main hand moves HANDO's hand but not its anchor; the preview adds it to the position, so that case is left as it was.)
     const sMain = loadingPreviewModelScale > 0 ? c1.scale.x / loadingPreviewModelScale : 1
     _lp2Rh.copy(alignQuat).invert().multiply(c1.quaternion)
-    // With HANDO's exact main-hand placement (lpTwoHandExact) the anchor is simply the FIXED point HANDO reflects about: its raw position through alignQuat and the model scale, plus whatever the Pose Offset added to the hand
-    // (HANDO's anchor does not move with it - the old behaviour, kept).
-    if (lpTwoHandExact) _lp2V2.copy(seq.handoAnchorRaw ? _lp2Anchor.set(seq.handoAnchorRaw.x, seq.handoAnchorRaw.y, seq.handoAnchorRaw.z) : handBoundsBoxCenterRaw).applyQuaternion(alignQuat).multiplyScalar(loadingPreviewModelScale).add(c1.position).sub(_lpTwoHandBase)
+    // With HANDO's exact main-hand placement (lpTwoHandExact) the anchor is simply the FIXED point HANDO reflects about: its raw position through alignQuat and the model scale. CORRECTED 2026-10-18: it used to be shifted by
+    // whatever the main hand's Pose Offset added, which made the 2nd hand follow the offset rigidly; in HANDO sceneState.center is fixed, so the 2nd hand is the offset hand mirrored about a fixed plane (an X offset moves it the other way).
+    if (lpTwoHandExact) _lp2V2.copy(seq.handoAnchorRaw ? _lp2Anchor.set(seq.handoAnchorRaw.x, seq.handoAnchorRaw.y, seq.handoAnchorRaw.z) : handBoundsBoxCenterRaw).applyQuaternion(alignQuat).multiplyScalar(loadingPreviewModelScale)
     else _lp2V2.copy(handoPivotRaw).applyQuaternion(_lp2Rh).multiplyScalar(sMain).add(seq.handoAnchorRaw ? _lp2Anchor.set(seq.handoAnchorRaw.x, seq.handoAnchorRaw.y, seq.handoAnchorRaw.z) : handBoundsBoxCenterRaw).sub(handoPivotRaw).applyQuaternion(alignQuat).multiplyScalar(loadingPreviewModelScale).add(c1.position)
     _lp2Final.makeTranslation(_lp2V2.x, _lp2V2.y, _lp2V2.z).multiply(_lp2Mir).multiply(_lp2Tmp.makeTranslation(-_lp2V2.x, -_lp2V2.y, -_lp2V2.z)).multiply(_lp2U)
   } else {
@@ -10233,7 +10235,7 @@ function applyLoadingPreviewPose(item) {
     _loadingPreviewBase.copy(loadingPreviewAnchor).sub(_loadingPreviewBase)
     previewBase = _loadingPreviewBase
   }
-  applyPoseOffsetToPosition(loadingPreviewHand.clone, previewBase, loadingPreviewCamera, values)
+  applyPoseOffsetToPosition(loadingPreviewHand.clone, previewBase, loadingPreviewCamera, values, (loadingPreviewTwoHandActive && lpHandoScaleCur > 0) ? loadingPreviewModelScale / lpHandoScaleCur : 0)
   loadingPreviewHand.clone.scale.setScalar(previewScale)
   // `item` (NOT `values` -- see this function's own top comment, `values`
   // is rebuilt fresh from ONLY POSE_PRESET_KEYS, which `hideWrist`
@@ -13047,10 +13049,17 @@ const _poseLocalOffsetVec = new THREE.Vector3(), _poseLocalAxesQ = new THREE.Qua
 // doesn't yet have a valid base position (see applyPoseValuesToHand()'s
 // own `hand.basePosition` guard) can skip JUST the position write
 // without also skipping its own unconditional scale update.
-function applyPoseOffsetToPosition(positionTarget, basePosition, cam, values) {
+// `handoUnit` (2026-10-18, direct report: "I exported a 2 hand tween to Handy Dandies and it doesn't offset correctly"): > 0 only for a pose played from a HANDO two-hand tween in the Loading Preview, = preview units per HANDO unit
+// (loadingPreviewModelScale / seq.handoScale). A HANDO pose offset is in HANDO world units, along HANDO's world axes; this preview's hand is ~3.9x smaller than HANDO's (scale ~100 vs 388), and its camera is a converted HANDO
+// camera that is not axis-aligned, so BOTH offsets (world and local) are scaled by it, and the world one follows HANDO's world axes (alignQuat, the same mapping the camera / lighting imports use) instead of the preview camera's
+// right / up / toward-camera. 0 = every other caller, unchanged (camera-relative world offset in HANDY DANDIES' own units).
+function applyPoseOffsetToPosition(positionTarget, basePosition, cam, values, handoUnit = 0) {
   positionTarget.position.copy(basePosition)
   const ox = values.poseOffsetX || 0, oy = values.poseOffsetY || 0, oz = values.poseOffsetZ || 0
-  if ((ox || oy || oz) && cam) {
+  if ((ox || oy || oz) && handoUnit > 0) {
+    _poseLocalOffsetVec.set(ox, oy, oz).applyQuaternion(alignQuat).multiplyScalar(handoUnit)
+    positionTarget.position.add(_poseLocalOffsetVec)
+  } else if ((ox || oy || oz) && cam) {
     cam.updateMatrixWorld()
     _poseOffsetRightVec.setFromMatrixColumn(cam.matrixWorld, 0)
     _poseOffsetUpVec.setFromMatrixColumn(cam.matrixWorld, 1)
@@ -13066,7 +13075,10 @@ function applyPoseOffsetToPosition(positionTarget, basePosition, cam, values) {
     _poseLocalAxesEuler.set(THREE.MathUtils.degToRad(values.modelRotX || 0), THREE.MathUtils.degToRad(values.modelRotY || 0), THREE.MathUtils.degToRad(values.modelRotZ || 0))
     _poseLocalAxesQ.setFromEuler(_poseLocalAxesEuler)
     _poseLocalAxesQ.multiply(computeBaseRotationQuat(values.baseRotationX || 0, values.baseRotationY || 0, values.baseRotationZ || 0, _poseLocalAxesRb)).premultiply(alignQuat)
-    _poseLocalOffsetVec.set(lx, ly, lz).applyQuaternion(_poseLocalAxesQ)
+    // the vector is in the hand MESH's own (glTF) axes, like HANDO's: modelBaseFrameQ (the mesh's axes relative to the model root - the armature's +90 deg X) takes it into the root frame this preview's raw positions live in,
+    // THEN the pose's orientation (alignQuat * Whole-Hand Rotation * Rotation at Base) turns it. Without the frame step the Y and Z sliders came out rotated by 90 deg about X relative to HANDO (measured against HANDO's own numbers).
+    _poseLocalOffsetVec.set(lx, ly, lz).applyQuaternion(modelBaseFrameQ).applyQuaternion(_poseLocalAxesQ)
+    if (handoUnit > 0) _poseLocalOffsetVec.multiplyScalar(handoUnit)
     positionTarget.position.add(_poseLocalOffsetVec)
   }
 }
