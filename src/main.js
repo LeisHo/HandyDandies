@@ -389,6 +389,7 @@ let loadingPreviewAnchorActive = false
 let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: null, speedRangeParsed: null }
 // Loading Preview End Sequence (2026-10-18): state + its own easing trig, declared up here (the restore can reach the onChange handlers at top level - TDZ). lpLastValues / lpHand2LastValues = the last pose applied to each preview hand.
 let loadingPreviewEndEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], speedRangeParsed: null }
+let lpLapNom = 0, lpLapNomStart = -1, lpLapNomLastMs = 0 // Animation Speed Curve: the lap's own progress clock (0..1), advanced per frame so the speed can change while a lap plays
 let lpHideModel1 = 0, lpHideModel2 = 0 // the Hide Model % of the pose each loading-preview hand is showing right now (kept so the Real Time Loading crop, which re-applies the clip on its own, does not lose it)
 let lpLastValues = null, lpHand2LastValues = null
 // Smooth loading (2026-10-18): loadingWarmMode = updateRenderOrder() is running behind the loading screen (only the first idle repose of the hands, in a time budget); fieldPreposeDeadline = the latest the reveal waits for it;
@@ -2929,6 +2930,11 @@ const DEV_GROUPS = [
       // checkbox inside an "Easing" subgroup (setupLoadingPreviewEasingGroup()).
       { key: 'loadingPreviewEasingCurveEnabled', label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: (v) => updateLoadingPreviewEasingCurveVisibility(v) },
       { key: 'loadingPreviewEasingCurve', label: 'Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseLoadingPreviewEasingConfig() },
+      // Animation Speed Curve (2026-10-19, direct request): the lap speed (ms per cycle, like Loading Preview Speed) changes over the LOADING PROGRESS - X = loading progress 0..100 %, Y = 0 -> the Min speed, 1 -> the Max speed.
+      // Gated subgroup built by setupLoadingPreviewSpeedCurveGroup(). Replaces the Speed slider while on (not in Count mode, where the laps are pinned to Min Loading Time / Count).
+      { key: 'loadingPreviewSpeedCurveEnabled', label: 'Animation Speed Curve On/Off', type: 'checkbox', def: false, onChange: (v) => updateLoadingPreviewSpeedCurveRows(v) },
+      { key: 'loadingPreviewSpeedCurveRange', label: 'Min / Max Speed (Ms / Cycle)', type: 'text', def: '{"min":600,"max":1500}' },
+      { key: 'loadingPreviewSpeedCurve', label: 'Speed Curve (Loading Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]' },
       // 2nd Hand Extra Offset X / Y / Z (2026-10-14, direct request: the two-hand loading tween still looked too far apart): added on top of the imported 2nd-hand placement (HANDO's Offset X / Y / Z, in HANDO's own world units, applied before the
       // mirror). With the usual mirror on X an imported Offset X is negative, so a POSITIVE extra X pulls the 2nd hand toward the main hand. 0 = exactly HANDO's placement (checked bone-for-bone against HANDO: <= 0.3 units).
       { key: 'loadingPreviewHand2ExtraX', label: 'Loading Preview 2nd Hand Extra Offset X (Units, + = Toward Main Hand)', type: 'slider', min: -100, max: 100, step: 0.5, def: 0 },
@@ -10383,6 +10389,25 @@ function setupLoadingPreviewEasingGroup() {
   wrapGatedSubgroup('loadingPreviewEasingCurveEnabled', ['loadingPreviewEasingCurve'], 'Easing')
   updateLoadingPreviewEasingCurveVisibility(!!cfg.loadingPreviewEasingCurveEnabled)
 }
+// Animation Speed Curve (see the control comment). The curve and the range are parsed only when their text changes.
+const lpSpeedCurveCache = { curveStr: null, pts: null, rangeStr: null, range: null }
+function lpSpeedCurveMs(progress) {
+  const c = lpSpeedCurveCache
+  if (cfg.loadingPreviewSpeedCurve !== c.curveStr) { c.curveStr = cfg.loadingPreviewSpeedCurve; c.pts = sphereParse(c.curveStr, [{ x: 0, y: 0 }, { x: 1, y: 1 }]) }
+  if (cfg.loadingPreviewSpeedCurveRange !== c.rangeStr) { c.rangeStr = cfg.loadingPreviewSpeedCurveRange; c.range = sphereParse(c.rangeStr, { min: 600, max: 1500 }) }
+  const t = THREE.MathUtils.clamp(evaluateArmLengthCurve(c.pts, progress), 0, 1)
+  return Math.max(c.range.min + (c.range.max - c.range.min) * t, 1)
+}
+function updateLoadingPreviewSpeedCurveRows(on) {
+  ;['loadingPreviewSpeedCurveRange', 'loadingPreviewSpeedCurve'].forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row) row.style.display = on ? '' : 'none' })
+}
+function setupLoadingPreviewSpeedCurveGroup() {
+  const curveRow = document.querySelector('.dp-row[data-key="loadingPreviewSpeedCurve"]'), rangeRow = document.querySelector('.dp-row[data-key="loadingPreviewSpeedCurveRange"]')
+  if (curveRow && !curveRow.querySelector('svg')) buildGenericCurveWidget(curveRow, { caption: 'X: Loading Progress (0 = Just Started, 100% = Loading Done)  ·  Y: Speed (0 = Min Speed, 1 = Max Speed, in Ms / Cycle)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (rangeRow && !rangeRow.dataset.lpscBuilt) { rangeRow.dataset.lpscBuilt = '1'; buildGenericRangeBarWidget(rangeRow, { trackMin: 200, trackMax: 5000, unit: 'ms', defaultValue: { min: 600, max: 1500 } }) }
+  wrapGatedSubgroup('loadingPreviewSpeedCurveEnabled', ['loadingPreviewSpeedCurveRange', 'loadingPreviewSpeedCurve'], 'Animation Speed Curve')
+  updateLoadingPreviewSpeedCurveRows(!!cfg.loadingPreviewSpeedCurveEnabled)
+}
 // Plays the selected Tween Sequence (every named pose in it) for as
 // long as the loading screen stays up, per the Sequence Mode
 // (Count/Loop/Oscillate) settings -- same lap-based mechanism as
@@ -10485,7 +10510,15 @@ function updateLoadingPreviewAnimation() {
     const baseW = segments.reduce((sum, sg) => sum + sg.weight, 0)
     lapMs = speedMs * (baseW + wrapK) / (baseW + 1)
   }
-  const lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / lapMs, 0, 1)
+  let lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / lapMs, 0, 1)
+  if (cfg.loadingPreviewSpeedCurveEnabled && playMode !== 'Count') {
+    // Animation Speed Curve: the lap clock advances by dt / (the speed at the CURRENT loading progress), so the speed can change while a lap plays; a new lap (loadingPreviewLapStartMs changed) restarts it. dt is capped so a hidden tab does not jump.
+    if (lpLapNomStart !== loadingPreviewLapStartMs) { lpLapNomStart = loadingPreviewLapStartMs; lpLapNom = 0; lpLapNomLastMs = loadingPreviewLapStartMs }
+    const dtMs = Math.min(Math.max(now - lpLapNomLastMs, 0), 100)
+    lpLapNomLastMs = now
+    lpLapNom += dtMs / Math.max(lpSpeedCurveMs(loadingProgressNow(true)) * (lapMs / speedMs), 1)
+    lapT = THREE.MathUtils.clamp(lpLapNom, 0, 1)
+  }
   // Easing Curve (2026-10-12): reshapes WHERE in the lap the pose sits, not
   // how long a lap lasts. The profile's own total is discarded here on
   // purpose -- Count mode's Min Loading Time / Count split must still hold --
@@ -22469,6 +22502,7 @@ updateFloor()
 setupHandOffsetStartupGroup()
 setupSphereSequenceGroup()
 setupLoadingPreviewEasingGroup()
+setupLoadingPreviewSpeedCurveGroup()
 safeRefreshSelectOptions('trackingPoint')
 document.addEventListener('visibilitychange', syncPauseWithVisibility)
 window.addEventListener('blur', syncPauseWithVisibility)
