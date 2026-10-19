@@ -269,19 +269,15 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "Two-Hand Tween",
+      "loadingPreviewTweenSelector": "2 Twids - 2H",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - 2H - F",
-          "sequence": "Two-Hand Tween"
-        },
-        {
           "name": "2 Twids - 2H",
-          "sequence": "Two-Hand Tween"
+          "sequence": "2 Twids - 2H"
         },
         {
-          "name": "2 T",
-          "sequence": "Two-Hand Tween"
+          "name": "2 Twids - 2H -F",
+          "sequence": "2 Twids - 2H -F"
         }
       ],
       "loadingPreviewSavedCameras": [
@@ -17190,7 +17186,7 @@
           "group": "FIST ROTATE"
         },
         {
-          "name": "Two-Hand Tween",
+          "name": "2 Twids - 2H",
           "tweenPoses": [
             "2 TWIDS - 0",
             "2 TWIDS - 25",
@@ -17409,6 +17405,40 @@
             "2 TWIDS - F1"
           ],
           "group": ""
+        },
+        {
+          "name": "2 Twids - 2H -F",
+          "tweenPoses": [
+            "2 TWIDS - 75",
+            "2 TWIDS - F0",
+            "2 TWIDS - F1"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 75 (2ND HAND)",
+            "2 TWIDS - F0 (2ND HAND)",
+            "2 TWIDS - F1 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
         }
       ],
       "cameraX": 1.5625001668540408,
@@ -22211,19 +22241,15 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 0,
-      "loadingPreviewTweenSelector": "WAITING HORIZONTAL",
+      "loadingPreviewTweenSelector": "2 Twids - 2H",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - 2H - F",
-          "sequence": "Two-Hand Tween"
-        },
-        {
           "name": "2 Twids - 2H",
-          "sequence": "Two-Hand Tween"
+          "sequence": "2 Twids - 2H"
         },
         {
-          "name": "2 T",
-          "sequence": "Two-Hand Tween"
+          "name": "2 Twids - 2H -F",
+          "sequence": "2 Twids - 2H -F"
         }
       ],
       "loadingPreviewSavedCameras": [
@@ -39132,7 +39158,7 @@
           "group": "FIST ROTATE"
         },
         {
-          "name": "Two-Hand Tween",
+          "name": "2 Twids - 2H",
           "tweenPoses": [
             "2 TWIDS - 0",
             "2 TWIDS - 25",
@@ -39351,10 +39377,44 @@
             "2 TWIDS - F1"
           ],
           "group": ""
+        },
+        {
+          "name": "2 Twids - 2H -F",
+          "tweenPoses": [
+            "2 TWIDS - 75",
+            "2 TWIDS - F0",
+            "2 TWIDS - F1"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 75 (2ND HAND)",
+            "2 TWIDS - F0 (2ND HAND)",
+            "2 TWIDS - F1 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
         }
       ],
       "cameraX": -3.422222222222221,
-      "cameraY": 1.0853324851110394e-12,
+      "cameraY": 1.1764462069676021e-12,
       "cameraZ": 495.9881938061244,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -44153,19 +44213,15 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "Two-Hand Tween",
+      "loadingPreviewTweenSelector": "2 Twids - 2H",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - 2H - F",
-          "sequence": "Two-Hand Tween"
-        },
-        {
           "name": "2 Twids - 2H",
-          "sequence": "Two-Hand Tween"
+          "sequence": "2 Twids - 2H"
         },
         {
-          "name": "2 T",
-          "sequence": "Two-Hand Tween"
+          "name": "2 Twids - 2H -F",
+          "sequence": "2 Twids - 2H -F"
         }
       ],
       "loadingPreviewSavedCameras": [
@@ -61074,7 +61130,7 @@
           "group": "FIST ROTATE"
         },
         {
-          "name": "Two-Hand Tween",
+          "name": "2 Twids - 2H",
           "tweenPoses": [
             "2 TWIDS - 0",
             "2 TWIDS - 25",
@@ -61293,6 +61349,40 @@
             "2 TWIDS - F1"
           ],
           "group": ""
+        },
+        {
+          "name": "2 Twids - 2H -F",
+          "tweenPoses": [
+            "2 TWIDS - 75",
+            "2 TWIDS - F0",
+            "2 TWIDS - F1"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 75 (2ND HAND)",
+            "2 TWIDS - F0 (2ND HAND)",
+            "2 TWIDS - F1 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
         }
       ],
       "cameraX": 6.6385295949156875,
@@ -66525,10 +66615,6 @@
                   "items": [
                     {
                       "type": "row",
-                      "key": "loadingPreviewImportTwoHandBtn"
-                    },
-                    {
-                      "type": "row",
                       "key": "loadingPreviewTwoHandTweens"
                     },
                     {
@@ -66593,7 +66679,6 @@
                     }
                   ],
                   "settings": [
-                    "loadingPreviewImportTwoHandBtn",
                     "loadingPreviewTwoHandTweens",
                     "loadingPreviewTweenSelector",
                     "loadingPreviewCameraSelector",
@@ -74170,8 +74255,8 @@
     "mobile": {
       "left": 20,
       "top": 176.2678680419922,
-      "width": 401.2857360839844,
-      "height": 494.9285888671875
+      "width": 394.4285888671875,
+      "height": 496.452392578125
     }
   }
 }
