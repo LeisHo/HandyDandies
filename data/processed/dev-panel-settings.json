@@ -14146,9 +14146,9 @@
           }
         }
       ],
-      "cameraX": 1.953488372093023,
-      "cameraY": 2.41656874146273e-13,
-      "cameraZ": 121.49224064861718,
+      "cameraX": 1.9534883720930232,
+      "cameraY": 2.041020698109996e-13,
+      "cameraZ": 245.9004898795015,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -56703,7 +56703,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
