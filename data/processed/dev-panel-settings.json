@@ -47820,7 +47820,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -47851,7 +47851,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -52378,9 +52378,9 @@
     "loadingPreviewOffsetZ": true,
     "loadingPreviewCameraFov": true,
     "loadingPreviewCameraZoom": true,
-    "loadingPreviewTweenSelector": true,
+    "loadingPreviewTweenSelector": false,
     "loadingPreviewCameraSelector": true,
-    "loadingPreviewLightingSelector": true,
+    "loadingPreviewLightingSelector": false,
     "loadingPreviewSequenceMode": false,
     "loadingPreviewSequenceCountMode": true,
     "loadingPreviewSequenceCount": true,
@@ -53138,7 +53138,17 @@
     "loadingPreviewEndRetransitionEnabled": false,
     "loadingPreviewEndRetransitionSpeedMs": false,
     "loadingPreviewEndRetransitionEasingEnabled": false,
-    "loadingPreviewEndPauseMs": false
+    "loadingPreviewEndPauseMs": false,
+    "loadingPreviewKeyAzimuth": false,
+    "loadingPreviewKeyElevation": false,
+    "loadingPreviewKeyTargetHeight": false,
+    "loadingPreviewKeyIntensity": false,
+    "loadingPreviewKeyColor": false,
+    "loadingPreviewAmbientIntensity": false,
+    "loadingPreviewAmbientSkyColor": false,
+    "loadingPreviewAmbientGroundColor": false,
+    "loadingPreviewKeyLightType": false,
+    "loadingPreviewKeyDistance": false
   },
   "devIndependence": {
     "mobile": {
