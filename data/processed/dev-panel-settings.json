@@ -267,7 +267,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -14146,9 +14146,9 @@
           }
         }
       ],
-      "cameraX": 1.9534883720930232,
-      "cameraY": 1.9836057229589415e-13,
-      "cameraZ": 152.13471971453785,
+      "cameraX": 1.953488372093023,
+      "cameraY": 2.1869146971580583e-13,
+      "cameraZ": 27.7216884521726,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -37691,7 +37691,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -56703,7 +56703,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -56799,7 +56799,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -56834,7 +56834,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -57185,14 +57185,14 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > End Sequence",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -64509,8 +64509,8 @@
     "desktop": {
       "left": 122.375,
       "top": 69,
-      "width": 411.3500061035156,
-      "height": 580.1875
+      "width": 414.5500183105469,
+      "height": 581.7875366210938
     }
   }
 }
