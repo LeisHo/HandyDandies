@@ -11,7 +11,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=93'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=95'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -36,7 +36,7 @@ function safeRefreshMultiSelectOptions(key) {
 // Every dropdown that lists the saved tween sequences: the Loading Tween Sequence, and the Sequence / Chain rows of EVERY click function (the Starting State one, custom functions, their Multi Triggers).
 // Found by the rows that exist right now instead of a hard-coded key list, which missed the loading preview and every custom function (2026-10-15, direct report: an imported tween did not show up in them).
 function refreshAllTweenSequenceSelectors() {
-  const keys = new Set(['loadingPreviewTweenSelector', 'dcHoldTweenSelector', 'rcTweenSelector', 'chpTweenSelector', 'rchpTweenSelector', 'clickTweenSelector', 'dblclickTweenSelector'])
+  const keys = new Set(['loadingPreviewTweenSelector', 'loadingPreviewEndSequence', 'dcHoldTweenSelector', 'rcTweenSelector', 'chpTweenSelector', 'rchpTweenSelector', 'clickTweenSelector', 'dblclickTweenSelector'])
   const chains = new Set()
   document.querySelectorAll('.dp-row[data-key]').forEach((row) => {
     const k = row.dataset.key
@@ -386,6 +386,18 @@ let loadingPreviewAnchorActive = false
 // shared profile code is reused unchanged. Declared up here, not next to its
 // functions: the restore can call its onChange at top level (TDZ gotcha).
 let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: null, speedRangeParsed: null }
+// Loading Preview End Sequence (2026-10-18): state + its own easing trig, declared up here (the restore can reach the onChange handlers at top level - TDZ). lpLastValues / lpHand2LastValues = the last pose applied to each preview hand.
+let loadingPreviewEndEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], speedRangeParsed: null }
+let lpLastValues = null, lpHand2LastValues = null
+// Smooth loading (2026-10-18): loadingWarmMode = updateRenderOrder() is running behind the loading screen (only the first idle repose of the hands, in a time budget); fieldPreposeDeadline = the latest the reveal waits for it;
+// loadingPreviewBuiltRoot = the model the preview hand was cloned from (a restored model setting that resolves to the same one must not rebuild the preview).
+let loadingWarmMode = false, fieldPreposeDeadline = 0, loadingPreviewBuiltRoot = null
+// On-screen frame rate (Debug > Show Frame Rate, 2026-10-18): frames actually drawn since the last refresh.
+let frameRateDrawn = 0, frameRateWindowStart = 0, frameRateEl = null
+const endSeq = { phase: 'off', finished: false, lapAtBegin: 0, timer: 0, seq: null, tr1: null, tr2: null, lapIndex: 1, lapStartMs: 0, holdEndMs: 0, dir: 1, lapStyle: 'Loop', total: 1, speedMs: 1000, pauseEndMs: 0, retStartMs: 0, retDur: 0, from1: null, from2: null }
+// Show Loading Preview (live) + End Sequence (2026-10-19): the live preview runs the whole startup cycle - the main loading animation for Min Loading Time, then the End Sequence, then again from the start. progress = the loading progress
+// the crop reads while this cycle is active (loadingProgressNow()); t0 = when the current cycle's main part began.
+const lpLiveCycle = { active: false, t0: 0, progress: 1 }
 const loadingPreviewAnchor = new THREE.Vector3()
 const _loadingPreviewBase = new THREE.Vector3(), _loadingPreviewV2 = new THREE.Vector3()
 // Two-hand tween: the base position applyLoadingPreviewPose() gave the main hand (before the Pose Offset), and whether it was HANDO's exact pivots (see there) - updateLoadingPreviewHand2() needs both for the mirror plane.
@@ -1115,7 +1127,7 @@ function setupLoadingPreviewProgressCropGroup() {
 // The crop runs ONCE (2026-10-17, direct request: "the cropping from 100 to 0 only runs once"): 0 -> 1 over the loading, then it holds at 1 - the loading screen going away does not restart it (it used to loop 0 -> 1 over Min Loading Time in the live preview).
 function loadingProgressNow(real = cfg.loadingPreviewProgressCropRealtime !== false) {
   const now = performance.now()
-  if (fieldRevealed) return 1
+  if (fieldRevealed) return lpLiveCycle.active ? lpLiveCycle.progress : 1
   if (fieldStarted) return 1
   const warm = fieldWarmStage >= 3 ? 1 : fieldWarmStage >= 1 ? 0.3 * (fieldWarmStage >= 2 ? 1 : Math.min(1, (now - fieldWarmStartMs) / FIELD_WARM_CAP_MS)) + 0.7 * (hands.length ? fieldWarmRevealIndex / hands.length : 0) : 0
   const work = 0.1 * (modelMeasurementsReady ? 1 : 0) + 0.1 * (startupSettingsReady ? 1 : 0) + 0.45 * (fieldBuildDone ? 1 : fieldBuildFrac) + 0.35 * warm
@@ -1401,6 +1413,17 @@ function tryStartField() {
       return
     }
   }
+  // Hands that have not had their first idle repose yet (it is spread over the warm-up frames, see animate()) would all do it in the first visible frame: wait a little for them, but never more than 2 s (a judgment call; a hidden tab
+  // does not tick animate() at all).
+  if (hands.length) {
+    if (!fieldPreposeDeadline) fieldPreposeDeadline = performance.now() + 2000
+    if (performance.now() < fieldPreposeDeadline && hands.some((h) => !h.everReposed)) { setTimeout(tryStartField, 50); return }
+  }
+  // End Sequence (2026-10-18): hold the reveal (and with it the whole startup sequence) until the loading animation has finished its lap and the End Sequence has played.
+  if (endSeqShouldRun()) {
+    if (endSeq.phase === 'off') startEndSequence()
+    if (endSeq.phase !== 'done') return
+  }
   fieldStarted = true
   logStartupTiming('fieldStarted = true')
   logLoadingPreview(`field starting -- loading screen hides; preview ${lpLiveOn() ? 'stays visible (Show Loading Preview is on)' : 'is hidden'}`)
@@ -1529,58 +1552,87 @@ const _roV = new THREE.Vector3()
 // ---- Pairwise render-order support (2026-10-11) ----
 // Each hand's K = RO_NEIGHBOURS nearest hands in screen-space XY, as unique pairs: roPairLo[t] < roPairHi[t], t < the returned count.
 let roPairLo = null, roPairHi = null
+// 2026-10-18: only hands that can be seen (_onScr !== false) take part, the grid is a counting-sorted typed array, and the K nearest are kept in a small insertion buffer. The previous version projected and searched EVERY hand; the
+// off-screen ones (behind or far off to the side of the camera) stretched the bounding box, made the cells huge and crowded, and the ring search sorted whole candidate lists: 72 ms of a 141 ms frame at 3025 hands (measured).
+// A hand that is not on screen is not drawn, so its place in the order does not matter; it simply has no pairs (and ends up in layer 0).
+let roAct = null, roCellStart = null, roCellFill = null, roCellItems = null, roCellOfA = null
+const roBD = new Float64Array(64), roBI = new Int32Array(64)
 function roKnnPairs(n) {
   const cw = renderer.domElement.clientWidth || window.innerWidth, ch = renderer.domElement.clientHeight || window.innerHeight
   if (!roSX || roSX.length !== n) { roSX = new Float64Array(n); roSY = new Float64Array(n); roSR = new Float64Array(n); roIndeg = new Int32Array(n); roHead = new Int32Array(n); roDone = new Uint8Array(n) }
-  const K = Math.min(RO_NEIGHBOURS, n - 1)
+  const K = Math.min(RO_NEIGHBOURS, n - 1, 64)
   if (!roPairLo || roPairLo.length < n * Math.max(K, 1)) { roPairLo = new Int32Array(n * Math.max(K, 1)); roPairHi = new Int32Array(n * Math.max(K, 1)) }
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
+  if (!roAct || roAct.length < n) { roAct = new Int32Array(n); roCellOfA = new Int32Array(n); roCellItems = new Int32Array(n) }
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, m = 0
   for (let i = 0; i < n; i++) {
     const h = hands[i]
+    if (h._curlSkip) continue // outside every camera's view (see updateFingerCurlSkip()): not drawn, so its place in the order is irrelevant
     _roV.copy(handBoundsCenterLocal).multiplyScalar(h.clone.scale.x).applyQuaternion(alignQuat).applyQuaternion(h.wrapper.quaternion).add(h.wrapper.position)
     _roV.project(camera)
     const sx = (_roV.x * 0.5 + 0.5) * cw, sy = (-_roV.y * 0.5 + 0.5) * ch
     roSX[i] = sx; roSY[i] = sy
+    roAct[m++] = i
     if (sx < minX) minX = sx
     if (sx > maxX) maxX = sx
     if (sy < minY) minY = sy
     if (sy > maxY) maxY = sy
   }
-  if (K <= 0) return 0
+  if (K <= 0 || m < 2) return 0
+  const Km = Math.min(K, m - 1)
   // grid cell sized for ~2 hands per cell on average, so a ring search finds the neighbours within a couple of rings
-  const cell = Math.max(Math.sqrt(Math.max((maxX - minX) * (maxY - minY), 1) * 2 / Math.max(n, 1)), 2)
-  const maxRing = Math.ceil(Math.max(maxX - minX, maxY - minY) / cell) + 2
-  const grid = new Map()
-  const cxOf = (i) => Math.floor((roSX[i] - minX) / cell), cyOf = (i) => Math.floor((roSY[i] - minY) / cell)
-  const keyOf = (cx, cy) => (cx + 1000) * 200003 + (cy + 1000)
-  for (let i = 0; i < n; i++) { const k = keyOf(cxOf(i), cyOf(i)); const arr = grid.get(k); if (arr) arr.push(i); else grid.set(k, [i]) }
+  let cell = Math.max(Math.sqrt(Math.max((maxX - minX) * (maxY - minY), 1) * 2 / m), 2)
+  let gw = Math.floor((maxX - minX) / cell) + 1, gh = Math.floor((maxY - minY) / cell) + 1
+  while (gw * gh > 4 * m + 1024) { cell *= 1.5; gw = Math.floor((maxX - minX) / cell) + 1; gh = Math.floor((maxY - minY) / cell) + 1 }
+  const cells = gw * gh
+  if (!roCellStart || roCellStart.length < cells + 1) { roCellStart = new Int32Array(cells + 1); roCellFill = new Int32Array(cells + 1) }
+  roCellStart.fill(0, 0, cells + 1)
+  for (let a = 0; a < m; a++) {
+    const i = roAct[a]
+    const cx = Math.min(Math.floor((roSX[i] - minX) / cell), gw - 1), cy = Math.min(Math.floor((roSY[i] - minY) / cell), gh - 1)
+    const c = cy * gw + cx
+    roCellOfA[a] = c
+    roCellStart[c + 1]++
+  }
+  for (let c = 0; c < cells; c++) roCellStart[c + 1] += roCellStart[c]
+  for (let c = 0; c < cells; c++) roCellFill[c] = roCellStart[c]
+  for (let a = 0; a < m; a++) roCellItems[roCellFill[roCellOfA[a]]++] = roAct[a]
+  const maxRing = Math.max(gw, gh) + 1
   const pairSeen = new Set()
-  const candD = [], candI = []
-  let count = 0
-  for (let i = 0; i < n; i++) {
-    const cx = cxOf(i), cy = cyOf(i)
-    candD.length = 0; candI.length = 0
-    for (let r = 0; r <= maxRing; r++) {
-      for (let dx = -r; dx <= r; dx++) for (let dy = -r; dy <= r; dy++) {
-        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue
-        const arr = grid.get(keyOf(cx + dx, cy + dy))
-        if (!arr) continue
-        for (let q = 0; q < arr.length; q++) {
-          const j = arr[q]
-          if (j === i) continue
-          const ddx = roSX[i] - roSX[j], ddy = roSY[i] - roSY[j]
-          candD.push(ddx * ddx + ddy * ddy); candI.push(j)
-        }
-      }
-      if (candI.length >= K) {
-        // done once the K-th nearest is closer than the unsearched region (everything outside r rings is at least r*cell away)
-        const sorted = candD.slice().sort((x, y) => x - y)
-        if (sorted[K - 1] <= (r * cell) * (r * cell)) break
+  let count = 0, cnt = 0, curI = 0, curX = 0, curY = 0
+  const scan = (gx, gy) => {
+    const c = gy * gw + gx
+    for (let q = roCellStart[c], qe = roCellStart[c + 1]; q < qe; q++) {
+      const j = roCellItems[q]
+      if (j === curI) continue
+      const ddx = curX - roSX[j], ddy = curY - roSY[j], d = ddx * ddx + ddy * ddy
+      if (cnt < Km) {
+        let p = cnt++
+        while (p > 0 && roBD[p - 1] > d) { roBD[p] = roBD[p - 1]; roBI[p] = roBI[p - 1]; p-- }
+        roBD[p] = d; roBI[p] = j
+      } else if (d < roBD[Km - 1]) {
+        let p = Km - 1
+        while (p > 0 && roBD[p - 1] > d) { roBD[p] = roBD[p - 1]; roBI[p] = roBI[p - 1]; p-- }
+        roBD[p] = d; roBI[p] = j
       }
     }
-    const order = candI.map((_, t) => t).sort((x, y) => candD[x] - candD[y])
-    for (let t = 0; t < Math.min(K, order.length); t++) {
-      const j = candI[order[t]]
+  }
+  for (let a = 0; a < m; a++) {
+    const i = roAct[a], c0 = roCellOfA[a]
+    const cx = c0 % gw, cy = (c0 - cx) / gw
+    curI = i; curX = roSX[i]; curY = roSY[i]; cnt = 0
+    for (let r = 0; r <= maxRing; r++) {
+      const x0 = cx - r, x1 = cx + r, y0 = cy - r, y1 = cy + r
+      const gy0 = Math.max(y0, 0), gy1 = Math.min(y1, gh - 1)
+      for (let gy = gy0; gy <= gy1; gy++) {
+        if (gy === y0 || gy === y1) { for (let gx = Math.max(x0, 0), ge = Math.min(x1, gw - 1); gx <= ge; gx++) scan(gx, gy) }
+        else { if (x0 >= 0) scan(x0, gy); if (x1 < gw) scan(x1, gy) }
+      }
+      // done once the Km-th nearest is closer than the unsearched region (everything outside r rings is at least r*cell away), or the whole grid has been covered
+      if (cnt >= Km && roBD[Km - 1] <= (r * cell) * (r * cell)) break
+      if (x0 <= 0 && y0 <= 0 && x1 >= gw - 1 && y1 >= gh - 1) break
+    }
+    for (let t = 0; t < cnt; t++) {
+      const j = roBI[t]
       const lo = i < j ? i : j, hi = i < j ? j : i
       const key = lo * n + hi
       if (pairSeen.has(key)) continue
@@ -1849,6 +1901,7 @@ function computeRenderOrderRanks() {
     if (!k || k.length !== n) k = roKeyArrs[id] = new Float64Array(n)
     for (let i = 0; i < n; i++) {
       const h = hands[i]
+      if (h._curlSkip) continue // not in any camera's view: no pairs, so its key is never compared (2026-10-18)
       roPointInto(h, p, _roNodeV)
       k[i] = m === 'z' ? _roNodeV.z * camSign : m === 'cur' ? -cursorDistXY(_roNodeV) : m === 'cur3' ? -_roNodeV.distanceTo(cursorTarget) : -cameraDistXYOfNode(h, p)
     }
@@ -2030,9 +2083,16 @@ function renestSubgroupRows(parentTitle, spec) {
   const body = fl && fl.querySelector(':scope > .dp-group-body')
   if (!body) return null
   let g = body.querySelector(':scope > .dp-group[data-key="' + spec.title + '"]')
-  if (!g) { g = createGroupElement(spec.title); body.appendChild(g) }
+  const flat = spec.keys.map((k) => body.querySelector(':scope > .dp-row[data-key="' + k + '"]')).filter(Boolean)
+  // 2026-10-18, direct report: "an empty Render Order group in Hand Field ... i moved the real group outside of it". This used to CREATE the group whenever it was missing, so once the user moved the real group out, an empty copy came back
+  // on every load (and a Save recorded it). The group is now created only when there are flat rows to put in it, and an EMPTY copy here is removed when a real one (with rows) lives elsewhere.
+  if (g && !flat.length && !g.querySelector('.dp-row')) {
+    const real = Array.from(document.querySelectorAll('.dp-group[data-key="' + spec.title + '"]')).find((x) => x !== g && x.querySelector('.dp-row'))
+    if (real) { g.remove(); return null }
+  }
+  if (!g) { if (!flat.length) return null; g = createGroupElement(spec.title); body.appendChild(g) }
   const gb = g.querySelector(':scope > .dp-group-body')
-  spec.keys.forEach((k) => { const row = body.querySelector(':scope > .dp-row[data-key="' + k + '"]'); if (row) gb.appendChild(row) })
+  flat.forEach((row) => gb.appendChild(row))
   return gb
 }
 function renestRenderOrderRows() {
@@ -2648,8 +2708,8 @@ const DEV_GROUPS = [
       // `min:0.02, max:1, step:0.01, def:1` convention as every other
       // damping slider in this file.
       // Arm Rotation fine-tune (2026-10-11, direct request, like Palm Face Rotation): extra degrees about the mesh X / Y axes on top of the cursor swing.
-      { key: 'armRotationOffsetX', label: 'Arm Rotation X (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
-      { key: 'armRotationOffsetY', label: 'Arm Rotation Y (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
+      { key: 'armRotationOffsetX', label: 'Arm Rotation X (Deg, Hand Model Axes)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
+      { key: 'armRotationOffsetY', label: 'Arm Rotation Y (Deg, Hand Model Axes)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
       { key: 'armRotationDamping', label: 'Arm Rotation Damping (x)', type: 'slider', min: 0.02, max: 1, step: 0.01, def: 1 },
       // REDEFINED 2026-09-14 (see computeRadialRollDeg()'s own comment
       // for the full account and the user's own exact reference points):
@@ -2673,7 +2733,7 @@ const DEV_GROUPS = [
       // crop plane's own normal (see computeRollQuat()'s own comment for
       // why that axis) -- CLAUDE.md 12n, "feel/response curves are
       // sliders, not constants."
-      { key: 'palmFaceRotationOffset', label: 'Palm Face Rotation (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
+      { key: 'palmFaceRotationOffset', label: 'Palm Face Rotation (Deg, About The Forearm Axis)', type: 'slider', min: -180, max: 180, step: 1, def: 0, perDevice: true },
       // Palm Faces Cursor Distance Curve -- direct spec item 2026-09-24
       // ("provide a curve graph input group... so I can set it such that
       // the further the hand, the less it is responsive to the palm
@@ -2723,10 +2783,12 @@ const DEV_GROUPS = [
       // on (see tryStartField()'s own gate) -- an artificial delay with
       // nothing to show for it isn't what was asked for.
       { key: 'loadingMinTimeMs', label: 'Min Loading Time (Ms)', type: 'slider', min: 0, max: 5000, step: 100, def: 1200 },
-      { key: 'loadingPreviewTweenSelector', label: 'Loading Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
-      // Two-hand tween (2026-10-13): reads a HANDO "hando-two-hand-tween" export from the clipboard, adds its poses / second-hand poses / sequence, and selects the sequence as the loading animation. A sequence flagged twoHand
-      // makes the preview render the second hand by itself (see updateLoadingPreviewHand2()).
-      { key: 'loadingPreviewImportTwoHandBtn', label: 'Import Two-Hand Tween From Clipboard (HANDO)', type: 'button', onClick: (btn) => importTwoHandTween(btn) },
+      { key: 'loadingPreviewTweenSelector', label: 'Loading Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })), onChange: () => { try { refreshListPickerMarksByKey('loadingPreviewTwoHandTweens') } catch (e) { /* no panel */ } } },
+      // Imported Two-Hand Tweens (import 2026-10-13, item selector 2026-10-18, reworked the same day): the Import button of this item selector reads a HANDO "hando-two-hand-tween" export from the clipboard and ADDS it - its poses go to
+      // Saved Poses, its sequence (flagged twoHand: the preview then renders the second hand, see updateLoadingPreviewHand2()) to Saved Tween Sequences - without selecting or using it anywhere; importing the same name again overwrites it.
+      // Every entry here IS such a sequence under the same name, so what the dropdowns list and what this list shows are the same thing: Rename renames the sequence (and every dropdown that had it selected), Delete deletes it,
+      // Use selects it as the Loading Tween Sequence (the entry in use is marked). See syncTwoHandTweenList().
+      { key: 'loadingPreviewTwoHandTweens', label: 'Imported Two-Hand Tweens', type: 'list-picker', def: [], hostManaged: true, buttons: ['use', 'import', 'rename', 'delete', 'group'], itemLabel: 'Two-Hand Tween', placeAfter: 'loadingPreviewTweenSelector', isInUse: (item) => !!cfg.loadingPreviewTweenSelector && cfg.loadingPreviewTweenSelector === (item.sequence || item.name), onUse: (item) => useTwoHandTweenItem(item), onRename: (item, name) => renameTwoHandTween(item, name), onDeleted: (item) => deleteTwoHandTween(item), onImportClick: (btn) => importTwoHandTween(btn) },
       // Camera/Lighting selection for the loading preview's own SEPARATE
       // scene -- direct follow-up request ("allow selecting a Camera
       // setting and a Lighting setting for the chosen loading-preview
@@ -2863,6 +2925,8 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewSequenceCount', label: 'Sequence Count', type: 'slider', min: 1, max: 50, step: 1, def: 3 },
       { key: 'loadingPreviewSequenceCountMode', label: 'Sequence Count Mode - Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Loop', 'Oscillate'], onChange: () => updateLoadingPreviewSequenceVisibility() },
       { key: 'loadingPreviewSequenceLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
+      // Loop Wrap-Back Time Scale (2026-10-18, direct request: a slider for the speed at which the last frame transitions back to the first): the closing last pose -> first pose transition takes this many times as long as one normal pose-to-pose transition (1 = as before). The other transitions keep their speed, so the lap gets longer / shorter by the difference (not in the Loading Preview's Count mode, whose laps are pinned to Min Loading Time: there the wrap-back takes a bigger / smaller share of the lap instead).
+      { key: 'loadingPreviewSequenceLoopWrapScale', label: 'Loop Wrap-Back Time Scale (x A Normal Transition)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1 },
       { key: 'loadingPreviewSequenceHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: 'loadingPreviewSize', label: 'Loading Preview Size (Px)', type: 'slider', min: 80, max: 400, step: 10, def: 160, onChange: () => resizeLoadingPreview() },
       // Responsive to the browser (2026-10-15, direct request: "font and animation size and placement to be responsive to the browser"), through the UI Layout Engine's blended-length values (lib/ui-engine, see
@@ -2908,9 +2972,9 @@ const DEV_GROUPS = [
       // so a rebuild always snaps back to the dropdown's own camera,
       // exactly as before -- orbiting never overrides it unless the user
       // explicitly re-Saves via the list-picker's own Save button.
-      { key: 'loadingPreviewRotationX', label: 'Loading Preview Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
-      { key: 'loadingPreviewRotationY', label: 'Loading Preview Yaw (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
-      { key: 'loadingPreviewRotationZ', label: 'Loading Preview Roll (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewRotationX', label: 'Loading Preview Pitch (Deg, Orbit Elevation Around The Hand)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewRotationY', label: 'Loading Preview Yaw (Deg, Orbit Around The Hand)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
+      { key: 'loadingPreviewRotationZ', label: 'Loading Preview Roll (Deg, About The View Axis)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       { key: 'loadingPreviewOffsetX', label: 'Loading Preview Offset X (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       { key: 'loadingPreviewOffsetY', label: 'Loading Preview Offset Y (World Units)', type: 'slider', min: -30, max: 30, step: 0.5, def: 0, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       // Direct request 2026-09-20 ("provide Loading Preview Offset Z...
@@ -2971,6 +3035,27 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewProgressCropFlip', label: 'Crop From The Fingertip End (Off = From The Arm End)', type: 'checkbox', def: false },
       { key: 'loadingPreviewProgressCropRange', label: 'Min / Max Crop (%)', type: 'text', def: '{"min":0,"max":100}' },
       { key: 'loadingPreviewProgressCropCurve', label: 'Crop Curve (Loading Progress -> Crop Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]' },
+      // End Sequence (2026-10-18, direct request): when the loading is complete the loading animation finishes its lap / count, the preview then plays this sequence, and only after it does the field start (the offset / sphere
+      // startup sequence). Same sub-groups as a click function set to a Sequence (Sequence, Sequence Mode, Easing, Retransition) minus the per-hand / distance ones. The rows are moved into a nested, toggleable "End Sequence" group
+      // by setupLoadingPreviewEndSequenceGroup(); see updateLoadingPreviewEndSequence() for how it plays.
+      { key: 'loadingPreviewEndEnabled', label: 'End Sequence On/Off', type: 'checkbox', def: false, onChange: () => updateLoadingPreviewEndGroupVisibility() },
+      { key: 'loadingPreviewEndSequence', label: 'Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
+      { key: 'loadingPreviewEndReverse', label: 'Reverse Sequence', type: 'checkbox', def: false },
+      { key: 'loadingPreviewEndGlide', label: 'Glide To Pose 1', type: 'checkbox', def: true },
+      { key: 'loadingPreviewEndGlideScale', label: 'First Transition Time Scale (x)', type: 'slider', min: 0.1, max: 5, step: 0.05, def: 1 },
+      { key: 'loadingPreviewEndSpeedMs', label: 'Animation Speed (Ms)', type: 'slider', min: 50, max: 5000, step: 10, def: 1500 },
+      { key: 'loadingPreviewEndCount', label: 'Sequence Count', type: 'slider', min: 1, max: 50, step: 1, def: 1 },
+      { key: 'loadingPreviewEndCountMode', label: 'Sequence Count Mode - Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Loop', 'Oscillate'] },
+      { key: 'loadingPreviewEndLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
+      { key: 'loadingPreviewEndLoopWrapScale', label: 'Loop Wrap-Back Time Scale (x A Normal Transition)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1 },
+      { key: 'loadingPreviewEndHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
+      { key: 'loadingPreviewEndEasingEnabled', label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateLoadingPreviewEndGroupVisibility() },
+      { key: 'loadingPreviewEndEasingCurve', label: 'Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseLoadingPreviewEndEasingConfig() },
+      { key: 'loadingPreviewEndPauseMs', label: 'Pause Duration At Sequence End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
+      { key: 'loadingPreviewEndRetransitionEnabled', label: 'Retransition On/Off', type: 'checkbox', def: false, onChange: () => updateLoadingPreviewEndGroupVisibility() },
+      { key: 'loadingPreviewEndRetransitionSpeedMs', label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 25000, step: 10, def: 600 },
+      { key: 'loadingPreviewEndRetransitionEasingEnabled', label: 'Retransition Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateLoadingPreviewEndGroupVisibility() },
+      { key: 'loadingPreviewEndRetransitionEasingCurve', label: 'Retransition Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseLoadingPreviewEndEasingConfig() },
       { key: 'loadingPreviewCameraEditMode', label: 'Loading Preview Camera Edit Mode', type: 'checkbox', def: false, onChange: (v) => { if (loadingPreviewOrbitControls) loadingPreviewOrbitControls.enabled = v; if (loadingPreviewCanvas) loadingPreviewCanvas.style.pointerEvents = v ? 'auto' : 'none' } }
     ]
   },
@@ -3241,8 +3326,8 @@ const DEV_GROUPS = [
       { key: 'tipTwistPinky', label: 'Pinky Tip Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: -3, onChange: () => applyCurl('pinky') },
       { key: 'midTwistPinky', label: 'Pinky 2nd Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
       { key: 'baseTwistPinky', label: 'Pinky Base Segment Twist (%)', type: 'slider', min: -100, max: 100, step: 1, def: 0, onChange: () => applyCurl('pinky') },
-      { key: 'wristBend', label: 'Wrist Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
-      { key: 'wristSplay', label: 'Wrist Splay (Deg)', type: 'slider', min: -30, max: 30, step: 1, def: -1, onChange: () => applyWristPose() },
+      { key: 'wristBend', label: 'Wrist Bend (Deg, Wrist Bone X Axis)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'wristSplay', label: 'Wrist Splay (Deg, Wrist Bone Z Axis)', type: 'slider', min: -30, max: 30, step: 1, def: -1, onChange: () => applyWristPose() },
       // Ported from HANDO (direct request: "check Hando. I added a wrist
       // rotation slider... make sure we can take those imports etc"). Same
       // local-Y rotation on the shared `rHand` bone HANDO's own comment
@@ -3258,19 +3343,19 @@ const DEV_GROUPS = [
       // unlike the camera/lighting HANDO-import path, this bone-local
       // rotation isn't affected by the alignQuat difference between the 2
       // projects).
-      { key: 'wristRotation', label: 'Wrist Rotation (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0, lockRange: true, onChange: () => applyWristPose() },
+      { key: 'wristRotation', label: 'Wrist Rotation (Deg, Wrist Bone Y Axis)', type: 'slider', min: -360, max: 360, step: 1, def: 0, lockRange: true, onChange: () => applyWristPose() },
       // IK rig only (see IK RIG above): HANDO's forearm joints. The sliders exist for every model so poses carry the values, but only the IK rig reads them.
-      { key: 'elbowBend', label: 'Elbow Bend (Deg)', type: 'slider', min: -10, max: 150, step: 1, def: 0, onChange: () => applyWristPose() },
-      { key: 'elbowSideBend', label: 'Elbow Side Bend (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
-      { key: 'forearmTwist', label: 'Forearm Twist (Deg)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
-      { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
-      { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
-      { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'elbowBend', label: 'Elbow Bend (Deg, Elbow Bone Z Axis)', type: 'slider', min: -10, max: 150, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'elbowSideBend', label: 'Elbow Side Bend (Deg, Elbow Bone X Axis)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'forearmTwist', label: 'Forearm Twist (Deg, Forearm Bone Y Axis)', type: 'slider', min: -90, max: 90, step: 1, def: 0, onChange: () => applyWristPose() },
+      { key: 'modelRotX', label: 'Whole-Hand Rotation X (Deg, Hand Model Axes)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'modelRotY', label: 'Whole-Hand Rotation Y (Deg, Hand Model Axes)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'modelRotZ', label: 'Whole-Hand Rotation Z (Deg, Hand Model Axes)', type: 'slider', min: -200, max: 200, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       // Whole-Hand Rotation at Base (ported from HANDO, 2026-10-11): turns the whole hand around the BASE OF THE ARM (the forearm root bone) about the hand
       // MODEL'S OWN local X/Y/Z axes, applied after Whole-Hand Rotation (so it rotates with it). Same -180..180 range as HANDO. See computeBaseRotationQuat().
-      { key: 'baseRotationX', label: 'Base Rotation X (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
-      { key: 'baseRotationY', label: 'Base Rotation Y (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
-      { key: 'baseRotationZ', label: 'Base Rotation Z (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'baseRotationX', label: 'Base Rotation X (Deg, Hand Model Axes, Around The Arm Base)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'baseRotationY', label: 'Base Rotation Y (Deg, Hand Model Axes, Around The Arm Base)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
+      { key: 'baseRotationZ', label: 'Base Rotation Z (Deg, Hand Model Axes, Around The Arm Base)', type: 'slider', min: -180, max: 180, step: 1, def: 0, lockRange: true, onChange: () => onWholeHandRotationChange() },
       // Ported from HANDO's own "Pose Offset X/Y/Z" + "Pose Scale" sliders
       // (direct request -- see POSE_PRESET_KEYS's own comment for the full
       // account). Deliberately scoped to ACTIVE pose transitions only
@@ -3288,6 +3373,11 @@ const DEV_GROUPS = [
       { key: 'poseOffsetX', label: 'Pose Offset X (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
       { key: 'poseOffsetY', label: 'Pose Offset Y (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
       { key: 'poseOffsetZ', label: 'Pose Offset Z (World Units)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
+      // Pose Local Offset X/Y/Z (2026-10-18, ported from HANDO, direct request: "3 more offset sliders ... XYZ, but in the hand model's local axes"): the Pose Offset above, but along the hand MESH's own axes - they turn with the pose's
+      // Whole-Hand Rotation and Rotation at Base. See applyPoseOffsetToPosition().
+      { key: 'poseLocalOffsetX', label: 'Pose Local Offset X (World Units, Hand Axes)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
+      { key: 'poseLocalOffsetY', label: 'Pose Local Offset Y (World Units, Hand Axes)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
+      { key: 'poseLocalOffsetZ', label: 'Pose Local Offset Z (World Units, Hand Axes)', type: 'slider', min: -20, max: 20, step: 0.1, def: 0, onChange: () => { cloneBaseVersion++ } },
       { key: 'poseScale', label: 'Pose Scale (x)', type: 'slider', min: 0.1, max: 3, step: 0.05, def: 1, onChange: () => { cloneBaseVersion++ } },
       // Direct user request: import poses exported from HANDO (identical
       // rig/bone names, same Pose-slider set) and preview them without
@@ -3506,7 +3596,7 @@ const DEV_GROUPS = [
         // group's own Tween Selector dropdown reads this same list via
         // options(), which devPanel.js only rebuilds on an explicit
         // refreshSelectOptions() call.
-        onChange: () => refreshAllTweenSequenceSelectors()
+        onChange: () => { refreshAllTweenSequenceSelectors(); syncTwoHandTweenList() }
       }
     ])
   },
@@ -3536,9 +3626,9 @@ const DEV_GROUPS = [
       // Camera orientation (2026-10-11, direct request: "provide camera yaw roll pitch sliders"). Turn the camera IN PLACE (its position and distance to the pan target stay put):
       // Yaw turns it left/right about the world Y axis, Pitch tilts it up/down, Roll spins it about its own view axis (Euler order YXZ, the usual first-person camera). 0/0/0 looks straight
       // down -Z with +Y up. Two-way bound like the position sliders: dragging the view, a Saved Camera or Default updates them (syncCameraPanelFromLive()).
-      { key: 'cameraYaw', label: 'Camera Yaw (Deg)', type: 'slider', min: -180, max: 180, step: 0.5, def: 1.464, perDevice: true, onChange: () => applyCameraOrientation() },
-      { key: 'cameraPitch', label: 'Camera Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 0.5, def: -2.946, perDevice: true, onChange: () => applyCameraOrientation() },
-      { key: 'cameraRoll', label: 'Camera Roll (Deg)', type: 'slider', min: -180, max: 180, step: 0.5, def: 0, perDevice: true, onChange: () => applyCameraOrientation() },
+      { key: 'cameraYaw', label: 'Camera Yaw (Deg, About World Up)', type: 'slider', min: -180, max: 180, step: 0.5, def: 1.464, perDevice: true, onChange: () => applyCameraOrientation() },
+      { key: 'cameraPitch', label: 'Camera Pitch (Deg, About The Camera X Axis)', type: 'slider', min: -89, max: 89, step: 0.5, def: -2.946, perDevice: true, onChange: () => applyCameraOrientation() },
+      { key: 'cameraRoll', label: 'Camera Roll (Deg, About The View Axis)', type: 'slider', min: -180, max: 180, step: 0.5, def: 0, perDevice: true, onChange: () => applyCameraOrientation() },
       // The Default camera of this set of settings (2026-10-15): Default on a Saved Camera stores the full view here (position, field of view, zoom, roll AND the pan target), so it is saved with every dev setting, comes back on load and on Use, and marks the right item. Hidden bookkeeping row.
       { key: 'cameraDefaultPreset', label: 'Default Camera (internal)', type: 'text', def: '', perDevice: true }, // per device (2026-10-16): the Default set on the Mobile tab is Mobile's own and never replaces Desktop's
       // Direct 2-way binding with scroll/pinch zoom, same pattern as the
@@ -3605,8 +3695,8 @@ const DEV_GROUPS = [
       { key: 'lockCameraPreviewPan', label: 'Lock Camera Pan', type: 'checkbox', def: false, onChange: (v) => withActiveCameraPreview((pc) => { pc.locks.pan = v; applyCameraPreviewLockState() }) },
       { key: 'lockCameraPreviewZoom', label: 'Lock Camera Zoom', type: 'checkbox', def: false, onChange: (v) => withActiveCameraPreview((pc) => { pc.locks.zoom = v; applyCameraPreviewLockState() }) },
       { key: 'lockCameraPreviewRotate', label: 'Lock Camera Rotate', type: 'checkbox', def: false, onChange: (v) => withActiveCameraPreview((pc) => { pc.locks.rotate = v; applyCameraPreviewLockState() }) },
-      { key: 'cameraPreviewYaw', label: 'Camera Yaw (Deg)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => withActiveCameraPreview((pc) => setSphericalFor(pc.camera, pc.controls, { yaw: v })) },
-      { key: 'cameraPreviewPitch', label: 'Camera Pitch (Deg)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => withActiveCameraPreview((pc) => setSphericalFor(pc.camera, pc.controls, { pitch: v })) },
+      { key: 'cameraPreviewYaw', label: 'Camera Yaw (Deg, Orbit Around The Target)', type: 'slider', min: -180, max: 180, step: 1, def: 0, onChange: (v) => withActiveCameraPreview((pc) => setSphericalFor(pc.camera, pc.controls, { yaw: v })) },
+      { key: 'cameraPreviewPitch', label: 'Camera Pitch (Deg, Orbit Around The Target)', type: 'slider', min: -89, max: 89, step: 1, def: 0, onChange: (v) => withActiveCameraPreview((pc) => setSphericalFor(pc.camera, pc.controls, { pitch: v })) },
       // Same list-picker shape as Saved Cameras above. A preview's own pan target is not stored: Use always pivots on world (0,0,0)
       // (HANDYSET's documented design), unlike Saved Cameras, which stores its target.
       { key: 'savedCameraPreviews', label: 'Saved Preview Cameras', type: 'list-picker', def: [], itemLabel: 'Preview Camera', exportable: true, importable: true, captureCurrent: () => captureCameraPreviewFromLive(), onUse: (item) => applyCameraPreviewPreset(item) },
@@ -3970,6 +4060,12 @@ const DEV_GROUPS = [
       { key: 'pauseLogsBtn', label: 'Pause Logs', type: 'button', onClick: (btn) => toggleLogsPaused(btn) },
       // Added 2026-10-17, direct request: "an Export Logs button below the Pause button. It exports all the logs that are active as a json file." See exportDebugLogs() for what counts as active.
       { key: 'exportLogsBtn', label: 'Export Logs', type: 'button', placeAfter: 'pauseLogsBtn', onClick: (btn) => exportDebugLogs(btn) },
+      // Added 2026-10-17, direct request: a checkbox under Export Logs that puts the same export on screen as a corner button next to Pause / Reset, so a log can be exported outside dev mode. A normal saved setting, read in every mode (see setupExportLogsUiButton()).
+      // Show Frame Rate (2026-10-18, direct request): the drawn frames per second as a number at the top right of the screen; the colour and the refresh interval rows only show while it is on. An ordinary saved setting, so it works outside dev mode too.
+      { key: 'showFrameRate', label: 'Show Frame Rate', type: 'checkbox', def: false, placeAfter: 'exportLogsUiButton', onChange: () => applyFrameRateDisplay() },
+      { key: 'frameRateTextColor', label: 'Frame Rate Text Color', type: 'color', def: '#ffffff', placeAfter: 'showFrameRate', onChange: () => applyFrameRateDisplay() },
+      { key: 'frameRateRefreshMs', label: 'Frame Rate Refresh Rate (Ms Between Updates)', type: 'slider', min: 100, max: 5000, step: 50, def: 500, placeAfter: 'frameRateTextColor' },
+      { key: 'exportLogsUiButton', label: 'ADD UI BUTTON', type: 'checkbox', def: false, placeAfter: 'exportLogsBtn', onChange: () => applyExportLogsButtonStyle() },
       // Debug > Snapshot (2026-10-11, direct request): one button takes a single log of THIS moment (replaces the previous snapshot, it is not a running log); the checkboxes pick what goes in it.
       { key: 'snapshotCursor', label: 'Snapshot: Cursor Position', type: 'checkbox', def: true },
       { key: 'snapshotMouse', label: 'Snapshot: Mouse Tracking', type: 'checkbox', def: true },
@@ -4113,11 +4209,16 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
     safeRefreshSelectOptions('loadingPreviewModelId')
+    safeRefreshSelectOptions('loadingPreviewEndSequence')
+    migrateTwoHandTweenList()
+    safeRefreshSelectOptions('loadingPreviewEndCountMode')
     safeRefreshSelectOptions('distCurveXOrigin')
     updateLoadingPreviewLightTypeRows()
     safeRefreshSelectOptions('loadingPreviewKeyLightType')
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
     prof('setupLoadingPreviewProgressCropGroup', setupLoadingPreviewProgressCropGroup)
+    prof('setupLoadingPreviewEndSequenceGroup', setupLoadingPreviewEndSequenceGroup)
+    applyFrameRateDisplay() // shows / hides the colour + refresh rows now that the panel exists
     prof('setupLoadingPreviewLayoutGroup', setupLoadingPreviewLayoutGroup)
     try { await setupResponsiveVelocity() } catch (e) { console.error('Responsive Velocity setup failed', e) }
     exclusiveTriggersReady = true // from here on a user turning a click function on / changing its trigger switches an overlapping one off
@@ -5017,7 +5118,7 @@ function fireStartupHandOffset(ignoreStartDistance) {
 // eligibility / delays) was measured from the wrong place (looked offset / mirrored). Take the cursor from the pointerdown itself, first in line (this listener is registered before every other pointerdown listener).
 window.addEventListener('pointerdown', (e) => {
   if (window.VisibilityTickLoop && window.VisibilityTickLoop.isPaused()) return
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   cursorNDC.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1)
   lastPointerClientX = e.clientX
   lastPointerClientY = e.clientY
@@ -5025,7 +5126,7 @@ window.addEventListener('pointerdown', (e) => {
 }, true)
 window.addEventListener('pointerdown', (e) => {
   if (e.button !== 0) return
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   if (!hands.length || !fieldRevealed) return
   if (sphereSeqActive()) {
     startupConsumeActive = true
@@ -5068,7 +5169,7 @@ function updateHandOffsetGroupVisibility() {
   body.classList.toggle('dp-startup-off', !cfg.handOffsetOnStartupEnabled)
 }
 function setupHandOffsetStartupGroup() {
-  const tweenMembers = ['Mode', 'TargetPose', 'TweenSelector', 'ReverseSequence', 'GlideToFirstPose', 'FirstGlideTimeScale', 'SequencePlayMode', 'SequenceCount', 'SequenceCountMode', 'SequenceLoopTransition', 'SequenceHoldMs', 'TweenChain'].map((k) => STARTUP_FN + k)
+  const tweenMembers = ['Mode', 'TargetPose', 'TweenSelector', 'ReverseSequence', 'GlideToFirstPose', 'FirstGlideTimeScale', 'SequencePlayMode', 'SequenceCount', 'SequenceCountMode', 'SequenceLoopTransition', 'LoopWrapScale', 'SequenceHoldMs', 'TweenChain'].map((k) => STARTUP_FN + k)
   const tg = wrapGatedSubgroup('startupHandTweenEnabled', tweenMembers, 'Animation Tween')
   const hzCurveRow = document.querySelector('.dp-row[data-key="startupHandZCurve"]'), hzRangeRow = document.querySelector('.dp-row[data-key="startupHandZRange"]')
   if (hzCurveRow) buildGenericCurveWidget(hzCurveRow, { caption: 'X: Hand Sequence Progress (0 = Not Started, 100% = Sequence End)  ·  Y: Z (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
@@ -5842,6 +5943,7 @@ function lpNoteRenderedFrame(intervalMs) {
   const dt = now - lpFpsLastFrameAt
   lpFpsLastFrameAt = now
   if (dt > lpFpsWorstMs) lpFpsWorstMs = dt
+  if (dt > 100 && lpFpsFrames > 1) logLoadingPreview('freeze: ' + Math.round(dt) + ' ms between two preview frames' + (fieldWarmStage ? ' (field warm-up stage ' + fieldWarmStage + ')' : (fieldBuildStarted && !fieldBuildDone ? ' (field being built)' : '')) + (endSeq.phase !== 'off' && endSeq.phase !== 'done' ? ' (End Sequence ' + endSeq.phase + ')' : ''))
   const elapsed = now - lpFpsWindowStart
   if (elapsed >= intervalMs) {
     logLoadingPreview(`preview animation ${(lpFpsFrames / (elapsed / 1000)).toFixed(1)} fps (average frame ${(elapsed / lpFpsFrames).toFixed(1)} ms, worst gap ${Math.round(lpFpsWorstMs)} ms, ${lpFpsFrames} frames in ${(elapsed / 1000).toFixed(1)} s)`)
@@ -7567,7 +7669,7 @@ const POSE_PRESET_KEYS = [
   // applied). `|| 0`/`?? 1` fallbacks throughout cover a pose saved
   // before these keys existed, or imported from a HANDO version that
   // predates them -- same convention as baseOnlyCurl*'s own comment.
-  'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseScale',
+  'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseLocalOffsetX', 'poseLocalOffsetY', 'poseLocalOffsetZ', 'poseScale',
   // IK rig (2026-10-16, ported from HANDO's pose set; see IK RIG above): a 0 default is a no-op for every other model, which never reads them.
   'thumbBaseSplay', 'midTwistThumb', 'baseTwistThumb', 'midTwistIndex', 'baseTwistIndex', 'midTwistMiddle', 'baseTwistMiddle', 'midTwistRing', 'baseTwistRing', 'midTwistPinky', 'baseTwistPinky',
   'elbowBend', 'elbowSideBend', 'forearmTwist'
@@ -7704,8 +7806,8 @@ function offsetExtraControls(p, parseFn) {
   rows.push({ key: `${p}RotationCurveXOrigin`, label: 'Rotation Curves: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] })
   ;['X', 'Y', 'Z'].forEach((ax) => {
     rows.push({ key: `${p}Rotation${ax}CurveEnabled`, label: `Rotation Curve ${ax} On/Off`, type: 'checkbox', def: false })
-    rows.push({ key: `${p}Rotation${ax}Curve`, label: `Rotation ${ax} Curve (Distance From Cursor -> Rotation)`, type: 'text', def: linear, onChange: () => parseFn(p) })
-    rows.push({ key: `${p}Rotation${ax}CurveRange`, label: `Rotation ${ax} Min / Max (Deg)`, type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
+    rows.push({ key: `${p}Rotation${ax}Curve`, label: `Rotation ${ax} Curve (Distance From Cursor -> Rotation, Axes Follow Rotation Mode)`, type: 'text', def: linear, onChange: () => parseFn(p) })
+    rows.push({ key: `${p}Rotation${ax}CurveRange`, label: `Rotation ${ax} Min / Max (Deg, Axes Follow Rotation Mode)`, type: 'text', def: '{"min":0,"max":0}', onChange: () => parseFn(p) })
   })
   // Retransition Between Loops (2026-10-14): see loopLapProgress(). One checkbox per group so each can be set on its own.
   rows.push({ key: `${p}OffsetLoopRetransition`, label: 'Offset: Retransition Between Loops', type: 'checkbox', def: false })
@@ -7788,15 +7890,15 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickHoldConfig(p) },
       ...offsetExtraControls(p, parseClickHoldConfig),
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
-      { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
-      { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
-      { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationX`, label: 'Rotation X (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationY`, label: 'Rotation Y (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationZ`, label: 'Rotation Z (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationLoopRetransition`, label: 'Rotation: Retransition Between Loops', type: 'checkbox', def: false },
       // Rotation Mode (2026-10-14, direct request - replaces the separate Rotation at Base group): where the Rotation turns the hand about.
       //  Rotation at Base - the arm base, in the model's own X / Y / Z (like a pose's Whole-Hand Rotation at Base).
       //  Rotation at Crop - the crop point = the first arm bone crossing the wrist-crop surface, in the model's own X / Y / Z.
       //  Rotation Around Cursor - the cursor (where it was when the function fired), in WORLD X / Y / Z.
-      { key: `${p}RotationMode`, label: 'Rotation Mode', type: 'select', def: 'Rotation at Crop', options: () => ['Rotation at Base', 'Rotation at Crop', 'Rotation Around Cursor'] },
+      { key: `${p}RotationMode`, label: 'Rotation Mode', type: 'select', def: 'Rotation at Crop', options: () => [{ value: 'Rotation at Base', text: 'Rotation at Base (Hand Model Axes)' }, { value: 'Rotation at Crop', text: 'Rotation at Crop (Hand Model Axes)' }, { value: 'Rotation Around Cursor', text: 'Rotation Around Cursor (World Axes)' }] },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       // Skip If Same Pose (2026-10-06, direct request). Single Pose mode only: when on, a hand that is
       // ALREADY in this function's target pose is left alone by this trigger; with Multi Trigger it moves
@@ -7867,6 +7969,8 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // reversing) before starting the next one. 0 (default) = no pause,
       // the original always-continuous cycling.
       { key: `${p}LoopHoldMs`, label: 'Loop Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
+      // Loop Wrap-Back Time Scale (2026-10-18, direct request: a slider for the speed at which the last frame transitions back to the first): the closing last pose -> first pose transition takes this many times as long as one normal pose-to-pose transition (1 = as before). The other transitions keep their speed, so the lap gets longer / shorter by the difference (not in the Loading Preview's Count mode, whose laps are pinned to Min Loading Time: there the wrap-back takes a bigger / smaller share of the lap instead). Loop Mode = Loop only.
+      { key: `${p}LoopWrapScale`, label: 'Loop Wrap-Back Time Scale (x A Normal Transition)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1 },
       // Direct user report, 2026-09-15: "right after te click, the closest
       // hand seems to start some sort of animation transition, but stops
       // after a split second, then the click-pose function runs smoothly."
@@ -8199,15 +8303,15 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickPoseConfig(p) },
       ...offsetExtraControls(p, parseClickPoseConfig),
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
-      { key: `${p}RotationX`, label: 'Rotation X (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
-      { key: `${p}RotationY`, label: 'Rotation Y (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
-      { key: `${p}RotationZ`, label: 'Rotation Z (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationX`, label: 'Rotation X (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationY`, label: 'Rotation Y (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
+      { key: `${p}RotationZ`, label: 'Rotation Z (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationLoopRetransition`, label: 'Rotation: Retransition Between Loops', type: 'checkbox', def: false },
       // Rotation Mode (2026-10-14, direct request - replaces the separate Rotation at Base group): where the Rotation turns the hand about.
       //  Rotation at Base - the arm base, in the model's own X / Y / Z (like a pose's Whole-Hand Rotation at Base).
       //  Rotation at Crop - the crop point = the first arm bone crossing the wrist-crop surface, in the model's own X / Y / Z.
       //  Rotation Around Cursor - the cursor (where it was when the function fired), in WORLD X / Y / Z.
-      { key: `${p}RotationMode`, label: 'Rotation Mode', type: 'select', def: 'Rotation at Crop', options: () => ['Rotation at Base', 'Rotation at Crop', 'Rotation Around Cursor'] },
+      { key: `${p}RotationMode`, label: 'Rotation Mode', type: 'select', def: 'Rotation at Crop', options: () => [{ value: 'Rotation at Base', text: 'Rotation at Base (Hand Model Axes)' }, { value: 'Rotation at Crop', text: 'Rotation at Crop (Hand Model Axes)' }, { value: 'Rotation Around Cursor', text: 'Rotation Around Cursor (World Axes)' }] },
       { key: `${p}TargetPose`, label: 'Target Pose', type: 'select', def: defaults.targetPose ?? '', options: () => (cfg.savedPoses || []).map((sp) => ({ value: sp.name, group: sp.group || null })) },
       // Skip If Same Pose (2026-10-06, direct request). Single Pose mode only: when on, a hand that is
       // ALREADY in this function's target pose is left alone by this trigger; with Multi Trigger it moves
@@ -8276,6 +8380,8 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // Sequence Count Mode = Loop) -- an Oscillate-style repeat reverses
       // in place and never needs to "jump back" anywhere.
       { key: `${p}SequenceLoopTransition`, label: 'Loop Transition On/Off', type: 'checkbox', def: true },
+      // Loop Wrap-Back Time Scale (2026-10-18, direct request: a slider for the speed at which the last frame transitions back to the first): the closing last pose -> first pose transition takes this many times as long as one normal pose-to-pose transition (1 = as before). The other transitions keep their speed, so the lap gets longer / shorter by the difference (not in the Loading Preview's Count mode, whose laps are pinned to Min Loading Time: there the wrap-back takes a bigger / smaller share of the lap instead).
+      { key: `${p}LoopWrapScale`, label: 'Loop Wrap-Back Time Scale (x A Normal Transition)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1 },
       // Hold Duration -- direct spec wording ("a Hold Duration slider for
       // the pause between loops/oscillations").
       { key: `${p}SequenceHoldMs`, label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
@@ -8980,13 +9086,80 @@ async function importTwoHandTween(btn) {
   cfg.savedTweenSequences = sequences
   syncValue('savedTweenSequences', sequences)
   refreshAllTweenSequenceSelectors()
+  // Nothing is selected or used here (2026-10-18, direct request): the import only adds the tween; Use on its entry in the Imported Two-Hand Tweens list (or the dropdowns) picks it.
+  syncTwoHandTweenList()
   const pick = incomingSeqs[incomingSeqs.length - 1].name
+  logLoadingPreview('imported two-hand tween "' + pick + '": ' + mainPoses.length + ' poses + ' + hand2Poses.length + ' second-hand poses (added to the list, not selected)')
+  flash('Imported "' + pick + '"')
+}
+// The Imported Two-Hand Tweens list always mirrors the two-hand sequences of Saved Tween Sequences, under the same names (so the list and every dropdown agree): entries whose sequence is gone are dropped, a sequence without an entry
+// gets one at the end; the order and groups the user gave to the rest are kept.
+function syncTwoHandTweenList() {
+  const seqs = (cfg.savedTweenSequences || []).filter((q) => q && q.twoHand && typeof q.name === 'string')
+  const names = new Set(seqs.map((q) => q.name))
+  const seen = new Set(), out = []
+  ;(cfg.loadingPreviewTwoHandTweens || []).forEach((it) => {
+    const n = (it && (it.sequence || it.name)) || ''
+    if (!names.has(n) || seen.has(n)) return
+    seen.add(n)
+    out.push({ ...it, name: n, sequence: n })
+  })
+  seqs.forEach((q) => { if (!seen.has(q.name)) { seen.add(q.name); out.push({ name: q.name, sequence: q.name }) } })
+  if (JSON.stringify(out) === JSON.stringify(cfg.loadingPreviewTwoHandTweens || [])) return
+  cfg.loadingPreviewTwoHandTweens = out
+  try { syncValue('loadingPreviewTwoHandTweens', out) } catch (e) { /* no panel */ }
+}
+// Renames a Saved Tween Sequence AND everything that had it selected (the Loading Tween Sequence, the End Sequence, every click function's Sequence / Chain). false when the new name is taken.
+function renameSequenceEverywhere(oldName, newName) {
+  const seqs = cfg.savedTweenSequences || []
+  if (!seqs.some((q) => q.name === oldName) || seqs.some((q) => q.name === newName)) return false
+  cfg.savedTweenSequences = seqs.map((q) => (q.name === oldName ? { ...q, name: newName } : q))
+  try { syncValue('savedTweenSequences', cfg.savedTweenSequences) } catch (e) { /* no panel */ }
+  Object.keys(cfg).forEach((k) => {
+    if ((/TweenSelector$/.test(k) || k === 'loadingPreviewEndSequence') && cfg[k] === oldName) { cfg[k] = newName; try { syncValue(k, newName) } catch (e) { /* no row */ } }
+    else if (/TweenChain$/.test(k) && Array.isArray(cfg[k]) && cfg[k].includes(oldName)) { const v = cfg[k].map((n) => (n === oldName ? newName : n)); cfg[k] = v; try { syncValue(k, v) } catch (e) { /* no row */ } }
+  })
+  return true
+}
+function renameTwoHandTween(item, name) {
+  const oldName = (item && (item.sequence || item.name)) || ''
+  const nn = String(name || '').trim()
+  if (!oldName || !nn || nn === oldName) return
+  if (!renameSequenceEverywhere(oldName, nn)) { alert('A tween named "' + nn + '" already exists (or "' + oldName + '" is gone).'); return }
+  syncTwoHandTweenList()
+  refreshAllTweenSequenceSelectors()
+  logLoadingPreview('renamed two-hand tween "' + oldName + '" to "' + nn + '"')
+}
+function deleteTwoHandTween(item) {
+  const name = (item && (item.sequence || item.name)) || ''
+  if (!name) return
+  cfg.savedTweenSequences = (cfg.savedTweenSequences || []).filter((q) => q.name !== name)
+  try { syncValue('savedTweenSequences', cfg.savedTweenSequences) } catch (e) { /* no panel */ }
+  syncTwoHandTweenList()
+  refreshAllTweenSequenceSelectors()
+  logLoadingPreview('deleted two-hand tween "' + name + '" (its poses stay in Saved Poses)')
+}
+// One-off at startup: an entry of the first version of this list could carry a name of its own (a rename of the label only), and two entries could point at the same sequence (both then showed as "in use"). An entry whose label differs
+// and is the only one for its sequence renames that sequence to the label; any duplicate entry for a sequence is dropped.
+function migrateTwoHandTweenList() {
+  const items = cfg.loadingPreviewTwoHandTweens || []
+  const bySeq = new Map()
+  items.forEach((it) => { const n = it.sequence || it.name; bySeq.set(n, (bySeq.get(n) || 0) + 1) })
+  items.forEach((it) => {
+    const seq = it.sequence || it.name
+    if (it.name && it.sequence && it.name !== it.sequence && bySeq.get(seq) === 1) renameSequenceEverywhere(seq, it.name)
+  })
+  syncTwoHandTweenList()
+}
+// Use on an Imported Two-Hand Tweens item: selects its sequence as the Loading Tween Sequence and restarts the preview animation on it.
+function useTwoHandTweenItem(item) {
+  const pick = (item && (item.sequence || item.name)) || ''
+  if (!pick || !(cfg.savedTweenSequences || []).some((q) => q.name === pick)) { logLoadingPreview('two-hand tween "' + pick + '" is not in Saved Tween Sequences any more -- nothing selected'); return }
   cfg.loadingPreviewTweenSelector = pick
   syncValue('loadingPreviewTweenSelector', pick)
-  // restart the preview animation on the new sequence
   loadingPreviewLapIndex = 1; loadingPreviewLapStartMs = performance.now(); loadingPreviewHoldEndMs = 0; loadingPreviewDirection = 1; loadingPreviewSequenceDone = false; loadingPreviewNoSequenceLogged = false
-  logLoadingPreview('imported two-hand tween "' + pick + '": ' + mainPoses.length + ' poses + ' + hand2Poses.length + ' second-hand poses; selected as the loading animation')
-  flash('Imported + selected "' + pick + '"')
+  logLoadingPreview('selected two-hand tween "' + pick + '" as the loading animation')
+  try { refreshListPickerMarksByKey('loadingPreviewTwoHandTweens') } catch (e) { /* no panel */ }
 }
 function ensureLoadingPreviewHand2(seq) {
   const need = !!(seq && seq.twoHand && loadingPreviewScene && loadingPreviewHand && lpSourceRoot())
@@ -9016,10 +9189,12 @@ function ensureLoadingPreviewHand2(seq) {
 const _lp2U = new THREE.Matrix4(), _lp2Pivot = new THREE.Matrix4(), _lp2Tmp = new THREE.Matrix4(), _lp2A = new THREE.Matrix4(), _lp2Ai = new THREE.Matrix4(), _lp2Mir = new THREE.Matrix4(), _lp2Final = new THREE.Matrix4()
 const _lp2Rh = new THREE.Quaternion(), _lp2Anchor = new THREE.Vector3()
 const _lp2Q = new THREE.Quaternion(), _lp2Base = new THREE.Quaternion(), _lp2V = new THREE.Vector3(), _lp2V2 = new THREE.Vector3(), _lp2S = new THREE.Vector3(), _lp2Eul = new THREE.Euler()
-function updateLoadingPreviewHand2(seq, lapStyle, t) {
+function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride) {
   const hand2 = loadingPreviewHand2
   if (!hand2 || !hand2.skinnedMesh || !loadingPreviewHand || !seq) return
   const cfg2 = seq.hand2 || {}
+  let values = valuesOverride || null // the End Sequence supplies the pose itself
+  if (!values) {
   // the second hand's own pose list (or the main list when it is told to mirror the main hand's pose)
   const entries2 = (cfg2.mirrorMainHandPose || !(seq.tweenPosesHand2 && seq.tweenPosesHand2.length)) ? (seq.tweenPoses || []) : seq.tweenPosesHand2
   const aIdx = entries2.findIndex((e) => typeof e === 'string' && e)
@@ -9028,15 +9203,16 @@ function updateLoadingPreviewHand2(seq, lapStyle, t) {
   if (!anchor2) return
   const segs2 = resolveTweenSegmentsWithAnchor(anchor2, entries2.slice(aIdx + 1))
   const last2 = segs2.length > 0 ? segs2[segs2.length - 1].poseB : anchor2
-  let values
   if (segs2.length === 0) values = anchor2
   else if (lapStyle === 'Oscillate') values = lerpTweenSegments(segs2, loadingPreviewDirection === 1 ? t : 1 - t)
   else if (cfg.loadingPreviewSequenceLoopTransition === false) values = lerpTweenSegments(segs2, t)
   else {
-    const ring = segs2.concat([{ poseA: last2, poseB: anchor2, weight: 1 }])
+    const ring = segs2.concat([{ poseA: last2, poseB: anchor2, weight: Math.max(cfg.loadingPreviewSequenceLoopWrapScale ?? 1, 0.01) }])
     const totalW = ring.reduce((sum, sg) => sum + sg.weight, 0)
     values = lerpLoopSegments(ring, (loadingPreviewLapIndex - 1 + t) * totalW)
   }
+  }
+  lpHand2LastValues = values
   const V = {}
   POSE_PRESET_KEYS.forEach((k) => { V[k] = values[k] !== undefined ? values[k] : POSE_KEY_DEFAULTS[k] })
   // --- placement ---
@@ -9230,6 +9406,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   if (lightingPreset) applyLoadingPreviewLighting(key, hemi, lightingPreset)
   syncLoadingPreviewLightSliders()
 
+  loadingPreviewBuiltRoot = lpSourceRoot()
   const clone = cloneSkeletal(lpSourceRoot())
   clone.quaternion.copy(alignQuat)
   const skinnedMesh = findSkinnedMesh(clone)
@@ -9779,14 +9956,17 @@ let loadingPreviewLiveRafId = null
 function startLoadingPreviewLiveLoop() {
   if (loadingPreviewLiveRafId !== null) return // already running
   lpFpsWindowStart = 0 // a fresh frame-rate window for this run of the live loop
+  lpLiveCycle.active = false // the cycle (End Sequence) starts over with this run
   logLoadingPreview('live render loop started')
   const tick = () => {
     if (!lpLiveOn() || !loadingPreviewRenderer) {
       logLoadingPreview(`live render loop stopped (${!lpLiveOn() ? 'Show Loading Preview is off' : 'renderer is gone'})`)
+      lpLiveCycle.active = false
       loadingPreviewLiveRafId = null
       return
     }
     try {
+      lpLiveCycleStep(performance.now())
       updateLoadingPreviewAnimation()
       updateLoadingPreviewPointLight()
       updateLoadingPreviewProgressCrop()
@@ -9969,6 +10149,7 @@ function repositionLoadingPreview() {
 // both would route through.
 function applyLoadingPreviewPose(item) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh) return
+  lpLastValues = item // the End Sequence glides from whatever pose is showing
   const values = {}
   POSE_PRESET_KEYS.forEach((k) => { values[k] = item[k] !== undefined ? item[k] : POSE_KEY_DEFAULTS[k] })
   // CORRECTED 2026-09-19 -- loadingPreviewRotationX/Y/Z (the dev-panel
@@ -10133,6 +10314,7 @@ function updateLoadingPreviewSequenceVisibility() {
   setRow('Count', isCount)
   setRow('CountMode', isCount)
   setRow('LoopTransition', playMode === 'Loop' || (playMode === 'Count' && cfg.loadingPreviewSequenceCountMode === 'Loop'))
+  setRow('LoopWrapScale', playMode === 'Loop' || (playMode === 'Count' && cfg.loadingPreviewSequenceCountMode === 'Loop'))
   // Direct request 2026-09-20: in Count mode, per-lap speed is now
   // DERIVED from Min Loading Time / Count (see updateLoadingPreviewAnimation()'s
   // own comment) -- hide the manual Speed slider then, since setting it
@@ -10188,6 +10370,9 @@ function setupLoadingPreviewEasingGroup() {
 // the selected sequence's own poses, nothing else -- no default-pose
 // anchor at either end.
 function updateLoadingPreviewAnimation() {
+  if (endSeq.phase !== 'off' && endSeq.phase !== 'done') {
+    try { if (updateLoadingPreviewEndSequence()) return } catch (err) { console.error('End Sequence frame threw -- ending it:', err); endSeqFinish('error: ' + (err && err.message)) }
+  }
   const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewTweenSelector)
   ensureLoadingPreviewHand2(seq) // adds / removes the second hand according to the selected sequence
   const rawEntries = seq ? (seq.tweenPoses || []) : []
@@ -10252,7 +10437,14 @@ function updateLoadingPreviewAnimation() {
   const speedMs = playMode === 'Count'
     ? Math.max((cfg.loadingMinTimeMs || 0) / totalLaps, 1)
     : Math.max(safeTweenSpeedMs(cfg.loadingPreviewSpeedMs), 1)
-  const lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / speedMs, 0, 1)
+  // Loop Wrap-Back Time Scale (see its control): the closing segment's weight; the lap grows / shrinks by (wrapK - 1) normal transitions, except in Count mode (the lap is pinned to Min Loading Time / Count there).
+  const wrapK = Math.max(cfg.loadingPreviewSequenceLoopWrapScale ?? 1, 0.01)
+  let lapMs = speedMs
+  if (playMode !== 'Count' && wrapK !== 1 && lapStyle !== 'Oscillate' && cfg.loadingPreviewSequenceLoopTransition !== false && segments.length > 0) {
+    const baseW = segments.reduce((sum, sg) => sum + sg.weight, 0)
+    lapMs = speedMs * (baseW + wrapK) / (baseW + 1)
+  }
+  const lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / lapMs, 0, 1)
   // Easing Curve (2026-10-12): reshapes WHERE in the lap the pose sits, not
   // how long a lap lasts. The profile's own total is discarded here on
   // purpose -- Count mode's Min Loading Time / Count split must still hold --
@@ -10280,7 +10472,7 @@ function updateLoadingPreviewAnimation() {
     // wrap-back point is included in the same weighted timeline instead
     // of being a separate equal-weight step the way it implicitly was
     // when every segment had weight 1.
-    const ringSegments = segments.concat([{ poseA: lastPose, poseB: anchorPose, weight: 1 }])
+    const ringSegments = segments.concat([{ poseA: lastPose, poseB: anchorPose, weight: wrapK }])
     const totalRingWeight = ringSegments.reduce((sum, seg) => sum + seg.weight, 0)
     const tCyclic = (loadingPreviewLapIndex - 1 + easedT) * totalRingWeight
     values = lerpLoopSegments(ringSegments, tCyclic)
@@ -10302,6 +10494,236 @@ function updateLoadingPreviewAnimation() {
   }
 }
 
+// ---- Loading Preview: End Sequence (2026-10-18, direct request) ----
+// "When the loading has completed, complete the loading animation sequence till its end. Then transition into the End Sequence selected. Then only after the end sequence does the starting sequence (offset / sphere) begin."
+// tryStartField() holds the reveal back (fieldStarted stays false, so nothing of the field logic starts) while endSeq.phase is not 'off' / 'done':
+//   wait    - the loading animation keeps playing until its current lap ends (or its Count is used up);
+//   play    - the End Sequence (Glide To Pose 1 -> its poses, Count / Loop / Oscillate laps, Easing) on the preview hand(s);
+//   pause   - Pause Duration At Sequence End;
+//   retrans - Retransition back to the default pose (optional);
+//   done    - endSeqFinish() lets tryStartField() carry on: the loading screen hides and the startup sequence begins.
+// A failure anywhere ends the sequence instead of holding the page: every error path and a safety timer call endSeqFinish().
+function parseLoadingPreviewEndEasingConfig() {
+  try { loadingPreviewEndEasingTrig.easingCurveParsed = JSON.parse(cfg.loadingPreviewEndEasingCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { loadingPreviewEndEasingTrig.retransitionEasingCurveParsed = JSON.parse(cfg.loadingPreviewEndRetransitionEasingCurve).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+}
+const LP_END_GROUP_KEY = 'Loading Preview > End Sequence'
+const LP_END_SUBGROUPS = [
+  { key: LP_END_GROUP_KEY + ' > Sequence', title: 'Sequence', rows: ['loadingPreviewEndSequence', 'loadingPreviewEndReverse', 'loadingPreviewEndGlide', 'loadingPreviewEndGlideScale', 'loadingPreviewEndSpeedMs'] },
+  { key: LP_END_GROUP_KEY + ' > Sequence Mode', title: 'Sequence Mode', rows: ['loadingPreviewEndCount', 'loadingPreviewEndCountMode', 'loadingPreviewEndLoopTransition', 'loadingPreviewEndLoopWrapScale', 'loadingPreviewEndHoldMs'] },
+  { key: LP_END_GROUP_KEY + ' > Easing', title: 'Easing', rows: ['loadingPreviewEndEasingEnabled', 'loadingPreviewEndEasingCurve'], gate: 'loadingPreviewEndEasingEnabled' },
+  { key: LP_END_GROUP_KEY + ' > Retransition', title: 'Retransition', rows: ['loadingPreviewEndRetransitionEnabled', 'loadingPreviewEndRetransitionSpeedMs', 'loadingPreviewEndRetransitionEasingEnabled', 'loadingPreviewEndRetransitionEasingCurve'], gate: 'loadingPreviewEndRetransitionEnabled' }
+]
+function updateLoadingPreviewEndGroupVisibility() {
+  if (!document.getElementById('dpStartupStyle')) { const st = document.createElement('style'); st.id = 'dpStartupStyle'; st.textContent = '.dp-startup-off > * { display: none !important }'; document.head.appendChild(st) }
+  const toggle = (key, off) => { const g = document.querySelector('.dp-group[data-key="' + key + '"]'); const b = g && g.querySelector(':scope > .dp-group-body'); if (b) b.classList.toggle('dp-startup-off', off) }
+  toggle(LP_END_GROUP_KEY, !cfg.loadingPreviewEndEnabled)
+  toggle(LP_END_GROUP_KEY + ' > Easing', !cfg.loadingPreviewEndEasingEnabled)
+  toggle(LP_END_GROUP_KEY + ' > Retransition', !cfg.loadingPreviewEndRetransitionEnabled)
+  const rEase = document.querySelector('.dp-row[data-key="loadingPreviewEndRetransitionEasingCurve"]')
+  if (rEase) rEase.style.display = cfg.loadingPreviewEndRetransitionEasingEnabled ? '' : 'none'
+}
+function setupLoadingPreviewEndSequenceGroup() {
+  parseLoadingPreviewEndEasingConfig()
+  const lpGroup = document.querySelector('.dp-group[data-key="Loading Preview"]')
+  if (!lpGroup) return
+  const lpBody = lpGroup.querySelector(':scope > .dp-group-body')
+  let g = document.querySelector('.dp-group[data-key="' + LP_END_GROUP_KEY + '"]')
+  if (!g) {
+    g = createGroupElement('End Sequence')
+    g.dataset.key = LP_END_GROUP_KEY // unique internal key (a bare title could be adopted by an unrelated group by the saved layout)
+    lpBody.appendChild(g)
+  }
+  const gb = g.querySelector(':scope > .dp-group-body')
+  LP_END_SUBGROUPS.forEach((sp) => {
+    let sg = document.querySelector('.dp-group[data-key="' + sp.key + '"]')
+    if (!sg) { sg = createGroupElement(sp.title); sg.dataset.key = sp.key; gb.appendChild(sg) }
+    const sb = sg.querySelector(':scope > .dp-group-body')
+    sp.rows.forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row && row.parentElement === lpBody) sb.appendChild(row) })
+  })
+  const pauseRow = document.querySelector('.dp-row[data-key="loadingPreviewEndPauseMs"]')
+  if (pauseRow && pauseRow.parentElement === lpBody) gb.appendChild(pauseRow)
+  const gateRow = document.querySelector('.dp-row[data-key="loadingPreviewEndEnabled"]')
+  if (gateRow && gateRow.parentElement === lpBody) gb.appendChild(gateRow)
+  ;['loadingPreviewEndEasingCurve', 'loadingPreviewEndRetransitionEasingCurve'].forEach((k) => {
+    const row = document.querySelector('.dp-row[data-key="' + k + '"]')
+    if (row && !row.querySelector('svg')) buildGenericCurveWidget(row, { caption: 'X: Progress (0-100%)  ·  Y: Speed (0 = Slowest, 1 = Fastest)', defaultPoints: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] })
+  })
+  gateGroupHeader(LP_END_GROUP_KEY, 'loadingPreviewEndEnabled')
+  LP_END_SUBGROUPS.forEach((sp) => { if (sp.gate) gateGroupHeader(sp.key, sp.gate) })
+  updateLoadingPreviewEndGroupVisibility()
+}
+// false when the loading animation itself cannot play (no sequence selected / its first pose missing): there is no lap to wait for then.
+function lpLoadingAnimPlayable() {
+  const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewTweenSelector)
+  const entries = seq ? (seq.tweenPoses || []) : []
+  const idx = entries.findIndex((e) => typeof e === 'string' && e)
+  return idx >= 0 && (cfg.savedPoses || []).some((p) => p.name === entries[idx])
+}
+function lpEndSeqObj() { return (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewEndSequence) || null }
+function endSeqShouldRun() { return !!cfg.loadingPreviewEnabled && !!cfg.loadingPreviewEndEnabled && !endSeq.finished && !!loadingPreviewRenderer && !!loadingPreviewHand && !!lpEndSeqObj() }
+function endSeqHolding() { return endSeq.phase !== 'off' && endSeq.phase !== 'done' }
+function startEndSequence() {
+  parseLoadingPreviewEndEasingConfig()
+  endSeq.phase = 'wait'
+  endSeq.lapAtBegin = loadingPreviewLapIndex
+  const speed = Math.max(cfg.loadingPreviewEndSpeedMs || 0, 1), laps = Math.max(cfg.loadingPreviewEndCount || 1, 1)
+  // Safety net (a judgment call, not a measurement): twice a generous estimate of the whole thing plus 3 s, so a bug or a stalled loop can never keep the loading screen up forever.
+  const est = Math.max(cfg.loadingPreviewSpeedMs || 0, 1) + (cfg.loadingPreviewSequenceHoldMs || 0) + (speed * 3 + (cfg.loadingPreviewEndHoldMs || 0)) * laps + (cfg.loadingPreviewEndPauseMs || 0) + (cfg.loadingPreviewEndRetransitionEnabled ? (cfg.loadingPreviewEndRetransitionSpeedMs || 0) : 0)
+  endSeq.timer = setTimeout(() => endSeqFinish('safety timer'), 2 * est + 3000)
+  logLoadingPreview('End Sequence: loading is complete -- finishing the loading animation first')
+}
+function endSeqFinish(reason) {
+  if (endSeq.phase === 'done') return
+  clearTimeout(endSeq.timer)
+  endSeq.phase = 'done'
+  endSeq.finished = true
+  logLoadingPreview('End Sequence finished (' + reason + ') -- the field starts')
+  tryStartField()
+}
+function lpEndEntries(seqObj, second) {
+  const raw = second ? (((seqObj.hand2 && seqObj.hand2.mirrorMainHandPose) || !(seqObj.tweenPosesHand2 && seqObj.tweenPosesHand2.length)) ? (seqObj.tweenPoses || []) : seqObj.tweenPosesHand2) : (seqObj.tweenPoses || [])
+  return cfg.loadingPreviewEndReverse ? raw.slice().reverse() : raw
+}
+// One hand's pieces of the End Sequence. Lap 1 starts from the pose the hand is in right now: with Glide To Pose 1 on it first glides to pose 1 (First Transition Time Scale x one segment), off = the current pose acts as pose 1.
+// Later laps run the sequence itself (a closing segment back to pose 1 when more laps follow and Loop Transition is on, as the loading preview does).
+function lpEndBuildTrack(entries, startValues, totalLaps, lapStyle) {
+  const idx = entries.findIndex((e) => typeof e === 'string' && e)
+  if (idx < 0) return null
+  const m = (cfg.savedPoses || []).filter((p) => p.name === entries[idx])
+  const anchor = m[m.length - 1]
+  if (!anchor) return null
+  const rest = entries.slice(idx + 1)
+  const glide = cfg.loadingPreviewEndGlide !== false
+  const k = Math.max(cfg.loadingPreviewEndGlideScale ?? 1, 0.01)
+  const plain = resolveTweenSegmentsWithAnchor(anchor, rest)
+  const last = plain.length ? plain[plain.length - 1].poseB : anchor
+  const ringMode = totalLaps > 1 && lapStyle === 'Loop' && cfg.loadingPreviewEndLoopTransition !== false
+  const wrapK = Math.max(cfg.loadingPreviewEndLoopWrapScale ?? 1, 0.01) // Loop Wrap-Back Time Scale: the closing segment's weight
+  const lapSegs = ringMode ? plain.concat([{ poseA: last, poseB: anchor, weight: wrapK }]) : plain
+  const sum = (a) => a.reduce((s, x) => s + x.weight, 0)
+  let lap1Segs
+  if (!startValues) lap1Segs = lapSegs
+  else if (glide) lap1Segs = [{ poseA: startValues, poseB: anchor, weight: k }].concat(lapSegs)
+  else {
+    const s2 = resolveTweenSegmentsWithAnchor(startValues, rest)
+    lap1Segs = ringMode ? s2.concat([{ poseA: s2.length ? s2[s2.length - 1].poseB : startValues, poseB: anchor, weight: wrapK }]) : s2
+  }
+  // Wref = the lap length in normal-transition units with the closing segment counted as 1, so only the wrap-back gets longer / shorter.
+  return { anchor, plain, lapSegs, lap1Segs, Wlap: sum(lapSegs), W1: sum(lap1Segs), Wref: sum(plain) + (ringMode ? 1 : 0), ringMode }
+}
+function lpEndValues(tr, lapIndex, eased, lapStyle, dir) {
+  if (lapIndex === 1) return tr.lap1Segs.length ? lerpTweenSegments(tr.lap1Segs, eased) : tr.anchor
+  if (lapStyle === 'Oscillate') return tr.plain.length ? lerpTweenSegments(tr.plain, dir === 1 ? eased : 1 - eased) : tr.anchor
+  const segs = tr.ringMode ? tr.lapSegs : tr.plain
+  return segs.length ? lerpTweenSegments(segs, eased) : tr.anchor
+}
+function endSeqKeepCrop() {
+  const rt = lpRealTimeCropPct()
+  if (rt !== null) { updateLoadingPreviewWristClip(rt); if (loadingPreviewHand2) updateHand2WristClip(rt) }
+}
+function endSeqBeginPlay(now) {
+  const seq = lpEndSeqObj()
+  if (!seq) { endSeqFinish('sequence not found'); return }
+  ensureLoadingPreviewHand2(seq) // adds / removes the second hand for this sequence
+  endSeq.seq = seq
+  endSeq.lapStyle = cfg.loadingPreviewEndCountMode === 'Oscillate' ? 'Oscillate' : 'Loop'
+  endSeq.total = Math.max(Math.round(cfg.loadingPreviewEndCount || 1), 1)
+  endSeq.speedMs = Math.max(cfg.loadingPreviewEndSpeedMs || 0, 1)
+  endSeq.tr1 = lpEndBuildTrack(lpEndEntries(seq, false), lpLastValues, endSeq.total, endSeq.lapStyle)
+  endSeq.tr2 = loadingPreviewHand2 ? lpEndBuildTrack(lpEndEntries(seq, true), lpHand2LastValues, endSeq.total, endSeq.lapStyle) : null
+  if (!endSeq.tr1) { endSeqFinish('first pose not in Saved Poses -- skipped'); return }
+  endSeq.lapIndex = 1; endSeq.lapStartMs = now; endSeq.holdEndMs = 0; endSeq.dir = 1
+  endSeq.phase = 'play'
+  logLoadingPreview('End Sequence: playing "' + seq.name + '" (' + endSeq.total + ' x ' + endSeq.lapStyle + ', ' + endSeq.speedMs + 'ms per pass, glide ' + (cfg.loadingPreviewEndGlide !== false ? 'on' : 'off') + ')')
+}
+function endSeqPlayFrame(now) {
+  const tr1 = endSeq.tr1
+  if (endSeq.holdEndMs) {
+    if (now < endSeq.holdEndMs) { endSeqKeepCrop(); return true }
+    endSeq.holdEndMs = 0; endSeq.lapStartMs = now
+    if (endSeq.lapStyle === 'Oscillate') endSeq.dir *= -1
+  }
+  const unit = tr1.Wref > 0 ? endSeq.speedMs / tr1.Wref : endSeq.speedMs
+  const lapDur = Math.max(endSeq.lapIndex === 1 ? unit * tr1.W1 : (tr1.Wlap > 0 ? unit * tr1.Wlap : endSeq.speedMs), 1)
+  const lapT = THREE.MathUtils.clamp((now - endSeq.lapStartMs) / lapDur, 0, 1)
+  const eased = cfg.loadingPreviewEndEasingEnabled ? easingProfilePAt(getEasingProfile('loadingPreviewEnd', true, loadingPreviewEndEasingTrig), lapT) : lapT
+  applyLoadingPreviewPose(lpEndValues(tr1, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir))
+  if (endSeq.tr2 && loadingPreviewHand2) updateLoadingPreviewHand2(endSeq.seq, endSeq.lapStyle, eased, lpEndValues(endSeq.tr2, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir))
+  if (lapT >= 1) {
+    logLoadingPreview('End Sequence: pass ' + endSeq.lapIndex + ' of ' + endSeq.total + ' complete')
+    endSeq.lapIndex++
+    if (endSeq.lapIndex > endSeq.total) {
+      const pauseMs = Math.max(cfg.loadingPreviewEndPauseMs || 0, 0)
+      if (pauseMs > 0) { endSeq.phase = 'pause'; endSeq.pauseEndMs = now + pauseMs } else endSeqAfterPause(now)
+    } else if ((cfg.loadingPreviewEndHoldMs || 0) > 0) {
+      endSeq.holdEndMs = now + cfg.loadingPreviewEndHoldMs
+    } else {
+      endSeq.lapStartMs = now
+      if (endSeq.lapStyle === 'Oscillate') endSeq.dir *= -1
+    }
+  }
+  return true
+}
+function endSeqAfterPause(now) {
+  const dur = Math.max(cfg.loadingPreviewEndRetransitionSpeedMs || 0, 0)
+  if (cfg.loadingPreviewEndRetransitionEnabled && dur > 0 && lpLastValues) {
+    endSeq.from1 = lpLastValues; endSeq.from2 = lpHand2LastValues
+    endSeq.retStartMs = now; endSeq.retDur = dur
+    endSeq.phase = 'retrans'
+    return
+  }
+  endSeqFinish('complete')
+}
+function endSeqRetransFrame(now) {
+  const u = THREE.MathUtils.clamp((now - endSeq.retStartMs) / endSeq.retDur, 0, 1)
+  const e = cfg.loadingPreviewEndRetransitionEasingEnabled ? easingProfilePAt(getEasingProfile('loadingPreviewEnd', true, loadingPreviewEndEasingTrig, true), u) : u
+  applyLoadingPreviewPose(lerpPoseValues(endSeq.from1, poseDefaultValues, e))
+  if (loadingPreviewHand2 && endSeq.from2) updateLoadingPreviewHand2(endSeq.seq, endSeq.lapStyle, e, lerpPoseValues(endSeq.from2, poseDefaultValues, e))
+  if (u >= 1) endSeqFinish('complete')
+  return true
+}
+// Restarts the main loading animation from its first lap (the same fields a new Loading Tween Sequence resets).
+function lpRestartMainAnimation(now) {
+  loadingPreviewLapIndex = 1; loadingPreviewLapStartMs = now; loadingPreviewHoldEndMs = 0; loadingPreviewDirection = 1; loadingPreviewSequenceDone = false; loadingPreviewNoSequenceLogged = false
+}
+function endSeqReset() {
+  clearTimeout(endSeq.timer)
+  endSeq.phase = 'off'; endSeq.finished = false; endSeq.seq = null; endSeq.tr1 = null; endSeq.tr2 = null
+}
+// Show Loading Preview (live), with the End Sequence switched on (2026-10-19, direct request: "the main sequence will run the minimum loading time, then the end sequence, then loop"): once per frame of the live loop.
+// The main loading animation runs for Min Loading Time (its crop follows lpLiveCycle.progress, 0 -> 1 over that time), then the End Sequence is started exactly as at the real startup (it first finishes the main animation's current
+// lap), and when it is done everything starts over. With the End Sequence off nothing changes: the live preview just keeps looping as before.
+function lpLiveCycleStep(now) {
+  const on = lpLiveOn() && !!cfg.loadingPreviewEndEnabled && !!lpEndSeqObj() && !!loadingPreviewHand
+  if (!on) { lpLiveCycle.active = false; return }
+  if (!lpLiveCycle.active) { lpLiveCycle.active = true; lpLiveCycle.t0 = now; lpLiveCycle.progress = 0; endSeqReset(); lpRestartMainAnimation(now); logLoadingPreview('live preview: running the loading cycle (main animation for Min Loading Time, then the End Sequence, then again)') }
+  const minMs = Math.max(cfg.loadingMinTimeMs || 0, 1)
+  if (endSeq.phase === 'off') {
+    lpLiveCycle.progress = THREE.MathUtils.clamp((now - lpLiveCycle.t0) / minMs, 0, 1)
+    if (now - lpLiveCycle.t0 >= minMs) { lpLiveCycle.progress = 1; startEndSequence() }
+  } else if (endSeq.phase === 'done') {
+    endSeqReset(); lpRestartMainAnimation(now); lpLiveCycle.t0 = now; lpLiveCycle.progress = 0
+    logLoadingPreview('live preview: End Sequence done -- starting the loading animation again')
+  } else {
+    lpLiveCycle.progress = 1
+  }
+}
+// Called at the top of every loading-preview animation frame while an End Sequence is under way; true = this frame's pose has been driven here (the normal loading animation is skipped), false = the loading animation
+// carries on (still waiting for its lap to end).
+function updateLoadingPreviewEndSequence() {
+  const now = performance.now()
+  if (endSeq.phase === 'wait') {
+    if (!(loadingPreviewSequenceDone || loadingPreviewLapIndex > endSeq.lapAtBegin || !lpLoadingAnimPlayable())) return false
+    loadingPreviewHoldEndMs = 0
+    endSeqBeginPlay(now)
+    if (endSeq.phase !== 'play') return false
+  }
+  if (endSeq.phase === 'play') return endSeqPlayFrame(now)
+  if (endSeq.phase === 'pause') { endSeqKeepCrop(); if (now >= endSeq.pauseEndMs) endSeqAfterPause(now); return true }
+  if (endSeq.phase === 'retrans') return endSeqRetransFrame(now)
+  return false
+}
 // Whole-Hand Rotation X/Y/Z -- changes `cloneBaseQuat` only (a single
 // shared quaternion, applied to every hand's own `clone.quaternion` every
 // frame alongside the arm-length position update below -- see
@@ -10809,16 +11231,16 @@ function rvSetControls(S) {
   ]
   return [
     { key: `${S}Enabled`, label: 'On/Off', type: 'checkbox', def: true, ...pd },
-    { key: `${S}Angle`, label: 'Displacement Angle (Deg)', type: 'slider', min: -360, max: 360, step: 1, def: 0, ...pd },
+    { key: `${S}Angle`, label: 'Displacement Angle (Deg, Camera Screen Plane, 0 = Away From The Cursor Path)', type: 'slider', min: -360, max: 360, step: 1, def: 0, ...pd },
     { key: `${S}DisplacementRange`, label: 'Min / Max Displacement (World Units)', type: 'text', def: '{"min":0,"max":5}', ...pd },
     { key: `${S}DisplacementCurve`, label: 'Displacement Curve (Velocity -> Displacement)', type: 'text', def: RV_LIN, ...pd },
     { key: `${S}DisplacementDistCurve`, label: 'Displacement Distance Curve (Distance -> Scaler)', type: 'text', def: RV_FLAT1, ...pd },
     { key: `${S}DisplacementDistCurveXOrigin`, label: 'Displacement Distance Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'], ...pd },
-    { key: `${S}TriggerAngleRange`, label: 'Min / Max Trigger Angle (Deg)', type: 'text', def: '{"min":0,"max":0}', ...pd },
+    { key: `${S}TriggerAngleRange`, label: 'Min / Max Trigger Angle (Deg, Camera Screen Plane)', type: 'text', def: '{"min":0,"max":0}', ...pd },
     { key: `${S}AngleCurveEnabled`, label: 'On/Off', type: 'checkbox', def: false, ...pd },
     { key: `${S}AngleCurveRange`, label: 'Min / Max Displacement Angle (Deg)', type: 'text', def: '{"min":0,"max":180}', ...pd },
     { key: `${S}AngleCurve`, label: 'Displacement Angle Curve (Trigger Angle -> Displacement Angle)', type: 'text', def: RV_LIN, ...pd },
-    ...effect('Arm', '{"min":0,"max":12}', 'Rotation', 'Deg'),
+    ...effect('Arm', '{"min":0,"max":12}', 'Rotation (World-Space Tilt Toward Displacement)', 'Deg'),
     ...effect('Splay', '{"min":0,"max":25}', 'Splay', 'Deg'),
     ...effect('Crop', '{"min":0,"max":0.4}', 'Crop', '0-1'),
     // Pose Transition (2026-10-17, direct request; replaces Finger Curl - the keys keep the Curl names so the saved layout and values stay attached): the hand blends toward ONE target pose by the curve's progress (X: velocity, Y: 0 = no change, 1 = the target pose).
@@ -10870,7 +11292,7 @@ function rvRegisterSet(prefix, title, mainBody, beforeEl) {
   rvRangeRow(`${S}TriggerAngleRange`, { trackMin: 0, trackMax: 180, unit: 'deg', defaultValue: { min: 0, max: 0 } })
   rvRangeRow(`${S}AngleCurveRange`, { trackMin: -360, trackMax: 360, unit: 'deg', defaultValue: { min: 0, max: 180 } })
   rvCurveRow(`${S}AngleCurve`, 'X: Hand Angle To The Cursor Path (Min -> Max Trigger Angle)  ·  Y: Displacement Angle (0 = Min, 1 = Max)', [{ x: 0, y: 0 }, { x: 1, y: 1 }])
-  const effects = [['Arm', 'Velocity Arm Rotation', 'Rotation', 60, 'deg', 1, { min: 0, max: 12 }], ['Splay', 'Velocity Wrist Splay', 'Splay', 90, 'deg', 1, { min: 0, max: 25 }], ['Crop', 'Velocity Wrist Crop', 'Crop', 1, '', 2, { min: 0, max: 0.4 }], ['Curl', 'Velocity Finger Curl', 'Pose Transition', 200, '%', 0, { min: 0, max: 40 }]]
+  const effects = [['Arm', 'Velocity Arm Rotation', 'Rotation (World-Space Tilt Toward Displacement)', 60, 'deg', 1, { min: 0, max: 12 }], ['Splay', 'Velocity Wrist Splay', 'Splay', 90, 'deg', 1, { min: 0, max: 25 }], ['Crop', 'Velocity Wrist Crop', 'Crop', 1, '', 2, { min: 0, max: 0.4 }], ['Curl', 'Velocity Finger Curl', 'Pose Transition', 200, '%', 0, { min: 0, max: 40 }]]
   effects.forEach(([name, , label, trackMax, unit, decimals, defVal]) => {
     if (name !== 'Curl') rvRangeRow(`${S}${name}Range`, { trackMin: name === 'Arm' || name === 'Splay' ? -trackMax : 0, trackMax, unit: unit || 'x', decimals, defaultValue: defVal })
     rvCurveRow(`${S}${name}Curve`, RV_CURVE_X_VELOCITY + (name === 'Curl' ? '  ·  Y: Progress To The Target Pose (0 = No Change, 1 = The Target Pose)' : `  ·  Y: ${label} (0 = Min, 1 = Max)`), [{ x: 0, y: 0 }, { x: 1, y: 1 }])
@@ -11618,6 +12040,91 @@ function attachCurveEditorExtras(row, svg, ctx) {
   sync()
   return { sync }
 }
+// Touch assist for the curve editors (2026-10-18, direct request: on mobile a double-tap meant to delete a node often ADDED one instead, and nodes / bezier handles took several tries to grab).
+// Why it happened: a node is a 16-unit transparent circle and a bezier handle a 7 px square, so a finger that lands a little off one hits the bare graph, whose click adds a node. This layer only acts on
+// TOUCH input (a mouse is unchanged) and only fills the gaps: a touch that lands on a node circle or a handle square is left to that element's own handler.
+//  - a touch on the bare graph within reach of a node or handle is passed to that node / handle as if it had hit it (grab + drag);
+//  - a tap never ADDS a node while it is within reach of an existing node or handle (delete / grab wins over add);
+//  - two quick taps near the same node delete it (own double-tap detection, so it does not depend on the browser's dblclick landing on the same tiny circle both times).
+// The radii are screen px and are judgment calls, not measurements: tune them here.
+const CURVE_TOUCH_POINT_RADIUS_PX = 30
+const CURVE_TOUCH_POINT_CORE_PX = 14 // inside this a node always wins over a handle
+const CURVE_TOUCH_HANDLE_RADIUS_PX = 26 // a bezier handle the user has made (real)
+const CURVE_TOUCH_PREVIEW_HANDLE_RADIUS_PX = 20 // the dim preview handle (grabbing it creates a handle), kept smaller so a tap meant for the node does not make one
+const CURVE_DOUBLE_TAP_MS = 400
+const CURVE_TAP_MAX_MOVE_PX = 12
+const CURVE_TAP_MAX_MS = 350
+function attachCurveTouchAssist(svg, api) {
+  // api: { points: () => [{ el, p }], handles: () => [{ el, p, kind, real }], remove: (p) => void, removable: (p) => boolean }
+  const st = { redispatching: false, suppressClickUntil: 0, lastTouchDownAt: 0, lastTap: null, down: null }
+  const center = (el) => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } }
+  function pick(x, y) {
+    let best = null, bestScore = Infinity
+    api.points().forEach((h) => {
+      const c = center(h.el), d = Math.hypot(x - c.x, y - c.y)
+      if (d > CURVE_TOUCH_POINT_RADIUS_PX) return
+      const score = d <= CURVE_TOUCH_POINT_CORE_PX ? d / 1000 - 1 : d / CURVE_TOUCH_POINT_RADIUS_PX
+      if (score < bestScore) { bestScore = score; best = { el: h.el, p: h.p, kind: 'point' } }
+    })
+    api.handles().forEach((h) => {
+      const c = center(h.el), d = Math.hypot(x - c.x, y - c.y), r = h.real ? CURVE_TOUCH_HANDLE_RADIUS_PX : CURVE_TOUCH_PREVIEW_HANDLE_RADIUS_PX
+      if (d > r) return
+      const score = d / r
+      if (score < bestScore) { bestScore = score; best = { el: h.el, p: h.p, kind: 'handle' } }
+    })
+    return best
+  }
+  function onUp(e) {
+    window.removeEventListener('pointerup', onUp)
+    window.removeEventListener('pointercancel', onUp)
+    const d = st.down
+    st.down = null
+    if (!d || e.type === 'pointercancel') return
+    const now = performance.now()
+    const isTap = Math.hypot(e.clientX - d.x, e.clientY - d.y) <= CURVE_TAP_MAX_MOVE_PX && now - d.t <= CURVE_TAP_MAX_MS
+    if (!isTap || !d.p) { st.lastTap = null; return }
+    const prev = st.lastTap
+    if (prev && prev.p === d.p && now - prev.t <= CURVE_DOUBLE_TAP_MS) {
+      st.lastTap = null
+      if (api.removable(d.p)) { st.suppressClickUntil = now + 600; api.remove(d.p) }
+      return
+    }
+    st.lastTap = { p: d.p, t: now }
+  }
+  svg.addEventListener('pointerdown', (e) => {
+    if (st.redispatching || e.pointerType !== 'touch' || !e.isPrimary) return
+    const now = performance.now()
+    st.lastTouchDownAt = now
+    const onPoint = api.points().find((h) => h.el === e.target)
+    const onHandle = api.handles().find((h) => h.el === e.target)
+    let tapPoint = null
+    if (onPoint) tapPoint = onPoint.p
+    else if (!onHandle) {
+      const hit = pick(e.clientX, e.clientY)
+      if (hit) {
+        if (hit.kind === 'point') tapPoint = hit.p
+        st.redispatching = true
+        try {
+          hit.el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, clientX: e.clientX, clientY: e.clientY, pointerId: e.pointerId, pointerType: 'touch', isPrimary: true, button: 0, buttons: 1 }))
+        } finally { st.redispatching = false }
+        e.stopPropagation()
+        e.preventDefault()
+      }
+    }
+    st.down = { x: e.clientX, y: e.clientY, t: now, p: tapPoint }
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onUp)
+  }, true)
+  return {
+    // true when the click that follows a touch must NOT add a node
+    blocksAdd(clickEv) {
+      const now = performance.now()
+      if (now < st.suppressClickUntil) return true
+      if (!(clickEv.pointerType === 'touch' || now - st.lastTouchDownAt < 800)) return false
+      return !!pick(clickEv.clientX, clickEv.clientY)
+    }
+  }
+}
 function buildArmLengthCurveWidget(row) {
   const input = row.querySelector('.dp-text-input')
   if (!input) return
@@ -11695,6 +12202,7 @@ function buildArmLengthCurveWidget(row) {
   const CURVE_SAMPLES = 48
   let handleEls = []
   let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
+  let pointHits = [], allHandleHits = [] // every node circle / every handle square (real or preview), rebuilt by redraw(): the touch assist (attachCurveTouchAssist) looks here
   // Same bezier-handle mechanism as buildGenericCurveWidget() -- see that
   // function's own comment for the full gesture/data-format account.
   const HANDLE_REMOVE_THRESHOLD_PX = 6
@@ -11736,6 +12244,8 @@ function buildArmLengthCurveWidget(row) {
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
     handleHits = []
+    pointHits = []
+    allHandleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -11758,6 +12268,7 @@ function buildArmLengthCurveWidget(row) {
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
         if (isReal) handleHits.push({ marker, p, i, kind })
+        allHandleHits.push({ el: marker, p, kind, real: isReal })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -11766,6 +12277,7 @@ function buildArmLengthCurveWidget(row) {
       hit.setAttribute('cx', px.x); hit.setAttribute('cy', px.y); hit.setAttribute('r', CURVE_HIT_RADIUS_PX)
       hit.setAttribute('fill', 'transparent')
       Object.assign(hit.style, { cursor: 'grab' })
+      pointHits.push({ el: hit, p })
       let dragged = false
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
@@ -11804,13 +12316,7 @@ function buildArmLengthCurveWidget(row) {
         window.addEventListener('pointermove', onMove)
         window.addEventListener('pointerup', onUp)
       })
-      function deletePointIfRemovable() {
-        if (points.length > 2 && i !== 0 && i !== points.length - 1) {
-          points.splice(points.indexOf(p), 1)
-          redraw()
-          commitPoints()
-        }
-      }
+      function deletePointIfRemovable() { removePointObj(p) }
       hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
         deletePointIfRemovable()
@@ -11835,8 +12341,17 @@ function buildArmLengthCurveWidget(row) {
       circles.push(dot)
     })
   }
+  function pointRemovable(p) { const idx = points.indexOf(p); return points.length > 2 && idx > 0 && idx < points.length - 1 }
+  function removePointObj(p) {
+    if (!pointRemovable(p)) return
+    points.splice(points.indexOf(p), 1)
+    redraw()
+    commitPoints()
+  }
+  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable })
   svg.addEventListener('click', (clickEv) => {
     if (clickEv.target.tagName === 'circle') return
+    if (touchAssist.blocksAdd(clickEv)) return // a tap near a node / handle grabs or deletes it, it never adds one
     const rect = svg.getBoundingClientRect()
     const np = fromPx(clickEv.clientX - rect.left, clickEv.clientY - rect.top)
     if (np.x <= 0 || np.x >= 1) return // keep the domain-spanning endpoints unique
@@ -12023,6 +12538,7 @@ function buildWristSplayCurveWidget(row) {
   const CURVE_SAMPLES = 48
   let handleEls = []
   let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
+  let pointHits = [], allHandleHits = [] // every node circle / every handle square (real or preview), rebuilt by redraw(): the touch assist (attachCurveTouchAssist) looks here
   const HANDLE_REMOVE_THRESHOLD_PX = 6
   const CURVE_HIT_RADIUS_PX = 16
   function startHandleDrag(p, i, kind, downEv) {
@@ -12062,6 +12578,8 @@ function buildWristSplayCurveWidget(row) {
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
     handleHits = []
+    pointHits = []
+    allHandleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -12084,6 +12602,7 @@ function buildWristSplayCurveWidget(row) {
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
         if (isReal) handleHits.push({ marker, p, i, kind })
+        allHandleHits.push({ el: marker, p, kind, real: isReal })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -12092,6 +12611,7 @@ function buildWristSplayCurveWidget(row) {
       hit.setAttribute('cx', px.x); hit.setAttribute('cy', px.y); hit.setAttribute('r', CURVE_HIT_RADIUS_PX)
       hit.setAttribute('fill', 'transparent')
       Object.assign(hit.style, { cursor: 'grab' })
+      pointHits.push({ el: hit, p })
       let dragged = false
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
@@ -12130,13 +12650,7 @@ function buildWristSplayCurveWidget(row) {
         window.addEventListener('pointermove', onMove)
         window.addEventListener('pointerup', onUp)
       })
-      function deletePointIfRemovable() {
-        if (points.length > 2 && i !== 0 && i !== points.length - 1) {
-          points.splice(points.indexOf(p), 1)
-          redraw()
-          commitPoints()
-        }
-      }
+      function deletePointIfRemovable() { removePointObj(p) }
       hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
         deletePointIfRemovable()
@@ -12156,8 +12670,17 @@ function buildWristSplayCurveWidget(row) {
       circles.push(dot)
     })
   }
+  function pointRemovable(p) { const idx = points.indexOf(p); return points.length > 2 && idx > 0 && idx < points.length - 1 }
+  function removePointObj(p) {
+    if (!pointRemovable(p)) return
+    points.splice(points.indexOf(p), 1)
+    redraw()
+    commitPoints()
+  }
+  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable })
   svg.addEventListener('click', (clickEv) => {
     if (clickEv.target.tagName === 'circle') return
+    if (touchAssist.blocksAdd(clickEv)) return // a tap near a node / handle grabs or deletes it, it never adds one
     const rect = svg.getBoundingClientRect()
     const np = fromPx(clickEv.clientX - rect.left, clickEv.clientY - rect.top)
     if (np.x <= 0 || np.x >= 1) return
@@ -12519,6 +13042,7 @@ const _poseOffsetRightVec = new THREE.Vector3()
 const _poseOffsetUpVec = new THREE.Vector3()
 const _poseOffsetTowardCameraVec = new THREE.Vector3()
 const _poseOffsetZeroVec = new THREE.Vector3()
+const _poseLocalOffsetVec = new THREE.Vector3(), _poseLocalAxesQ = new THREE.Quaternion(), _poseLocalAxesEuler = new THREE.Euler(), _poseLocalAxesRb = new THREE.Quaternion()
 // Position only -- kept separate from scale (below) so a caller that
 // doesn't yet have a valid base position (see applyPoseValuesToHand()'s
 // own `hand.basePosition` guard) can skip JUST the position write
@@ -12534,6 +13058,16 @@ function applyPoseOffsetToPosition(positionTarget, basePosition, cam, values) {
     positionTarget.position.addScaledVector(_poseOffsetRightVec, ox)
     positionTarget.position.addScaledVector(_poseOffsetUpVec, oy)
     positionTarget.position.addScaledVector(_poseOffsetTowardCameraVec, oz)
+  }
+  // Pose Local Offset X/Y/Z: the vector is in the hand mesh's own axes; the hand's orientation for this pose (alignQuat * Whole-Hand Rotation * Rotation at Base - what the clone's quaternion is set to) takes it to world.
+  // Not scaled by Pose Scale, like the world offset; a plain translation, so it stacks with it in any order. Own scratch quaternions: computeBaseQuatFromValues() leaves _poseBaseRb for its callers' arm-base pivot.
+  const lx = values.poseLocalOffsetX || 0, ly = values.poseLocalOffsetY || 0, lz = values.poseLocalOffsetZ || 0
+  if (lx || ly || lz) {
+    _poseLocalAxesEuler.set(THREE.MathUtils.degToRad(values.modelRotX || 0), THREE.MathUtils.degToRad(values.modelRotY || 0), THREE.MathUtils.degToRad(values.modelRotZ || 0))
+    _poseLocalAxesQ.setFromEuler(_poseLocalAxesEuler)
+    _poseLocalAxesQ.multiply(computeBaseRotationQuat(values.baseRotationX || 0, values.baseRotationY || 0, values.baseRotationZ || 0, _poseLocalAxesRb)).premultiply(alignQuat)
+    _poseLocalOffsetVec.set(lx, ly, lz).applyQuaternion(_poseLocalAxesQ)
+    positionTarget.position.add(_poseLocalOffsetVec)
   }
 }
 function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
@@ -13394,9 +13928,9 @@ function remapGlideProgress(u, N, k) {
 }
 // STACKING ON THE DEFAULT (2026-10-11, direct request: "the rotation settings of the triggered pose or sequence should be applied ontop of the default pose. So if a pose has a rotation x value
 // of 180, that will be taken as 180 from the default position's own x rotation"). The rotation / position keys a saved pose or tween step carries are ADDED to the live default (the sliders, which
-// are the default pose): Whole-Hand Rotation X/Y/Z, Rotation at Base X/Y/Z and Pose Offset X/Y/Z are default + pose value (default X 84 and a pose with X 180 gives 264); Pose Scale multiplies.
+// are the default pose): Whole-Hand Rotation X/Y/Z, Rotation at Base X/Y/Z and Pose Offset X/Y/Z (and Pose Local Offset X/Y/Z) are default + pose value (default X 84 and a pose with X 180 gives 264); Pose Scale multiplies.
 // A pose that does not carry a key adds nothing (every pose saved before Rotation at Base existed has no Base Rotation). Only field hands use this; the previews keep absolute poses.
-const STACK_KEYS = ['modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ', 'poseOffsetX', 'poseOffsetY', 'poseOffsetZ']
+const STACK_KEYS = ['modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ', 'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseLocalOffsetX', 'poseLocalOffsetY', 'poseLocalOffsetZ']
 // cloneBaseVersion changes whenever any of the stacking sliders or the Default pose change (their onChange / onWholeHandRotationChange bump it), so it is the cache key.
 function currentStackSig() { return cloneBaseVersion }
 function stackOnDefault(item) {
@@ -13540,7 +14074,7 @@ function lerpLoopSegments(ringSegments, tCyclic) {
 //   fwd  = first named pose -> ... -> last named pose, Holds included (Oscillate's one-way lap)
 //   ring = fwd + a closing segment last -> first of weight 1 (Loop's full wrap)
 // ringW / fwdW are the total weights (the lap lengths, in weight units). With no Hold every weight is 1, so ringW = number of poses and fwdW = poses - 1: exactly the old segment counts.
-function buildLoopTimelines(entries) {
+function buildLoopTimelines(entries, wrapScale = 1) {
   const list = entries || []
   let firstIdx = -1
   let firstPose = null
@@ -13554,7 +14088,7 @@ function buildLoopTimelines(entries) {
   if (!firstPose) return { ring: null, ringW: 0, fwd: null, fwdW: 0 }
   const fwd = resolveTweenSegmentsWithAnchor(firstPose, list.slice(firstIdx + 1), true)
   const last = fwd.length > 0 ? fwd[fwd.length - 1].poseB : firstPose
-  const ring = fwd.concat([{ poseA: last, poseB: firstPose, weight: 1 }])
+  const ring = fwd.concat([{ poseA: last, poseB: firstPose, weight: wrapScale }])
   const sumW = (a) => a.reduce((sum, seg) => sum + seg.weight, 0)
   return { ring, ringW: sumW(ring), fwd, fwdW: sumW(fwd) }
 }
@@ -13590,7 +14124,7 @@ function lerpLoopSequence(poses, tCyclic) {
 // playthrough of the sequence"). Duration of one named-pose segment, in ms.
 function loopSegmentMsFor(p, chp, trig) {
   return (cfg[`${p}SpeedCurveEnabled`] && chp.frozenSpeedMs > 0)
-    ? Math.max(chp.frozenSpeedMs * chainSequenceCount(p) / Math.max(trig.loopRingW || trig.loopPoses.length, 1), 1)
+    ? Math.max(chp.frozenSpeedMs * chainSequenceCount(p) / Math.max((trig.loopRingW || trig.loopPoses.length) - (trig.loopWrapK || 1) + 1, 1), 1)
     : trig.loopSegmentMs
 }
 // Pose at `elapsedSegments` segments into a lap that began in direction
@@ -13606,7 +14140,8 @@ function loopPoseValuesBeyondLap(p, chp, trig, elapsedSegments) {
     return trig.loopFwd ? lerpTweenSegments(trig.loopFwd, (position / segments) * chp.frozenTweenFractionCap) : lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
   }
   const segments = trig.loopRingW || trig.loopPoses.length
-  return trig.loopRing ? lerpLoopSegments(trig.loopRing, (segments - 1) + elapsedSegments) : lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
+  const wrapOffset = trig.loopWrapK || 1 // the lap starts where the closing segment starts
+  return trig.loopRing ? lerpLoopSegments(trig.loopRing, (segments - wrapOffset) + elapsedSegments) : lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
 }
 // Same as computeStartDelayMs(), but the nearest-to-farthest domain is chosen by this function's own "Visible Hands Only" checkbox (`${p}${flag}`, default on):
 // on = hands that are on screen, off = all hands. xy = current-position screen distance (every click-function curve).
@@ -14363,7 +14898,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // wrap-back branch.
       const segments = trig.loopRingW || trig.loopPoses.length // lap length in weight units (a Hold counts), = number of poses without Holds
       lapT = elapsedSegments / segments
-      const tCyclic = (segments - 1) + Math.min(elapsedSegments, segments)
+      const tCyclic = (segments - (trig.loopWrapK || 1)) + Math.min(elapsedSegments, segments)
       values = trig.loopRing ? lerpLoopSegments(trig.loopRing, tCyclic) : lerpLoopSequence(trig.loopPoses, tCyclic)
     }
     chp.lastAppliedValues = values
@@ -14625,12 +15160,14 @@ function startClickHoldPose(p) {
         })
       : selectedSequenceEntries(p)
     // Hold-aware Loop / Oscillate timelines (see buildLoopTimelines()). Each weight unit lasts what one pose-to-pose segment used to, so lap length = total weight x loopSegmentMs.
-    const tl = buildLoopTimelines(trig.rawChainEntries)
+    const wrapK = Math.max(cfg[`${p}LoopWrapScale`] ?? 1, 0.01) // Loop Wrap-Back Time Scale (see its control): the closing segment's weight
+    const tl = buildLoopTimelines(trig.rawChainEntries, wrapK)
+    trig.loopWrapK = wrapK
     trig.loopRing = tl.ring
     trig.loopRingW = tl.ringW
     trig.loopFwd = tl.fwd
     trig.loopFwdW = tl.fwdW
-    if (tl.ringW > 0) trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) * chainSequenceCount(p) / tl.ringW, 1)
+    if (tl.ringW > 0) trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) * chainSequenceCount(p) / (tl.ringW - wrapK + 1), 1) // a normal transition's time: the closing segment is not counted as more than 1 here, so only it gets longer / shorter
   } else {
     trig.loopPoses = null
     trig.rawChainEntries = null
@@ -14907,7 +15444,7 @@ function endClickHoldPose(p) {
 // triggers, so a hand can never get stuck mid-transition forever with no
 // way to reach it.
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   // CORRECTED 2026-09-30 -- see isClickHoldChainContinuation()'s own
   // comment (declared further below, but a plain function declaration is
   // hoisted, and this callback only ever runs on a real later pointerdown
@@ -15357,7 +15894,13 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       cp.lapNom = 0
       if (lapStyle === 'Oscillate') cp.sequenceDirection *= -1
     }
-    const speedMs = Math.max(animSpeedMs(p, true, cp.frozenSpeedMs), 1)
+    let speedMs = Math.max(animSpeedMs(p, true, cp.frozenSpeedMs), 1)
+    // Loop Wrap-Back Time Scale: the closing segment's weight is wrapK (1 = a normal transition); the other segments keep their speed, so the lap is longer / shorter by (wrapK - 1) normal transitions.
+    const wrapK = Math.max(cfg[`${p}LoopWrapScale`] ?? 1, 0.01)
+    if (wrapK !== 1 && lapStyle !== 'Oscillate' && cfg[`${p}SequenceLoopTransition`] !== false && cp.lapSegments) {
+      const baseW = cp.lapSegments.reduce((sum, sg) => sum + sg.weight, 0)
+      speedMs = speedMs * (baseW + wrapK) / (baseW + 1)
+    }
     const lapT = THREE.MathUtils.clamp((cp.lapNom ?? (now - cp.sequenceLapStartTime)) / speedMs, 0, 1)
     let values
     if (lapStyle === 'Oscillate') {
@@ -15383,7 +15926,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // report/CHANGELOG entry.
       if (cp.lapSegments) {
         // weighted ring: this lap's forward segments (Holds included) + one closing segment last pose -> first pose of weight 1 (same ring the Loading Preview builds)
-        const ring = cp.lapSegments.concat([{ poseA: cp.lapSegments[cp.lapSegments.length - 1].poseB, poseB: cp.lapSegments[0].poseA, weight: 1 }])
+        const ring = cp.lapSegments.concat([{ poseA: cp.lapSegments[cp.lapSegments.length - 1].poseB, poseB: cp.lapSegments[0].poseA, weight: wrapK }])
         const totalRingWeight = ring.reduce((sum, sg) => sum + sg.weight, 0)
         values = lerpLoopSegments(ring, (cp.sequenceLapIndex - 1 + lapT) * totalRingWeight)
       } else {
@@ -15731,7 +16274,7 @@ let leftPointerDown = false
 window.addEventListener('pointerdown', (e) => { if (e.button === 0) leftPointerDown = true })
 window.addEventListener('pointerup', (e) => { if (e.button === 0) leftPointerDown = false })
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   if (e.button !== 0) return
   // This exact pointerup was releasing a Click-Hold-Pose hold, not a
   // standalone click -- see lastPointerupWasHoldRelease's own comment
@@ -15833,7 +16376,7 @@ window.addEventListener('pointerup', (e) => {
 let rightClickPoseClickCount = 0
 let rightClickPoseClickTimer = null
 window.addEventListener('pointerup', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   if (e.button !== 2) return
   if (lastPointerupWasRchpHoldRelease) return
   triggerClickPose('rc')
@@ -15940,7 +16483,7 @@ function isClickHoldChainContinuation(now) {
   return now - clickHoldChainLastCleanUpTime <= cfg.multiClickWindowMs
 }
 window.addEventListener('pointerdown', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   if (e.button !== 0) return
   const now = performance.now()
   if (isClickHoldChainContinuation(now)) {
@@ -16254,6 +16797,7 @@ function buildGenericCurveWidget(row, opts) {
   const CURVE_SAMPLES = 48
   let handleEls = []
   let handleHits = [] // { marker, p, i, kind } of every REAL (user-made) bezier handle, rebuilt by redraw(): the point's own hit circle looks here first
+  let pointHits = [], allHandleHits = [] // every node circle / every handle square (real or preview), rebuilt by redraw(): the touch assist (attachCurveTouchAssist) looks here
   // Bezier curve handles (direct spec item, this widget only -- the
   // project-specific Arm Length/Wrist Splay curve widgets are deliberately
   // separate copies, per their own comments, and are NOT extended here).
@@ -16315,6 +16859,8 @@ function buildGenericCurveWidget(row, opts) {
     handleEls.forEach((el) => svg.removeChild(el))
     handleEls = []
     handleHits = []
+    pointHits = []
+    allHandleHits = []
     circles.forEach((c) => svg.removeChild(c))
     circles = []
     points.forEach((p, i) => {
@@ -16347,6 +16893,7 @@ function buildGenericCurveWidget(row, opts) {
         Object.assign(marker.style, { cursor: 'grab' })
         marker.addEventListener('pointerdown', (downEv) => startHandleDrag(p, i, kind, downEv))
         if (isReal) handleHits.push({ marker, p, i, kind })
+        allHandleHits.push({ el: marker, p, kind, real: isReal })
         svg.appendChild(marker)
         handleEls.push(marker)
       })
@@ -16359,6 +16906,7 @@ function buildGenericCurveWidget(row, opts) {
       hit.setAttribute('cx', px.x); hit.setAttribute('cy', px.y); hit.setAttribute('r', CURVE_HIT_RADIUS_PX)
       hit.setAttribute('fill', 'transparent')
       Object.assign(hit.style, { cursor: 'grab' })
+      pointHits.push({ el: hit, p })
       let dragged = false
       hit.addEventListener('pointerdown', (downEv) => {
         if (downEv.altKey) { startHandleDrag(p, i, 'h1', downEv); return }
@@ -16397,13 +16945,7 @@ function buildGenericCurveWidget(row, opts) {
         window.addEventListener('pointermove', onMove)
         window.addEventListener('pointerup', onUp)
       })
-      function deletePointIfRemovable() {
-        if (points.length > 2 && i !== 0 && i !== points.length - 1) {
-          points.splice(points.indexOf(p), 1)
-          redraw()
-          commitPoints()
-        }
-      }
+      function deletePointIfRemovable() { removePointObj(p) }
       hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
         deletePointIfRemovable()
@@ -16423,8 +16965,17 @@ function buildGenericCurveWidget(row, opts) {
       circles.push(dot)
     })
   }
+  function pointRemovable(p) { const idx = points.indexOf(p); return points.length > 2 && idx > 0 && idx < points.length - 1 }
+  function removePointObj(p) {
+    if (!pointRemovable(p)) return
+    points.splice(points.indexOf(p), 1)
+    redraw()
+    commitPoints()
+  }
+  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable })
   svg.addEventListener('click', (clickEv) => {
     if (clickEv.target.tagName === 'circle') return
+    if (touchAssist.blocksAdd(clickEv)) return // a tap near a node / handle grabs or deletes it, it never adds one
     const rect = svg.getBoundingClientRect()
     const np = fromPx(clickEv.clientX - rect.left, clickEv.clientY - rect.top)
     if (np.x <= 0 || np.x >= 1) return
@@ -16453,7 +17004,7 @@ function buildOffsetAxisWidgets(p) {
   ;['X', 'Y', 'Z'].forEach((ax) => {
     const curveRow = document.querySelector(`.dp-row[data-key="${p}Rotation${ax}Curve"]`)
     const rangeRow = document.querySelector(`.dp-row[data-key="${p}Rotation${ax}CurveRange"]`)
-    if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand, Live)  ·  Y: Rotation Fraction (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+    if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand, Live)  ·  Y: Rotation Fraction (0=Min, 1=Max)  ·  Axes Follow Rotation Mode (Hand Model Axes, or World Axes for Around Cursor)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
     if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: -360, trackMax: 360, unit: 'deg', defaultValue: { min: 0, max: 0 } })
   })
   const cursorCaption = 'X: Distance From Cursor (Live, Nearest→Farthest On-Screen Hand)  ·  Y: Offset Fraction (0=Min, 1=Max)'
@@ -16886,6 +17437,9 @@ function persistCustomClickFunctionIds() {
         if (parents.length) entry.parent = parents
         else delete entry.parent
         entry.collapsed = g.classList.contains('collapsed')
+        // The drag order (2026-10-18, direct report: "click function group order never saves, it reverts on refresh"). The saved list is in creation order and restore builds each function at the TOP of its group, so the order the user
+        // dragged them into was never recorded and every reload gave newest-first again. ord = this function's place among the function groups that share its container (0 = top), see the restore side.
+        entry.ord = Array.from(g.parentElement.children).filter((c) => c.dataset && c.dataset.customFunctionId).indexOf(g)
         { const t = cfg[`${entry.id}Type`]; if (t) entry.kind = kindForCustomFunctionType(t) } // never save a kind that disagrees with the function's Type
         // Every nested group (Offset, Rotation, Retransition ..., and a Multi Trigger's own) by its path inside this function; cv = 2 marks "recorded by this version" (older saves carried a stale function-level flag only).
         entry.sub = {}
@@ -17675,7 +18229,7 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'PauseDurationMs' },
   { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
-  { type: 'row', suffix: 'SequenceLoopTransition' }, { type: 'row', suffix: 'SequenceHoldMs' },
+  { type: 'row', suffix: 'SequenceLoopTransition' }, { type: 'row', suffix: 'LoopWrapScale' }, { type: 'row', suffix: 'SequenceHoldMs' },
   // CORRECTED 2026-10-04 (direct request: "look at the group ordering within
   // Click Offset Test, I want new click functions and existing functions to
   // follow this group order") -- read from `custom18`'s own saved `order`
@@ -17710,7 +18264,7 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'row', suffix: 'Mode' },
   { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'SkipIfSamePose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'GlideToFirstPose' }, { type: 'row', suffix: 'FirstGlideTimeScale' }, { type: 'row', suffix: 'TweenChain' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
-  { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' },
+  { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' }, { type: 'row', suffix: 'LoopWrapScale' },
   // 2026-10-04 -- same group order as CUSTOM_FUNCTION_POSE_LAYOUT (taken
   // from Click Offset Test); Tween Stop stays last, hold-kind only.
   { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Easing' },
@@ -17768,7 +18322,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   TargetPose: '', TweenSelector: '', TweenSpeedMs: 800,
   TweenStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', TweenStartTimeRange: '{"min":0,"max":300}',
   SequencePlayMode: 'Count', SequenceCount: 1, SequenceCountMode: 'Loop',
-  SequenceLoopTransition: true, SequenceHoldMs: 0, TransitionSpeedMs: 700,
+  SequenceLoopTransition: true, LoopWrapScale: 1, SequenceHoldMs: 0, TransitionSpeedMs: 700,
   EasingCurveEnabled: false, EasingCurve: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]',
   RetransitionEasingCurveEnabled: false, RetransitionEasingCurve: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]',
   SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":500,"max":1500}',
@@ -17929,6 +18483,26 @@ async function restoreCustomClickFunctions() {
       }
       container.appendChild(fg)
     })
+    // Put the function groups back in the order they were saved in (see persistCustomClickFunctionIds()'s ord). They are re-placed into the slots the function groups already occupy, so groups the user made keep their positions.
+    // A function with no saved ord (added since the last save) counts as the top, which is where a new function is built. Nothing is reordered when no entry has an ord (a layout saved before this existed).
+    {
+      const ordOf = new Map(saved.filter((e) => e && e.id && Number.isFinite(e.ord)).map((e) => [e.id, e.ord]))
+      if (ordOf.size) {
+        const containers = new Set([anchorBody])
+        anchorBody.querySelectorAll('.dp-group[data-custom-function-id]').forEach((fg) => { if (fg.parentElement) containers.add(fg.parentElement) })
+        containers.forEach((container) => {
+          const kids = Array.from(container.children)
+          const fgs = kids.filter((k) => k.dataset && k.dataset.customFunctionId)
+          if (fgs.length < 2) return
+          const ordFor = (k) => (ordOf.has(k.dataset.customFunctionId) ? ordOf.get(k.dataset.customFunctionId) : -1)
+          const sorted = fgs.slice().sort((a, b) => ordFor(a) - ordFor(b))
+          const slots = new Set(fgs)
+          let n = 0
+          const placed = kids.map((k) => (slots.has(k) ? sorted[n++] : k))
+          placed.forEach((k) => container.appendChild(k))
+        })
+      }
+    }
     applyTextOverrides()
     saved.forEach((entry) => {
       const fg = entry && entry.id && anchorBody.querySelector(`.dp-group[data-custom-function-id="${entry.id}"]`)
@@ -18151,6 +18725,8 @@ function onLoadingPreviewModelChanged() {
   const id = cfg.loadingPreviewModelId
   lpLoadPreviewModel(id).then(() => {
     if (cfg.loadingPreviewModelId !== id) return // changed again meanwhile
+    // The restored setting often resolves to the model the preview is already built from (the Hand model, when the saved local model is not on this device): rebuilding then only froze the loading hand for ~180 ms on a phone (measured in a log).
+    if (loadingPreviewBuiltRoot && lpSourceRoot() === loadingPreviewBuiltRoot) { logLoadingPreview('preview model setting resolves to the model already shown -- no rebuild'); return }
     // rebuild only a preview that is on screen (its canvas shown); otherwise the next build uses the new model
     if (loadingPreviewCanvas && loadingPreviewCanvas.style.display !== 'none') { logLoadingPreview('preview model changed -- rebuilding'); buildLoadingPreview(true) }
   })
@@ -18434,7 +19010,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'TweenStopDelayEnabled', 'TweenStopDelayMs', 'TweenStopDelayCurveEnabled', 'TweenStopDelayCurve', 'TweenStopDelayRange',
   // Loop type selector per trigger: hold-kind = Loop Mode (+ hold duration); pose-kind = Sequence Mode
   // (Count / Loop / Oscillate) and its Count / Count Mode / Loop Transition / Hold Duration rows.
-  'LoopMode', 'LoopHoldMs',
+  'LoopMode', 'LoopHoldMs', 'LoopWrapScale',
   'SequencePlayMode', 'SequenceCount', 'SequenceCountMode', 'SequenceLoopTransition', 'SequenceHoldMs'
 ]
 // CORRECTED 2026-10-01, direct request ("Click Functions that trigger a
@@ -18734,7 +19310,7 @@ async function reconcileMultiTriggers(id, wantJson) {
 // next click after that -- direct spec wording ("if there are none, when
 // i add one, its the tween for the 2nd click. The next one added will be
 // the 3rd").
-function addMultiTriggerTrigger(id, kind) {
+async function addMultiTriggerTrigger(id, kind) {
   let triggers = []
   try { triggers = JSON.parse(cfg[`${id}MultiTriggers`] || '[]') } catch (e) { triggers = [] }
   if (!Array.isArray(triggers)) triggers = []
@@ -18759,7 +19335,13 @@ function addMultiTriggerTrigger(id, kind) {
   const realMtGroup = functionBody ? functionBody.querySelector(':scope > .dp-group[data-key="Multi Trigger"]') : null
   const mtBody = realMtGroup ? realMtGroup.querySelector(':scope > .dp-group-body') : null
   const addBtnRow = mtBody ? mtBody.querySelector(':scope > .dp-multi-trigger-add-row') : null
-  registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, id)
+  await registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kind, id)
+  // The new trigger starts fully collapsed: its group and every subgroup in it (2026-10-18, direct request: "by default set the group and its subgroups as all collapsed, it is currently all expanded"). Only this "+ Add Trigger" path;
+  // a trigger restored on page load keeps its own saved open / closed state.
+  if (mtBody) {
+    const ng = mtBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${prefix}"]`)
+    if (ng) { ng.classList.add('collapsed'); ng.querySelectorAll('.dp-group').forEach((sg) => sg.classList.add('collapsed')) }
+  }
   saveCurrentSettings()
 }
 // Reads the LIVE DOM order of this function's own trigger sub-groups and
@@ -18971,7 +19553,7 @@ function endCustomHoldFunctions(type, ordinal = 1) {
 // (a deliberate "repeat rate," not a one-shot-per-page-load limit).
 let scrollTriggerTimer = null
 window.addEventListener('wheel', (e) => {
-  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')) return
+  if (e.target && e.target.closest && e.target.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')) return
   if (scrollTriggerTimer) return
   triggerCustomPoseFunctions('Scroll')
   scrollTriggerTimer = setTimeout(() => { scrollTriggerTimer = null }, cfg.multiClickWindowMs)
@@ -19258,6 +19840,8 @@ function updateChainModeVisibility(p) {
 function updateLoopHoldVisibility(p) {
   const row = document.querySelector(`.dp-row[data-key="${p}LoopHoldMs"]`)
   if (row) row.style.display = (isSequenceOrChainMode(p) && cfg[`${p}LoopMode`] !== 'Off') ? '' : 'none'
+  const wrapRow = document.querySelector(`.dp-row[data-key="${p}LoopWrapScale"]`)
+  if (wrapRow) wrapRow.style.display = (isSequenceOrChainMode(p) && cfg[`${p}LoopMode`] === 'Loop') ? '' : 'none'
 }
 // Owns StartTimeCurveEnabled/SpeedCurveEnabled/RetransitionEnabled's own
 // rows (mode-gated only, always visible in Single Pose regardless of
@@ -19556,6 +20140,7 @@ function updateSequencePlayModeVisibility(p) {
   setRow('SequenceCountMode', isCount)
   const isLoopStyle = showBase && (playMode === 'Loop' || (playMode === 'Count' && cfg[`${p}SequenceCountMode`] === 'Loop'))
   setRow('SequenceLoopTransition', isLoopStyle)
+  setRow('LoopWrapScale', isLoopStyle)
   setRow('SequenceHoldMs', showBase)
 }
 // Offset/Rotation rows are each gated by their own On/Off checkbox,
@@ -20715,7 +21300,7 @@ function setPaused(v) {
 // `?dev=1` one -- this is why its own click handler is wired here,
 // unconditionally, rather than via a DEV_GROUPS onClick. Excluded from
 // every click-hold-pose/click-pose/click-count-chain gesture listener
-// via `.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #presetPanel')` (see those listeners' own
+// via `.closest('.dp-panel, .camera-preview-panel, #pauseButton, #resetButton, #presetButton, #exportLogsButton, #presetPanel')` (see those listeners' own
 // guard, main.js) -- clicking it only ever calls setPaused(), never a
 // cursor-tracking-driven pose/tween trigger.
 function updatePauseButtonIcon() {
@@ -20768,6 +21353,7 @@ function applyPauseButtonStyle() {
     rb.style.opacity = btn.style.opacity
   }
   applyColorPresetButtonStyle()
+  applyExportLogsButtonStyle()
 }
 // Reset (direct request 2026-10-04: "a reset button next to the pause
 // button that resets all hands back to default position and pose").
@@ -21012,6 +21598,59 @@ function setupColorPresetUi() {
   applyColorPresetButtonStyle()
 }
 setupColorPresetUi()
+// Export Logs UI button (2026-10-17): the fourth corner button, right of Color Presets, same look as the others (the Pause Button group's settings). Shown only while "ADD UI BUTTON" (Debug > Export Logs) is on; works in every mode because the logs record without the panel.
+function applyExportLogsButtonStyle() {
+  const btn = document.getElementById('exportLogsButton')
+  if (!btn) return
+  const on = !!cfg.exportLogsUiButton
+  btn.style.display = on ? 'flex' : 'none'
+  if (!on) return
+  const st = colorPresetBtnStyle(), x = (cfg.pauseBtnXOffset ?? 12) + (st.size + 8) * 3
+  btn.style.left = x + 'px'; btn.style.top = (cfg.pauseBtnYOffset ?? 12) + 'px'
+  btn.style.width = st.size + 'px'; btn.style.height = st.size + 'px'
+  btn.style.fontSize = (cfg.pauseBtnIconSize ?? 18) + 'px'
+  btn.style.borderRadius = st.radius; btn.style.borderWidth = st.bw; btn.style.borderStyle = 'solid'; btn.style.borderColor = st.border
+  btn.style.background = st.bg; btn.style.color = st.fg; btn.style.opacity = (cfg.pauseBtnOpacity ?? 100) / 100
+}
+function setupExportLogsUiButton() {
+  if (document.getElementById('exportLogsButton')) return
+  const btn = document.createElement('button')
+  btn.id = 'exportLogsButton'; btn.type = 'button'; btn.setAttribute('aria-label', 'Export logs'); btn.title = 'Export logs (JSON)'; btn.textContent = '\u2193'
+  btn.style.cssText = 'position:fixed;z-index:100001;padding:0;margin:0;display:none;align-items:center;justify-content:center;cursor:pointer;line-height:1;user-select:none;-webkit-tap-highlight-color:transparent'
+  document.body.appendChild(btn)
+  btn.addEventListener('click', (e) => { e.stopPropagation(); exportDebugLogs(btn) })
+  applyExportLogsButtonStyle()
+}
+setupExportLogsUiButton()
+// Frame rate readout: a fixed, click-through element at the top right. Shown only while "Show Frame Rate" is on; its text is refreshed every Refresh Rate ms from the frames drawn in that window.
+function applyFrameRateDisplay() {
+  const on = !!cfg.showFrameRate
+  if (frameRateEl) {
+    frameRateEl.style.display = on ? 'block' : 'none'
+    frameRateEl.style.color = cfg.frameRateTextColor || '#ffffff'
+    if (on) { frameRateDrawn = 0; frameRateWindowStart = performance.now() }
+  }
+  ;['frameRateTextColor', 'frameRateRefreshMs'].forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row) row.style.display = on ? '' : 'none' })
+}
+function updateFrameRateDisplay() {
+  if (!frameRateEl || !cfg.showFrameRate) return
+  const now = performance.now()
+  const elapsed = now - frameRateWindowStart
+  if (elapsed < Math.max(cfg.frameRateRefreshMs || 0, 50)) return
+  frameRateEl.textContent = (frameRateDrawn * 1000 / elapsed).toFixed(1) + ' fps'
+  frameRateDrawn = 0; frameRateWindowStart = now
+}
+function setupFrameRateDisplay() {
+  if (document.getElementById('frameRateDisplay')) return
+  const el = document.createElement('div')
+  el.id = 'frameRateDisplay'
+  el.style.cssText = 'position:fixed;top:8px;right:12px;z-index:100002;display:none;pointer-events:none;user-select:none;font:600 14px/1.2 ui-monospace,Menlo,Consolas,monospace;text-shadow:0 0 3px rgba(0,0,0,0.85),0 0 1px rgba(0,0,0,0.85)'
+  el.textContent = '-- fps'
+  document.body.appendChild(el)
+  frameRateEl = el
+  applyFrameRateDisplay()
+}
+setupFrameRateDisplay()
 // Both Saved Tween Sequences' new "Edit" button acts on the list-
 // picker's own currently-SELECTED row -- same convention as Saved Poses'
 // own "Default" button (getSelectedSavedPoseItem()), just scoped to this
@@ -21303,7 +21942,11 @@ function animate(dt, now) {
     // Pose/tween state machine, per hand) is what actually freezes every
     // animation exactly where it is; nothing here re-applies a pose or
     // advances a phase while `isPaused` is true.
-    if (!isPaused) {
+    // Hide Hands (2026-10-18, direct report: the live Loading Preview ran at ~15 fps on the laptop with the hands hidden): hiding only stopped the hands from being DRAWN, the per-frame logic of every hand (cursor tracking, the distance
+    // pre-passes, the render order, Responsive Velocity, the triggers) still ran on the same thread as the preview. While the hands are hidden none of it is needed, so only the cursor target stays current. (The render order in particular has
+    // nothing to do with the loading preview.) Un-hiding resumes everything; hands that were hidden simply carry on from the state they were left in.
+    if (!isPaused && handsHiddenByPanel()) updateCursorTarget()
+    if (!isPaused && !handsHiddenByPanel()) {
       updateCursorTarget()
       const armTrackOn = trackingActiveFor('Arm'), palmTrackOn = trackingActiveFor('Palm')
       if (armTrackOn || palmTrackOn) {
@@ -21578,8 +22221,17 @@ function animate(dt, now) {
       updateResponsiveVelocity(nowVirtual()) // Cursor Tracking > Responsive Velocity (cursor-speed effects)
       rvApplyArmTilt(armTrackOn || palmTrackOn)
       const __uroStart = performance.now()
-      updateRenderOrder()
-      applyFieldBounds()
+      // 2026-10-18: while the loading screen is up (the field is built / being warmed up behind it, nothing of it visible) the hand logic is skipped: with 3025 hands it took ~90 ms of every ~150 ms frame, which is what made the
+      // 2-hand loading preview run at 6 fps on the laptop. The first frame after fieldStarted does the idle repose of every hand in one go, then the loading screen hides.
+      if (fieldStarted || !hands.length) {
+        updateRenderOrder()
+        applyFieldBounds()
+      } else {
+        // Behind the loading screen (2026-10-18): the pre-passes plus the first idle repose of the hands in a time budget (no render-order ranks, nothing for a hand that is already posed), so the mass repose that used to
+        // land in ONE frame (a ~150 ms freeze at the end of the build, then again at the reveal) is spread over the warm-up frames.
+        loadingWarmMode = true
+        try { updateRenderOrder() } finally { loadingWarmMode = false }
+      }
       checkStartupFloorHide()
       __frameProfiler.updateRenderOrderMs += performance.now() - __uroStart
       if (cfg.logPoseJumpsEnabled) detectPoseJumps()
@@ -21611,9 +22263,9 @@ function animate(dt, now) {
     const __pausedRenderIntervalMs = 1000 / Math.max(1, cfg.pausedRenderFps ?? 15)
     const __pausedSafetyNetIntervalMs = 2000
     const __sinceLastPausedRender = __nowForRender - lastPausedRenderMs
-    const __shouldRenderThisFrame = !isPaused
+    const __shouldRenderThisFrame = !endSeqHolding() && (!isPaused
       || (sceneNeedsRedraw && __sinceLastPausedRender >= __pausedRenderIntervalMs)
-      || __sinceLastPausedRender >= __pausedSafetyNetIntervalMs
+      || __sinceLastPausedRender >= __pausedSafetyNetIntervalMs)
     if (__shouldRenderThisFrame) {
       if (isPaused) { lastPausedRenderMs = __nowForRender; sceneNeedsRedraw = false }
       const __renderStart = performance.now()
@@ -21623,6 +22275,7 @@ function animate(dt, now) {
       window.__lastComposerMs = performance.now() - __renderStart
       fieldWarmLastRenderMs = window.__lastComposerMs
       __frameProfiler.frames++
+      frameRateDrawn++
       if (fieldStarted && !fieldRevealed && ++fieldRevealFrames >= 2) finalizeReveal() // two painted field frames, then the loading screen goes
     }
     // Covers everything from the true top of animate() through the
@@ -21634,6 +22287,7 @@ function animate(dt, now) {
     // (fps=4.2 with both of those reading normal) where the missing time
     // had to be somewhere this line now actually measures.
     __frameProfiler.animateTotalMs += performance.now() - __animateTotalStart
+    updateFrameRateDisplay()
     if (DEBUG_TIMING && fieldStarted && (window.__postStartFrames = (window.__postStartFrames || 0) + 1) <= 8) logStartupTiming('post-start animate #' + window.__postStartFrames + ' total ' + Math.round(performance.now() - __animateTotalStart) + 'ms (composer ' + Math.round(window.__lastComposerMs || 0) + ')')
     {
       const elapsed = performance.now() - __frameProfiler.windowStart
@@ -21959,8 +22613,10 @@ function updateRenderOrder() {
     const rh = hands[ri], rlive = liveDistances[ri]
     rh.effectiveRenderOrder = (flashFixOn && rh.isOverlapping) ? rh.effectiveRenderOrder + (rlive - rh.effectiveRenderOrder) * REORDER_SMOOTHING : rlive
   }
-  computeRenderOrderRanks()
+  if (!loadingWarmMode) computeRenderOrderRanks()
+  const warmReposeDeadline = loadingWarmMode ? performance.now() + 6 : 0 // 6 ms: the same slice the field build uses (a judgment call, not a measurement)
   hands.forEach((hand, i) => {
+    if (loadingWarmMode && (hand.everReposed || performance.now() > warmReposeDeadline)) return
     const live = liveDistances[i]
     // Render order (2026-10-11): this hand's position in the per-frame sort (see computeRenderOrderRanks()).
     const roBase = hand._roRank || 0

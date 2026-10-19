@@ -2277,6 +2277,9 @@ function refreshGroupCascadeChrome(g) {
   forEachVisibilityDescendant(g, (ctrl) => visCtrls.push(ctrl))
   const vis = g._visCascadeCheckbox
   const indep = g._indepCascadeCheckbox
+  // 2026-10-18, direct request: a group whose Show in Mobile/Landscape box is unchecked on Desktop (every checkable setting inside it hidden) must not be visible on Mobile / Landscape at all, even if it also holds rows the checkbox system
+  // cannot cover (text widgets, buttons, curves). Computed here, with the checkbox state, and read by refreshEmptyGroupVisibility().
+  g._allVisOff = visCtrls.length > 0 && visCtrls.every((c) => !isDevRowVisible(c.key))
   if (vis) {
     vis.style.display = (onDesktop && visCtrls.length) ? '' : 'none'
     if (visCtrls.length) {
@@ -2435,8 +2438,12 @@ export function seedControlValue(key, value) {
 export function renderDynamicGroup(groupSpec) {
   devGroups.push(groupSpec)
   const real = realDeviceClass()
+  // A group built with seedFrom is a FRESHLY ADDED copy (Multi Trigger "+ Add Trigger"; never passed on a page-load restore), so the source's values AS THEY STAND NOW are authoritative (2026-10-18, direct request: "the new
+  // Trigger group will match the parent click function exactly as it stands, not based off the last git save"). Before, a saved value for the same key won over the copy, and a value already in cfg was kept: a trigger number
+  // that had been used and deleted came back with its old saved settings. The source's Show in Mobile / Independent flags are copied too.
+  const fresh = !!groupSpec.seedFrom
   groupSpec.controls.forEach((c) => {
-    if (cfg[c.key] !== undefined) return
+    if (cfg[c.key] !== undefined && !fresh) return
     // Optional `groupSpec.seedFrom(ctrl)` -> another control's key: a brand-new
     // control starts as a copy of that control's CURRENT value on every
     // device (2026-10-04, Multi Trigger "new trigger duplicates the base
@@ -2446,9 +2453,17 @@ export function renderDynamicGroup(groupSpec) {
     DEVICES.forEach((d) => {
       const restored = lastRestoredValues && lastRestoredValues[d] ? lastRestoredValues[d][c.key] : undefined
       const copied = srcKey && store[d] ? store[d][srcKey] : undefined
-      store[d][c.key] = restored !== undefined ? restored : (copied !== undefined ? copied : c.def)
+      store[d][c.key] = fresh && copied !== undefined ? copied : (restored !== undefined ? restored : (copied !== undefined ? copied : c.def))
+      if (fresh && copied !== undefined && copied !== null && typeof copied === 'object') store[d][c.key] = JSON.parse(JSON.stringify(copied))
     })
     cfg[c.key] = store[real][c.key]
+    if (fresh && srcKey) {
+      if (devVisibility[srcKey] !== undefined) devVisibility[c.key] = devVisibility[srcKey]; else delete devVisibility[c.key]
+      ;['mobile', 'landscape'].forEach((d) => {
+        if (!devIndependence[d]) return
+        if (devIndependence[d][srcKey] !== undefined) devIndependence[d][c.key] = devIndependence[d][srcKey]; else delete devIndependence[d][c.key]
+      })
+    }
   })
   const groupsEl = document.getElementById('dpGroups')
   if (!groupsEl) return null // DEV_MODE off / panel never built -- nothing to render into
@@ -3265,7 +3280,7 @@ function refreshEmptyGroupVisibility() {
       if (g.dataset.alwaysVisible === '1') { g.classList.remove('dp-group-hidden-empty'); return }
       const hasVisibleRow = !!Array.from(body.children).find((child) => child.classList.contains('dp-row') && !child.classList.contains('dp-row-device-hidden'))
       const hasVisibleSubgroup = !!Array.from(body.children).find((child) => child.classList.contains('dp-group') && !child.classList.contains('dp-group-hidden-empty'))
-      g.classList.toggle('dp-group-hidden-empty', !hasVisibleRow && !hasVisibleSubgroup)
+      g.classList.toggle('dp-group-hidden-empty', !!g._allVisOff || (!hasVisibleRow && !hasVisibleSubgroup))
     })
 }
 
