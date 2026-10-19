@@ -278,6 +278,10 @@
         {
           "name": "2 Twids",
           "sequence": "Two-Hand Tween"
+        },
+        {
+          "name": "2 T",
+          "sequence": "Two-Hand Tween"
         }
       ],
       "loadingPreviewSavedCameras": [
@@ -22216,6 +22220,10 @@
         {
           "name": "2 Twids",
           "sequence": "Two-Hand Tween"
+        },
+        {
+          "name": "2 T",
+          "sequence": "Two-Hand Tween"
         }
       ],
       "loadingPreviewSavedCameras": [
@@ -39346,7 +39354,7 @@
         }
       ],
       "cameraX": -3.422222222222221,
-      "cameraY": 9.942187632544766e-13,
+      "cameraY": 1.0853324851110394e-12,
       "cameraZ": 495.9881938061244,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -44153,6 +44161,10 @@
         },
         {
           "name": "2 Twids",
+          "sequence": "Two-Hand Tween"
+        },
+        {
+          "name": "2 T",
           "sequence": "Two-Hand Tween"
         }
       ],
@@ -74159,7 +74171,7 @@
       "left": 20,
       "top": 176.2678680419922,
       "width": 401.2857360839844,
-      "height": 490.3571472167969
+      "height": 494.9285888671875
     }
   }
 }
