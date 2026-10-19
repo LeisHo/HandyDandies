@@ -207,7 +207,7 @@
       "alternateRowOffset": 4,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": true,
+      "hideHands": false,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
       "fieldOffsetZ": 0,
@@ -267,7 +267,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -31705,7 +31705,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -47820,7 +47820,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -48202,14 +48202,14 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > End Sequence",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -48278,7 +48278,7 @@
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Easing",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -48347,7 +48347,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -48358,7 +48358,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -50497,7 +50497,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
