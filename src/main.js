@@ -13915,12 +13915,13 @@ const _baseRotDecay = new THREE.Quaternion(), _wrV2 = new THREE.Vector3()
 // lastPositionalFn (the last triggered function with it on); with no such function it stays at 0, so the offset / rotation stay and the hand remains in this retransition phase until another function takes over.
 function positionalRetransitionOn(p) { return cfg[`${p}PositionalRetransition`] !== false }
 function notePositionalFn(p) { if (positionalRetransitionOn(p) && cfg[`${p}RetransitionEnabled`] !== false) lastPositionalFn = p }
-function positionalProgressFor(p, poseProgress, elapsedMs) {
+function positionalProgressFor(p, poseProgress, st) {
   if (positionalRetransitionOn(p)) return poseProgress
   const q = lastPositionalFn
-  if (!q) return 0
-  const ms = Math.max(((CLICK_HOLD_KEYS.includes(q) && isSequenceOrChainMode(q)) ? cfg[`${q}TweenRetransitionSpeedMs`] : cfg[`${q}RetransitionSpeedMs`]) ?? 400, 1)
-  return THREE.MathUtils.clamp(elapsedMs / ms, 0, 1)
+  const qTrig = q ? (CLICK_HOLD_KEYS.includes(q) ? clickHoldPoseTriggers[q] : clickPoseTriggers[q]) : null
+  if (!qTrig || !(st.posProg > 0)) return 0
+  // the borrowed function's own Retransition Easing Curve shapes it too
+  return cfg[`${q}RetransitionEasingCurveEnabled`] ? easingProfilePAt(getEasingProfile(q, CLICK_HOLD_KEYS.includes(q) && isSequenceOrChainMode(q), qTrig, true), st.posProg) : st.posProg
 }
 function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart, baseAccumStart, cursorAccumStart) {
   const remaining = 1 - progress
@@ -14656,6 +14657,29 @@ function liveStartDelayMs(hand, p, trig, isTween) {
   if (cfg[`${p}StartTimeCurveEnabled`] === false) return 0
   return isTween ? liveCurveValue(hand, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed, p, 'StartTimeCurveVisibleOnly') : liveCurveValue(hand, trig.startCurveParsed, trig.startRangeParsed, p, 'StartTimeCurveVisibleOnly')
 }
+// The Retransition Start Time delay and the Retransition duration (Speed slider / Speed Curve / Distance Curve) of function p for this hand, live. Used for p's own retransition and, for Positional Retransition, for the
+// function whose timing the offset / rotation borrow.
+function retTimingFor(hand, p, trig, isTw) {
+    const delay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
+      : (isTw ? liveCurveValue(hand, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed, p, 'RetransitionStartTimeCurveVisibleOnly') : liveCurveValue(hand, trig.retransitionCurveParsed, trig.retransitionRangeParsed, p, 'RetransitionStartTimeCurveVisibleOnly'))
+    const distMs = retransitionDistanceMs(hand, p) // Retransition Distance Curve (null when off) replaces the Retransition Speed duration
+    const speedMs = distMs !== null ? Math.max(distMs, 1) : Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`]
+      ? (isTw ? liveCurveValue(hand, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed, p, 'RetransitionSpeedCurveVisibleOnly') : liveCurveValue(hand, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed, p, 'RetransitionSpeedCurveVisibleOnly'))
+      : (isTw ? cfg[`${p}TweenRetransitionSpeedMs`] : cfg[`${p}RetransitionSpeedMs`]), 1)
+  return { delay, speedMs }
+}
+// Positional Retransition: while p (Positional Retransition off) retransitions, the offset / rotation progress (st.posProg) is accumulated with the FULL retransition timing of lastPositionalFn - its Start Time and Speed curves,
+// Distance Curve and Scaler - on the same clock (st.retElapsed) as p's own retransition. No such function: it stays 0.
+function advancePositionalProgress(st, hand, p, dt) {
+  if (positionalRetransitionOn(p)) return
+  const q = lastPositionalFn
+  const qTrig = q ? (CLICK_HOLD_KEYS.includes(q) ? clickHoldPoseTriggers[q] : clickPoseTriggers[q]) : null
+  if (!qTrig) { st.posProg = 0; return }
+  if (st._posSeenStart !== st.retransitionStartTime) { st._posSeenStart = st.retransitionStartTime; st.posProg = 0 }
+  const qt = retTimingFor(hand, q, qTrig, CLICK_HOLD_KEYS.includes(q) && isSequenceOrChainMode(q))
+  const eff = Math.min(dt, st.retElapsed - qt.delay)
+  if (eff > 0) st.posProg = Math.min((st.posProg ?? 0) + eff / (qt.speedMs / retransitionScalerMul(hand, q)), 1)
+}
 // kind: 'hold' (chp state) or 'pose' (cp state). Called at the top of each per-hand update, before any phase logic.
 function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
   // Waiting to start: re-evaluate the Start Time delay from where the hand is now.
@@ -14694,12 +14718,10 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
     }
     st.retElapsed += dt
     const isTw = kind === 'hold' && !!st.retransitionIsTween
-    const delay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
-      : (isTw ? liveCurveValue(hand, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed, p, 'RetransitionStartTimeCurveVisibleOnly') : liveCurveValue(hand, trig.retransitionCurveParsed, trig.retransitionRangeParsed, p, 'RetransitionStartTimeCurveVisibleOnly'))
-    const distMs = retransitionDistanceMs(hand, p) // Retransition Distance Curve (null when off) replaces the Retransition Speed duration
-    const speedMs = distMs !== null ? Math.max(distMs, 1) : Math.max(cfg[`${p}RetransitionSpeedCurveEnabled`]
-      ? (isTw ? liveCurveValue(hand, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed, p, 'RetransitionSpeedCurveVisibleOnly') : liveCurveValue(hand, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed, p, 'RetransitionSpeedCurveVisibleOnly'))
-      : (isTw ? cfg[`${p}TweenRetransitionSpeedMs`] : cfg[`${p}RetransitionSpeedMs`]), 1)
+    const rt0 = retTimingFor(hand, p, trig, isTw)
+    const delay = rt0.delay
+    const speedMs = rt0.speedMs
+    advancePositionalProgress(st, hand, p, dt)
     st.retransitionDelay = delay
     const eff = Math.min(dt, st.retElapsed - delay)
     if (eff > 0) st.retProg = Math.min((st.retProg ?? 0) + eff / (speedMs / retransitionScalerMul(hand, p)), 1)
@@ -15219,9 +15241,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // (snapshotted at retransition-start by snapshotOffsetRotationAccumForRetransition())
     // back to zero, not just this function's own last increment -- and
     // clears the real accumulator once progress reaches 1.
-    const posProgressH = positionalProgressFor(p, easedProgress, elapsed)
+    const posProgressH = positionalProgressFor(p, easedProgress, chp)
     applyOffsetRotationRetransition(hand, posProgressH, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart, chp.retransitionBaseAccumStart, chp.retransitionCursorAccumStart)
-    if (progress >= 1 && (positionalRetransitionOn(p) || posProgressH >= 1)) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
+    if (progress >= 1 && (positionalRetransitionOn(p) || chp.posProg >= 1)) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
 }
 function startClickHoldPose(p) {
@@ -16169,9 +16191,9 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // (snapshotted above at retransition-start) back to zero, not just
     // this function's own last increment -- and clears the real
     // accumulator once progress reaches 1, a genuinely fresh start.
-    const posProgressC = positionalProgressFor(p, easedProgress, elapsed)
+    const posProgressC = positionalProgressFor(p, easedProgress, cp)
     applyOffsetRotationRetransition(hand, posProgressC, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart, cp.retransitionBaseAccumStart, cp.retransitionCursorAccumStart)
-    if (progress >= 1 && (positionalRetransitionOn(p) || posProgressC >= 1)) cp.phase = 'idle'
+    if (progress >= 1 && (positionalRetransitionOn(p) || cp.posProg >= 1)) cp.phase = 'idle'
   }
 }
 // Starts every hand's own full sequence at once -- unlike
