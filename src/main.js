@@ -389,6 +389,7 @@ let loadingPreviewAnchorActive = false
 let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: null, speedRangeParsed: null }
 // Loading Preview End Sequence (2026-10-18): state + its own easing trig, declared up here (the restore can reach the onChange handlers at top level - TDZ). lpLastValues / lpHand2LastValues = the last pose applied to each preview hand.
 let loadingPreviewEndEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], speedRangeParsed: null }
+let lpHideModel1 = 0, lpHideModel2 = 0 // the Hide Model % of the pose each loading-preview hand is showing right now (kept so the Real Time Loading crop, which re-applies the clip on its own, does not lose it)
 let lpLastValues = null, lpHand2LastValues = null
 // Smooth loading (2026-10-18): loadingWarmMode = updateRenderOrder() is running behind the loading screen (only the first idle repose of the hands, in a time budget); fieldPreposeDeadline = the latest the reveal waits for it;
 // loadingPreviewBuiltRoot = the model the preview hand was cloned from (a restored model setting that resolves to the same one must not rebuild the preview).
@@ -9272,7 +9273,8 @@ function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride) {
   hand2.clone.updateMatrixWorld(true)
   const rtCrop2 = lpRealTimeCropPct()
   // Hide Model is part of each POSE (HANDO 2026-10-19: a 2nd-hand pose carries hand2HideModel, stored here as hideModel by hand2PoseToMainItem(); a mirroring hand plays the main poses): `values` is this lap's interpolated 2nd-hand pose (hideModel is not in POSE_PRESET_KEYS, so not in V), a pose without it = 0
-  const hideModel2 = rtCrop2 !== null ? 0 : (values.hideModel || 0)
+  const hideModel2 = values.hideModel || 0 // always the pose's own value, also under Real Time Loading (see applyLoadingPreviewPose)
+  lpHideModel2 = hideModel2
   updateHand2WristClip(rtCrop2 !== null ? rtCrop2 : (typeof cfg2.hand2HideWrist === 'number' ? cfg2.hand2HideWrist : 100), hideModel2)
 }
 // Same crop as updateLoadingPreviewWristClip(), for the second hand.
@@ -10258,7 +10260,9 @@ function applyLoadingPreviewPose(item) {
   // wrist-crop data at all (poseDefaultValues, which -- like `values` --
   // is also built from POSE_PRESET_KEYS only).
   const rtCrop = lpRealTimeCropPct()
-  updateLoadingPreviewWristClip(rtCrop !== null ? rtCrop : (item.hideWrist ?? 100), rtCrop !== null ? 0 : (item.hideModel ?? 0))
+  // Hide Model is a pose value of its own and always applies (2026-10-19): Real Time Loading replaces only the Hide Wrist part with the loading progress; it used to force Hide Model to 0 as well, which hid the slider's effect for good.
+  lpHideModel1 = item.hideModel ?? 0
+  updateLoadingPreviewWristClip(rtCrop !== null ? rtCrop : (item.hideWrist ?? 100), lpHideModel1)
 }
 // Loading Preview's own per-pose wrist crop -- direct report ("the
 // imported tweens and poses dont seem to read the wrist cropping data
@@ -10420,7 +10424,7 @@ function updateLoadingPreviewAnimation() {
   if (loadingPreviewSequenceDone) {
     // frozen at whatever was last applied (a finished Count) - except the Real Time Loading wrist crop, which keeps following the loading progress
     const rt = lpRealTimeCropPct()
-    if (rt !== null) { updateLoadingPreviewWristClip(rt); if (loadingPreviewHand2) updateHand2WristClip(rt) }
+    if (rt !== null) { updateLoadingPreviewWristClip(rt, lpHideModel1); if (loadingPreviewHand2) updateHand2WristClip(rt, lpHideModel2) }
     return
   }
   const segments = resolveTweenSegmentsWithAnchor(anchorPose, rawEntries.slice(anchorIdx + 1))
@@ -10632,7 +10636,7 @@ function lpEndValues(tr, lapIndex, eased, lapStyle, dir) {
 }
 function endSeqKeepCrop() {
   const rt = lpRealTimeCropPct()
-  if (rt !== null) { updateLoadingPreviewWristClip(rt); if (loadingPreviewHand2) updateHand2WristClip(rt) }
+  if (rt !== null) { updateLoadingPreviewWristClip(rt, lpHideModel1); if (loadingPreviewHand2) updateHand2WristClip(rt, lpHideModel2) }
 }
 function endSeqBeginPlay(now) {
   const seq = lpEndSeqObj()
