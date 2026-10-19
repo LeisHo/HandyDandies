@@ -14601,7 +14601,7 @@
       "startupFnCursorClampRange": "{\"min\":0,\"max\":0}",
       "startupFnOffsetLoopRetransition": false,
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "2 TWIDS",
+      "startupFnTweenSelector": "PALM FAN - FAST FAN",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 3,
@@ -52053,7 +52053,7 @@
       "startupFnCursorClampRange": "{\"min\":0,\"max\":0}",
       "startupFnOffsetLoopRetransition": false,
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "2 TWIDS",
+      "startupFnTweenSelector": "PALM FAN - FAST FAN",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 3,
@@ -56841,7 +56841,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -59549,7 +59549,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -59568,7 +59568,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -59591,7 +59591,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
