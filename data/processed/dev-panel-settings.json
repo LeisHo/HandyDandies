@@ -14113,13 +14113,11 @@
           "name": "2 TWIDS - END",
           "tweenPoses": [
             "2 TWIDS - 75",
-            "2 TWIDS - F0",
             "2 TWIDS - F1",
             "2 TWIDS - F2"
           ],
           "tweenPosesHand2": [
             "2 TWIDS - 75 (2ND HAND)",
-            "2 TWIDS - F0 (2ND HAND)",
             "2 TWIDS - F1 (2ND HAND)",
             "2 TWIDS - F2 (2ND HAND)"
           ],
@@ -32825,13 +32823,11 @@
           "name": "2 TWIDS - END",
           "tweenPoses": [
             "2 TWIDS - 75",
-            "2 TWIDS - F0",
             "2 TWIDS - F1",
             "2 TWIDS - F2"
           ],
           "tweenPosesHand2": [
             "2 TWIDS - 75 (2ND HAND)",
-            "2 TWIDS - F0 (2ND HAND)",
             "2 TWIDS - F1 (2ND HAND)",
             "2 TWIDS - F2 (2ND HAND)"
           ],
@@ -51537,13 +51533,11 @@
           "name": "2 TWIDS - END",
           "tweenPoses": [
             "2 TWIDS - 75",
-            "2 TWIDS - F0",
             "2 TWIDS - F1",
             "2 TWIDS - F2"
           ],
           "tweenPosesHand2": [
             "2 TWIDS - 75 (2ND HAND)",
-            "2 TWIDS - F0 (2ND HAND)",
             "2 TWIDS - F1 (2ND HAND)",
             "2 TWIDS - F2 (2ND HAND)"
           ],
@@ -56834,7 +56828,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -57185,7 +57179,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > End Sequence",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -57680,7 +57674,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -64515,8 +64509,8 @@
     "mobile": {
       "left": 20,
       "top": 176.2678680419922,
-      "width": 404.71429443359375,
-      "height": 486.7202453613281
+      "width": 408.1428527832031,
+      "height": 488.2440490722656
     }
   }
 }
