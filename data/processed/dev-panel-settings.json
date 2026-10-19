@@ -635,8 +635,8 @@
       "modelRotY": 0,
       "modelRotZ": 0,
       "baseRotationX": 0,
-      "baseRotationY": 0,
-      "baseRotationZ": 0,
+      "baseRotationY": 180,
+      "baseRotationZ": 180,
       "poseOffsetX": 0,
       "poseOffsetY": 0,
       "poseOffsetZ": 0,
@@ -14149,14 +14149,14 @@
         }
       ],
       "cameraX": 1.9534883720930232,
-      "cameraY": 2.041020698109996e-13,
-      "cameraZ": 245.9004898795015,
+      "cameraY": 1.9836057229589415e-13,
+      "cameraZ": 152.13471971453785,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.041020698109996e-13,\"cameraZ\":245.9004898795015,\"cameraFov\":20,\"cameraZoom\":121.5,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 121.5,
+      "cameraZoom": 27.73422983503636,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -14589,7 +14589,7 @@
       "startupFnCursorClampRange": "{\"min\":0,\"max\":0}",
       "startupFnOffsetLoopRetransition": false,
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "FIST PALM + 30",
+      "startupFnTweenSelector": "FIST PALM",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 3,
@@ -19349,8 +19349,8 @@
       "modelRotY": 0,
       "modelRotZ": 0,
       "baseRotationX": 0,
-      "baseRotationY": 0,
-      "baseRotationZ": 0,
+      "baseRotationY": 180,
+      "baseRotationZ": 180,
       "poseOffsetX": 0,
       "poseOffsetY": 0,
       "poseOffsetZ": 0,
@@ -38063,8 +38063,8 @@
       "modelRotY": 0,
       "modelRotZ": 0,
       "baseRotationX": 0,
-      "baseRotationY": 0,
-      "baseRotationZ": 0,
+      "baseRotationY": 180,
+      "baseRotationZ": 180,
       "poseOffsetX": 0,
       "poseOffsetY": 0,
       "poseOffsetZ": 0,
@@ -52017,7 +52017,7 @@
       "startupFnCursorClampRange": "{\"min\":0,\"max\":0}",
       "startupFnOffsetLoopRetransition": false,
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "FIST PALM + 30",
+      "startupFnTweenSelector": "FIST PALM",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 3,
@@ -57342,7 +57342,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -57686,7 +57686,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -57701,7 +57701,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (8)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -57728,7 +57728,7 @@
                 "type": "group",
                 "group": {
                   "key": "Whole-Hand Rotation & Thumb",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -58112,7 +58112,7 @@
                 "type": "group",
                 "group": {
                   "key": "Whole-Hand Rotation at Base",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -59090,7 +59090,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -59201,7 +59201,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -64515,8 +64515,8 @@
     "desktop": {
       "left": 122.375,
       "top": 69,
-      "width": 408.1499938964844,
-      "height": 578.5875244140625
+      "width": 411.3500061035156,
+      "height": 580.1875
     }
   }
 }
