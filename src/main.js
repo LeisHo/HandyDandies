@@ -406,7 +406,6 @@ const _loadingPreviewBase = new THREE.Vector3(), _loadingPreviewV2 = new THREE.V
 // Two-hand tween: the base position applyLoadingPreviewPose() gave the main hand (before the Pose Offset), and whether it was HANDO's exact pivots (see there) - updateLoadingPreviewHand2() needs both for the mirror plane.
 const _lpTwoHandBase = new THREE.Vector3(), _lpWholeRotQ = new THREE.Quaternion(), _lpPivotDelta = new THREE.Vector3()
 let lpTwoHandExact = false
-let lpMainHideModel = 0 // the main pose's Hide Model % (HANDO `hideModel`, 2026-10-19), shared with the mirrored 2nd hand
 let lpHandoScaleCur = 0 // the selected two-hand sequence's HANDO world units per raw model unit (seq.handoScale), 0 when there is none: set by ensureLoadingPreviewHand2()
 // World-XY-only cursor distance for click-function settings (2026-10-04,
 // direct request: "for any click function settings that depend on distance
@@ -9026,7 +9025,7 @@ const _loadingPreviewWholeHandRotEuler = new THREE.Euler()
 // The second hand is placed the way HANDO does it: world = Mirror(about the main hand's centre) * Translate(offset) * MainHand * (rotate / scale about the palm centre). HANDO's world axes map onto this preview's by
 // alignQuat (the same mapping the camera / lighting imports use), the offset is in HANDO units (scaled with the preview hand), and the skeleton is posed UN-mirrored (its base orientation = the main hand's times the
 // rotation) with the reflection applied only to the final matrix - a mirrored copy of a posed hand, not a mirrored pose.
-const HAND2_CONFIG_KEYS = ['mirrorMainHandPose', 'hand2MirrorX', 'hand2MirrorY', 'hand2MirrorZ', 'hand2OffsetX', 'hand2OffsetY', 'hand2OffsetZ', 'hand2RotX', 'hand2RotY', 'hand2RotZ', 'hand2Scale', 'hand2HideWrist', 'hand2HideModel']
+const HAND2_CONFIG_KEYS = ['mirrorMainHandPose', 'hand2MirrorX', 'hand2MirrorY', 'hand2MirrorZ', 'hand2OffsetX', 'hand2OffsetY', 'hand2OffsetZ', 'hand2RotX', 'hand2RotY', 'hand2RotZ', 'hand2Scale', 'hand2HideWrist']
 function hand2PoseToMainItem(p) {
   const out = { name: p.name, hand2Pose: true }
   Object.keys(p).forEach((k) => { if (k.length > 5 && k.startsWith('hand2')) out[k[5].toLowerCase() + k.slice(6)] = p[k] }) // hand2ThumbCurl -> thumbCurl
@@ -9273,8 +9272,8 @@ function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride) {
   hand2.clone.matrixWorldNeedsUpdate = true
   hand2.clone.updateMatrixWorld(true)
   const rtCrop2 = lpRealTimeCropPct()
-  // Hide Model: a mirroring 2nd hand follows the main hand's pose value, an independent one uses its own placement slider (HANDO's updateHand2WristClipPlane())
-  const hideModel2 = rtCrop2 !== null ? 0 : (cfg2.mirrorMainHandPose ? lpMainHideModel : (typeof cfg2.hand2HideModel === 'number' ? cfg2.hand2HideModel : 0))
+  // Hide Model is part of each POSE (HANDO 2026-10-19: a 2nd-hand pose carries hand2HideModel, stored here as hideModel by hand2PoseToMainItem(); a mirroring hand plays the main poses): `values` is this lap's interpolated 2nd-hand pose (hideModel is not in POSE_PRESET_KEYS, so not in V), a pose without it = 0
+  const hideModel2 = rtCrop2 !== null ? 0 : (values.hideModel || 0)
   updateHand2WristClip(rtCrop2 !== null ? rtCrop2 : (typeof cfg2.hand2HideWrist === 'number' ? cfg2.hand2HideWrist : 100), hideModel2)
 }
 // Same crop as updateLoadingPreviewWristClip(), for the second hand.
@@ -10263,8 +10262,7 @@ function applyLoadingPreviewPose(item) {
   // wrist-crop data at all (poseDefaultValues, which -- like `values` --
   // is also built from POSE_PRESET_KEYS only).
   const rtCrop = lpRealTimeCropPct()
-  lpMainHideModel = rtCrop !== null ? 0 : (item.hideModel ?? 0) // read by the 2nd hand when it mirrors this one (updateLoadingPreviewHand2)
-  updateLoadingPreviewWristClip(rtCrop !== null ? rtCrop : (item.hideWrist ?? 100), lpMainHideModel)
+  updateLoadingPreviewWristClip(rtCrop !== null ? rtCrop : (item.hideWrist ?? 100), rtCrop !== null ? 0 : (item.hideModel ?? 0))
 }
 // Loading Preview's own per-pose wrist crop -- direct report ("the
 // imported tweens and poses dont seem to read the wrist cropping data
