@@ -919,8 +919,8 @@ function renderListPickerRows(entry) {
   // every name it doesn't know about (which keep their natural relative
   // order, appended after).
   const orderedTopOrder = [
-    ...entry.groupOrder.filter((n) => rootNode.children.has(n)),
-    ...discoveryOrder.filter((n) => !entry.groupOrder.includes(n))
+    ...entry.groupOrder.filter((n) => topOrder.includes(n)),
+    ...topOrder.filter((n) => !entry.groupOrder.includes(n))
   ]
 
   const ungroupedBody = el('div', 'dp-lp-ungrouped-body')
