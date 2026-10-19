@@ -18204,7 +18204,7 @@ The Floor group's plane lives in the field scene only, so the Loading Preview (i
 (Correction: the main.js ?v= for the Loading Preview Floor round is 500, not 497 - other sessions had bumped it in between.)
 
 --------------------------------------------------------------------------------
-2026-10-19 [local; measured with `date`: start 02:51:41 (shared with the HANDO half), finish see below]
+2026-10-19 [local; measured with `date`: start 02:51:41 (shared with the HANDO half), finish 03:02:22]
 HIDE MODEL (HANDO `hideModel` / `hand2HideModel`) READ FROM IMPORTS AND APPLIED IN THE LOADING PREVIEW (main.js?v=501)
 - HANDO's new Pose slider Hide Model (%) (0 = nothing hidden, 100 = the whole model hidden: the Hide Wrist clip taken past the wrist to the end of the model) travels in pose items (`hideModel`) and in a Two-Hand Tween bundle's `hand2.hand2HideModel`. Poses / sequences imported here keep it (items are stored whole); the Loading Preview now applies it: updateLoadingPreviewWristClip(hideWrist, hideModel) and updateHand2WristClip(percent, hideModel). A mirroring 2nd hand follows the main hand's pose value (lpMainHideModel), an independent one uses hand2HideModel.
 - Both clip paths: the plain clip plane reaches max(wrist reach, modelSpanAlongAxis()) (furthest joint along the forearm->wrist axis + 15%); the Clipping Block rig (setClipRigT(rig, t, modelT)) lowers/raises the box as before up to the wrist and, past it, stretches the box's top (scale.y, base fixed, since moving a fixed-height box up would uncover the forearm).
