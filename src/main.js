@@ -395,6 +395,9 @@ let loadingWarmMode = false, fieldPreposeDeadline = 0, loadingPreviewBuiltRoot =
 // On-screen frame rate (Debug > Show Frame Rate, 2026-10-18): frames actually drawn since the last refresh.
 let frameRateDrawn = 0, frameRateWindowStart = 0, frameRateEl = null
 const endSeq = { phase: 'off', finished: false, lapAtBegin: 0, timer: 0, seq: null, tr1: null, tr2: null, lapIndex: 1, lapStartMs: 0, holdEndMs: 0, dir: 1, lapStyle: 'Loop', total: 1, speedMs: 1000, pauseEndMs: 0, retStartMs: 0, retDur: 0, from1: null, from2: null }
+// Show Loading Preview (live) + End Sequence (2026-10-19): the live preview runs the whole startup cycle - the main loading animation for Min Loading Time, then the End Sequence, then again from the start. progress = the loading progress
+// the crop reads while this cycle is active (loadingProgressNow()); t0 = when the current cycle's main part began.
+const lpLiveCycle = { active: false, t0: 0, progress: 1 }
 const loadingPreviewAnchor = new THREE.Vector3()
 const _loadingPreviewBase = new THREE.Vector3(), _loadingPreviewV2 = new THREE.Vector3()
 // Two-hand tween: the base position applyLoadingPreviewPose() gave the main hand (before the Pose Offset), and whether it was HANDO's exact pivots (see there) - updateLoadingPreviewHand2() needs both for the mirror plane.
@@ -1124,7 +1127,7 @@ function setupLoadingPreviewProgressCropGroup() {
 // The crop runs ONCE (2026-10-17, direct request: "the cropping from 100 to 0 only runs once"): 0 -> 1 over the loading, then it holds at 1 - the loading screen going away does not restart it (it used to loop 0 -> 1 over Min Loading Time in the live preview).
 function loadingProgressNow(real = cfg.loadingPreviewProgressCropRealtime !== false) {
   const now = performance.now()
-  if (fieldRevealed) return 1
+  if (fieldRevealed) return lpLiveCycle.active ? lpLiveCycle.progress : 1
   if (fieldStarted) return 1
   const warm = fieldWarmStage >= 3 ? 1 : fieldWarmStage >= 1 ? 0.3 * (fieldWarmStage >= 2 ? 1 : Math.min(1, (now - fieldWarmStartMs) / FIELD_WARM_CAP_MS)) + 0.7 * (hands.length ? fieldWarmRevealIndex / hands.length : 0) : 0
   const work = 0.1 * (modelMeasurementsReady ? 1 : 0) + 0.1 * (startupSettingsReady ? 1 : 0) + 0.45 * (fieldBuildDone ? 1 : fieldBuildFrac) + 0.35 * warm
@@ -9953,14 +9956,17 @@ let loadingPreviewLiveRafId = null
 function startLoadingPreviewLiveLoop() {
   if (loadingPreviewLiveRafId !== null) return // already running
   lpFpsWindowStart = 0 // a fresh frame-rate window for this run of the live loop
+  lpLiveCycle.active = false // the cycle (End Sequence) starts over with this run
   logLoadingPreview('live render loop started')
   const tick = () => {
     if (!lpLiveOn() || !loadingPreviewRenderer) {
       logLoadingPreview(`live render loop stopped (${!lpLiveOn() ? 'Show Loading Preview is off' : 'renderer is gone'})`)
+      lpLiveCycle.active = false
       loadingPreviewLiveRafId = null
       return
     }
     try {
+      lpLiveCycleStep(performance.now())
       updateLoadingPreviewAnimation()
       updateLoadingPreviewPointLight()
       updateLoadingPreviewProgressCrop()
@@ -10676,6 +10682,32 @@ function endSeqRetransFrame(now) {
   if (loadingPreviewHand2 && endSeq.from2) updateLoadingPreviewHand2(endSeq.seq, endSeq.lapStyle, e, lerpPoseValues(endSeq.from2, poseDefaultValues, e))
   if (u >= 1) endSeqFinish('complete')
   return true
+}
+// Restarts the main loading animation from its first lap (the same fields a new Loading Tween Sequence resets).
+function lpRestartMainAnimation(now) {
+  loadingPreviewLapIndex = 1; loadingPreviewLapStartMs = now; loadingPreviewHoldEndMs = 0; loadingPreviewDirection = 1; loadingPreviewSequenceDone = false; loadingPreviewNoSequenceLogged = false
+}
+function endSeqReset() {
+  clearTimeout(endSeq.timer)
+  endSeq.phase = 'off'; endSeq.finished = false; endSeq.seq = null; endSeq.tr1 = null; endSeq.tr2 = null
+}
+// Show Loading Preview (live), with the End Sequence switched on (2026-10-19, direct request: "the main sequence will run the minimum loading time, then the end sequence, then loop"): once per frame of the live loop.
+// The main loading animation runs for Min Loading Time (its crop follows lpLiveCycle.progress, 0 -> 1 over that time), then the End Sequence is started exactly as at the real startup (it first finishes the main animation's current
+// lap), and when it is done everything starts over. With the End Sequence off nothing changes: the live preview just keeps looping as before.
+function lpLiveCycleStep(now) {
+  const on = lpLiveOn() && !!cfg.loadingPreviewEndEnabled && !!lpEndSeqObj() && !!loadingPreviewHand
+  if (!on) { lpLiveCycle.active = false; return }
+  if (!lpLiveCycle.active) { lpLiveCycle.active = true; lpLiveCycle.t0 = now; lpLiveCycle.progress = 0; endSeqReset(); lpRestartMainAnimation(now); logLoadingPreview('live preview: running the loading cycle (main animation for Min Loading Time, then the End Sequence, then again)') }
+  const minMs = Math.max(cfg.loadingMinTimeMs || 0, 1)
+  if (endSeq.phase === 'off') {
+    lpLiveCycle.progress = THREE.MathUtils.clamp((now - lpLiveCycle.t0) / minMs, 0, 1)
+    if (now - lpLiveCycle.t0 >= minMs) { lpLiveCycle.progress = 1; startEndSequence() }
+  } else if (endSeq.phase === 'done') {
+    endSeqReset(); lpRestartMainAnimation(now); lpLiveCycle.t0 = now; lpLiveCycle.progress = 0
+    logLoadingPreview('live preview: End Sequence done -- starting the loading animation again')
+  } else {
+    lpLiveCycle.progress = 1
+  }
 }
 // Called at the top of every loading-preview animation frame while an End Sequence is under way; true = this frame's pose has been driven here (the normal loading animation is skipped), false = the loading animation
 // carries on (still waiting for its lap to end).
