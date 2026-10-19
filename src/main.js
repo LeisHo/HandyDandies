@@ -11,7 +11,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=95'
+import { nestImportedGroups, DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=96'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -9040,10 +9040,10 @@ async function importTwoHandTween(btn) {
       if (!item || typeof item.name !== 'string') return
       const i = out.findIndex((x) => x.name === item.name)
       // an incoming MAIN pose replacing a leftover second-hand pose of the same name (an earlier import with the name clash below) does not inherit that pose's "2ND HAND" group
-      if (i >= 0) out[i] = { ...item, ...(out[i].group && !(out[i].hand2Pose && !item.hand2Pose) ? { group: out[i].group } : {}) }
+      if (i >= 0) out[i] = { ...item, ...(!item.group && out[i].group && !(out[i].hand2Pose && !item.hand2Pose) ? { group: out[i].group } : {}) } // the imported group wins (2026-10-19)
       else out.push(item)
     })
-    return out
+    return nestImportedGroups(out, incoming.map((q) => q && q.group).filter(Boolean))
   }
   const mainPoses = Array.isArray(data.poses) ? data.poses : []
   // HANDO keeps the main hand's poses and the 2nd hand's poses in two SEPARATE lists, so the same name can be used in both (a "2 TWIDS - 0" for each hand). Saved Poses here is ONE list keyed by name, so merging both by name made the
@@ -21735,10 +21735,11 @@ function mergeImportedListByName(existing, incoming) {
     // item's own group membership from a DIFFERENT project/session is
     // meaningless here, but overwriting a name that's already been
     // organized into a local group here shouldn't silently un-group it.
-    if (idx >= 0) items[idx] = { ...incomingItem, ...(items[idx].group ? { group: items[idx].group } : {}) }
+    if (idx >= 0) items[idx] = { ...incomingItem, ...(!incomingItem.group && items[idx].group ? { group: items[idx].group } : {}) } // the imported group wins (2026-10-19)
     else items = items.concat([incomingItem])
     count++
   })
+  items = nestImportedGroups(items, incoming.map((q) => q && q.group).filter(Boolean)) // groups already in the list nest under the parents the import says
   return { items, count }
 }
 async function importPosesAndTweenSequences(btn) {

@@ -442,6 +442,25 @@ export function setDeviceValue(device, key, v) {
 // own row.__item reference (set at render time), not by index -- indices
 // are exactly what a reorder invalidates.
 const LP_GROUP_PATH_SEP = '/'
+// An import that brings nested groups (items whose .group is a path "A/B") overrides how the target list is organized (2026-10-19, direct request: "groups that were not previously nested in another group should become nested
+// if the new import says so"). The imported items carry their own paths; this re-parents the groups ALREADY in the list: every non-root segment of an imported path (the "B" of "A/B", the "C" of "A/B/C") names a group that
+// lives under its parent, so an existing TOP-LEVEL group of that name - with everything in it, subgroups included - moves under that parent too. importedGroupPaths = the .group values of the imported items.
+export function nestImportedGroups(items, importedGroupPaths) {
+  const renames = new Map() // 'B' -> 'A/B'
+  ;(importedGroupPaths || []).forEach((path) => {
+    const segs = String(path || '').split(LP_GROUP_PATH_SEP).filter(Boolean)
+    for (let i = 1; i < segs.length; i++) { if (!renames.has(segs[i])) renames.set(segs[i], segs.slice(0, i + 1).join(LP_GROUP_PATH_SEP)) }
+  })
+  if (!renames.size) return items
+  return items.map((it) => {
+    if (!it || !it.group) return it
+    for (const [leaf, full] of renames) {
+      if (it.group === leaf) return { ...it, group: full }
+      if (it.group.startsWith(leaf + LP_GROUP_PATH_SEP)) return { ...it, group: full + it.group.slice(leaf.length) }
+    }
+    return it
+  })
+}
 //
 // A group's full identity is a "/"-joined path (LP_GROUP_PATH_SEP) stored
 // directly in item.group -- "Parent" for a top-level group, "Parent/Child"
@@ -1866,11 +1885,9 @@ function buildListPickerRow(ctrl, row) {
     exportBtn.addEventListener('click', async () => {
       const checked = entry.items.filter((it) => entry.exportChecked.has(it))
       if (checked.length === 0) { flashBtn(exportBtn, 'Check items first'); return }
-      // Strips .group -- the exporting project's own group organization is
-      // meaningless (and could even collide) in whatever project imports
-      // this; the imported items land ungrouped there, same as any other
-      // freshly-Saved item.
-      const payload = checked.map(({ group, ...rest }) => (ctrl.exportTransform ? ctrl.exportTransform(rest) : rest)) // ctrl.exportTransform (optional): tag / convert an item on its way out (main.js: Loading Preview camera + lighting are in this project's own frame)
+      // Keeps .group (2026-10-19, direct request: an import of nested groups must be able to re-create / override the grouping): the group path travels with each item, and the importing list nests its own groups to match
+      // (see nestImportedGroups()). It used to be stripped so that imported items landed ungrouped.
+      const payload = checked.map((rest) => (ctrl.exportTransform ? ctrl.exportTransform(rest) : rest)) // ctrl.exportTransform (optional): tag / convert an item on its way out (main.js: Loading Preview camera + lighting are in this project's own frame)
       try {
         await navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
         flashBtn(exportBtn, `Copied ${checked.length}!`)
@@ -1906,9 +1923,11 @@ function buildListPickerRow(ctrl, row) {
         if (!incomingItem || typeof incomingItem.name !== 'string') return
         const item = ctrl.importTransform ? ctrl.importTransform(incomingItem) : incomingItem
         const existingIndex = items.findIndex((it) => it.name === item.name)
-        if (existingIndex >= 0) items[existingIndex] = { ...item, ...(items[existingIndex].group ? { group: items[existingIndex].group } : {}) }
+        // The imported item's own group wins (2026-10-19); only an item that comes without one keeps the group the existing item was in.
+        if (existingIndex >= 0) items[existingIndex] = { ...item, ...(!item.group && items[existingIndex].group ? { group: items[existingIndex].group } : {}) }
         else items = items.concat([item])
       })
+      items = nestImportedGroups(items, incoming.map((q) => q && q.group).filter(Boolean))
       entry.items = items
       commit(ctrl, entry.items)
       renderListPickerRows(entry)
