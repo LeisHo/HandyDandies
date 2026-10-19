@@ -267,7 +267,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -37719,7 +37719,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
