@@ -11,7 +11,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible } from './devpanel/devPanel.js?v=95'
+import { DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible, mergeImportedItem } from './devpanel/devPanel.js?v=96'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -21741,14 +21741,8 @@ function mergeImportedListByName(existing, incoming) {
   let count = 0
   incoming.forEach((incomingItem) => {
     if (!incomingItem || typeof incomingItem.name !== 'string') return
-    const idx = items.findIndex((it) => it.name === incomingItem.name)
-    // Preserve the EXISTING item's own `.group` (if any) -- same
-    // reasoning as devPanel.js's own single-list Import: an imported
-    // item's own group membership from a DIFFERENT project/session is
-    // meaningless here, but overwriting a name that's already been
-    // organized into a local group here shouldn't silently un-group it.
-    if (idx >= 0) items[idx] = { ...incomingItem, ...(items[idx].group ? { group: items[idx].group } : {}) }
-    else items = items.concat([incomingItem])
+    // CHANGED 2026-10-19: the import's group wins (see mergeImportedItem() in devPanel.js)
+    items = mergeImportedItem(items, incomingItem)
     count++
   })
   return { items, count }

@@ -678,6 +678,21 @@ function renameListPickerGroup(entry, path) {
 // persist. Ported from the canonical TEMPLATE_DEV_PANEL.html (built there
 // first, live-verified with real PointerEvents, then adapted here via
 // HANDO's own already-ported version of the same feature).
+// The ONE rule every list-picker import uses to merge an incoming item into a list, by name (2026-10-19, direct report: "I imported this and it didn't overwrite the existing groups / group nesting"; ported from HANDO):
+//  - same name: the incoming item REPLACES the existing one in place; if it carries a `group` key, that group wins (an empty group means "ungrouped" and removes the existing group); an incoming item with NO `group` key at all
+//    (an export from before groups were exported, or a host-built item) says nothing about groups, so the existing item keeps its own;
+//  - new name: appended as-is (an empty group is dropped), the group path it names is created by renderListPickerRows().
+export function mergeImportedItem(items, incomingItem) {
+  const hasGroup = Object.prototype.hasOwnProperty.call(incomingItem, 'group')
+  const next = { ...incomingItem }
+  if (hasGroup && !next.group) delete next.group
+  const existingIndex = items.findIndex((it) => it.name === incomingItem.name)
+  if (existingIndex < 0) return items.concat([next])
+  const out = items.slice()
+  const existing = items[existingIndex]
+  out[existingIndex] = (!hasGroup && existing.group) ? { ...next, group: existing.group } : next
+  return out
+}
 function lpItemsUnderGroup(entry, path) {
   const prefix = path + LP_GROUP_PATH_SEP
   return entry.items.filter((it) => it.group === path || (it.group && it.group.startsWith(prefix)))
@@ -1866,11 +1881,8 @@ function buildListPickerRow(ctrl, row) {
     exportBtn.addEventListener('click', async () => {
       const checked = entry.items.filter((it) => entry.exportChecked.has(it))
       if (checked.length === 0) { flashBtn(exportBtn, 'Check items first'); return }
-      // Strips .group -- the exporting project's own group organization is
-      // meaningless (and could even collide) in whatever project imports
-      // this; the imported items land ungrouped there, same as any other
-      // freshly-Saved item.
-      const payload = checked.map(({ group, ...rest }) => (ctrl.exportTransform ? ctrl.exportTransform(rest) : rest)) // ctrl.exportTransform (optional): tag / convert an item on its way out (main.js: Loading Preview camera + lighting are in this project's own frame)
+      // CHANGED 2026-10-19: keeps .group (the full "/" path; empty = ungrouped) so an import rebuilds the same groups and nesting - and the export's group overwrites an existing same-name item's group (mergeImportedItem()).
+      const payload = checked.map((it) => { const o = { ...it, group: it.group || '' }; return ctrl.exportTransform ? ctrl.exportTransform(o) : o }) // ctrl.exportTransform (optional): tag / convert an item on its way out (main.js: Loading Preview camera + lighting are in this project's own frame)
       try {
         await navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
         flashBtn(exportBtn, `Copied ${checked.length}!`)
@@ -1904,10 +1916,10 @@ function buildListPickerRow(ctrl, row) {
       let items = entry.items.slice()
       incoming.forEach((incomingItem) => {
         if (!incomingItem || typeof incomingItem.name !== 'string') return
-        const item = ctrl.importTransform ? ctrl.importTransform(incomingItem) : incomingItem
-        const existingIndex = items.findIndex((it) => it.name === item.name)
-        if (existingIndex >= 0) items[existingIndex] = { ...item, ...(items[existingIndex].group ? { group: items[existingIndex].group } : {}) }
-        else items = items.concat([item])
+        let item = ctrl.importTransform ? ctrl.importTransform(incomingItem) : incomingItem
+        // the transform may drop an EMPTY group key (= "ungrouped"); the export's own group statement is what counts
+        if (Object.prototype.hasOwnProperty.call(incomingItem, 'group')) item = { ...item, group: incomingItem.group }
+        items = mergeImportedItem(items, item)
       })
       entry.items = items
       commit(ctrl, entry.items)
