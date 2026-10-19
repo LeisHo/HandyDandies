@@ -406,6 +406,7 @@ const _loadingPreviewBase = new THREE.Vector3(), _loadingPreviewV2 = new THREE.V
 // Two-hand tween: the base position applyLoadingPreviewPose() gave the main hand (before the Pose Offset), and whether it was HANDO's exact pivots (see there) - updateLoadingPreviewHand2() needs both for the mirror plane.
 const _lpTwoHandBase = new THREE.Vector3(), _lpWholeRotQ = new THREE.Quaternion(), _lpPivotDelta = new THREE.Vector3()
 let lpTwoHandExact = false
+let lpMainHideModel = 0 // the main pose's Hide Model % (HANDO `hideModel`, 2026-10-19), shared with the mirrored 2nd hand
 let lpHandoScaleCur = 0 // the selected two-hand sequence's HANDO world units per raw model unit (seq.handoScale), 0 when there is none: set by ensureLoadingPreviewHand2()
 // World-XY-only cursor distance for click-function settings (2026-10-04,
 // direct request: "for any click function settings that depend on distance
@@ -9025,7 +9026,7 @@ const _loadingPreviewWholeHandRotEuler = new THREE.Euler()
 // The second hand is placed the way HANDO does it: world = Mirror(about the main hand's centre) * Translate(offset) * MainHand * (rotate / scale about the palm centre). HANDO's world axes map onto this preview's by
 // alignQuat (the same mapping the camera / lighting imports use), the offset is in HANDO units (scaled with the preview hand), and the skeleton is posed UN-mirrored (its base orientation = the main hand's times the
 // rotation) with the reflection applied only to the final matrix - a mirrored copy of a posed hand, not a mirrored pose.
-const HAND2_CONFIG_KEYS = ['mirrorMainHandPose', 'hand2MirrorX', 'hand2MirrorY', 'hand2MirrorZ', 'hand2OffsetX', 'hand2OffsetY', 'hand2OffsetZ', 'hand2RotX', 'hand2RotY', 'hand2RotZ', 'hand2Scale', 'hand2HideWrist']
+const HAND2_CONFIG_KEYS = ['mirrorMainHandPose', 'hand2MirrorX', 'hand2MirrorY', 'hand2MirrorZ', 'hand2OffsetX', 'hand2OffsetY', 'hand2OffsetZ', 'hand2RotX', 'hand2RotY', 'hand2RotZ', 'hand2Scale', 'hand2HideWrist', 'hand2HideModel']
 function hand2PoseToMainItem(p) {
   const out = { name: p.name, hand2Pose: true }
   Object.keys(p).forEach((k) => { if (k.length > 5 && k.startsWith('hand2')) out[k[5].toLowerCase() + k.slice(6)] = p[k] }) // hand2ThumbCurl -> thumbCurl
@@ -9272,14 +9273,16 @@ function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride) {
   hand2.clone.matrixWorldNeedsUpdate = true
   hand2.clone.updateMatrixWorld(true)
   const rtCrop2 = lpRealTimeCropPct()
-  updateHand2WristClip(rtCrop2 !== null ? rtCrop2 : (typeof cfg2.hand2HideWrist === 'number' ? cfg2.hand2HideWrist : 100))
+  // Hide Model: a mirroring 2nd hand follows the main hand's pose value, an independent one uses its own placement slider (HANDO's updateHand2WristClipPlane())
+  const hideModel2 = rtCrop2 !== null ? 0 : (cfg2.mirrorMainHandPose ? lpMainHideModel : (typeof cfg2.hand2HideModel === 'number' ? cfg2.hand2HideModel : 0))
+  updateHand2WristClip(rtCrop2 !== null ? rtCrop2 : (typeof cfg2.hand2HideWrist === 'number' ? cfg2.hand2HideWrist : 100), hideModel2)
 }
 // Same crop as updateLoadingPreviewWristClip(), for the second hand.
-function updateHand2WristClip(percent) {
+function updateHand2WristClip(percent, hideModelPercent = 0) {
   const h = loadingPreviewHand2
   if (!h || !h.skinnedMesh) return
   if (h.clipRig) {
-    setClipRigT(h.clipRig, percent / 100)
+    setClipRigT(h.clipRig, percent / 100, hideModelPercent / 100)
     updateClipRigPlanes(h.clipRig)
     return
   }
@@ -9290,7 +9293,8 @@ function updateHand2WristClip(percent) {
   farBone.getWorldPosition(far)
   nearBone.getWorldPosition(near)
   const dir = near.clone().sub(far).normalize()
-  h.wristClipPlane.setFromNormalAndCoplanarPoint(dir, far.clone().addScaledVector(dir, far.distanceTo(near) * percent / 100))
+  const reach = Math.max(far.distanceTo(near) * percent / 100, hideModelPercent > 0 ? modelSpanAlongAxis(h.skinnedMesh.skeleton, far, dir) * Math.min(hideModelPercent / 100, 1) : 0)
+  h.wristClipPlane.setFromNormalAndCoplanarPoint(dir, far.clone().addScaledVector(dir, reach))
 }
 // CORRECTED 2026-09-19 -- the Loading Preview's own camera DOES have
 // interactive OrbitControls now (loadingPreviewCameraEditMode, below),
@@ -10259,7 +10263,8 @@ function applyLoadingPreviewPose(item) {
   // wrist-crop data at all (poseDefaultValues, which -- like `values` --
   // is also built from POSE_PRESET_KEYS only).
   const rtCrop = lpRealTimeCropPct()
-  updateLoadingPreviewWristClip(rtCrop !== null ? rtCrop : (item.hideWrist ?? 100))
+  lpMainHideModel = rtCrop !== null ? 0 : (item.hideModel ?? 0) // read by the 2nd hand when it mirrors this one (updateLoadingPreviewHand2)
+  updateLoadingPreviewWristClip(rtCrop !== null ? rtCrop : (item.hideWrist ?? 100), lpMainHideModel)
 }
 // Loading Preview's own per-pose wrist crop -- direct report ("the
 // imported tweens and poses dont seem to read the wrist cropping data
@@ -10290,10 +10295,10 @@ const _loadingPreviewClipPoint = new THREE.Vector3()
 function lpRealTimeCropPct() {
   return cfg.loadingPreviewRealTimeLoading ? THREE.MathUtils.clamp(loadingProgressNow(true), 0, 1) * 100 : null
 }
-function updateLoadingPreviewWristClip(hideWristPercent) {
+function updateLoadingPreviewWristClip(hideWristPercent, hideModelPercent = 0) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh || !loadingPreviewHand.wristClipPlane) return
   if (loadingPreviewHand.clipRig) { // Clipping Block path (see makeClipRig)
-    setClipRigT(loadingPreviewHand.clipRig, (typeof hideWristPercent === 'number' ? hideWristPercent : 100) / 100)
+    setClipRigT(loadingPreviewHand.clipRig, (typeof hideWristPercent === 'number' ? hideWristPercent : 100) / 100, (typeof hideModelPercent === 'number' ? hideModelPercent : 0) / 100)
     loadingPreviewHand.clone.updateMatrixWorld(true)
     updateClipRigPlanes(loadingPreviewHand.clipRig)
     return
@@ -10306,7 +10311,9 @@ function updateLoadingPreviewWristClip(hideWristPercent) {
   _loadingPreviewClipDir.subVectors(_loadingPreviewClipNearPos, _loadingPreviewClipFarPos).normalize()
   const armToWristDist = _loadingPreviewClipFarPos.distanceTo(_loadingPreviewClipNearPos)
   const t = (typeof hideWristPercent === 'number' ? hideWristPercent : 100) / 100
-  _loadingPreviewClipPoint.copy(_loadingPreviewClipFarPos).addScaledVector(_loadingPreviewClipDir, armToWristDist * t)
+  const tModel = (typeof hideModelPercent === 'number' ? hideModelPercent : 0) / 100
+  const reach = Math.max(armToWristDist * t, tModel > 0 ? modelSpanAlongAxis(loadingPreviewHand.skinnedMesh.skeleton, _loadingPreviewClipFarPos, _loadingPreviewClipDir) * Math.min(tModel, 1) : 0)
+  _loadingPreviewClipPoint.copy(_loadingPreviewClipFarPos).addScaledVector(_loadingPreviewClipDir, reach)
   loadingPreviewHand.wristClipPlane.setFromNormalAndCoplanarPoint(_loadingPreviewClipDir, _loadingPreviewClipPoint)
 }
 // Row visibility for the Loading Preview's own Sequence Mode controls --
@@ -12984,7 +12991,8 @@ function buildLerpPoseValuesFast() {
       const q = JSON.stringify(k)
       src += `${q}:(av=a[${q}],bv=b[${q}],av=av!==undefined?av:D[${q}],bv=bv!==undefined?bv:D[${q}],av+(bv-av)*t),\n`
     })
-    src += 'hideWrist:(av=a.hideWrist,bv=b.hideWrist,av=av!==undefined?av:100,bv=bv!==undefined?bv:100,av+(bv-av)*t)}'
+    src += 'hideWrist:(av=a.hideWrist,bv=b.hideWrist,av=av!==undefined?av:100,bv=bv!==undefined?bv:100,av+(bv-av)*t),\n'
+    src += 'hideModel:(av=a.hideModel,bv=b.hideModel,av=av!==undefined?av:0,bv=bv!==undefined?bv:0,av+(bv-av)*t)}'
     return new Function('D', `return function(a,b,t){${src}}`)(POSE_KEY_DEFAULTS)
   } catch (err) {
     return false
@@ -13013,6 +13021,10 @@ function lerpPoseValues(a, b, t) {
   const aw = a.hideWrist !== undefined ? a.hideWrist : 100
   const bw = b.hideWrist !== undefined ? b.hideWrist : 100
   result.hideWrist = aw + (bw - aw) * t
+  // Hide Model (HANDO `hideModel`, 2026-10-19): interpolated the same way, default 0 = nothing hidden.
+  const am = a.hideModel !== undefined ? a.hideModel : 0
+  const bm = b.hideModel !== undefined ? b.hideModel : 0
+  result.hideModel = am + (bm - am) * t
   return result
 }
 const _poseBaseQuatEuler = new THREE.Euler()
@@ -20647,6 +20659,9 @@ function makeClipRig(clone) {
   block.visible = false
   return {
     block,
+    clone,
+    scaleY0: block.scale.y,
+    maxY: bb.max.y,
     baseY: block.position.y,
     topY0: block.position.y + block.scale.y * bb.max.y, // top of the box as authored, in the clone's frame
     planes: [0, 1, 2, 3, 4, 5].map(() => new THREE.Plane()),
@@ -20654,9 +20669,44 @@ function makeClipRig(clone) {
     localC: [-bb.max.x, bb.min.x, -bb.max.y, bb.min.y, -bb.max.z, bb.min.z] // outward normals: inside the box = negative side of every plane
   }
 }
-function setClipRigT(rig, t) {
+// Hide Model (2026-10-19, direct request: a pose slider like Hide Wrist whose 100% goes "all the way to the end of the model to hide the entire model"; HANDO's `hideModel` / `hand2HideModel`): modelT 0 .. 1 raises the
+// top of the clip to modelT * (the end of the model, the furthest skeleton joint along the clone's Y + 15% for the fingertip). Whichever of Hide Wrist (t) and Hide Model reaches higher wins. Up to the wrist the block is
+// simply moved down as before; past it the block's TOP is stretched (scale.y) with its base fixed, because moving a block of fixed height up would uncover the forearm again.
+const _clipEndV = new THREE.Vector3()
+function clipRigModelEndY(rig) {
+  if (!rig.bones) { rig.bones = []; rig.clone.traverse((o) => { if (o.isBone) rig.bones.push(o) }) }
+  rig.clone.updateMatrixWorld(true)
+  let m = 0
+  rig.bones.forEach((b) => {
+    b.getWorldPosition(_clipEndV)
+    rig.clone.worldToLocal(_clipEndV)
+    if (_clipEndV.y > m) m = _clipEndV.y
+  })
+  return m * 1.15
+}
+function setClipRigT(rig, t, modelT = 0) {
   const tt = THREE.MathUtils.clamp(t, 0, 1)
-  rig.block.position.y = tt <= 0 ? rig.baseY - 10 : rig.baseY - (1 - tt) * rig.topY0 // t = 0 parks it far below the mesh: clips nothing
+  rig.block.scale.y = rig.scaleY0
+  const topWrist = tt <= 0 ? 0 : tt * rig.topY0
+  const topModel = modelT > 0 ? clipRigModelEndY(rig) * Math.min(modelT, 1) : 0
+  const top = Math.max(topWrist, topModel)
+  if (top > rig.topY0 && rig.topY0 > rig.baseY) {
+    rig.block.position.y = rig.baseY
+    rig.block.scale.y = rig.scaleY0 * (top - rig.baseY) / (rig.topY0 - rig.baseY)
+    return
+  }
+  const te = rig.topY0 > 0 ? Math.min(top / rig.topY0, 1) : tt
+  rig.block.position.y = te <= 0 ? rig.baseY - 10 : rig.baseY - (1 - te) * rig.topY0 // 0 parks it far below the mesh: clips nothing
+}
+const _clipSpanV = new THREE.Vector3()
+function modelSpanAlongAxis(skeleton, farPos, dir) { // how far (along dir from farPos) the furthest joint is, + 15% for the fingertip
+  let m = 0
+  skeleton.bones.forEach((b) => {
+    b.getWorldPosition(_clipSpanV)
+    const d = _clipSpanV.sub(farPos).dot(dir)
+    if (d > m) m = d
+  })
+  return m * 1.15
 }
 function updateClipRigPlanes(rig) {
   _clipNormalMatrix.getNormalMatrix(rig.block.matrixWorld)
