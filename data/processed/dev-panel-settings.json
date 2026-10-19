@@ -272,11 +272,11 @@
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - F",
+          "name": "2 Twids - 2H - F",
           "sequence": "Two-Hand Tween"
         },
         {
-          "name": "2 Twids",
+          "name": "2 Twids - 2H",
           "sequence": "Two-Hand Tween"
         },
         {
@@ -22211,14 +22211,14 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 0,
-      "loadingPreviewTweenSelector": "Two-Hand Tween",
+      "loadingPreviewTweenSelector": "WAITING HORIZONTAL",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - F",
+          "name": "2 Twids - 2H - F",
           "sequence": "Two-Hand Tween"
         },
         {
-          "name": "2 Twids",
+          "name": "2 Twids - 2H",
           "sequence": "Two-Hand Tween"
         },
         {
@@ -44156,11 +44156,11 @@
       "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - F",
+          "name": "2 Twids - 2H - F",
           "sequence": "Two-Hand Tween"
         },
         {
-          "name": "2 Twids",
+          "name": "2 Twids - 2H",
           "sequence": "Two-Hand Tween"
         },
         {
