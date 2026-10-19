@@ -21881,7 +21881,11 @@ function animate(dt, now) {
     // Pose/tween state machine, per hand) is what actually freezes every
     // animation exactly where it is; nothing here re-applies a pose or
     // advances a phase while `isPaused` is true.
-    if (!isPaused) {
+    // Hide Hands (2026-10-18, direct report: the live Loading Preview ran at ~15 fps on the laptop with the hands hidden): hiding only stopped the hands from being DRAWN, the per-frame logic of every hand (cursor tracking, the distance
+    // pre-passes, the render order, Responsive Velocity, the triggers) still ran on the same thread as the preview. While the hands are hidden none of it is needed, so only the cursor target stays current. (The render order in particular has
+    // nothing to do with the loading preview.) Un-hiding resumes everything; hands that were hidden simply carry on from the state they were left in.
+    if (!isPaused && handsHiddenByPanel()) updateCursorTarget()
+    if (!isPaused && !handsHiddenByPanel()) {
       updateCursorTarget()
       const armTrackOn = trackingActiveFor('Arm'), palmTrackOn = trackingActiveFor('Palm')
       if (armTrackOn || palmTrackOn) {
