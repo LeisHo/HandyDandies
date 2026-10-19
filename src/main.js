@@ -2922,6 +2922,8 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewSequenceCount', label: 'Sequence Count', type: 'slider', min: 1, max: 50, step: 1, def: 3 },
       { key: 'loadingPreviewSequenceCountMode', label: 'Sequence Count Mode - Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Loop', 'Oscillate'], onChange: () => updateLoadingPreviewSequenceVisibility() },
       { key: 'loadingPreviewSequenceLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
+      // Loop Wrap-Back Time Scale (2026-10-18, direct request: a slider for the speed at which the last frame transitions back to the first): the closing last pose -> first pose transition takes this many times as long as one normal pose-to-pose transition (1 = as before). The other transitions keep their speed, so the lap gets longer / shorter by the difference (not in the Loading Preview's Count mode, whose laps are pinned to Min Loading Time: there the wrap-back takes a bigger / smaller share of the lap instead).
+      { key: 'loadingPreviewSequenceLoopWrapScale', label: 'Loop Wrap-Back Time Scale (x A Normal Transition)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1 },
       { key: 'loadingPreviewSequenceHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: 'loadingPreviewSize', label: 'Loading Preview Size (Px)', type: 'slider', min: 80, max: 400, step: 10, def: 160, onChange: () => resizeLoadingPreview() },
       // Responsive to the browser (2026-10-15, direct request: "font and animation size and placement to be responsive to the browser"), through the UI Layout Engine's blended-length values (lib/ui-engine, see
@@ -3042,6 +3044,7 @@ const DEV_GROUPS = [
       { key: 'loadingPreviewEndCount', label: 'Sequence Count', type: 'slider', min: 1, max: 50, step: 1, def: 1 },
       { key: 'loadingPreviewEndCountMode', label: 'Sequence Count Mode - Loop, Oscillate', type: 'select', def: 'Loop', options: () => ['Loop', 'Oscillate'] },
       { key: 'loadingPreviewEndLoopTransition', label: 'Loop Transition On/Off', type: 'checkbox', def: true },
+      { key: 'loadingPreviewEndLoopWrapScale', label: 'Loop Wrap-Back Time Scale (x A Normal Transition)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1 },
       { key: 'loadingPreviewEndHoldMs', label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
       { key: 'loadingPreviewEndEasingEnabled', label: 'Easing Curve On/Off', type: 'checkbox', def: false, onChange: () => updateLoadingPreviewEndGroupVisibility() },
       { key: 'loadingPreviewEndEasingCurve', label: 'Easing Curve (Progress -> Speed)', type: 'text', def: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]', onChange: () => parseLoadingPreviewEndEasingConfig() },
@@ -5163,7 +5166,7 @@ function updateHandOffsetGroupVisibility() {
   body.classList.toggle('dp-startup-off', !cfg.handOffsetOnStartupEnabled)
 }
 function setupHandOffsetStartupGroup() {
-  const tweenMembers = ['Mode', 'TargetPose', 'TweenSelector', 'ReverseSequence', 'GlideToFirstPose', 'FirstGlideTimeScale', 'SequencePlayMode', 'SequenceCount', 'SequenceCountMode', 'SequenceLoopTransition', 'SequenceHoldMs', 'TweenChain'].map((k) => STARTUP_FN + k)
+  const tweenMembers = ['Mode', 'TargetPose', 'TweenSelector', 'ReverseSequence', 'GlideToFirstPose', 'FirstGlideTimeScale', 'SequencePlayMode', 'SequenceCount', 'SequenceCountMode', 'SequenceLoopTransition', 'LoopWrapScale', 'SequenceHoldMs', 'TweenChain'].map((k) => STARTUP_FN + k)
   const tg = wrapGatedSubgroup('startupHandTweenEnabled', tweenMembers, 'Animation Tween')
   const hzCurveRow = document.querySelector('.dp-row[data-key="startupHandZCurve"]'), hzRangeRow = document.querySelector('.dp-row[data-key="startupHandZRange"]')
   if (hzCurveRow) buildGenericCurveWidget(hzCurveRow, { caption: 'X: Hand Sequence Progress (0 = Not Started, 100% = Sequence End)  ·  Y: Z (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
@@ -7963,6 +7966,8 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // reversing) before starting the next one. 0 (default) = no pause,
       // the original always-continuous cycling.
       { key: `${p}LoopHoldMs`, label: 'Loop Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
+      // Loop Wrap-Back Time Scale (2026-10-18, direct request: a slider for the speed at which the last frame transitions back to the first): the closing last pose -> first pose transition takes this many times as long as one normal pose-to-pose transition (1 = as before). The other transitions keep their speed, so the lap gets longer / shorter by the difference (not in the Loading Preview's Count mode, whose laps are pinned to Min Loading Time: there the wrap-back takes a bigger / smaller share of the lap instead). Loop Mode = Loop only.
+      { key: `${p}LoopWrapScale`, label: 'Loop Wrap-Back Time Scale (x A Normal Transition)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1 },
       // Direct user report, 2026-09-15: "right after te click, the closest
       // hand seems to start some sort of animation transition, but stops
       // after a split second, then the click-pose function runs smoothly."
@@ -8372,6 +8377,8 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // Sequence Count Mode = Loop) -- an Oscillate-style repeat reverses
       // in place and never needs to "jump back" anywhere.
       { key: `${p}SequenceLoopTransition`, label: 'Loop Transition On/Off', type: 'checkbox', def: true },
+      // Loop Wrap-Back Time Scale (2026-10-18, direct request: a slider for the speed at which the last frame transitions back to the first): the closing last pose -> first pose transition takes this many times as long as one normal pose-to-pose transition (1 = as before). The other transitions keep their speed, so the lap gets longer / shorter by the difference (not in the Loading Preview's Count mode, whose laps are pinned to Min Loading Time: there the wrap-back takes a bigger / smaller share of the lap instead).
+      { key: `${p}LoopWrapScale`, label: 'Loop Wrap-Back Time Scale (x A Normal Transition)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1 },
       // Hold Duration -- direct spec wording ("a Hold Duration slider for
       // the pause between loops/oscillations").
       { key: `${p}SequenceHoldMs`, label: 'Sequence Hold Duration (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: 0 },
@@ -9197,7 +9204,7 @@ function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride) {
   else if (lapStyle === 'Oscillate') values = lerpTweenSegments(segs2, loadingPreviewDirection === 1 ? t : 1 - t)
   else if (cfg.loadingPreviewSequenceLoopTransition === false) values = lerpTweenSegments(segs2, t)
   else {
-    const ring = segs2.concat([{ poseA: last2, poseB: anchor2, weight: 1 }])
+    const ring = segs2.concat([{ poseA: last2, poseB: anchor2, weight: Math.max(cfg.loadingPreviewSequenceLoopWrapScale ?? 1, 0.01) }])
     const totalW = ring.reduce((sum, sg) => sum + sg.weight, 0)
     values = lerpLoopSegments(ring, (loadingPreviewLapIndex - 1 + t) * totalW)
   }
@@ -10301,6 +10308,7 @@ function updateLoadingPreviewSequenceVisibility() {
   setRow('Count', isCount)
   setRow('CountMode', isCount)
   setRow('LoopTransition', playMode === 'Loop' || (playMode === 'Count' && cfg.loadingPreviewSequenceCountMode === 'Loop'))
+  setRow('LoopWrapScale', playMode === 'Loop' || (playMode === 'Count' && cfg.loadingPreviewSequenceCountMode === 'Loop'))
   // Direct request 2026-09-20: in Count mode, per-lap speed is now
   // DERIVED from Min Loading Time / Count (see updateLoadingPreviewAnimation()'s
   // own comment) -- hide the manual Speed slider then, since setting it
@@ -10423,7 +10431,14 @@ function updateLoadingPreviewAnimation() {
   const speedMs = playMode === 'Count'
     ? Math.max((cfg.loadingMinTimeMs || 0) / totalLaps, 1)
     : Math.max(safeTweenSpeedMs(cfg.loadingPreviewSpeedMs), 1)
-  const lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / speedMs, 0, 1)
+  // Loop Wrap-Back Time Scale (see its control): the closing segment's weight; the lap grows / shrinks by (wrapK - 1) normal transitions, except in Count mode (the lap is pinned to Min Loading Time / Count there).
+  const wrapK = Math.max(cfg.loadingPreviewSequenceLoopWrapScale ?? 1, 0.01)
+  let lapMs = speedMs
+  if (playMode !== 'Count' && wrapK !== 1 && lapStyle !== 'Oscillate' && cfg.loadingPreviewSequenceLoopTransition !== false && segments.length > 0) {
+    const baseW = segments.reduce((sum, sg) => sum + sg.weight, 0)
+    lapMs = speedMs * (baseW + wrapK) / (baseW + 1)
+  }
+  const lapT = THREE.MathUtils.clamp((now - loadingPreviewLapStartMs) / lapMs, 0, 1)
   // Easing Curve (2026-10-12): reshapes WHERE in the lap the pose sits, not
   // how long a lap lasts. The profile's own total is discarded here on
   // purpose -- Count mode's Min Loading Time / Count split must still hold --
@@ -10451,7 +10466,7 @@ function updateLoadingPreviewAnimation() {
     // wrap-back point is included in the same weighted timeline instead
     // of being a separate equal-weight step the way it implicitly was
     // when every segment had weight 1.
-    const ringSegments = segments.concat([{ poseA: lastPose, poseB: anchorPose, weight: 1 }])
+    const ringSegments = segments.concat([{ poseA: lastPose, poseB: anchorPose, weight: wrapK }])
     const totalRingWeight = ringSegments.reduce((sum, seg) => sum + seg.weight, 0)
     const tCyclic = (loadingPreviewLapIndex - 1 + easedT) * totalRingWeight
     values = lerpLoopSegments(ringSegments, tCyclic)
@@ -10489,7 +10504,7 @@ function parseLoadingPreviewEndEasingConfig() {
 const LP_END_GROUP_KEY = 'Loading Preview > End Sequence'
 const LP_END_SUBGROUPS = [
   { key: LP_END_GROUP_KEY + ' > Sequence', title: 'Sequence', rows: ['loadingPreviewEndSequence', 'loadingPreviewEndReverse', 'loadingPreviewEndGlide', 'loadingPreviewEndGlideScale', 'loadingPreviewEndSpeedMs'] },
-  { key: LP_END_GROUP_KEY + ' > Sequence Mode', title: 'Sequence Mode', rows: ['loadingPreviewEndCount', 'loadingPreviewEndCountMode', 'loadingPreviewEndLoopTransition', 'loadingPreviewEndHoldMs'] },
+  { key: LP_END_GROUP_KEY + ' > Sequence Mode', title: 'Sequence Mode', rows: ['loadingPreviewEndCount', 'loadingPreviewEndCountMode', 'loadingPreviewEndLoopTransition', 'loadingPreviewEndLoopWrapScale', 'loadingPreviewEndHoldMs'] },
   { key: LP_END_GROUP_KEY + ' > Easing', title: 'Easing', rows: ['loadingPreviewEndEasingEnabled', 'loadingPreviewEndEasingCurve'], gate: 'loadingPreviewEndEasingEnabled' },
   { key: LP_END_GROUP_KEY + ' > Retransition', title: 'Retransition', rows: ['loadingPreviewEndRetransitionEnabled', 'loadingPreviewEndRetransitionSpeedMs', 'loadingPreviewEndRetransitionEasingEnabled', 'loadingPreviewEndRetransitionEasingCurve'], gate: 'loadingPreviewEndRetransitionEnabled' }
 ]
@@ -10578,16 +10593,18 @@ function lpEndBuildTrack(entries, startValues, totalLaps, lapStyle) {
   const plain = resolveTweenSegmentsWithAnchor(anchor, rest)
   const last = plain.length ? plain[plain.length - 1].poseB : anchor
   const ringMode = totalLaps > 1 && lapStyle === 'Loop' && cfg.loadingPreviewEndLoopTransition !== false
-  const lapSegs = ringMode ? plain.concat([{ poseA: last, poseB: anchor, weight: 1 }]) : plain
+  const wrapK = Math.max(cfg.loadingPreviewEndLoopWrapScale ?? 1, 0.01) // Loop Wrap-Back Time Scale: the closing segment's weight
+  const lapSegs = ringMode ? plain.concat([{ poseA: last, poseB: anchor, weight: wrapK }]) : plain
   const sum = (a) => a.reduce((s, x) => s + x.weight, 0)
   let lap1Segs
   if (!startValues) lap1Segs = lapSegs
   else if (glide) lap1Segs = [{ poseA: startValues, poseB: anchor, weight: k }].concat(lapSegs)
   else {
     const s2 = resolveTweenSegmentsWithAnchor(startValues, rest)
-    lap1Segs = ringMode ? s2.concat([{ poseA: s2.length ? s2[s2.length - 1].poseB : startValues, poseB: anchor, weight: 1 }]) : s2
+    lap1Segs = ringMode ? s2.concat([{ poseA: s2.length ? s2[s2.length - 1].poseB : startValues, poseB: anchor, weight: wrapK }]) : s2
   }
-  return { anchor, plain, lapSegs, lap1Segs, Wlap: sum(lapSegs), W1: sum(lap1Segs), ringMode }
+  // Wref = the lap length in normal-transition units with the closing segment counted as 1, so only the wrap-back gets longer / shorter.
+  return { anchor, plain, lapSegs, lap1Segs, Wlap: sum(lapSegs), W1: sum(lap1Segs), Wref: sum(plain) + (ringMode ? 1 : 0), ringMode }
 }
 function lpEndValues(tr, lapIndex, eased, lapStyle, dir) {
   if (lapIndex === 1) return tr.lap1Segs.length ? lerpTweenSegments(tr.lap1Segs, eased) : tr.anchor
@@ -10621,8 +10638,8 @@ function endSeqPlayFrame(now) {
     endSeq.holdEndMs = 0; endSeq.lapStartMs = now
     if (endSeq.lapStyle === 'Oscillate') endSeq.dir *= -1
   }
-  const unit = tr1.Wlap > 0 ? endSeq.speedMs / tr1.Wlap : endSeq.speedMs
-  const lapDur = Math.max(endSeq.lapIndex === 1 ? unit * tr1.W1 : endSeq.speedMs, 1)
+  const unit = tr1.Wref > 0 ? endSeq.speedMs / tr1.Wref : endSeq.speedMs
+  const lapDur = Math.max(endSeq.lapIndex === 1 ? unit * tr1.W1 : (tr1.Wlap > 0 ? unit * tr1.Wlap : endSeq.speedMs), 1)
   const lapT = THREE.MathUtils.clamp((now - endSeq.lapStartMs) / lapDur, 0, 1)
   const eased = cfg.loadingPreviewEndEasingEnabled ? easingProfilePAt(getEasingProfile('loadingPreviewEnd', true, loadingPreviewEndEasingTrig), lapT) : lapT
   applyLoadingPreviewPose(lpEndValues(tr1, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir))
@@ -14025,7 +14042,7 @@ function lerpLoopSegments(ringSegments, tCyclic) {
 //   fwd  = first named pose -> ... -> last named pose, Holds included (Oscillate's one-way lap)
 //   ring = fwd + a closing segment last -> first of weight 1 (Loop's full wrap)
 // ringW / fwdW are the total weights (the lap lengths, in weight units). With no Hold every weight is 1, so ringW = number of poses and fwdW = poses - 1: exactly the old segment counts.
-function buildLoopTimelines(entries) {
+function buildLoopTimelines(entries, wrapScale = 1) {
   const list = entries || []
   let firstIdx = -1
   let firstPose = null
@@ -14039,7 +14056,7 @@ function buildLoopTimelines(entries) {
   if (!firstPose) return { ring: null, ringW: 0, fwd: null, fwdW: 0 }
   const fwd = resolveTweenSegmentsWithAnchor(firstPose, list.slice(firstIdx + 1), true)
   const last = fwd.length > 0 ? fwd[fwd.length - 1].poseB : firstPose
-  const ring = fwd.concat([{ poseA: last, poseB: firstPose, weight: 1 }])
+  const ring = fwd.concat([{ poseA: last, poseB: firstPose, weight: wrapScale }])
   const sumW = (a) => a.reduce((sum, seg) => sum + seg.weight, 0)
   return { ring, ringW: sumW(ring), fwd, fwdW: sumW(fwd) }
 }
@@ -14075,7 +14092,7 @@ function lerpLoopSequence(poses, tCyclic) {
 // playthrough of the sequence"). Duration of one named-pose segment, in ms.
 function loopSegmentMsFor(p, chp, trig) {
   return (cfg[`${p}SpeedCurveEnabled`] && chp.frozenSpeedMs > 0)
-    ? Math.max(chp.frozenSpeedMs * chainSequenceCount(p) / Math.max(trig.loopRingW || trig.loopPoses.length, 1), 1)
+    ? Math.max(chp.frozenSpeedMs * chainSequenceCount(p) / Math.max((trig.loopRingW || trig.loopPoses.length) - (trig.loopWrapK || 1) + 1, 1), 1)
     : trig.loopSegmentMs
 }
 // Pose at `elapsedSegments` segments into a lap that began in direction
@@ -14091,7 +14108,8 @@ function loopPoseValuesBeyondLap(p, chp, trig, elapsedSegments) {
     return trig.loopFwd ? lerpTweenSegments(trig.loopFwd, (position / segments) * chp.frozenTweenFractionCap) : lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
   }
   const segments = trig.loopRingW || trig.loopPoses.length
-  return trig.loopRing ? lerpLoopSegments(trig.loopRing, (segments - 1) + elapsedSegments) : lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
+  const wrapOffset = trig.loopWrapK || 1 // the lap starts where the closing segment starts
+  return trig.loopRing ? lerpLoopSegments(trig.loopRing, (segments - wrapOffset) + elapsedSegments) : lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
 }
 // Same as computeStartDelayMs(), but the nearest-to-farthest domain is chosen by this function's own "Visible Hands Only" checkbox (`${p}${flag}`, default on):
 // on = hands that are on screen, off = all hands. xy = current-position screen distance (every click-function curve).
@@ -14848,7 +14866,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // wrap-back branch.
       const segments = trig.loopRingW || trig.loopPoses.length // lap length in weight units (a Hold counts), = number of poses without Holds
       lapT = elapsedSegments / segments
-      const tCyclic = (segments - 1) + Math.min(elapsedSegments, segments)
+      const tCyclic = (segments - (trig.loopWrapK || 1)) + Math.min(elapsedSegments, segments)
       values = trig.loopRing ? lerpLoopSegments(trig.loopRing, tCyclic) : lerpLoopSequence(trig.loopPoses, tCyclic)
     }
     chp.lastAppliedValues = values
@@ -15110,12 +15128,14 @@ function startClickHoldPose(p) {
         })
       : selectedSequenceEntries(p)
     // Hold-aware Loop / Oscillate timelines (see buildLoopTimelines()). Each weight unit lasts what one pose-to-pose segment used to, so lap length = total weight x loopSegmentMs.
-    const tl = buildLoopTimelines(trig.rawChainEntries)
+    const wrapK = Math.max(cfg[`${p}LoopWrapScale`] ?? 1, 0.01) // Loop Wrap-Back Time Scale (see its control): the closing segment's weight
+    const tl = buildLoopTimelines(trig.rawChainEntries, wrapK)
+    trig.loopWrapK = wrapK
     trig.loopRing = tl.ring
     trig.loopRingW = tl.ringW
     trig.loopFwd = tl.fwd
     trig.loopFwdW = tl.fwdW
-    if (tl.ringW > 0) trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) * chainSequenceCount(p) / tl.ringW, 1)
+    if (tl.ringW > 0) trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) * chainSequenceCount(p) / (tl.ringW - wrapK + 1), 1) // a normal transition's time: the closing segment is not counted as more than 1 here, so only it gets longer / shorter
   } else {
     trig.loopPoses = null
     trig.rawChainEntries = null
@@ -15842,7 +15862,13 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       cp.lapNom = 0
       if (lapStyle === 'Oscillate') cp.sequenceDirection *= -1
     }
-    const speedMs = Math.max(animSpeedMs(p, true, cp.frozenSpeedMs), 1)
+    let speedMs = Math.max(animSpeedMs(p, true, cp.frozenSpeedMs), 1)
+    // Loop Wrap-Back Time Scale: the closing segment's weight is wrapK (1 = a normal transition); the other segments keep their speed, so the lap is longer / shorter by (wrapK - 1) normal transitions.
+    const wrapK = Math.max(cfg[`${p}LoopWrapScale`] ?? 1, 0.01)
+    if (wrapK !== 1 && lapStyle !== 'Oscillate' && cfg[`${p}SequenceLoopTransition`] !== false && cp.lapSegments) {
+      const baseW = cp.lapSegments.reduce((sum, sg) => sum + sg.weight, 0)
+      speedMs = speedMs * (baseW + wrapK) / (baseW + 1)
+    }
     const lapT = THREE.MathUtils.clamp((cp.lapNom ?? (now - cp.sequenceLapStartTime)) / speedMs, 0, 1)
     let values
     if (lapStyle === 'Oscillate') {
@@ -15868,7 +15894,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // report/CHANGELOG entry.
       if (cp.lapSegments) {
         // weighted ring: this lap's forward segments (Holds included) + one closing segment last pose -> first pose of weight 1 (same ring the Loading Preview builds)
-        const ring = cp.lapSegments.concat([{ poseA: cp.lapSegments[cp.lapSegments.length - 1].poseB, poseB: cp.lapSegments[0].poseA, weight: 1 }])
+        const ring = cp.lapSegments.concat([{ poseA: cp.lapSegments[cp.lapSegments.length - 1].poseB, poseB: cp.lapSegments[0].poseA, weight: wrapK }])
         const totalRingWeight = ring.reduce((sum, sg) => sum + sg.weight, 0)
         values = lerpLoopSegments(ring, (cp.sequenceLapIndex - 1 + lapT) * totalRingWeight)
       } else {
@@ -18171,7 +18197,7 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'PauseDurationMs' },
   { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
-  { type: 'row', suffix: 'SequenceLoopTransition' }, { type: 'row', suffix: 'SequenceHoldMs' },
+  { type: 'row', suffix: 'SequenceLoopTransition' }, { type: 'row', suffix: 'LoopWrapScale' }, { type: 'row', suffix: 'SequenceHoldMs' },
   // CORRECTED 2026-10-04 (direct request: "look at the group ordering within
   // Click Offset Test, I want new click functions and existing functions to
   // follow this group order") -- read from `custom18`'s own saved `order`
@@ -18206,7 +18232,7 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'row', suffix: 'Mode' },
   { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'SkipIfSamePose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'GlideToFirstPose' }, { type: 'row', suffix: 'FirstGlideTimeScale' }, { type: 'row', suffix: 'TweenChain' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
-  { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' },
+  { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' }, { type: 'row', suffix: 'LoopWrapScale' },
   // 2026-10-04 -- same group order as CUSTOM_FUNCTION_POSE_LAYOUT (taken
   // from Click Offset Test); Tween Stop stays last, hold-kind only.
   { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Easing' },
@@ -18264,7 +18290,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   TargetPose: '', TweenSelector: '', TweenSpeedMs: 800,
   TweenStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', TweenStartTimeRange: '{"min":0,"max":300}',
   SequencePlayMode: 'Count', SequenceCount: 1, SequenceCountMode: 'Loop',
-  SequenceLoopTransition: true, SequenceHoldMs: 0, TransitionSpeedMs: 700,
+  SequenceLoopTransition: true, LoopWrapScale: 1, SequenceHoldMs: 0, TransitionSpeedMs: 700,
   EasingCurveEnabled: false, EasingCurve: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]',
   RetransitionEasingCurveEnabled: false, RetransitionEasingCurve: '[{"x":0,"y":0.5},{"x":1,"y":0.5}]',
   SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":500,"max":1500}',
@@ -18952,7 +18978,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'TweenStopDelayEnabled', 'TweenStopDelayMs', 'TweenStopDelayCurveEnabled', 'TweenStopDelayCurve', 'TweenStopDelayRange',
   // Loop type selector per trigger: hold-kind = Loop Mode (+ hold duration); pose-kind = Sequence Mode
   // (Count / Loop / Oscillate) and its Count / Count Mode / Loop Transition / Hold Duration rows.
-  'LoopMode', 'LoopHoldMs',
+  'LoopMode', 'LoopHoldMs', 'LoopWrapScale',
   'SequencePlayMode', 'SequenceCount', 'SequenceCountMode', 'SequenceLoopTransition', 'SequenceHoldMs'
 ]
 // CORRECTED 2026-10-01, direct request ("Click Functions that trigger a
@@ -19782,6 +19808,8 @@ function updateChainModeVisibility(p) {
 function updateLoopHoldVisibility(p) {
   const row = document.querySelector(`.dp-row[data-key="${p}LoopHoldMs"]`)
   if (row) row.style.display = (isSequenceOrChainMode(p) && cfg[`${p}LoopMode`] !== 'Off') ? '' : 'none'
+  const wrapRow = document.querySelector(`.dp-row[data-key="${p}LoopWrapScale"]`)
+  if (wrapRow) wrapRow.style.display = (isSequenceOrChainMode(p) && cfg[`${p}LoopMode`] === 'Loop') ? '' : 'none'
 }
 // Owns StartTimeCurveEnabled/SpeedCurveEnabled/RetransitionEnabled's own
 // rows (mode-gated only, always visible in Single Pose regardless of
@@ -20080,6 +20108,7 @@ function updateSequencePlayModeVisibility(p) {
   setRow('SequenceCountMode', isCount)
   const isLoopStyle = showBase && (playMode === 'Loop' || (playMode === 'Count' && cfg[`${p}SequenceCountMode`] === 'Loop'))
   setRow('SequenceLoopTransition', isLoopStyle)
+  setRow('LoopWrapScale', isLoopStyle)
   setRow('SequenceHoldMs', showBase)
 }
 // Offset/Rotation rows are each gated by their own On/Off checkbox,
