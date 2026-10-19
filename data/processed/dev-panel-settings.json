@@ -506,14 +506,14 @@
       "loadingPreviewEndReverse": false,
       "loadingPreviewEndGlide": true,
       "loadingPreviewEndGlideScale": 0.1,
-      "loadingPreviewEndSpeedMs": 1000,
+      "loadingPreviewEndSpeedMs": 510,
       "loadingPreviewEndCount": 1,
       "loadingPreviewEndCountMode": "Loop",
       "loadingPreviewEndLoopTransition": false,
       "loadingPreviewEndLoopWrapScale": 1,
       "loadingPreviewEndHoldMs": 0,
       "loadingPreviewEndEasingEnabled": true,
-      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.49511083686474333,\"y\":0.2792704264322916}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.30912149288889346,\"y\":0}}]",
+      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.82518684299775,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.30912149288889346,\"y\":0}}]",
       "loadingPreviewEndPauseMs": 0,
       "loadingPreviewEndRetransitionEnabled": false,
       "loadingPreviewEndRetransitionSpeedMs": 600,
@@ -19232,14 +19232,14 @@
       "loadingPreviewEndReverse": false,
       "loadingPreviewEndGlide": true,
       "loadingPreviewEndGlideScale": 0.1,
-      "loadingPreviewEndSpeedMs": 1000,
+      "loadingPreviewEndSpeedMs": 510,
       "loadingPreviewEndCount": 1,
       "loadingPreviewEndCountMode": "Loop",
       "loadingPreviewEndLoopTransition": false,
       "loadingPreviewEndLoopWrapScale": 1,
       "loadingPreviewEndHoldMs": 0,
       "loadingPreviewEndEasingEnabled": true,
-      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.49511083686474333,\"y\":0.2792704264322916}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.30912149288889346,\"y\":0}}]",
+      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.82518684299775,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.30912149288889346,\"y\":0}}]",
       "loadingPreviewEndPauseMs": 0,
       "loadingPreviewEndRetransitionEnabled": false,
       "loadingPreviewEndRetransitionSpeedMs": 600,
@@ -37958,14 +37958,14 @@
       "loadingPreviewEndReverse": false,
       "loadingPreviewEndGlide": true,
       "loadingPreviewEndGlideScale": 0.1,
-      "loadingPreviewEndSpeedMs": 1000,
+      "loadingPreviewEndSpeedMs": 510,
       "loadingPreviewEndCount": 1,
       "loadingPreviewEndCountMode": "Loop",
       "loadingPreviewEndLoopTransition": false,
       "loadingPreviewEndLoopWrapScale": 1,
       "loadingPreviewEndHoldMs": 0,
       "loadingPreviewEndEasingEnabled": true,
-      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.49511083686474333,\"y\":0.2792704264322916}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.30912149288889346,\"y\":0}}]",
+      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.82518684299775,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.30912149288889346,\"y\":0}}]",
       "loadingPreviewEndPauseMs": 0,
       "loadingPreviewEndRetransitionEnabled": false,
       "loadingPreviewEndRetransitionSpeedMs": 600,
@@ -56842,7 +56842,7 @@
           "group": {
             "key": "Loading Preview",
             "collapsed": false,
-            "locked": true,
+            "locked": false,
             "items": [
               {
                 "type": "row",
@@ -56877,7 +56877,7 @@
                 "group": {
                   "key": "New Group (7)",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -56942,6 +56942,28 @@
                     {
                       "type": "row",
                       "key": "loadingPreviewAnimScalePct"
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Animation Speed Curve",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "loadingPreviewSpeedCurveRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "loadingPreviewSpeedCurve"
+                          }
+                        ],
+                        "settings": [
+                          "loadingPreviewSpeedCurveRange",
+                          "loadingPreviewSpeedCurve"
+                        ]
+                      }
                     }
                   ],
                   "settings": [
@@ -56969,7 +56991,7 @@
                 "group": {
                   "key": "New Group (5)",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -57031,7 +57053,7 @@
                 "group": {
                   "key": "New Group",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -57098,7 +57120,7 @@
                 "group": {
                   "key": "Loading Preview > Text",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -57162,7 +57184,7 @@
                 "group": {
                   "key": "Loading Preview > Layout",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -57179,7 +57201,7 @@
                 "group": {
                   "key": "Loading Preview > Progress Crop",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -57211,7 +57233,7 @@
                 "group": {
                   "key": "Easing",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -57228,14 +57250,14 @@
                 "group": {
                   "key": "Loading Preview > End Sequence",
                   "collapsed": false,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence",
                         "collapsed": false,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -57260,28 +57282,6 @@
                           {
                             "type": "row",
                             "key": "loadingPreviewEndPauseMs"
-                          },
-                          {
-                            "type": "group",
-                            "group": {
-                              "key": "Animation Speed Curve",
-                              "collapsed": false,
-                              "locked": true,
-                              "items": [
-                                {
-                                  "type": "row",
-                                  "key": "loadingPreviewSpeedCurveRange"
-                                },
-                                {
-                                  "type": "row",
-                                  "key": "loadingPreviewSpeedCurve"
-                                }
-                              ],
-                              "settings": [
-                                "loadingPreviewSpeedCurveRange",
-                                "loadingPreviewSpeedCurve"
-                              ]
-                            }
                           }
                         ],
                         "settings": [
@@ -57298,8 +57298,8 @@
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence Mode",
-                        "collapsed": true,
-                        "locked": true,
+                        "collapsed": false,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -57335,8 +57335,8 @@
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Easing",
-                        "collapsed": true,
-                        "locked": true,
+                        "collapsed": false,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -57353,7 +57353,7 @@
                       "group": {
                         "key": "Loading Preview > End Sequence > Retransition",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
