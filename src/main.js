@@ -2780,13 +2780,12 @@ const DEV_GROUPS = [
       // on (see tryStartField()'s own gate) -- an artificial delay with
       // nothing to show for it isn't what was asked for.
       { key: 'loadingMinTimeMs', label: 'Min Loading Time (Ms)', type: 'slider', min: 0, max: 5000, step: 100, def: 1200 },
-      { key: 'loadingPreviewTweenSelector', label: 'Loading Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
-      // Two-hand tween (2026-10-13): reads a HANDO "hando-two-hand-tween" export from the clipboard, adds its poses / second-hand poses / sequence, and selects the sequence as the loading animation. A sequence flagged twoHand
-      // makes the preview render the second hand by itself (see updateLoadingPreviewHand2()).
-      { key: 'loadingPreviewImportTwoHandBtn', label: 'Import Two-Hand Tween From Clipboard (HANDO)', type: 'button', onClick: (btn) => importTwoHandTween(btn) },
-      // Imported Two-Hand Tweens (2026-10-18, direct request): every import is saved here by name (importing the same name again overwrites its entry). Use selects it as the Loading Tween Sequence; Save adds the current
-      // Loading Tween Sequence under a name. An item points at a sequence in Saved Tween Sequences (its poses live in Saved Poses, as before).
-      { key: 'loadingPreviewTwoHandTweens', label: 'Imported Two-Hand Tweens', type: 'list-picker', def: [], itemLabel: 'Two-Hand Tween', placeAfter: 'loadingPreviewImportTwoHandBtn', isInUse: (item) => !!cfg.loadingPreviewTweenSelector && cfg.loadingPreviewTweenSelector === (item.sequence || item.name), captureCurrent: () => ({ sequence: cfg.loadingPreviewTweenSelector || '' }), onUse: (item) => useTwoHandTweenItem(item) },
+      { key: 'loadingPreviewTweenSelector', label: 'Loading Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })), onChange: () => { try { refreshListPickerMarksByKey('loadingPreviewTwoHandTweens') } catch (e) { /* no panel */ } } },
+      // Imported Two-Hand Tweens (import 2026-10-13, item selector 2026-10-18, reworked the same day): the Import button of this item selector reads a HANDO "hando-two-hand-tween" export from the clipboard and ADDS it - its poses go to
+      // Saved Poses, its sequence (flagged twoHand: the preview then renders the second hand, see updateLoadingPreviewHand2()) to Saved Tween Sequences - without selecting or using it anywhere; importing the same name again overwrites it.
+      // Every entry here IS such a sequence under the same name, so what the dropdowns list and what this list shows are the same thing: Rename renames the sequence (and every dropdown that had it selected), Delete deletes it,
+      // Use selects it as the Loading Tween Sequence (the entry in use is marked). See syncTwoHandTweenList().
+      { key: 'loadingPreviewTwoHandTweens', label: 'Imported Two-Hand Tweens', type: 'list-picker', def: [], hostManaged: true, buttons: ['use', 'import', 'rename', 'delete', 'group'], itemLabel: 'Two-Hand Tween', placeAfter: 'loadingPreviewTweenSelector', isInUse: (item) => !!cfg.loadingPreviewTweenSelector && cfg.loadingPreviewTweenSelector === (item.sequence || item.name), onUse: (item) => useTwoHandTweenItem(item), onRename: (item, name) => renameTwoHandTween(item, name), onDeleted: (item) => deleteTwoHandTween(item), onImportClick: (btn) => importTwoHandTween(btn) },
       // Camera/Lighting selection for the loading preview's own SEPARATE
       // scene -- direct follow-up request ("allow selecting a Camera
       // setting and a Lighting setting for the chosen loading-preview
@@ -3591,7 +3590,7 @@ const DEV_GROUPS = [
         // group's own Tween Selector dropdown reads this same list via
         // options(), which devPanel.js only rebuilds on an explicit
         // refreshSelectOptions() call.
-        onChange: () => refreshAllTweenSequenceSelectors()
+        onChange: () => { refreshAllTweenSequenceSelectors(); syncTwoHandTweenList() }
       }
     ])
   },
@@ -4205,6 +4204,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
     safeRefreshSelectOptions('loadingPreviewModelId')
     safeRefreshSelectOptions('loadingPreviewEndSequence')
+    migrateTwoHandTweenList()
     safeRefreshSelectOptions('loadingPreviewEndCountMode')
     safeRefreshSelectOptions('distCurveXOrigin')
     updateLoadingPreviewLightTypeRows()
@@ -9076,20 +9076,70 @@ async function importTwoHandTween(btn) {
   cfg.savedTweenSequences = sequences
   syncValue('savedTweenSequences', sequences)
   refreshAllTweenSequenceSelectors()
-  // Imported Two-Hand Tweens picker (2026-10-18): one entry per imported sequence, by name; the same name again overwrites its entry (keeping its group).
-  {
-    const items = (cfg.loadingPreviewTwoHandTweens || []).slice()
-    incomingSeqs.forEach((q) => { const i = items.findIndex((x) => x.name === q.name); const it = { name: q.name, sequence: q.name }; if (i >= 0) items[i] = { ...items[i], ...it }; else items.push(it) })
-    cfg.loadingPreviewTwoHandTweens = items
-    syncValue('loadingPreviewTwoHandTweens', items)
-  }
+  // Nothing is selected or used here (2026-10-18, direct request): the import only adds the tween; Use on its entry in the Imported Two-Hand Tweens list (or the dropdowns) picks it.
+  syncTwoHandTweenList()
   const pick = incomingSeqs[incomingSeqs.length - 1].name
-  cfg.loadingPreviewTweenSelector = pick
-  syncValue('loadingPreviewTweenSelector', pick)
-  // restart the preview animation on the new sequence
-  loadingPreviewLapIndex = 1; loadingPreviewLapStartMs = performance.now(); loadingPreviewHoldEndMs = 0; loadingPreviewDirection = 1; loadingPreviewSequenceDone = false; loadingPreviewNoSequenceLogged = false
-  logLoadingPreview('imported two-hand tween "' + pick + '": ' + mainPoses.length + ' poses + ' + hand2Poses.length + ' second-hand poses; selected as the loading animation')
-  flash('Imported + selected "' + pick + '"')
+  logLoadingPreview('imported two-hand tween "' + pick + '": ' + mainPoses.length + ' poses + ' + hand2Poses.length + ' second-hand poses (added to the list, not selected)')
+  flash('Imported "' + pick + '"')
+}
+// The Imported Two-Hand Tweens list always mirrors the two-hand sequences of Saved Tween Sequences, under the same names (so the list and every dropdown agree): entries whose sequence is gone are dropped, a sequence without an entry
+// gets one at the end; the order and groups the user gave to the rest are kept.
+function syncTwoHandTweenList() {
+  const seqs = (cfg.savedTweenSequences || []).filter((q) => q && q.twoHand && typeof q.name === 'string')
+  const names = new Set(seqs.map((q) => q.name))
+  const seen = new Set(), out = []
+  ;(cfg.loadingPreviewTwoHandTweens || []).forEach((it) => {
+    const n = (it && (it.sequence || it.name)) || ''
+    if (!names.has(n) || seen.has(n)) return
+    seen.add(n)
+    out.push({ ...it, name: n, sequence: n })
+  })
+  seqs.forEach((q) => { if (!seen.has(q.name)) { seen.add(q.name); out.push({ name: q.name, sequence: q.name }) } })
+  if (JSON.stringify(out) === JSON.stringify(cfg.loadingPreviewTwoHandTweens || [])) return
+  cfg.loadingPreviewTwoHandTweens = out
+  try { syncValue('loadingPreviewTwoHandTweens', out) } catch (e) { /* no panel */ }
+}
+// Renames a Saved Tween Sequence AND everything that had it selected (the Loading Tween Sequence, the End Sequence, every click function's Sequence / Chain). false when the new name is taken.
+function renameSequenceEverywhere(oldName, newName) {
+  const seqs = cfg.savedTweenSequences || []
+  if (!seqs.some((q) => q.name === oldName) || seqs.some((q) => q.name === newName)) return false
+  cfg.savedTweenSequences = seqs.map((q) => (q.name === oldName ? { ...q, name: newName } : q))
+  try { syncValue('savedTweenSequences', cfg.savedTweenSequences) } catch (e) { /* no panel */ }
+  Object.keys(cfg).forEach((k) => {
+    if ((/TweenSelector$/.test(k) || k === 'loadingPreviewEndSequence') && cfg[k] === oldName) { cfg[k] = newName; try { syncValue(k, newName) } catch (e) { /* no row */ } }
+    else if (/TweenChain$/.test(k) && Array.isArray(cfg[k]) && cfg[k].includes(oldName)) { const v = cfg[k].map((n) => (n === oldName ? newName : n)); cfg[k] = v; try { syncValue(k, v) } catch (e) { /* no row */ } }
+  })
+  return true
+}
+function renameTwoHandTween(item, name) {
+  const oldName = (item && (item.sequence || item.name)) || ''
+  const nn = String(name || '').trim()
+  if (!oldName || !nn || nn === oldName) return
+  if (!renameSequenceEverywhere(oldName, nn)) { alert('A tween named "' + nn + '" already exists (or "' + oldName + '" is gone).'); return }
+  syncTwoHandTweenList()
+  refreshAllTweenSequenceSelectors()
+  logLoadingPreview('renamed two-hand tween "' + oldName + '" to "' + nn + '"')
+}
+function deleteTwoHandTween(item) {
+  const name = (item && (item.sequence || item.name)) || ''
+  if (!name) return
+  cfg.savedTweenSequences = (cfg.savedTweenSequences || []).filter((q) => q.name !== name)
+  try { syncValue('savedTweenSequences', cfg.savedTweenSequences) } catch (e) { /* no panel */ }
+  syncTwoHandTweenList()
+  refreshAllTweenSequenceSelectors()
+  logLoadingPreview('deleted two-hand tween "' + name + '" (its poses stay in Saved Poses)')
+}
+// One-off at startup: an entry of the first version of this list could carry a name of its own (a rename of the label only), and two entries could point at the same sequence (both then showed as "in use"). An entry whose label differs
+// and is the only one for its sequence renames that sequence to the label; any duplicate entry for a sequence is dropped.
+function migrateTwoHandTweenList() {
+  const items = cfg.loadingPreviewTwoHandTweens || []
+  const bySeq = new Map()
+  items.forEach((it) => { const n = it.sequence || it.name; bySeq.set(n, (bySeq.get(n) || 0) + 1) })
+  items.forEach((it) => {
+    const seq = it.sequence || it.name
+    if (it.name && it.sequence && it.name !== it.sequence && bySeq.get(seq) === 1) renameSequenceEverywhere(seq, it.name)
+  })
+  syncTwoHandTweenList()
 }
 // Use on an Imported Two-Hand Tweens item: selects its sequence as the Loading Tween Sequence and restarts the preview animation on it.
 function useTwoHandTweenItem(item) {
@@ -9099,6 +9149,7 @@ function useTwoHandTweenItem(item) {
   syncValue('loadingPreviewTweenSelector', pick)
   loadingPreviewLapIndex = 1; loadingPreviewLapStartMs = performance.now(); loadingPreviewHoldEndMs = 0; loadingPreviewDirection = 1; loadingPreviewSequenceDone = false; loadingPreviewNoSequenceLogged = false
   logLoadingPreview('selected two-hand tween "' + pick + '" as the loading animation')
+  try { refreshListPickerMarksByKey('loadingPreviewTwoHandTweens') } catch (e) { /* no panel */ }
 }
 function ensureLoadingPreviewHand2(seq) {
   const need = !!(seq && seq.twoHand && loadingPreviewScene && loadingPreviewHand && lpSourceRoot())
