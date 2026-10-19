@@ -269,15 +269,15 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "2 Twids - 2H",
+      "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - 2H",
-          "sequence": "2 Twids - 2H"
+          "name": "2 TWIDS",
+          "sequence": "2 TWIDS"
         },
         {
-          "name": "2 Twids - 2H -F",
-          "sequence": "2 Twids - 2H -F"
+          "name": "2 TWIDS - F",
+          "sequence": "2 TWIDS - F"
         }
       ],
       "loadingPreviewSavedCameras": [
@@ -676,14 +676,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -68.09999999999998,
+      "loadingPreviewRotationY": 180,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.0259642043754,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -17186,42 +17186,6 @@
           "group": "FIST ROTATE"
         },
         {
-          "name": "2 Twids - 2H",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 0 (2ND HAND)",
-            "2 TWIDS - 25 (2ND HAND)",
-            "2 TWIDS - 50 (2ND HAND)",
-            "2 TWIDS - 75 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
-          }
-        },
-        {
           "name": "Closed to Open Flower ",
           "tweenPoses": [
             "Closed Flower (DS)",
@@ -17407,7 +17371,43 @@
           "group": ""
         },
         {
-          "name": "2 Twids - 2H -F",
+          "name": "2 TWIDS",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 0 (2ND HAND)",
+            "2 TWIDS - 25 (2ND HAND)",
+            "2 TWIDS - 50 (2ND HAND)",
+            "2 TWIDS - 75 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -73.6,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": 0.44822774048186503,
+            "y": 0.29523179295711777,
+            "z": 0.12358317309890328
+          }
+        },
+        {
+          "name": "2 TWIDS - F",
           "tweenPoses": [
             "2 TWIDS - 75",
             "2 TWIDS - F0",
@@ -17424,7 +17424,7 @@
             "hand2MirrorX": true,
             "hand2MirrorY": false,
             "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
+            "hand2OffsetX": -73.6,
             "hand2OffsetY": 0,
             "hand2OffsetZ": 0,
             "hand2RotX": 0,
@@ -17435,14 +17435,14 @@
           },
           "handoScale": 388.43600000000004,
           "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
+            "x": 0.44822774048186503,
+            "y": 0.29523179295711777,
+            "z": 0.12358317309890328
           }
         }
       ],
       "cameraX": 1.5625001668540408,
-      "cameraY": 5.479270713453735e-13,
+      "cameraY": 5.661130763127118e-13,
       "cameraZ": 197.9876688948102,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -17855,7 +17855,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 2,
+      "pixelRatio": 1,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -22244,12 +22244,12 @@
       "loadingPreviewTweenSelector": "2 Twids - 2H",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - 2H",
-          "sequence": "2 Twids - 2H"
+          "name": "2 TWIDS",
+          "sequence": "2 TWIDS"
         },
         {
-          "name": "2 Twids - 2H -F",
-          "sequence": "2 Twids - 2H -F"
+          "name": "2 TWIDS - F",
+          "sequence": "2 TWIDS - F"
         }
       ],
       "loadingPreviewSavedCameras": [
@@ -22648,14 +22648,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -68.09999999999998,
+      "loadingPreviewRotationY": 180,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.0259642043754,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -39158,42 +39158,6 @@
           "group": "FIST ROTATE"
         },
         {
-          "name": "2 Twids - 2H",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 0 (2ND HAND)",
-            "2 TWIDS - 25 (2ND HAND)",
-            "2 TWIDS - 50 (2ND HAND)",
-            "2 TWIDS - 75 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
-          }
-        },
-        {
           "name": "Closed to Open Flower ",
           "tweenPoses": [
             "Closed Flower (DS)",
@@ -39379,7 +39343,43 @@
           "group": ""
         },
         {
-          "name": "2 Twids - 2H -F",
+          "name": "2 TWIDS",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 0 (2ND HAND)",
+            "2 TWIDS - 25 (2ND HAND)",
+            "2 TWIDS - 50 (2ND HAND)",
+            "2 TWIDS - 75 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -73.6,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": 0.44822774048186503,
+            "y": 0.29523179295711777,
+            "z": 0.12358317309890328
+          }
+        },
+        {
+          "name": "2 TWIDS - F",
           "tweenPoses": [
             "2 TWIDS - 75",
             "2 TWIDS - F0",
@@ -39396,7 +39396,7 @@
             "hand2MirrorX": true,
             "hand2MirrorY": false,
             "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
+            "hand2OffsetX": -73.6,
             "hand2OffsetY": 0,
             "hand2OffsetZ": 0,
             "hand2RotX": 0,
@@ -39407,9 +39407,9 @@
           },
           "handoScale": 388.43600000000004,
           "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
+            "x": 0.44822774048186503,
+            "y": 0.29523179295711777,
+            "z": 0.12358317309890328
           }
         }
       ],
@@ -39827,7 +39827,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 2,
+      "pixelRatio": 1,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -44213,15 +44213,15 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "2 Twids - 2H",
+      "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
         {
-          "name": "2 Twids - 2H",
-          "sequence": "2 Twids - 2H"
+          "name": "2 TWIDS",
+          "sequence": "2 TWIDS"
         },
         {
-          "name": "2 Twids - 2H -F",
-          "sequence": "2 Twids - 2H -F"
+          "name": "2 TWIDS - F",
+          "sequence": "2 TWIDS - F"
         }
       ],
       "loadingPreviewSavedCameras": [
@@ -44620,14 +44620,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -68.09999999999998,
+      "loadingPreviewRotationY": 180,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.0259642043754,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -61130,42 +61130,6 @@
           "group": "FIST ROTATE"
         },
         {
-          "name": "2 Twids - 2H",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 0 (2ND HAND)",
-            "2 TWIDS - 25 (2ND HAND)",
-            "2 TWIDS - 50 (2ND HAND)",
-            "2 TWIDS - 75 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
-          }
-        },
-        {
           "name": "Closed to Open Flower ",
           "tweenPoses": [
             "Closed Flower (DS)",
@@ -61351,7 +61315,43 @@
           "group": ""
         },
         {
-          "name": "2 Twids - 2H -F",
+          "name": "2 TWIDS",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 0 (2ND HAND)",
+            "2 TWIDS - 25 (2ND HAND)",
+            "2 TWIDS - 50 (2ND HAND)",
+            "2 TWIDS - 75 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -73.6,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": 0.44822774048186503,
+            "y": 0.29523179295711777,
+            "z": 0.12358317309890328
+          }
+        },
+        {
+          "name": "2 TWIDS - F",
           "tweenPoses": [
             "2 TWIDS - 75",
             "2 TWIDS - F0",
@@ -61368,7 +61368,7 @@
             "hand2MirrorX": true,
             "hand2MirrorY": false,
             "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
+            "hand2OffsetX": -73.6,
             "hand2OffsetY": 0,
             "hand2OffsetZ": 0,
             "hand2RotX": 0,
@@ -61379,9 +61379,9 @@
           },
           "handoScale": 388.43600000000004,
           "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
+            "x": 0.44822774048186503,
+            "y": 0.29523179295711777,
+            "z": 0.12358317309890328
           }
         }
       ],
@@ -61799,7 +61799,7 @@
       "floorColor": "#000000",
       "floorZOffset": 0,
       "floorXYScale": 1,
-      "pixelRatio": 2,
+      "pixelRatio": 1,
       "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
@@ -74249,8 +74249,8 @@
     "desktop": {
       "left": 85.59375,
       "top": 100.78125,
-      "width": 511.765625,
-      "height": 637.1875
+      "width": 515.765625,
+      "height": 639.1875
     },
     "mobile": {
       "left": 20,
