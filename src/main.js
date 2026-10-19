@@ -389,6 +389,8 @@ let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y
 // Loading Preview End Sequence (2026-10-18): state + its own easing trig, declared up here (the restore can reach the onChange handlers at top level - TDZ). lpLastValues / lpHand2LastValues = the last pose applied to each preview hand.
 let loadingPreviewEndEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], speedRangeParsed: null }
 let lpLastValues = null, lpHand2LastValues = null
+// On-screen frame rate (Debug > Show Frame Rate, 2026-10-18): frames actually drawn since the last refresh.
+let frameRateDrawn = 0, frameRateWindowStart = 0, frameRateEl = null
 const endSeq = { phase: 'off', finished: false, lapAtBegin: 0, timer: 0, seq: null, tr1: null, tr2: null, lapIndex: 1, lapStartMs: 0, holdEndMs: 0, dir: 1, lapStyle: 'Loop', total: 1, speedMs: 1000, pauseEndMs: 0, retStartMs: 0, retDur: 0, from1: null, from2: null }
 const loadingPreviewAnchor = new THREE.Vector3()
 const _loadingPreviewBase = new THREE.Vector3(), _loadingPreviewV2 = new THREE.Vector3()
@@ -4045,6 +4047,10 @@ const DEV_GROUPS = [
       // Added 2026-10-17, direct request: "an Export Logs button below the Pause button. It exports all the logs that are active as a json file." See exportDebugLogs() for what counts as active.
       { key: 'exportLogsBtn', label: 'Export Logs', type: 'button', placeAfter: 'pauseLogsBtn', onClick: (btn) => exportDebugLogs(btn) },
       // Added 2026-10-17, direct request: a checkbox under Export Logs that puts the same export on screen as a corner button next to Pause / Reset, so a log can be exported outside dev mode. A normal saved setting, read in every mode (see setupExportLogsUiButton()).
+      // Show Frame Rate (2026-10-18, direct request): the drawn frames per second as a number at the top right of the screen; the colour and the refresh interval rows only show while it is on. An ordinary saved setting, so it works outside dev mode too.
+      { key: 'showFrameRate', label: 'Show Frame Rate', type: 'checkbox', def: false, placeAfter: 'exportLogsUiButton', onChange: () => applyFrameRateDisplay() },
+      { key: 'frameRateTextColor', label: 'Frame Rate Text Color', type: 'color', def: '#ffffff', placeAfter: 'showFrameRate', onChange: () => applyFrameRateDisplay() },
+      { key: 'frameRateRefreshMs', label: 'Frame Rate Refresh Rate (Ms Between Updates)', type: 'slider', min: 100, max: 5000, step: 50, def: 500, placeAfter: 'frameRateTextColor' },
       { key: 'exportLogsUiButton', label: 'ADD UI BUTTON', type: 'checkbox', def: false, placeAfter: 'exportLogsBtn', onChange: () => applyExportLogsButtonStyle() },
       // Debug > Snapshot (2026-10-11, direct request): one button takes a single log of THIS moment (replaces the previous snapshot, it is not a running log); the checkboxes pick what goes in it.
       { key: 'snapshotCursor', label: 'Snapshot: Cursor Position', type: 'checkbox', def: true },
@@ -4197,6 +4203,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
     prof('setupLoadingPreviewProgressCropGroup', setupLoadingPreviewProgressCropGroup)
     prof('setupLoadingPreviewEndSequenceGroup', setupLoadingPreviewEndSequenceGroup)
+    applyFrameRateDisplay() // shows / hides the colour + refresh rows now that the panel exists
     prof('setupLoadingPreviewLayoutGroup', setupLoadingPreviewLayoutGroup)
     try { await setupResponsiveVelocity() } catch (e) { console.error('Responsive Velocity setup failed', e) }
     exclusiveTriggersReady = true // from here on a user turning a click function on / changing its trigger switches an overlapping one off
@@ -21490,6 +21497,35 @@ function setupExportLogsUiButton() {
   applyExportLogsButtonStyle()
 }
 setupExportLogsUiButton()
+// Frame rate readout: a fixed, click-through element at the top right. Shown only while "Show Frame Rate" is on; its text is refreshed every Refresh Rate ms from the frames drawn in that window.
+function applyFrameRateDisplay() {
+  const on = !!cfg.showFrameRate
+  if (frameRateEl) {
+    frameRateEl.style.display = on ? 'block' : 'none'
+    frameRateEl.style.color = cfg.frameRateTextColor || '#ffffff'
+    if (on) { frameRateDrawn = 0; frameRateWindowStart = performance.now() }
+  }
+  ;['frameRateTextColor', 'frameRateRefreshMs'].forEach((k) => { const row = document.querySelector('.dp-row[data-key="' + k + '"]'); if (row) row.style.display = on ? '' : 'none' })
+}
+function updateFrameRateDisplay() {
+  if (!frameRateEl || !cfg.showFrameRate) return
+  const now = performance.now()
+  const elapsed = now - frameRateWindowStart
+  if (elapsed < Math.max(cfg.frameRateRefreshMs || 0, 50)) return
+  frameRateEl.textContent = (frameRateDrawn * 1000 / elapsed).toFixed(1) + ' fps'
+  frameRateDrawn = 0; frameRateWindowStart = now
+}
+function setupFrameRateDisplay() {
+  if (document.getElementById('frameRateDisplay')) return
+  const el = document.createElement('div')
+  el.id = 'frameRateDisplay'
+  el.style.cssText = 'position:fixed;top:8px;right:12px;z-index:100002;display:none;pointer-events:none;user-select:none;font:600 14px/1.2 ui-monospace,Menlo,Consolas,monospace;text-shadow:0 0 3px rgba(0,0,0,0.85),0 0 1px rgba(0,0,0,0.85)'
+  el.textContent = '-- fps'
+  document.body.appendChild(el)
+  frameRateEl = el
+  applyFrameRateDisplay()
+}
+setupFrameRateDisplay()
 // Both Saved Tween Sequences' new "Edit" button acts on the list-
 // picker's own currently-SELECTED row -- same convention as Saved Poses'
 // own "Default" button (getSelectedSavedPoseItem()), just scoped to this
@@ -22105,6 +22141,7 @@ function animate(dt, now) {
       window.__lastComposerMs = performance.now() - __renderStart
       fieldWarmLastRenderMs = window.__lastComposerMs
       __frameProfiler.frames++
+      frameRateDrawn++
       if (fieldStarted && !fieldRevealed && ++fieldRevealFrames >= 2) finalizeReveal() // two painted field frames, then the loading screen goes
     }
     // Covers everything from the true top of animate() through the
@@ -22116,6 +22153,7 @@ function animate(dt, now) {
     // (fps=4.2 with both of those reading normal) where the missing time
     // had to be somewhere this line now actually measures.
     __frameProfiler.animateTotalMs += performance.now() - __animateTotalStart
+    updateFrameRateDisplay()
     if (DEBUG_TIMING && fieldStarted && (window.__postStartFrames = (window.__postStartFrames || 0) + 1) <= 8) logStartupTiming('post-start animate #' + window.__postStartFrames + ' total ' + Math.round(performance.now() - __animateTotalStart) + 'ms (composer ' + Math.round(window.__lastComposerMs || 0) + ')')
     {
       const elapsed = performance.now() - __frameProfiler.windowStart
