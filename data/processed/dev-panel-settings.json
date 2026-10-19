@@ -267,7 +267,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -37695,7 +37695,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": false,
+      "loadingPreviewShowLive": true,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -56709,7 +56709,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -56805,7 +56805,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -56840,7 +56840,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -57191,14 +57191,14 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > End Sequence",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -58953,7 +58953,7 @@
           "type": "group",
           "group": {
             "key": "New Group (16)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -59492,7 +59492,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
