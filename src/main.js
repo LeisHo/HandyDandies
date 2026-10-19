@@ -389,6 +389,7 @@ let loadingPreviewAnchorActive = false
 let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: null, speedRangeParsed: null }
 // Loading Preview End Sequence (2026-10-18): state + its own easing trig, declared up here (the restore can reach the onChange handlers at top level - TDZ). lpLastValues / lpHand2LastValues = the last pose applied to each preview hand.
 let loadingPreviewEndEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], speedRangeParsed: null }
+let lastPositionalFn = null // the last click function that was triggered with Positional Retransition on (its Retransition Speed unwinds the offset / rotation of functions that have it off)
 let lpLapNom = 0, lpLapNomStart = -1, lpLapNomLastMs = 0 // Animation Speed Curve: the lap's own progress clock (0..1), advanced per frame so the speed can change while a lap plays
 let lpLastLapOnLast = false // the loading animation's most recently completed lap ended on the sequence's LAST pose (not on pose 1 after a wrap-back)
 let lpHideModel1 = 0, lpHideModel2 = 0 // the Hide Model % of the pose each loading-preview hand is showing right now (kept so the Real Time Loading crop, which re-applies the clip on its own, does not lose it)
@@ -8123,6 +8124,9 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // original spec's own grouping -- Sequence/Tween mode's own
       // release always retransitions, a disclosed scoping choice.
       { key: `${p}RetransitionEnabled`, label: 'Retransition On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
+      // Positional Retransition (2026-10-19, direct request): On (default) = this function retransitions fully back to its starting state. Off = only the hand POSE retransitions with this function's Retransition settings; the hand's
+      // click-function offset and rotation unwind instead at the Retransition Speed of the last triggered click function that has Positional Retransition on - and do not unwind at all while no such function has been triggered.
+      { key: `${p}PositionalRetransition`, label: 'Positional Retransition', type: 'checkbox', def: true },
       { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 25000, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
       // Retransition Speed Curve -- direct request 2026-09-24 (item 5):
       // "In the Retransition settings group, add a Curve Graph input and
@@ -8462,6 +8466,9 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartDistanceCurve`, label: 'Start Distance Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}PauseDurationMs`, label: 'Pause Duration At Tween End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: defaults.pauseDurationMs ?? 500 },
       { key: `${p}RetransitionEnabled`, label: 'Retransition On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
+      // Positional Retransition (2026-10-19, direct request): On (default) = this function retransitions fully back to its starting state. Off = only the hand POSE retransitions with this function's Retransition settings; the hand's
+      // click-function offset and rotation unwind instead at the Retransition Speed of the last triggered click function that has Positional Retransition on - and do not unwind at all while no such function has been triggered.
+      { key: `${p}PositionalRetransition`, label: 'Positional Retransition', type: 'checkbox', def: true },
       { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 25000, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
       // Retransition Speed Curve -- direct request 2026-09-24 (item 5) --
       // see makeClickHoldPoseGroup()'s own matching comment for the full
@@ -13904,6 +13911,17 @@ function bakeInFlightOffsetRotation(hand, p) {
 // accumulator entirely once progress reaches 1 -- a genuinely fresh
 // start for the next trigger, not just a visual reset.
 const _baseRotDecay = new THREE.Quaternion(), _wrV2 = new THREE.Vector3()
+// Positional Retransition (see the control): the progress the OFFSET / ROTATION unwind uses during p's retransition. On = the pose's own progress, as always. Off = the unwind runs on its own clock at the Retransition Speed of
+// lastPositionalFn (the last triggered function with it on); with no such function it stays at 0, so the offset / rotation stay and the hand remains in this retransition phase until another function takes over.
+function positionalRetransitionOn(p) { return cfg[`${p}PositionalRetransition`] !== false }
+function notePositionalFn(p) { if (positionalRetransitionOn(p) && cfg[`${p}RetransitionEnabled`] !== false) lastPositionalFn = p }
+function positionalProgressFor(p, poseProgress, elapsedMs) {
+  if (positionalRetransitionOn(p)) return poseProgress
+  const q = lastPositionalFn
+  if (!q) return 0
+  const ms = Math.max(((CLICK_HOLD_KEYS.includes(q) && isSequenceOrChainMode(q)) ? cfg[`${q}TweenRetransitionSpeedMs`] : cfg[`${q}RetransitionSpeedMs`]) ?? 400, 1)
+  return THREE.MathUtils.clamp(elapsedMs / ms, 0, 1)
+}
 function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart, baseAccumStart, cursorAccumStart) {
   const remaining = 1 - progress
   const decayedX = offsetAccumStart ? offsetAccumStart.x * remaining : 0
@@ -15201,12 +15219,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // (snapshotted at retransition-start by snapshotOffsetRotationAccumForRetransition())
     // back to zero, not just this function's own last increment -- and
     // clears the real accumulator once progress reaches 1.
-    applyOffsetRotationRetransition(hand, easedProgress, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart, chp.retransitionBaseAccumStart, chp.retransitionCursorAccumStart)
-    if (progress >= 1) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
+    const posProgressH = positionalProgressFor(p, easedProgress, elapsed)
+    applyOffsetRotationRetransition(hand, posProgressH, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart, chp.retransitionBaseAccumStart, chp.retransitionCursorAccumStart)
+    if (progress >= 1 && (positionalRetransitionOn(p) || posProgressH >= 1)) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
 }
 function startClickHoldPose(p) {
   if (!cfg[`${p}Enabled`]) return
+  notePositionalFn(p)
   captureClickCursorPivot(p)
   if (startupBlocksClickFunctions()) return
   releaseStartupHold() // (startupBlocksClickFunctions() is true until every visible hand has finished its startup sequence, so this click is the one that starts cursor tracking)
@@ -16149,8 +16169,9 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // (snapshotted above at retransition-start) back to zero, not just
     // this function's own last increment -- and clears the real
     // accumulator once progress reaches 1, a genuinely fresh start.
-    applyOffsetRotationRetransition(hand, easedProgress, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart, cp.retransitionBaseAccumStart, cp.retransitionCursorAccumStart)
-    if (progress >= 1) cp.phase = 'idle'
+    const posProgressC = positionalProgressFor(p, easedProgress, elapsed)
+    applyOffsetRotationRetransition(hand, posProgressC, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart, cp.retransitionBaseAccumStart, cp.retransitionCursorAccumStart)
+    if (progress >= 1 && (positionalRetransitionOn(p) || posProgressC >= 1)) cp.phase = 'idle'
   }
 }
 // Starts every hand's own full sequence at once -- unlike
@@ -16217,6 +16238,7 @@ function assignHandsToCycle(cycle, startIdx) {
   return groups
 }
 function triggerClickPose(p, onlyHands = null) {
+  notePositionalFn(p)
   if (!cfg[`${p}Enabled`]) return
   captureClickCursorPivot(p)
   if (p !== STARTUP_FN) {
@@ -18436,7 +18458,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":500,"max":1500}',
   StartTimeCurveEnabled: false, StartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', StartTimeRange: '{"min":0,"max":300}',
   PauseDurationMs: 0,
-  RetransitionEnabled: false, RetransitionSpeedMs: 400,
+  RetransitionEnabled: false, PositionalRetransition: true, RetransitionSpeedMs: 400,
   RetransitionSpeedCurveEnabled: false, RetransitionSpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionSpeedCurveRange: '{"min":50,"max":25000}',
   RetransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionStartTimeRange: '{"min":0,"max":300}'
 }
@@ -19103,7 +19125,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'SpeedCurveVisibleOnly', 'SpeedCurveXOrigin', 'StartTimeCurveVisibleOnly', 'StartTimeCurveXOrigin', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionSpeedCurveXOrigin', 'RetransitionStartTimeCurveVisibleOnly', 'RetransitionStartTimeCurveXOrigin', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveXOrigin', 'TweenStopDelayCurveVisibleOnly', 'TweenStopDelayCurveXOrigin', 'CameraOffsetVisibleOnly', 'CameraOffsetXOrigin', 'CursorOffsetVisibleOnly', 'CursorOffsetXOrigin',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
   'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceXOrigin', 'StartDistanceCurve',
-  'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
+  'RetransitionEnabled', 'PositionalRetransition', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
   'RetransitionDistCurveEnabled', 'RetransitionDistCurve', 'RetransitionDistRange',
   'RetransitionScalerEnabled', 'RetransitionScalerCurve', 'RetransitionScalerMulRange', 'RetransitionScalerDistRange',
   // 2026-10-06 (direct request, "1 - CH"): a hold-kind trigger in Sequence/Chain mode uses its own
@@ -20092,6 +20114,7 @@ function updateSingleTimingGateVisibility(p) {
   // child fields" pattern) -- its own curve/range pair visible only once
   // also switched on, AND only for whichever mode's own pair is currently
   // relevant (hold-kind) or unconditionally (pose-kind, see above).
+  setRow('PositionalRetransition', retransitionOn)
   setRow('RetransitionStartTimeCurveEnabled', retransitionOn)
   const retransitionStartCurveEnabled = cfg[`${p}RetransitionStartTimeCurveEnabled`] !== false
   setRow('RetransitionStartTimeCurve', retransitionCurvesOn && retransitionStartCurveEnabled)
@@ -20424,7 +20447,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   // heading -- RetransitionEnabled itself still governs both regardless
   // of mode, preserving the 2026-09-22 request.
   wrapGatedSubgroup(`${p}RetransitionEnabled`, [
-    `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurveXOrigin`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurveXOrigin`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
+    `${p}PositionalRetransition`, `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurveXOrigin`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurveXOrigin`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
     `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`,
     `${p}RetransitionEasingCurveEnabled`, `${p}RetransitionEasingCurve`,
     `${p}RetransitionDistCurveEnabled`, `${p}RetransitionDistCurve`, `${p}RetransitionDistRange`,
