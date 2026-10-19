@@ -390,6 +390,7 @@ let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y
 // Loading Preview End Sequence (2026-10-18): state + its own easing trig, declared up here (the restore can reach the onChange handlers at top level - TDZ). lpLastValues / lpHand2LastValues = the last pose applied to each preview hand.
 let loadingPreviewEndEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], speedRangeParsed: null }
 let lpLapNom = 0, lpLapNomStart = -1, lpLapNomLastMs = 0 // Animation Speed Curve: the lap's own progress clock (0..1), advanced per frame so the speed can change while a lap plays
+let lpLastLapOnLast = false // the loading animation's most recently completed lap ended on the sequence's LAST pose (not on pose 1 after a wrap-back)
 let lpHideModel1 = 0, lpHideModel2 = 0 // the Hide Model % of the pose each loading-preview hand is showing right now (kept so the Real Time Loading crop, which re-applies the clip on its own, does not lose it)
 let lpLastValues = null, lpHand2LastValues = null
 // Smooth loading (2026-10-18): loadingWarmMode = updateRenderOrder() is running behind the loading screen (only the first idle repose of the hands, in a time budget); fieldPreposeDeadline = the latest the reveal waits for it;
@@ -9221,7 +9222,7 @@ function ensureLoadingPreviewHand2(seq) {
 const _lp2U = new THREE.Matrix4(), _lp2Pivot = new THREE.Matrix4(), _lp2Tmp = new THREE.Matrix4(), _lp2A = new THREE.Matrix4(), _lp2Ai = new THREE.Matrix4(), _lp2Mir = new THREE.Matrix4(), _lp2Final = new THREE.Matrix4()
 const _lp2Rh = new THREE.Quaternion(), _lp2Anchor = new THREE.Vector3()
 const _lp2Q = new THREE.Quaternion(), _lp2Base = new THREE.Quaternion(), _lp2V = new THREE.Vector3(), _lp2V2 = new THREE.Vector3(), _lp2S = new THREE.Vector3(), _lp2Eul = new THREE.Euler()
-function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride) {
+function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride, ringMode = 0) {
   const hand2 = loadingPreviewHand2
   if (!hand2 || !hand2.skinnedMesh || !loadingPreviewHand || !seq) return
   const cfg2 = seq.hand2 || {}
@@ -9241,7 +9242,11 @@ function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride) {
   else {
     const ring = segs2.concat([{ poseA: last2, poseB: anchor2, weight: Math.max(cfg.loadingPreviewSequenceLoopWrapScale ?? 1, 0.01) }])
     const totalW = ring.reduce((sum, sg) => sum + sg.weight, 0)
-    values = lerpLoopSegments(ring, (loadingPreviewLapIndex - 1 + t) * totalW)
+    let pos2 = (loadingPreviewLapIndex - 1 + t) * totalW
+    const baseW2 = totalW - ring[ring.length - 1].weight
+    if (ringMode === 1) pos2 = (loadingPreviewLapIndex - 1) * totalW + t * baseW2 // same stretch as the main hand: the last lap of a Count ends on this hand's last pose
+    else if (ringMode === 2) pos2 = Math.min(pos2, (loadingPreviewLapIndex - 1) * totalW + baseW2) // finishing: stop at this hand's last pose
+    values = lerpLoopSegments(ring, pos2)
   }
   }
   lpHand2LastValues = values
@@ -10525,7 +10530,7 @@ function updateLoadingPreviewAnimation() {
   // so this only uses the profile's shape (easingProfilePAt() maps linear lap
   // time to eased position over the same 0-1 range).
   const easedT = cfg.loadingPreviewEasingCurveEnabled ? easingProfilePAt(getEasingProfile('loadingPreview', true, loadingPreviewEasingTrig), lapT) : lapT
-  let values
+  let values, ringMode = 0, ringDoneEarly = false // ringMode: 1 = last lap of a Count (stretched to end on the last pose), 2 = finishing (stop at the last pose)
   if (segments.length === 0) {
     // Only the anchor pose itself, nothing after it (a single-pose
     // sequence, or every entry after the anchor was empty) -- same
@@ -10548,12 +10553,22 @@ function updateLoadingPreviewAnimation() {
     // when every segment had weight 1.
     const ringSegments = segments.concat([{ poseA: lastPose, poseB: anchorPose, weight: wrapK }])
     const totalRingWeight = ringSegments.reduce((sum, seg) => sum + seg.weight, 0)
-    const tCyclic = (loadingPreviewLapIndex - 1 + easedT) * totalRingWeight
+    // Ending on the LAST pose (2026-10-19, direct request: "make sure that loading preview animation always finishes on the last frame of the sequence"): the ring's closing segment brings the hand back to pose 1, so the final
+    // lap of a Count is stretched over the plain segments only, and once the loading is complete (End Sequence wait / finish) the lap in progress stops where the plain segments end.
+    const baseW = totalRingWeight - wrapK
+    let tCyclic = (loadingPreviewLapIndex - 1 + easedT) * totalRingWeight
+    if (playMode === 'Count' && loadingPreviewLapIndex === totalLaps) { ringMode = 1; tCyclic = (loadingPreviewLapIndex - 1) * totalRingWeight + easedT * baseW }
+    else if (endSeq.phase === 'wait') {
+      const cap = (loadingPreviewLapIndex - 1) * totalRingWeight + baseW
+      if (endSeq.capState === undefined) endSeq.capState = tCyclic >= cap ? 'past' : 'before' // first wait frame: already in the wrap-back part of this lap? then this lap runs on to its end and only the NEXT one stops at the last pose (no jump back)
+      if (!(loadingPreviewLapIndex === endSeq.lapAtBegin && endSeq.capState === 'past')) { ringMode = 2; if (tCyclic >= cap - 1e-6) { tCyclic = cap; ringDoneEarly = true } }
+    }
     values = lerpLoopSegments(ringSegments, tCyclic)
   }
   applyLoadingPreviewPose(values)
-  updateLoadingPreviewHand2(seq, lapStyle, typeof easedT !== 'undefined' ? easedT : lapT) // same timeline position, second hand's own poses
-  if (lapT >= 1) {
+  updateLoadingPreviewHand2(seq, lapStyle, typeof easedT !== 'undefined' ? easedT : lapT, undefined, ringMode) // same timeline position, second hand's own poses
+  if (lapT >= 1 || ringDoneEarly) {
+    lpLastLapOnLast = segments.length === 0 || (lapStyle === 'Oscillate' ? loadingPreviewDirection === 1 : (cfg.loadingPreviewSequenceLoopTransition === false || ringMode === 1 || ringDoneEarly))
     logLoadingPreview(`lap ${loadingPreviewLapIndex} complete (${playMode}${playMode === 'Count' ? ' of ' + totalLaps : ''})`)
     loadingPreviewLapIndex++
     if (loadingPreviewLapIndex > totalLaps) {
@@ -10635,11 +10650,13 @@ function lpLoadingAnimPlayable() {
   return idx >= 0 && (cfg.savedPoses || []).some((p) => p.name === entries[idx])
 }
 function lpEndSeqObj() { return (cfg.savedTweenSequences || []).find((s) => s.name === cfg.loadingPreviewEndSequence) || null }
-function endSeqShouldRun() { return !!cfg.loadingPreviewEnabled && !!cfg.loadingPreviewEndEnabled && !endSeq.finished && !!loadingPreviewRenderer && !!loadingPreviewHand && !!lpEndSeqObj() }
+// With the End Sequence off (or its sequence missing) this still runs, as a finish-only wait: the loading animation is carried on to the LAST pose of its sequence before the loading screen hides (2026-10-19).
+function endSeqShouldRun() { return !!cfg.loadingPreviewEnabled && !endSeq.finished && !!loadingPreviewRenderer && !!loadingPreviewHand && ((!!cfg.loadingPreviewEndEnabled && !!lpEndSeqObj()) || lpLoadingAnimPlayable()) }
 function endSeqHolding() { return endSeq.phase !== 'off' && endSeq.phase !== 'done' }
 function startEndSequence() {
   parseLoadingPreviewEndEasingConfig()
   endSeq.phase = 'wait'
+  endSeq.capState = undefined
   endSeq.lapAtBegin = loadingPreviewLapIndex
   const speed = Math.max(cfg.loadingPreviewEndSpeedMs || 0, 1), laps = Math.max(cfg.loadingPreviewEndCount || 1, 1)
   // Safety net (a judgment call, not a measurement): twice a generous estimate of the whole thing plus 3 s, so a bug or a stalled loop can never keep the loading screen up forever.
@@ -10698,7 +10715,7 @@ function endSeqKeepCrop() {
 }
 function endSeqBeginPlay(now) {
   const seq = lpEndSeqObj()
-  if (!seq) { endSeqFinish('sequence not found'); return }
+  if (!cfg.loadingPreviewEndEnabled || !seq) { endSeqFinish(cfg.loadingPreviewEndEnabled ? 'sequence not found' : 'loading animation finished on its last pose'); return }
   ensureLoadingPreviewHand2(seq) // adds / removes the second hand for this sequence
   endSeq.seq = seq
   endSeq.lapStyle = cfg.loadingPreviewEndCountMode === 'Oscillate' ? 'Oscillate' : 'Loop'
@@ -10788,7 +10805,7 @@ function lpLiveCycleStep(now) {
 function updateLoadingPreviewEndSequence() {
   const now = performance.now()
   if (endSeq.phase === 'wait') {
-    if (!(loadingPreviewSequenceDone || loadingPreviewLapIndex > endSeq.lapAtBegin || !lpLoadingAnimPlayable())) return false
+    if (!(loadingPreviewSequenceDone || (loadingPreviewLapIndex > endSeq.lapAtBegin && lpLastLapOnLast) || !lpLoadingAnimPlayable())) return false
     loadingPreviewHoldEndMs = 0
     endSeqBeginPlay(now)
     if (endSeq.phase !== 'play') return false
