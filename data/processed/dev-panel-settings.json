@@ -57764,7 +57764,7 @@
                 "type": "group",
                 "group": {
                   "key": "Wrist",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
