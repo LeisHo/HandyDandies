@@ -497,7 +497,7 @@
       "loadingPreviewEndLoopWrapScale": 1,
       "loadingPreviewEndHoldMs": 0,
       "loadingPreviewEndEasingEnabled": true,
-      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.41867618474028556,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.08722177657172292,\"y\":-0.6103268941243489}}]",
+      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0.4848215738932292,\"h1\":{\"x\":0.30194474375622987,\"y\":-0.3650792439778646}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2714477182614864,\"y\":0}}]",
       "loadingPreviewEndPauseMs": 0,
       "loadingPreviewEndRetransitionEnabled": false,
       "loadingPreviewEndRetransitionSpeedMs": 600,
@@ -19207,7 +19207,7 @@
       "loadingPreviewEndLoopWrapScale": 1,
       "loadingPreviewEndHoldMs": 0,
       "loadingPreviewEndEasingEnabled": true,
-      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.41867618474028556,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.08722177657172292,\"y\":-0.6103268941243489}}]",
+      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0.4848215738932292,\"h1\":{\"x\":0.30194474375622987,\"y\":-0.3650792439778646}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2714477182614864,\"y\":0}}]",
       "loadingPreviewEndPauseMs": 0,
       "loadingPreviewEndRetransitionEnabled": false,
       "loadingPreviewEndRetransitionSpeedMs": 600,
@@ -37917,7 +37917,7 @@
       "loadingPreviewEndLoopWrapScale": 1,
       "loadingPreviewEndHoldMs": 0,
       "loadingPreviewEndEasingEnabled": true,
-      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.41867618474028556,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.08722177657172292,\"y\":-0.6103268941243489}}]",
+      "loadingPreviewEndEasingCurve": "[{\"x\":0,\"y\":0.4848215738932292,\"h1\":{\"x\":0.30194474375622987,\"y\":-0.3650792439778646}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2714477182614864,\"y\":0}}]",
       "loadingPreviewEndPauseMs": 0,
       "loadingPreviewEndRetransitionEnabled": false,
       "loadingPreviewEndRetransitionSpeedMs": 600,
@@ -57264,7 +57264,7 @@
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Easing",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -64508,9 +64508,9 @@
     },
     "mobile": {
       "left": 20,
-      "top": 516.1190795898438,
-      "width": 442.4285888671875,
-      "height": 263.4940490722656
+      "top": 221.1607208251953,
+      "width": 413.9702453613281,
+      "height": 565.357177734375
     }
   }
 }
