@@ -269,7 +269,7 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "2 TWIDS - 1ST HAND - F",
+      "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewTwoHandTweens": [
         {
           "name": "2 Twids - F",
@@ -44145,7 +44145,7 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
-      "loadingPreviewTweenSelector": "2 TWIDS - 1ST HAND - F",
+      "loadingPreviewTweenSelector": "Two-Hand Tween",
       "loadingPreviewTwoHandTweens": [
         {
           "name": "2 Twids - F",
