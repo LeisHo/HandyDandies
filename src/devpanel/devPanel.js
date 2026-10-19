@@ -442,6 +442,25 @@ export function setDeviceValue(device, key, v) {
 // own row.__item reference (set at render time), not by index -- indices
 // are exactly what a reorder invalidates.
 const LP_GROUP_PATH_SEP = '/'
+// An import that brings nested groups (items whose .group is a path "A/B") overrides how the target list is organized (2026-10-19, direct request: "groups that were not previously nested in another group should become nested
+// if the new import says so"). The imported items carry their own paths; this re-parents the groups ALREADY in the list: every non-root segment of an imported path (the "B" of "A/B", the "C" of "A/B/C") names a group that
+// lives under its parent, so an existing TOP-LEVEL group of that name - with everything in it, subgroups included - moves under that parent too. importedGroupPaths = the .group values of the imported items.
+export function nestImportedGroups(items, importedGroupPaths) {
+  const renames = new Map() // 'B' -> 'A/B'
+  ;(importedGroupPaths || []).forEach((path) => {
+    const segs = String(path || '').split(LP_GROUP_PATH_SEP).filter(Boolean)
+    for (let i = 1; i < segs.length; i++) { if (!renames.has(segs[i])) renames.set(segs[i], segs.slice(0, i + 1).join(LP_GROUP_PATH_SEP)) }
+  })
+  if (!renames.size) return items
+  return items.map((it) => {
+    if (!it || !it.group) return it
+    for (const [leaf, full] of renames) {
+      if (it.group === leaf) return { ...it, group: full }
+      if (it.group.startsWith(leaf + LP_GROUP_PATH_SEP)) return { ...it, group: full + it.group.slice(leaf.length) }
+    }
+    return it
+  })
+}
 //
 // A group's full identity is a "/"-joined path (LP_GROUP_PATH_SEP) stored
 // directly in item.group -- "Parent" for a top-level group, "Parent/Child"
@@ -863,31 +882,42 @@ export function refreshListPickerTogglesByKey(key) {
 }
 function renderListPickerRows(entry) {
   entry.listEl.innerHTML = ''
-  // A tree with one node per group at ANY depth (2026-10-19, unlimited nesting, ported from HANDO): node = { items, children: Map(leafName -> node) }. A Map keeps discovery order for free at every level.
-  const rootNode = { items: [], children: new Map() }
-  const discoveryOrder = []
+  // Tree of any depth (2026-10-19; it used to stop at top + one subgroup, which flattened an imported "A/B/C" into A > "B/C"): node = { items, kids: Map(leaf -> node) }, built from the items' group paths.
+  const root = { items: [], kids: new Map() }
   const ungrouped = []
-  function ensureNode(segs) {
-    let node = rootNode
-    segs.forEach((seg) => {
-      if (!node.children.has(seg)) node.children.set(seg, { items: [], children: new Map() })
-      node = node.children.get(seg)
+  function nodeFor(path) {
+    let n = root
+    path.split(LP_GROUP_PATH_SEP).forEach((seg) => {
+      if (!n.kids.has(seg)) n.kids.set(seg, { items: [], kids: new Map() })
+      n = n.kids.get(seg)
     })
-    return node
+    return n
   }
   entry.items.forEach((item) => {
     if (!item.group) { ungrouped.push(item); return }
-    const segs = item.group.split(LP_GROUP_PATH_SEP)
-    if (!rootNode.children.has(segs[0])) discoveryOrder.push(segs[0])
-    ensureNode(segs).items.push(item)
+    nodeFor(item.group).items.push(item)
   })
-  ;(entry.pendingGroups || []).forEach((path) => {
-    const segs = path.split(LP_GROUP_PATH_SEP)
-    if (!rootNode.children.has(segs[0])) discoveryOrder.push(segs[0])
-    ensureNode(segs)
-  })
-  // Re-sort the top level by entry.groupOrder (added 2026-09-15, "place the new group at the top"): any name it lists sorts by ITS position there, newest first, ahead of every name it doesn't know about (which keep
-  // their natural relative order after). Only the top level has this priority list; a deeper level's order is the Map's own insertion order.
+  ;(entry.pendingGroups || []).forEach((path) => { nodeFor(path) })
+  // Startup (2026-10-19, direct request: every item selector starts with ALL groups and nested groups collapsed): until the user first touches this picker, every group that exists - however it got here (the
+  // restore, a later host-driven refill, an import done by the code, empty groups) - is collapsed on every render. entry.userTouched is set by the first pointer press inside the picker.
+  if (!entry.userTouched) {
+    const addAll = (node, path) => node.kids.forEach((kid, seg) => { const p = path ? path + LP_GROUP_PATH_SEP + seg : seg; entry.collapsedGroups.add(p); addAll(kid, p) })
+    addAll(root, '')
+  }
+  const topOrder = Array.from(root.kids.keys())
+  // Re-sort top-level order by entry.groupOrder (added 2026-09-15, direct
+  // request: "place the new group at the top of the list instead of the
+  // bottom") -- `topOrder` above is built purely by first-occurrence
+  // while walking items-then-pendingGroups, which can't by itself rank a
+  // brand-new group above an OLDER pre-existing one of the other kind
+  // (e.g. a new auto-assigned group vs. an older still-empty one) since
+  // the 2 loops run unconditionally in a fixed order regardless of actual
+  // creation recency. `entry.groupOrder` (maintained by addGroupBtn's own
+  // handler, below, and cleared entirely on a manual drag -- see
+  // syncListPickerFromDom()) is the real creation-order priority signal;
+  // any name it lists sorts by ITS position there, newest first, ahead of
+  // every name it doesn't know about (which keep their natural relative
+  // order, appended after).
   const orderedTopOrder = [
     ...entry.groupOrder.filter((n) => rootNode.children.has(n)),
     ...discoveryOrder.filter((n) => !entry.groupOrder.includes(n))
@@ -898,20 +928,21 @@ function renderListPickerRows(entry) {
   entry.listEl.appendChild(ungroupedBody)
   entry.ungroupedBody = ungroupedBody
 
-  // Renders one group (any depth) and everything nested inside it; `path` is its full "/"-joined identity.
-  function renderGroup(path, node) {
+  function renderGroupNode(path, node) {
     const g = el('div', 'dp-lp-group' + (entry.collapsedGroups.has(path) ? ' collapsed' : ''))
     g.__groupName = path
     g.appendChild(buildGroupHeader(entry, path))
     const body = el('div', 'dp-lp-group-body')
     node.items.forEach((item) => body.appendChild(renderListPickerItemRow(entry, item)))
-    node.children.forEach((childNode, leafName) => body.appendChild(renderGroup(path + LP_GROUP_PATH_SEP + leafName, childNode)))
+    node.kids.forEach((kid, seg) => body.appendChild(renderGroupNode(path + LP_GROUP_PATH_SEP + seg, kid)))
     g.appendChild(body)
-    // Group export checkboxes are purely derived (never persisted), so this is safe on a still-detached subtree; nested groups were already refreshed by their own renderGroup() call.
+    // Group export checkboxes are purely derived (never persisted) -- refreshGroupExportCheckbox() reads straight from entry.items/exportChecked (no DOM query), so this is safe on a still-detached subtree.
     if (entry.ctrl.exportable) refreshGroupExportCheckbox(g, entry)
     return g
   }
-  orderedTopOrder.forEach((name) => entry.listEl.appendChild(renderGroup(name, rootNode.children.get(name))))
+  orderedTopOrder.forEach((name) => {
+    entry.listEl.appendChild(renderGroupNode(name, root.kids.get(name)))
+  })
   refreshListPickerToggles(entry)
 }
 
@@ -1704,6 +1735,8 @@ function buildListPickerRow(ctrl, row) {
     lastPick: 'item' // 'item' | 'group': which kind the Rename button acts on
   }
   numEls[ctrl.key] = entry
+  // First press inside this picker ends its startup state (see renderListPickerRows): groups it gets later behave normally.
+  row.addEventListener('pointerdown', () => { entry.userTouched = true }, true)
 
   saveBtn.addEventListener('click', () => {
     const label = ctrl.itemLabel || 'Item'
@@ -1898,6 +1931,7 @@ function buildListPickerRow(ctrl, row) {
         if (Object.prototype.hasOwnProperty.call(incomingItem, 'group')) item = { ...item, group: incomingItem.group }
         items = mergeImportedItem(items, item)
       })
+      items = nestImportedGroups(items, incoming.map((q) => q && q.group).filter(Boolean))
       entry.items = items
       commit(ctrl, entry.items)
       renderListPickerRows(entry)
