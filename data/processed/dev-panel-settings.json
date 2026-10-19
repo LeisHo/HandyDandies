@@ -268,8 +268,8 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": true,
-      "loadingPreviewFloorEnabled": false,
-      "loadingPreviewFloorZOffset": 0,
+      "loadingPreviewFloorEnabled": true,
+      "loadingPreviewFloorZOffset": -1.35,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -482,7 +482,7 @@
       "loadingPreviewTextFont": "Cormorant Garamond",
       "loadingPreviewTextOffsetX": -660,
       "loadingPreviewTextOffsetY": 318,
-      "loadingPreviewProgressCropEnabled": true,
+      "loadingPreviewProgressCropEnabled": false,
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
@@ -18999,8 +18999,8 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
-      "loadingPreviewFloorEnabled": false,
-      "loadingPreviewFloorZOffset": 0,
+      "loadingPreviewFloorEnabled": true,
+      "loadingPreviewFloorZOffset": -1.35,
       "loadingMinTimeMs": 0,
       "loadingPreviewTweenSelector": "2 Twids - 2H",
       "loadingPreviewTwoHandTweens": [
@@ -37730,8 +37730,8 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": true,
-      "loadingPreviewFloorEnabled": false,
-      "loadingPreviewFloorZOffset": 0,
+      "loadingPreviewFloorEnabled": true,
+      "loadingPreviewFloorZOffset": -1.35,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -37944,7 +37944,7 @@
       "loadingPreviewTextFont": "Cormorant Garamond",
       "loadingPreviewTextOffsetX": 0,
       "loadingPreviewTextOffsetY": 0,
-      "loadingPreviewProgressCropEnabled": true,
+      "loadingPreviewProgressCropEnabled": false,
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
@@ -57242,14 +57242,14 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > End Sequence",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
