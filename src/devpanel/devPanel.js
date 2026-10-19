@@ -445,10 +445,9 @@ const LP_GROUP_PATH_SEP = '/'
 //
 // A group's full identity is a "/"-joined path (LP_GROUP_PATH_SEP) stored
 // directly in item.group -- "Parent" for a top-level group, "Parent/Child"
-// for a group nested one level inside it (the same one-level cap the outer
-// settings panel's own groups already use, and for the same reason: it
-// keeps this a flat string on each item rather than a second, separately-
-// persisted tree structure to keep in sync).
+// for a group nested inside it, to ANY depth ("A/B/C/D", unlimited nesting as of
+// 2026-10-19): it keeps this a flat string on each item rather than a second,
+// separately-persisted tree structure to keep in sync).
 function syncListPickerFromDom(entry) {
   const items = []
   const pending = []
@@ -458,33 +457,34 @@ function syncListPickerFromDom(entry) {
     delete it.group
     items.push(it)
   })
-  Array.from(entry.listEl.querySelectorAll(':scope > .dp-lp-group')).forEach((g) => {
-    const path = g.__groupName
-    const directRows = g.querySelectorAll(':scope > .dp-lp-group-body > .dp-list-picker-row')
+  // UNLIMITED nesting (2026-10-19, direct request: "make sure that infinite nesting is possible"; ported from HANDO): walk() reads one group's own body at its FULL "/"-joined path, any depth. A group with neither
+  // rows nor child groups is a bare empty shell, tracked in `pending` (it still renders, but is not persisted while empty).
+  // Every group's path is what the DOM says it is NOW: g.__groupName is the path as of the LAST RENDER and a drag does not re-render, so a group dragged out of / into another one still carried its old path (items kept
+  // living, invisibly, under the old parent and went with it when that parent was deleted). enter() brings __groupName up to date and the collapsed state follows a group to its new path.
+  const pathChanges = new Map()
+  function walk(container, path) {
+    const directRows = Array.from(container.querySelectorAll(':scope > .dp-list-picker-row'))
     directRows.forEach((r) => {
       const it = r.__item
       if (!it) return
       it.group = path
       items.push(it)
     })
-    if (directRows.length === 0) pending.push(path)
-    // One level of nesting only -- a subgroup's own rows get the joined
-    // "Parent/Child" path; a subgroup can never itself contain a further
-    // subgroup (setupReorder's own getTargets, in buildListPickerRow,
-    // refuses to offer a group that already HAS subgroups as a nesting
-    // target, so this can't arise from a real drag).
-    g.querySelectorAll(':scope > .dp-lp-group-body > .dp-lp-group').forEach((sub) => {
-      const subPath = path + LP_GROUP_PATH_SEP + sub.__groupName.split(LP_GROUP_PATH_SEP).pop()
-      const subRows = sub.querySelectorAll(':scope > .dp-lp-group-body > .dp-list-picker-row')
-      subRows.forEach((r) => {
-        const it = r.__item
-        if (!it) return
-        it.group = subPath
-        items.push(it)
-      })
-      if (subRows.length === 0) pending.push(subPath)
-    })
-  })
+    const childGroups = Array.from(container.querySelectorAll(':scope > .dp-lp-group'))
+    if (directRows.length === 0 && childGroups.length === 0) pending.push(path)
+    childGroups.forEach((g) => enter(g, path + LP_GROUP_PATH_SEP + g.__groupName.split(LP_GROUP_PATH_SEP).pop()))
+  }
+  function enter(g, newPath) {
+    if (g.__groupName !== newPath) pathChanges.set(g.__groupName, newPath)
+    g.__groupName = newPath
+    walk(g.querySelector(':scope > .dp-lp-group-body'), newPath)
+  }
+  Array.from(entry.listEl.querySelectorAll(':scope > .dp-lp-group')).forEach((g) => enter(g, g.__groupName.split(LP_GROUP_PATH_SEP).pop()))
+  if (pathChanges.size) {
+    const remap = (pth) => (pathChanges.has(pth) ? pathChanges.get(pth) : pth)
+    entry.collapsedGroups = new Set(Array.from(entry.collapsedGroups).map(remap))
+    entry.selectedGroups = new Set(Array.from(entry.selectedGroups).map(remap))
+  }
   entry.items = items
   entry.pendingGroups = pending
   // entry.groupOrder (the "place a new group at the top" priority list,
@@ -664,7 +664,7 @@ function renameListPickerGroup(entry, path) {
   entry.items.forEach((it) => { if (it.group) it.group = rename(it.group) })
   entry.pendingGroups = (entry.pendingGroups || []).map(rename)
   entry.groupOrder = (entry.groupOrder || []).map(rename)
-  if (entry.collapsedGroups.has(path)) { entry.collapsedGroups.delete(path); entry.collapsedGroups.add(newPath) }
+  entry.collapsedGroups = new Set(Array.from(entry.collapsedGroups).map(rename)) // the group AND every group nested under it keep their collapsed state under the new path
   entry.selectedGroups = new Set()
   commit(entry.ctrl, entry.items)
   renderListPickerRows(entry)
@@ -715,14 +715,17 @@ function refreshExportCheckboxAncestors(el2, entry) {
     g = g.parentElement ? g.parentElement.closest('.dp-lp-group') : null
   }
 }
-function buildGroupHeader(entry, path) {
+function buildGroupHeader(entry, path0) {
+  let path = path0
   const header = el('div', 'dp-lp-group-header')
+  // the group's path NOW: a drag renames / re-parents a group without re-rendering its header (see syncListPickerFromDom()), so the path captured when this header was built can be stale
+  const livePath = () => { const gEl = header.closest('.dp-lp-group'); return (gEl && gEl.__groupName) || path }
   header.appendChild(el('span', 'dp-lp-group-handle', { textContent: '⠿' }))
   if (entry.ctrl.exportable) {
     const exportCb = el('input', 'dp-lp-export-checkbox dp-lp-group-export-checkbox', { type: 'checkbox' })
     exportCb.addEventListener('click', (e) => e.stopPropagation())
     exportCb.addEventListener('change', () => {
-      const items = lpItemsUnderGroup(entry, path)
+      const items = lpItemsUnderGroup(entry, livePath())
       items.forEach((it) => { if (exportCb.checked) entry.exportChecked.add(it); else entry.exportChecked.delete(it) })
       const groupEl = header.closest('.dp-lp-group')
       groupEl.querySelectorAll('.dp-list-picker-row').forEach((r) => {
@@ -741,7 +744,7 @@ function buildGroupHeader(entry, path) {
     gcb.addEventListener('change', () => {
       // Read ONCE, before the loop: switching the first item re-syncs every checkbox from the host (refreshListPickerToggles), which unticks this group checkbox while some items are still off - re-reading gcb.checked per item then switched the rest the wrong way (2026-10-15: ticking a group enabled only its first function).
       const on = gcb.checked
-      listPickerGroupItems(entry, path).forEach((it) => entry.ctrl.itemToggle.setOn(it, on))
+      listPickerGroupItems(entry, livePath()).forEach((it) => entry.ctrl.itemToggle.setOn(it, on))
       refreshListPickerToggles(entry)
     })
     header.appendChild(gcb)
@@ -752,6 +755,7 @@ function buildGroupHeader(entry, path) {
   const removeBtn = el('button', 'dp-lp-group-remove', { type: 'button', textContent: '×' })
   removeBtn.addEventListener('click', (e) => {
     e.stopPropagation()
+    path = livePath()
     // Reads entry.items directly (the live, current membership) rather
     // than a closure captured when this row was rendered -- a live drag
     // (setupReorder's onDrop -> syncListPickerFromDom) can add/remove this
@@ -784,6 +788,7 @@ function buildGroupHeader(entry, path) {
   })
   header.appendChild(removeBtn)
   header.addEventListener('click', (e) => {
+    path = livePath()
     const g = header.closest('.dp-lp-group')
     if (e.ctrlKey || e.metaKey) {
       // Ctrl / Cmd-click a group header (2026-10-14): pick the group (for Rename / Duplicate) instead of collapsing it
@@ -817,14 +822,14 @@ function buildGroupHeader(entry, path) {
 // instead (see syncListPickerFromDom above) rather than rebuilding it.
 //
 // Direct user request: let a list-picker's own items be organized into
-// user-created groups (drag items into them, one level of NESTED groups
-// too -- same cap as the outer settings panel's own groups) and freely
+// user-created groups (drag items into them, NESTED groups to any depth
+// too) and freely
 // reordered, the same way the outer settings-panel's own groups/rows
 // already work (setupReorder, reused as-is -- see its own comment for why
 // it's generic enough to cover this without modification beyond the
 // onDrop param). Ungrouped items always render first, directly in the
 // list (no header); groups render below as their own collapsible sub-
-// sections, with any subgroups nested one level inside their own body. A
+// sections, with any subgroups nested inside their own body (any depth). A
 // group with 0 items still renders (entry.pendingGroups) so a freshly-
 // created empty group has something to drag an item into -- it simply
 // won't survive a reload if it's still empty at Save time (its existence
@@ -858,50 +863,34 @@ export function refreshListPickerTogglesByKey(key) {
 }
 function renderListPickerRows(entry) {
   entry.listEl.innerHTML = ''
-  // One-level tree: top[name] = { items, subs: { subName: { items } }, subOrder }
-  const top = {}
-  const topOrder = []
+  // A tree with one node per group at ANY depth (2026-10-19, unlimited nesting, ported from HANDO): node = { items, children: Map(leafName -> node) }. A Map keeps discovery order for free at every level.
+  const rootNode = { items: [], children: new Map() }
+  const discoveryOrder = []
   const ungrouped = []
-  function ensureTop(name) {
-    if (!top[name]) { top[name] = { items: [], subs: {}, subOrder: [] }; topOrder.push(name) }
-    return top[name]
+  function ensureNode(segs) {
+    let node = rootNode
+    segs.forEach((seg) => {
+      if (!node.children.has(seg)) node.children.set(seg, { items: [], children: new Map() })
+      node = node.children.get(seg)
+    })
+    return node
   }
   entry.items.forEach((item) => {
     if (!item.group) { ungrouped.push(item); return }
     const segs = item.group.split(LP_GROUP_PATH_SEP)
-    const t = ensureTop(segs[0])
-    if (segs.length > 1) {
-      const subName = segs.slice(1).join(LP_GROUP_PATH_SEP)
-      if (!t.subs[subName]) { t.subs[subName] = { items: [] }; t.subOrder.push(subName) }
-      t.subs[subName].items.push(item)
-    } else {
-      t.items.push(item)
-    }
+    if (!rootNode.children.has(segs[0])) discoveryOrder.push(segs[0])
+    ensureNode(segs).items.push(item)
   })
   ;(entry.pendingGroups || []).forEach((path) => {
     const segs = path.split(LP_GROUP_PATH_SEP)
-    const t = ensureTop(segs[0])
-    if (segs.length > 1) {
-      const subName = segs.slice(1).join(LP_GROUP_PATH_SEP)
-      if (!t.subs[subName]) { t.subs[subName] = { items: [] }; t.subOrder.push(subName) }
-    }
+    if (!rootNode.children.has(segs[0])) discoveryOrder.push(segs[0])
+    ensureNode(segs)
   })
-  // Re-sort top-level order by entry.groupOrder (added 2026-09-15, direct
-  // request: "place the new group at the top of the list instead of the
-  // bottom") -- `topOrder` above is built purely by first-occurrence
-  // while walking items-then-pendingGroups, which can't by itself rank a
-  // brand-new group above an OLDER pre-existing one of the other kind
-  // (e.g. a new auto-assigned group vs. an older still-empty one) since
-  // the 2 loops run unconditionally in a fixed order regardless of actual
-  // creation recency. `entry.groupOrder` (maintained by addGroupBtn's own
-  // handler, below, and cleared entirely on a manual drag -- see
-  // syncListPickerFromDom()) is the real creation-order priority signal;
-  // any name it lists sorts by ITS position there, newest first, ahead of
-  // every name it doesn't know about (which keep their natural relative
-  // order, appended after).
+  // Re-sort the top level by entry.groupOrder (added 2026-09-15, "place the new group at the top"): any name it lists sorts by ITS position there, newest first, ahead of every name it doesn't know about (which keep
+  // their natural relative order after). Only the top level has this priority list; a deeper level's order is the Map's own insertion order.
   const orderedTopOrder = [
-    ...entry.groupOrder.filter((n) => topOrder.includes(n)),
-    ...topOrder.filter((n) => !entry.groupOrder.includes(n))
+    ...entry.groupOrder.filter((n) => rootNode.children.has(n)),
+    ...discoveryOrder.filter((n) => !entry.groupOrder.includes(n))
   ]
 
   const ungroupedBody = el('div', 'dp-lp-ungrouped-body')
@@ -909,32 +898,20 @@ function renderListPickerRows(entry) {
   entry.listEl.appendChild(ungroupedBody)
   entry.ungroupedBody = ungroupedBody
 
-  orderedTopOrder.forEach((name) => {
-    const t = top[name]
-    const g = el('div', 'dp-lp-group' + (entry.collapsedGroups.has(name) ? ' collapsed' : ''))
-    g.__groupName = name
-    g.appendChild(buildGroupHeader(entry, name))
+  // Renders one group (any depth) and everything nested inside it; `path` is its full "/"-joined identity.
+  function renderGroup(path, node) {
+    const g = el('div', 'dp-lp-group' + (entry.collapsedGroups.has(path) ? ' collapsed' : ''))
+    g.__groupName = path
+    g.appendChild(buildGroupHeader(entry, path))
     const body = el('div', 'dp-lp-group-body')
-    t.items.forEach((item) => body.appendChild(renderListPickerItemRow(entry, item)))
-    t.subOrder.forEach((subName) => {
-      const subPath = name + LP_GROUP_PATH_SEP + subName
-      const sg = el('div', 'dp-lp-group' + (entry.collapsedGroups.has(subPath) ? ' collapsed' : ''))
-      sg.__groupName = subPath
-      sg.appendChild(buildGroupHeader(entry, subPath))
-      const subBody = el('div', 'dp-lp-group-body')
-      t.subs[subName].items.forEach((item) => subBody.appendChild(renderListPickerItemRow(entry, item)))
-      sg.appendChild(subBody)
-      body.appendChild(sg)
-      // Group export checkboxes are purely derived (never persisted) --
-      // refreshGroupExportCheckbox() reads straight from entry.items/
-      // exportChecked (no DOM query), so this is safe on a still-
-      // detached subtree.
-      if (entry.ctrl.exportable) refreshGroupExportCheckbox(sg, entry)
-    })
+    node.items.forEach((item) => body.appendChild(renderListPickerItemRow(entry, item)))
+    node.children.forEach((childNode, leafName) => body.appendChild(renderGroup(path + LP_GROUP_PATH_SEP + leafName, childNode)))
     g.appendChild(body)
-    entry.listEl.appendChild(g)
+    // Group export checkboxes are purely derived (never persisted), so this is safe on a still-detached subtree; nested groups were already refreshed by their own renderGroup() call.
     if (entry.ctrl.exportable) refreshGroupExportCheckbox(g, entry)
-  })
+    return g
+  }
+  orderedTopOrder.forEach((name) => entry.listEl.appendChild(renderGroup(name, rootNode.children.get(name))))
   refreshListPickerToggles(entry)
 }
 
@@ -1936,24 +1913,14 @@ function buildListPickerRow(ctrl, row) {
   // inside renderListPickerRows, which reruns on every Save/Delete/etc --
   // re-attaching a pointerdown listener to listEl every render would stack
   // duplicates, since listEl itself survives innerHTML='' clears).
-  // Groups reorder among top-level siblings by default (target: listEl
-  // itself) and can ALSO be dragged into another TOP-LEVEL group's own
-  // body to nest one level deep -- this picker's OWN cap, kept as-is
-  // (out of scope for the 2026-09-14 unlimited-nesting change to the
-  // OUTER settings panel's own groups, see buildDevPanel()'s own comment
-  // -- the 2 group systems no longer share the same rule, corrected here
-  // since this comment used to claim they did): a group that already
-  // contains its own subgroup(s) is offered ONLY listEl (dragging it
-  // into another group would bring its children along, producing 2
-  // levels of nesting). Needs its own onDrop too (not
+  // Groups reorder among top-level siblings (target: listEl itself) and can ALSO be dragged into ANY group's body at any depth, except their own: unlimited nesting (2026-10-19). Needs its own onDrop too (not
   // just the item-drag below) -- promoting/demoting a group changes every
   // one of its members' own .group PATH, which only syncListPickerFromDom
   // (reading the new DOM position) can resolve.
   setupReorder(listEl, 'dp-lp-group', 'dp-lp-group-handle', (item) => {
-    if (item.querySelector('.dp-lp-group-body .dp-lp-group')) return [listEl]
-    const topLevelBodies = Array.from(listEl.querySelectorAll(':scope > .dp-lp-group > .dp-lp-group-body'))
-      .filter((b) => b.closest('.dp-lp-group') !== item)
-    return [listEl, ...topLevelBodies]
+    // UNLIMITED nesting (2026-10-19): a group can be dropped into ANY group body at any depth, except its own (or one inside it).
+    const allBodies = Array.from(listEl.querySelectorAll('.dp-lp-group-body')).filter((b) => !item.contains(b))
+    return [listEl, ...allBodies]
   }, () => syncListPickerFromDom(entry))
   setupReorder(listEl, 'dp-list-picker-row', 'dp-lp-row-handle',
     () => Array.from(listEl.querySelectorAll('.dp-lp-group-body, .dp-lp-ungrouped-body')),
