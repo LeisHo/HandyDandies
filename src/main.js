@@ -398,9 +398,6 @@ const endSeq = { phase: 'off', finished: false, lapAtBegin: 0, timer: 0, seq: nu
 // Show Loading Preview (live) + End Sequence (2026-10-19): the live preview runs the whole startup cycle - the main loading animation for Min Loading Time, then the End Sequence, then again from the start. progress = the loading progress
 // the crop reads while this cycle is active (loadingProgressNow()); t0 = when the current cycle's main part began.
 const lpLiveCycle = { active: false, t0: 0, progress: 1 }
-// Loading Preview Floor (2026-10-19): a floor plane inside the preview's own scene, like the Floor group's plane in the field scene. mesh = the plane; clip = the plane the preview renderer uses to crop the hand behind it; baseZ = the
-// preview hand's rest Z (captured after the build); side = which side of the plane the camera is on (the crop keeps the camera's side).
-const lpFloor = { mesh: null, clip: new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), baseZ: 0, side: 1 }
 const loadingPreviewAnchor = new THREE.Vector3()
 const _loadingPreviewBase = new THREE.Vector3(), _loadingPreviewV2 = new THREE.Vector3()
 // Two-hand tween: the base position applyLoadingPreviewPose() gave the main hand (before the Pose Offset), and whether it was HANDO's exact pivots (see there) - updateLoadingPreviewHand2() needs both for the mirror plane.
@@ -2783,9 +2780,6 @@ const DEV_GROUPS = [
       // hand field starts, by design -- this reopens it on demand
       // through a separate loop, rather than reversing that).
       { key: 'loadingPreviewShowLive', label: 'Show Loading Preview (Live, No Reload Needed)', type: 'checkbox', def: false, onChange: (v) => setLoadingPreviewLiveVisible(v) },
-      // Loading Preview Floor (2026-10-19, direct request): a floor plane in the preview's own scene, in the Floor Color, that crops the part of the hand behind it - the same effect the Floor group has on the field's hands.
-      { key: 'loadingPreviewFloorEnabled', label: 'Loading Preview Floor On/Off', type: 'checkbox', def: false, onChange: () => updateLoadingPreviewFloor() },
-      { key: 'loadingPreviewFloorZOffset', label: 'Loading Preview Floor Z Offset (x Hand Radius)', type: 'slider', min: -3, max: 3, step: 0.05, def: 0, onChange: () => updateLoadingPreviewFloor() },
       // Only actually delays the reveal while the preview above is ALSO
       // on (see tryStartField()'s own gate) -- an artificial delay with
       // nothing to show for it isn't what was asked for.
@@ -3833,7 +3827,7 @@ const DEV_GROUPS = [
     title: 'Floor',
     controls: [
       { key: 'floorEnabled', label: 'Floor On/Off', type: 'checkbox', def: false, onChange: () => { startupFloorHidden = false; syncBackgroundToFloor(); updateFloorRowVisibility(); updateFloor() } },
-      { key: 'floorColor', label: 'Floor Color', type: 'color', def: '#ffffff', onChange: () => { syncBackgroundToFloor(); updateFloor(); updateLoadingPreviewFloor() } },
+      { key: 'floorColor', label: 'Floor Color', type: 'color', def: '#ffffff', onChange: () => { syncBackgroundToFloor(); updateFloor() } },
       { key: 'floorZOffset', label: 'Floor Z Offset (World Units)', type: 'slider', min: -200, max: 200, step: 0.5, def: 0, onChange: () => updateFloor() },
       { key: 'floorXYScale', label: 'Floor XY Scale (x)', type: 'slider', min: 0.1, max: 10, step: 0.05, def: 1, onChange: () => updateFloor() }
     ]
@@ -9472,9 +9466,6 @@ function buildLoadingPreview(bypassEnabledGate) {
   else applyLoadingPreviewCameraAutoFrame()
 
   applyLoadingPreviewPose(poseDefaultValues)
-  lpFloor.baseZ = loadingPreviewHand.clone.position.z // the hand's rest Z: Floor Z Offset 0 puts the plane through the hand's origin, like Floor Z Offset 0 does in the field
-  lpFloor.mesh = null // belonged to the previous scene
-  updateLoadingPreviewFloor()
   loadingPreviewAnimStartMs = performance.now()
   // Sequence Mode state -- fresh for every build (a page-load-lifetime
   // instance, but reset defensively rather than assuming this only ever
@@ -10385,42 +10376,7 @@ function setupLoadingPreviewEasingGroup() {
 // selected sequence's own named poses actually were. Now plays exactly
 // the selected sequence's own poses, nothing else -- no default-pose
 // anchor at either end.
-// Creates / updates the Loading Preview Floor (see lpFloor). Safe to call at any time; does nothing until the preview exists.
-function updateLoadingPreviewFloor() {
-  try {
-    if (!loadingPreviewScene || !loadingPreviewRenderer || !loadingPreviewHand || !loadingPreviewCamera) return
-    if (!cfg.loadingPreviewFloorEnabled) {
-      if (lpFloor.mesh) lpFloor.mesh.visible = false
-      if (loadingPreviewRenderer.clippingPlanes.length) loadingPreviewRenderer.clippingPlanes = []
-      return
-    }
-    if (!lpFloor.mesh || lpFloor.mesh.parent !== loadingPreviewScene) {
-      lpFloor.mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: cfg.floorColor || '#ffffff', side: THREE.DoubleSide, depthTest: false, depthWrite: false, toneMapped: false }))
-      lpFloor.mesh.renderOrder = -1000000
-      lpFloor.mesh.frustumCulled = false
-      lpFloor.mesh.name = 'Loading Preview Floor'
-      loadingPreviewScene.add(lpFloor.mesh)
-    }
-    const rw = Math.max(handBoundsRadiusLocal * (loadingPreviewModelScale || 1), 1e-3)
-    const fz = lpFloor.baseZ + (cfg.loadingPreviewFloorZOffset || 0) * rw
-    lpFloor.mesh.visible = true
-    lpFloor.mesh.position.set(0, 0, fz)
-    lpFloor.mesh.scale.set(rw * 400, rw * 400, 1)
-    lpFloor.mesh.material.color.set(cfg.floorColor || '#ffffff')
-    lpFloor.side = loadingPreviewCamera.position.z >= fz ? 1 : -1
-    lpFloor.clip.normal.set(0, 0, lpFloor.side)
-    lpFloor.clip.constant = -lpFloor.side * fz + rw * 0.002
-    loadingPreviewRenderer.clippingPlanes = [lpFloor.clip]
-  } catch (err) { /* preview not built yet */ }
-}
-// Per frame: the crop keeps the camera's side of the plane, so flip it if an orbiting camera crosses the plane.
-function lpFloorFrame() {
-  if (!cfg.loadingPreviewFloorEnabled || !lpFloor.mesh || !loadingPreviewCamera) return
-  const side = loadingPreviewCamera.position.z >= lpFloor.mesh.position.z ? 1 : -1
-  if (side !== lpFloor.side) updateLoadingPreviewFloor()
-}
 function updateLoadingPreviewAnimation() {
-  lpFloorFrame()
   if (endSeq.phase !== 'off' && endSeq.phase !== 'done') {
     try { if (updateLoadingPreviewEndSequence()) return } catch (err) { console.error('End Sequence frame threw -- ending it:', err); endSeqFinish('error: ' + (err && err.message)) }
   }

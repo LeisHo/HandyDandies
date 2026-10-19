@@ -268,8 +268,6 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
-      "loadingPreviewFloorEnabled": false,
-      "loadingPreviewFloorZOffset": -1.35,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -466,14 +464,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65.00000000000001,
+      "loadingPreviewRotationX": -65.00000000000003,
       "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043628,
+      "loadingPreviewCameraZoom": 554.0259642043627,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -482,7 +480,7 @@
       "loadingPreviewTextFont": "Cormorant Garamond",
       "loadingPreviewTextOffsetX": -660,
       "loadingPreviewTextOffsetY": 318,
-      "loadingPreviewProgressCropEnabled": false,
+      "loadingPreviewProgressCropEnabled": true,
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
@@ -4378,7 +4376,7 @@
           "shoulderRaise": 0,
           "shoulderSwing": 0,
           "shoulderRotation": 0,
-          "elbowBend": 10,
+          "elbowBend": 15,
           "elbowSideBend": 0,
           "forearmTwist": 0,
           "group": "FISH/FISH ARM"
@@ -4534,7 +4532,7 @@
           "shoulderRaise": 0,
           "shoulderSwing": 0,
           "shoulderRotation": 0,
-          "elbowBend": -4,
+          "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
           "group": "FISH/FISH ARM"
@@ -4749,7 +4747,7 @@
           "midTwistPinky": 0,
           "baseTwistPinky": 0,
           "wristBend": 0,
-          "wristSplay": -10,
+          "wristSplay": 20,
           "wristRotation": 0,
           "modelRotX": 0,
           "modelRotY": 0,
@@ -13683,6 +13681,78 @@
       "tweenPoses": [],
       "savedTweenSequences": [
         {
+          "name": "2 TWIDS",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 0 (2ND HAND)",
+            "2 TWIDS - 25 (2ND HAND)",
+            "2 TWIDS - 50 (2ND HAND)",
+            "2 TWIDS - 75 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
+        },
+        {
+          "name": "2 TWIDS - F",
+          "tweenPoses": [
+            "2 TWIDS - 75",
+            "2 TWIDS - F0",
+            "2 TWIDS - F1",
+            "2 TWIDS - F2"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 75 (2ND HAND)",
+            "2 TWIDS - F0 (2ND HAND)",
+            "2 TWIDS - F1 (2ND HAND)",
+            "2 TWIDS - F2 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 0,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
+        },
+        {
           "name": "WAVE",
           "tweenPoses": [
             "Wave 1 (NS)",
@@ -13709,34 +13779,6 @@
             "SOFT NEUTRAL +60"
           ],
           "group": "FANNING"
-        },
-        {
-          "name": "WAITING HORIZONTAL",
-          "tweenPoses": [
-            "Waiting Horizontal Tap - 0",
-            "Waiting Horizontal Tap - 1",
-            "Waiting Hoirzontal Tap - 2",
-            "Waiting Horizontal Tap - 3",
-            "Waiting Horizontal Tap - 4",
-            "Waiting Horizontal Tap - 5",
-            "Waiting Horizontal Tap - 5.5"
-          ],
-          "group": "WAITING"
-        },
-        {
-          "name": "COUNTDOWN VERT",
-          "tweenPoses": [
-            "COUNTDOWN (VERT) - 1",
-            "COUNTDOWN (VERT) - 2",
-            "COUNTDOWN (VERT) - 3",
-            "COUNTDOWN (VERT) - 4",
-            "COUNTDOWN (VERT) - 5",
-            "COUNTDOWN (VERT) - 6",
-            "COUNTDOWN (VERT) - 7",
-            "COUNTDOWN (VERT) - 8",
-            "COUNTDOWN (VERT) - 9"
-          ],
-          "group": "COUNTDOWN"
         },
         {
           "name": "NEUTRAL NNBB",
@@ -13769,6 +13811,64 @@
           "group": "FANNING"
         },
         {
+          "name": "PALM FAN - FAST FAN",
+          "tweenPoses": [
+            "Max Palm -10",
+            "Max Palm -20",
+            "Max Palm -30",
+            "Max Palm -40",
+            "Max Palm -50",
+            "SOFT NNN +60",
+            "SOFT NEUTRAL +30",
+            "NEUTRAL +15"
+          ],
+          "group": "FANNING"
+        },
+        {
+          "name": "PALM FAN - FAST OPEN",
+          "tweenPoses": [
+            "Max Palm -50",
+            "Max Palm -40",
+            "Max Palm -30",
+            "Mid Palm -20",
+            "Mid Palm -10",
+            "NEUTRAL",
+            "NEUTRAL +15",
+            "SOFT NEUTRAL +30",
+            "SOFT NNN +45",
+            "SOFT NNN +60"
+          ],
+          "group": "FANNING"
+        },
+        {
+          "name": "WAITING HORIZONTAL",
+          "tweenPoses": [
+            "Waiting Horizontal Tap - 0",
+            "Waiting Horizontal Tap - 1",
+            "Waiting Hoirzontal Tap - 2",
+            "Waiting Horizontal Tap - 3",
+            "Waiting Horizontal Tap - 4",
+            "Waiting Horizontal Tap - 5",
+            "Waiting Horizontal Tap - 5.5"
+          ],
+          "group": "WAITING"
+        },
+        {
+          "name": "COUNTDOWN VERT",
+          "tweenPoses": [
+            "COUNTDOWN (VERT) - 1",
+            "COUNTDOWN (VERT) - 2",
+            "COUNTDOWN (VERT) - 3",
+            "COUNTDOWN (VERT) - 4",
+            "COUNTDOWN (VERT) - 5",
+            "COUNTDOWN (VERT) - 6",
+            "COUNTDOWN (VERT) - 7",
+            "COUNTDOWN (VERT) - 8",
+            "COUNTDOWN (VERT) - 9"
+          ],
+          "group": "COUNTDOWN"
+        },
+        {
           "name": "FLOWER CHARGE",
           "tweenPoses": [
             "Closed Flower - 0",
@@ -13777,6 +13877,18 @@
             "Closed Flower - 1"
           ],
           "group": "FLOWER"
+        },
+        {
+          "name": "FIST PALM",
+          "tweenPoses": [
+            "NEUTRAL -15",
+            "Max Palm -30",
+            "Max Palm -50",
+            "Fist +15",
+            "Fist +45",
+            "Fist +60"
+          ],
+          "group": "FIST PALM"
         },
         {
           "name": "FIST PALM + 15",
@@ -13828,8 +13940,24 @@
             "FISH - ARM - 4",
             "FISH - ARM - 5",
             "FISH - ARM - 6",
-            "FISH - ARM - 0",
-            "FISH - ARM - 0"
+            "FISH - ARM - 7",
+            "FISH - ARM - 8",
+            "FISH - ARM - 9"
+          ],
+          "group": "FISH"
+        },
+        {
+          "name": "FISH - WRIST",
+          "tweenPoses": [
+            "FISH - 0",
+            "FISH - 0.5",
+            "FISH - 1",
+            "FISH - 2",
+            "FISH - 2.5",
+            "FISH - 3",
+            "FISH - 4",
+            "FISH - 5",
+            "FISH - 6"
           ],
           "group": "FISH"
         },
@@ -13840,6 +13968,16 @@
             "2 TWIDS - F0",
             "2 TWIDS - F1",
             "2 TWIDS - F2"
+          ],
+          "group": "2 TWIDS - 1ST HAND"
+        },
+        {
+          "name": "2 TWIDS - 1ST HAND",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
           ],
           "group": "2 TWIDS - 1ST HAND"
         },
@@ -14004,144 +14142,17 @@
             "Count - Thumb"
           ],
           "group": "COUNT"
-        },
-        {
-          "name": "2 TWIDS - 1ST HAND",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "group": "2 TWIDS - 1ST HAND"
-        },
-        {
-          "name": "PALM FAN - FAST FAN",
-          "tweenPoses": [
-            "Max Palm -10",
-            "Max Palm -20",
-            "Max Palm -30",
-            "Max Palm -40",
-            "Max Palm -50",
-            "SOFT NNN +60",
-            "SOFT NEUTRAL +30",
-            "NEUTRAL +15"
-          ],
-          "group": "FANNING"
-        },
-        {
-          "name": "PALM FAN - FAST OPEN",
-          "tweenPoses": [
-            "Max Palm -50",
-            "Max Palm -40",
-            "Max Palm -30",
-            "Mid Palm -20",
-            "Mid Palm -10",
-            "NEUTRAL",
-            "NEUTRAL +15",
-            "SOFT NEUTRAL +30",
-            "SOFT NNN +45",
-            "SOFT NNN +60"
-          ],
-          "group": "FANNING"
-        },
-        {
-          "name": "FISH - WRIST",
-          "tweenPoses": [
-            "FISH - 0",
-            "FISH - 0.5",
-            "FISH - 1",
-            "FISH - 2",
-            "FISH - 2.5",
-            "FISH - 3",
-            "FISH - 4",
-            "FISH - 5",
-            "FISH - 6"
-          ],
-          "group": "FISH"
-        },
-        {
-          "name": "2 TWIDS",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 0 (2ND HAND)",
-            "2 TWIDS - 25 (2ND HAND)",
-            "2 TWIDS - 50 (2ND HAND)",
-            "2 TWIDS - 75 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
-          }
-        },
-        {
-          "name": "2 TWIDS - F",
-          "tweenPoses": [
-            "2 TWIDS - 75",
-            "2 TWIDS - F0",
-            "2 TWIDS - F1",
-            "2 TWIDS - F2"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 75 (2ND HAND)",
-            "2 TWIDS - F0 (2ND HAND)",
-            "2 TWIDS - F1 (2ND HAND)",
-            "2 TWIDS - F2 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 0,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
-          }
         }
       ],
       "cameraX": 1.56250016685404,
-      "cameraY": 5.925005421171129e-13,
-      "cameraZ": 0.8221816597274405,
+      "cameraY": 5.928128391110669e-13,
+      "cameraZ": 0.6563939463614747,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 1.7432878812271186,
+      "cameraZoom": 1.5895405102726934,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -15430,8 +15441,8 @@
       "custom39CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom39CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom39CameraOffsetZEnabled": true,
-      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.023914119430193358,\"y\":-0.1230209350585938}},{\"x\":0.08333710212981416,\"y\":0.6836458841959636,\"h2\":{\"x\":0.002898692870804513,\"y\":0.20000000000000007},\"h1\":{\"x\":0.06666968723264813,\"y\":-0.5866668701171875}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
-      "custom39CameraOffsetZRange": "{\"min\":1,\"max\":10}",
+      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.023914119430193358,\"y\":0.1230209350585938}},{\"x\":0.08333710212981416,\"y\":0.3163541158040364,\"h1\":{\"x\":0.06666968723264813,\"y\":0.5866668701171875},\"h2\":{\"x\":0.002898692870804513,\"y\":-0.20000000000000007}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
+      "custom39CameraOffsetZRange": "{\"min\":-10,\"max\":-1}",
       "custom39RotationCurveVisibleOnly": true,
       "custom39RotationCurveXOrigin": "Global Setting",
       "custom39RotationXCurveEnabled": false,
@@ -15578,7 +15589,7 @@
       "custom39Trig6RotationMode": "Rotation at Crop",
       "custom39Trig6TargetPose": "",
       "custom39Trig6SkipIfSamePose": false,
-      "custom39Trig6TweenSelector": "PALM FAN",
+      "custom39Trig6TweenSelector": "PALM FAN - FAST FAN",
       "custom39Trig6ReverseSequence": false,
       "custom39Trig6GlideToFirstPose": true,
       "custom39Trig6FirstGlideTimeScale": 2,
@@ -16723,7 +16734,7 @@
       "custom50RotationMode": "Rotation at Crop",
       "custom50TargetPose": "Max Palm -20",
       "custom50SkipIfSamePose": false,
-      "custom50TweenSelector": "FIST PALM + 30",
+      "custom50TweenSelector": "FIST PALM",
       "custom50ReverseSequence": false,
       "custom50GlideToFirstPose": true,
       "custom50FirstGlideTimeScale": 1.55,
@@ -16734,7 +16745,7 @@
       "custom50SequenceCount": 1,
       "custom50SequenceCountMode": "Loop",
       "custom50SequenceLoopTransition": true,
-      "custom50LoopWrapScale": 1,
+      "custom50LoopWrapScale": 3,
       "custom50SequenceHoldMs": 0,
       "custom50TransitionSpeedMs": 400,
       "custom50EasingCurveEnabled": true,
@@ -16776,9 +16787,9 @@
       "custom50RetransitionStartTimeCurveXOrigin": "Global Setting",
       "custom50RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.35160602290248916,\"y\":0}},{\"x\":1,\"y\":1}]",
       "custom50RetransitionStartTimeRange": "{\"min\":0,\"max\":465}",
-      "custom50MultiTriggerEnabled": false,
+      "custom50MultiTriggerEnabled": true,
       "custom50MultiTriggers": "[{\"prefix\":\"custom50Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom50Trig1Enabled": true,
+      "custom50Trig1Enabled": false,
       "custom50Trig1Mode": "Single Pose",
       "custom50Trig1OffsetEnabled": false,
       "custom50Trig1OffsetMode": "XYZ Offset",
@@ -18967,8 +18978,6 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
-      "loadingPreviewFloorEnabled": false,
-      "loadingPreviewFloorZOffset": -1.35,
       "loadingMinTimeMs": 0,
       "loadingPreviewTweenSelector": "2 Twids - 2H",
       "loadingPreviewTwoHandTweens": [
@@ -19165,14 +19174,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65.00000000000001,
+      "loadingPreviewRotationX": -65.00000000000003,
       "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043628,
+      "loadingPreviewCameraZoom": 554.0259642043627,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -23077,7 +23086,7 @@
           "shoulderRaise": 0,
           "shoulderSwing": 0,
           "shoulderRotation": 0,
-          "elbowBend": 10,
+          "elbowBend": 15,
           "elbowSideBend": 0,
           "forearmTwist": 0,
           "group": "FISH/FISH ARM"
@@ -23233,7 +23242,7 @@
           "shoulderRaise": 0,
           "shoulderSwing": 0,
           "shoulderRotation": 0,
-          "elbowBend": -4,
+          "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
           "group": "FISH/FISH ARM"
@@ -23448,7 +23457,7 @@
           "midTwistPinky": 0,
           "baseTwistPinky": 0,
           "wristBend": 0,
-          "wristSplay": -10,
+          "wristSplay": 20,
           "wristRotation": 0,
           "modelRotX": 0,
           "modelRotY": 0,
@@ -32382,6 +32391,78 @@
       "tweenPoses": [],
       "savedTweenSequences": [
         {
+          "name": "2 TWIDS",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 0 (2ND HAND)",
+            "2 TWIDS - 25 (2ND HAND)",
+            "2 TWIDS - 50 (2ND HAND)",
+            "2 TWIDS - 75 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
+        },
+        {
+          "name": "2 TWIDS - F",
+          "tweenPoses": [
+            "2 TWIDS - 75",
+            "2 TWIDS - F0",
+            "2 TWIDS - F1",
+            "2 TWIDS - F2"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 75 (2ND HAND)",
+            "2 TWIDS - F0 (2ND HAND)",
+            "2 TWIDS - F1 (2ND HAND)",
+            "2 TWIDS - F2 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 0,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
+        },
+        {
           "name": "WAVE",
           "tweenPoses": [
             "Wave 1 (NS)",
@@ -32408,34 +32489,6 @@
             "SOFT NEUTRAL +60"
           ],
           "group": "FANNING"
-        },
-        {
-          "name": "WAITING HORIZONTAL",
-          "tweenPoses": [
-            "Waiting Horizontal Tap - 0",
-            "Waiting Horizontal Tap - 1",
-            "Waiting Hoirzontal Tap - 2",
-            "Waiting Horizontal Tap - 3",
-            "Waiting Horizontal Tap - 4",
-            "Waiting Horizontal Tap - 5",
-            "Waiting Horizontal Tap - 5.5"
-          ],
-          "group": "WAITING"
-        },
-        {
-          "name": "COUNTDOWN VERT",
-          "tweenPoses": [
-            "COUNTDOWN (VERT) - 1",
-            "COUNTDOWN (VERT) - 2",
-            "COUNTDOWN (VERT) - 3",
-            "COUNTDOWN (VERT) - 4",
-            "COUNTDOWN (VERT) - 5",
-            "COUNTDOWN (VERT) - 6",
-            "COUNTDOWN (VERT) - 7",
-            "COUNTDOWN (VERT) - 8",
-            "COUNTDOWN (VERT) - 9"
-          ],
-          "group": "COUNTDOWN"
         },
         {
           "name": "NEUTRAL NNBB",
@@ -32468,6 +32521,64 @@
           "group": "FANNING"
         },
         {
+          "name": "PALM FAN - FAST FAN",
+          "tweenPoses": [
+            "Max Palm -10",
+            "Max Palm -20",
+            "Max Palm -30",
+            "Max Palm -40",
+            "Max Palm -50",
+            "SOFT NNN +60",
+            "SOFT NEUTRAL +30",
+            "NEUTRAL +15"
+          ],
+          "group": "FANNING"
+        },
+        {
+          "name": "PALM FAN - FAST OPEN",
+          "tweenPoses": [
+            "Max Palm -50",
+            "Max Palm -40",
+            "Max Palm -30",
+            "Mid Palm -20",
+            "Mid Palm -10",
+            "NEUTRAL",
+            "NEUTRAL +15",
+            "SOFT NEUTRAL +30",
+            "SOFT NNN +45",
+            "SOFT NNN +60"
+          ],
+          "group": "FANNING"
+        },
+        {
+          "name": "WAITING HORIZONTAL",
+          "tweenPoses": [
+            "Waiting Horizontal Tap - 0",
+            "Waiting Horizontal Tap - 1",
+            "Waiting Hoirzontal Tap - 2",
+            "Waiting Horizontal Tap - 3",
+            "Waiting Horizontal Tap - 4",
+            "Waiting Horizontal Tap - 5",
+            "Waiting Horizontal Tap - 5.5"
+          ],
+          "group": "WAITING"
+        },
+        {
+          "name": "COUNTDOWN VERT",
+          "tweenPoses": [
+            "COUNTDOWN (VERT) - 1",
+            "COUNTDOWN (VERT) - 2",
+            "COUNTDOWN (VERT) - 3",
+            "COUNTDOWN (VERT) - 4",
+            "COUNTDOWN (VERT) - 5",
+            "COUNTDOWN (VERT) - 6",
+            "COUNTDOWN (VERT) - 7",
+            "COUNTDOWN (VERT) - 8",
+            "COUNTDOWN (VERT) - 9"
+          ],
+          "group": "COUNTDOWN"
+        },
+        {
           "name": "FLOWER CHARGE",
           "tweenPoses": [
             "Closed Flower - 0",
@@ -32476,6 +32587,18 @@
             "Closed Flower - 1"
           ],
           "group": "FLOWER"
+        },
+        {
+          "name": "FIST PALM",
+          "tweenPoses": [
+            "NEUTRAL -15",
+            "Max Palm -30",
+            "Max Palm -50",
+            "Fist +15",
+            "Fist +45",
+            "Fist +60"
+          ],
+          "group": "FIST PALM"
         },
         {
           "name": "FIST PALM + 15",
@@ -32527,8 +32650,24 @@
             "FISH - ARM - 4",
             "FISH - ARM - 5",
             "FISH - ARM - 6",
-            "FISH - ARM - 0",
-            "FISH - ARM - 0"
+            "FISH - ARM - 7",
+            "FISH - ARM - 8",
+            "FISH - ARM - 9"
+          ],
+          "group": "FISH"
+        },
+        {
+          "name": "FISH - WRIST",
+          "tweenPoses": [
+            "FISH - 0",
+            "FISH - 0.5",
+            "FISH - 1",
+            "FISH - 2",
+            "FISH - 2.5",
+            "FISH - 3",
+            "FISH - 4",
+            "FISH - 5",
+            "FISH - 6"
           ],
           "group": "FISH"
         },
@@ -32539,6 +32678,16 @@
             "2 TWIDS - F0",
             "2 TWIDS - F1",
             "2 TWIDS - F2"
+          ],
+          "group": "2 TWIDS - 1ST HAND"
+        },
+        {
+          "name": "2 TWIDS - 1ST HAND",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
           ],
           "group": "2 TWIDS - 1ST HAND"
         },
@@ -32703,133 +32852,6 @@
             "Count - Thumb"
           ],
           "group": "COUNT"
-        },
-        {
-          "name": "2 TWIDS - 1ST HAND",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "group": "2 TWIDS - 1ST HAND"
-        },
-        {
-          "name": "PALM FAN - FAST FAN",
-          "tweenPoses": [
-            "Max Palm -10",
-            "Max Palm -20",
-            "Max Palm -30",
-            "Max Palm -40",
-            "Max Palm -50",
-            "SOFT NNN +60",
-            "SOFT NEUTRAL +30",
-            "NEUTRAL +15"
-          ],
-          "group": "FANNING"
-        },
-        {
-          "name": "PALM FAN - FAST OPEN",
-          "tweenPoses": [
-            "Max Palm -50",
-            "Max Palm -40",
-            "Max Palm -30",
-            "Mid Palm -20",
-            "Mid Palm -10",
-            "NEUTRAL",
-            "NEUTRAL +15",
-            "SOFT NEUTRAL +30",
-            "SOFT NNN +45",
-            "SOFT NNN +60"
-          ],
-          "group": "FANNING"
-        },
-        {
-          "name": "FISH - WRIST",
-          "tweenPoses": [
-            "FISH - 0",
-            "FISH - 0.5",
-            "FISH - 1",
-            "FISH - 2",
-            "FISH - 2.5",
-            "FISH - 3",
-            "FISH - 4",
-            "FISH - 5",
-            "FISH - 6"
-          ],
-          "group": "FISH"
-        },
-        {
-          "name": "2 TWIDS",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 0 (2ND HAND)",
-            "2 TWIDS - 25 (2ND HAND)",
-            "2 TWIDS - 50 (2ND HAND)",
-            "2 TWIDS - 75 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
-          }
-        },
-        {
-          "name": "2 TWIDS - F",
-          "tweenPoses": [
-            "2 TWIDS - 75",
-            "2 TWIDS - F0",
-            "2 TWIDS - F1",
-            "2 TWIDS - F2"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 75 (2ND HAND)",
-            "2 TWIDS - F0 (2ND HAND)",
-            "2 TWIDS - F1 (2ND HAND)",
-            "2 TWIDS - F2 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 0,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
-          }
         }
       ],
       "cameraX": -3.422222222222221,
@@ -34129,8 +34151,8 @@
       "custom39CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom39CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom39CameraOffsetZEnabled": true,
-      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.023914119430193358,\"y\":-0.1230209350585938}},{\"x\":0.08333710212981416,\"y\":0.6836458841959636,\"h2\":{\"x\":0.002898692870804513,\"y\":0.20000000000000007},\"h1\":{\"x\":0.06666968723264813,\"y\":-0.5866668701171875}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
-      "custom39CameraOffsetZRange": "{\"min\":1,\"max\":10}",
+      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.023914119430193358,\"y\":0.1230209350585938}},{\"x\":0.08333710212981416,\"y\":0.3163541158040364,\"h1\":{\"x\":0.06666968723264813,\"y\":0.5866668701171875},\"h2\":{\"x\":0.002898692870804513,\"y\":-0.20000000000000007}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
+      "custom39CameraOffsetZRange": "{\"min\":-10,\"max\":-1}",
       "custom39RotationCurveVisibleOnly": true,
       "custom39RotationCurveXOrigin": "Global Setting",
       "custom39RotationXCurveEnabled": false,
@@ -34277,7 +34299,7 @@
       "custom39Trig6RotationMode": "Rotation at Crop",
       "custom39Trig6TargetPose": "",
       "custom39Trig6SkipIfSamePose": false,
-      "custom39Trig6TweenSelector": "PALM FAN",
+      "custom39Trig6TweenSelector": "PALM FAN - FAST FAN",
       "custom39Trig6ReverseSequence": false,
       "custom39Trig6GlideToFirstPose": true,
       "custom39Trig6FirstGlideTimeScale": 2,
@@ -35422,7 +35444,7 @@
       "custom50RotationMode": "Rotation at Crop",
       "custom50TargetPose": "Max Palm -20",
       "custom50SkipIfSamePose": false,
-      "custom50TweenSelector": "FIST PALM + 30",
+      "custom50TweenSelector": "FIST PALM",
       "custom50ReverseSequence": false,
       "custom50GlideToFirstPose": true,
       "custom50FirstGlideTimeScale": 1.55,
@@ -35433,7 +35455,7 @@
       "custom50SequenceCount": 1,
       "custom50SequenceCountMode": "Loop",
       "custom50SequenceLoopTransition": true,
-      "custom50LoopWrapScale": 1,
+      "custom50LoopWrapScale": 3,
       "custom50SequenceHoldMs": 0,
       "custom50TransitionSpeedMs": 400,
       "custom50EasingCurveEnabled": true,
@@ -35475,9 +35497,9 @@
       "custom50RetransitionStartTimeCurveXOrigin": "Global Setting",
       "custom50RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.35160602290248916,\"y\":0}},{\"x\":1,\"y\":1}]",
       "custom50RetransitionStartTimeRange": "{\"min\":0,\"max\":465}",
-      "custom50MultiTriggerEnabled": false,
+      "custom50MultiTriggerEnabled": true,
       "custom50MultiTriggers": "[{\"prefix\":\"custom50Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom50Trig1Enabled": true,
+      "custom50Trig1Enabled": false,
       "custom50Trig1Mode": "Single Pose",
       "custom50Trig1OffsetEnabled": false,
       "custom50Trig1OffsetMode": "XYZ Offset",
@@ -37666,8 +37688,6 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
-      "loadingPreviewFloorEnabled": false,
-      "loadingPreviewFloorZOffset": -1.35,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -37864,14 +37884,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65.00000000000001,
+      "loadingPreviewRotationX": -65.00000000000003,
       "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043628,
+      "loadingPreviewCameraZoom": 554.0259642043627,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -37880,7 +37900,7 @@
       "loadingPreviewTextFont": "Cormorant Garamond",
       "loadingPreviewTextOffsetX": 0,
       "loadingPreviewTextOffsetY": 0,
-      "loadingPreviewProgressCropEnabled": false,
+      "loadingPreviewProgressCropEnabled": true,
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
@@ -41776,7 +41796,7 @@
           "shoulderRaise": 0,
           "shoulderSwing": 0,
           "shoulderRotation": 0,
-          "elbowBend": 10,
+          "elbowBend": 15,
           "elbowSideBend": 0,
           "forearmTwist": 0,
           "group": "FISH/FISH ARM"
@@ -41932,7 +41952,7 @@
           "shoulderRaise": 0,
           "shoulderSwing": 0,
           "shoulderRotation": 0,
-          "elbowBend": -4,
+          "elbowBend": 0,
           "elbowSideBend": 0,
           "forearmTwist": 0,
           "group": "FISH/FISH ARM"
@@ -42147,7 +42167,7 @@
           "midTwistPinky": 0,
           "baseTwistPinky": 0,
           "wristBend": 0,
-          "wristSplay": -10,
+          "wristSplay": 20,
           "wristRotation": 0,
           "modelRotX": 0,
           "modelRotY": 0,
@@ -51081,6 +51101,78 @@
       "tweenPoses": [],
       "savedTweenSequences": [
         {
+          "name": "2 TWIDS",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 0 (2ND HAND)",
+            "2 TWIDS - 25 (2ND HAND)",
+            "2 TWIDS - 50 (2ND HAND)",
+            "2 TWIDS - 75 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 4,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
+        },
+        {
+          "name": "2 TWIDS - F",
+          "tweenPoses": [
+            "2 TWIDS - 75",
+            "2 TWIDS - F0",
+            "2 TWIDS - F1",
+            "2 TWIDS - F2"
+          ],
+          "tweenPosesHand2": [
+            "2 TWIDS - 75 (2ND HAND)",
+            "2 TWIDS - F0 (2ND HAND)",
+            "2 TWIDS - F1 (2ND HAND)",
+            "2 TWIDS - F2 (2ND HAND)"
+          ],
+          "twoHand": true,
+          "hand2": {
+            "mirrorMainHandPose": false,
+            "hand2MirrorX": true,
+            "hand2MirrorY": false,
+            "hand2MirrorZ": false,
+            "hand2OffsetX": -424,
+            "hand2OffsetY": 0,
+            "hand2OffsetZ": 0,
+            "hand2RotX": 0,
+            "hand2RotY": 0,
+            "hand2RotZ": 0,
+            "hand2Scale": 1,
+            "hand2HideWrist": 0
+          },
+          "handoScale": 388.43600000000004,
+          "handoAnchorRaw": {
+            "x": -0.0015342131803909977,
+            "y": -0.0029899291689026945,
+            "z": -0.26111274339665974
+          }
+        },
+        {
           "name": "WAVE",
           "tweenPoses": [
             "Wave 1 (NS)",
@@ -51107,34 +51199,6 @@
             "SOFT NEUTRAL +60"
           ],
           "group": "FANNING"
-        },
-        {
-          "name": "WAITING HORIZONTAL",
-          "tweenPoses": [
-            "Waiting Horizontal Tap - 0",
-            "Waiting Horizontal Tap - 1",
-            "Waiting Hoirzontal Tap - 2",
-            "Waiting Horizontal Tap - 3",
-            "Waiting Horizontal Tap - 4",
-            "Waiting Horizontal Tap - 5",
-            "Waiting Horizontal Tap - 5.5"
-          ],
-          "group": "WAITING"
-        },
-        {
-          "name": "COUNTDOWN VERT",
-          "tweenPoses": [
-            "COUNTDOWN (VERT) - 1",
-            "COUNTDOWN (VERT) - 2",
-            "COUNTDOWN (VERT) - 3",
-            "COUNTDOWN (VERT) - 4",
-            "COUNTDOWN (VERT) - 5",
-            "COUNTDOWN (VERT) - 6",
-            "COUNTDOWN (VERT) - 7",
-            "COUNTDOWN (VERT) - 8",
-            "COUNTDOWN (VERT) - 9"
-          ],
-          "group": "COUNTDOWN"
         },
         {
           "name": "NEUTRAL NNBB",
@@ -51167,6 +51231,64 @@
           "group": "FANNING"
         },
         {
+          "name": "PALM FAN - FAST FAN",
+          "tweenPoses": [
+            "Max Palm -10",
+            "Max Palm -20",
+            "Max Palm -30",
+            "Max Palm -40",
+            "Max Palm -50",
+            "SOFT NNN +60",
+            "SOFT NEUTRAL +30",
+            "NEUTRAL +15"
+          ],
+          "group": "FANNING"
+        },
+        {
+          "name": "PALM FAN - FAST OPEN",
+          "tweenPoses": [
+            "Max Palm -50",
+            "Max Palm -40",
+            "Max Palm -30",
+            "Mid Palm -20",
+            "Mid Palm -10",
+            "NEUTRAL",
+            "NEUTRAL +15",
+            "SOFT NEUTRAL +30",
+            "SOFT NNN +45",
+            "SOFT NNN +60"
+          ],
+          "group": "FANNING"
+        },
+        {
+          "name": "WAITING HORIZONTAL",
+          "tweenPoses": [
+            "Waiting Horizontal Tap - 0",
+            "Waiting Horizontal Tap - 1",
+            "Waiting Hoirzontal Tap - 2",
+            "Waiting Horizontal Tap - 3",
+            "Waiting Horizontal Tap - 4",
+            "Waiting Horizontal Tap - 5",
+            "Waiting Horizontal Tap - 5.5"
+          ],
+          "group": "WAITING"
+        },
+        {
+          "name": "COUNTDOWN VERT",
+          "tweenPoses": [
+            "COUNTDOWN (VERT) - 1",
+            "COUNTDOWN (VERT) - 2",
+            "COUNTDOWN (VERT) - 3",
+            "COUNTDOWN (VERT) - 4",
+            "COUNTDOWN (VERT) - 5",
+            "COUNTDOWN (VERT) - 6",
+            "COUNTDOWN (VERT) - 7",
+            "COUNTDOWN (VERT) - 8",
+            "COUNTDOWN (VERT) - 9"
+          ],
+          "group": "COUNTDOWN"
+        },
+        {
           "name": "FLOWER CHARGE",
           "tweenPoses": [
             "Closed Flower - 0",
@@ -51175,6 +51297,18 @@
             "Closed Flower - 1"
           ],
           "group": "FLOWER"
+        },
+        {
+          "name": "FIST PALM",
+          "tweenPoses": [
+            "NEUTRAL -15",
+            "Max Palm -30",
+            "Max Palm -50",
+            "Fist +15",
+            "Fist +45",
+            "Fist +60"
+          ],
+          "group": "FIST PALM"
         },
         {
           "name": "FIST PALM + 15",
@@ -51226,8 +51360,24 @@
             "FISH - ARM - 4",
             "FISH - ARM - 5",
             "FISH - ARM - 6",
-            "FISH - ARM - 0",
-            "FISH - ARM - 0"
+            "FISH - ARM - 7",
+            "FISH - ARM - 8",
+            "FISH - ARM - 9"
+          ],
+          "group": "FISH"
+        },
+        {
+          "name": "FISH - WRIST",
+          "tweenPoses": [
+            "FISH - 0",
+            "FISH - 0.5",
+            "FISH - 1",
+            "FISH - 2",
+            "FISH - 2.5",
+            "FISH - 3",
+            "FISH - 4",
+            "FISH - 5",
+            "FISH - 6"
           ],
           "group": "FISH"
         },
@@ -51238,6 +51388,16 @@
             "2 TWIDS - F0",
             "2 TWIDS - F1",
             "2 TWIDS - F2"
+          ],
+          "group": "2 TWIDS - 1ST HAND"
+        },
+        {
+          "name": "2 TWIDS - 1ST HAND",
+          "tweenPoses": [
+            "2 TWIDS - 0",
+            "2 TWIDS - 25",
+            "2 TWIDS - 50",
+            "2 TWIDS - 75"
           ],
           "group": "2 TWIDS - 1ST HAND"
         },
@@ -51402,133 +51562,6 @@
             "Count - Thumb"
           ],
           "group": "COUNT"
-        },
-        {
-          "name": "2 TWIDS - 1ST HAND",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "group": "2 TWIDS - 1ST HAND"
-        },
-        {
-          "name": "PALM FAN - FAST FAN",
-          "tweenPoses": [
-            "Max Palm -10",
-            "Max Palm -20",
-            "Max Palm -30",
-            "Max Palm -40",
-            "Max Palm -50",
-            "SOFT NNN +60",
-            "SOFT NEUTRAL +30",
-            "NEUTRAL +15"
-          ],
-          "group": "FANNING"
-        },
-        {
-          "name": "PALM FAN - FAST OPEN",
-          "tweenPoses": [
-            "Max Palm -50",
-            "Max Palm -40",
-            "Max Palm -30",
-            "Mid Palm -20",
-            "Mid Palm -10",
-            "NEUTRAL",
-            "NEUTRAL +15",
-            "SOFT NEUTRAL +30",
-            "SOFT NNN +45",
-            "SOFT NNN +60"
-          ],
-          "group": "FANNING"
-        },
-        {
-          "name": "FISH - WRIST",
-          "tweenPoses": [
-            "FISH - 0",
-            "FISH - 0.5",
-            "FISH - 1",
-            "FISH - 2",
-            "FISH - 2.5",
-            "FISH - 3",
-            "FISH - 4",
-            "FISH - 5",
-            "FISH - 6"
-          ],
-          "group": "FISH"
-        },
-        {
-          "name": "2 TWIDS",
-          "tweenPoses": [
-            "2 TWIDS - 0",
-            "2 TWIDS - 25",
-            "2 TWIDS - 50",
-            "2 TWIDS - 75"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 0 (2ND HAND)",
-            "2 TWIDS - 25 (2ND HAND)",
-            "2 TWIDS - 50 (2ND HAND)",
-            "2 TWIDS - 75 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 4,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
-          }
-        },
-        {
-          "name": "2 TWIDS - F",
-          "tweenPoses": [
-            "2 TWIDS - 75",
-            "2 TWIDS - F0",
-            "2 TWIDS - F1",
-            "2 TWIDS - F2"
-          ],
-          "tweenPosesHand2": [
-            "2 TWIDS - 75 (2ND HAND)",
-            "2 TWIDS - F0 (2ND HAND)",
-            "2 TWIDS - F1 (2ND HAND)",
-            "2 TWIDS - F2 (2ND HAND)"
-          ],
-          "twoHand": true,
-          "hand2": {
-            "mirrorMainHandPose": false,
-            "hand2MirrorX": true,
-            "hand2MirrorY": false,
-            "hand2MirrorZ": false,
-            "hand2OffsetX": -424,
-            "hand2OffsetY": 0,
-            "hand2OffsetZ": 0,
-            "hand2RotX": 0,
-            "hand2RotY": 0,
-            "hand2RotZ": 0,
-            "hand2Scale": 1,
-            "hand2HideWrist": 0
-          },
-          "handoScale": 388.43600000000004,
-          "handoAnchorRaw": {
-            "x": -0.0015342131803909977,
-            "y": -0.0029899291689026945,
-            "z": -0.26111274339665974
-          }
         }
       ],
       "cameraX": 6.6385295949156875,
@@ -52828,8 +52861,8 @@
       "custom39CameraOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.324820628419056,\"y\":0},\"bg\":0.64,\"m\":\"linear\"},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.467575665942766,\"y\":0}}]",
       "custom39CameraOffsetYRange": "{\"min\":-1,\"max\":2}",
       "custom39CameraOffsetZEnabled": true,
-      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.023914119430193358,\"y\":-0.1230209350585938}},{\"x\":0.08333710212981416,\"y\":0.6836458841959636,\"h2\":{\"x\":0.002898692870804513,\"y\":0.20000000000000007},\"h1\":{\"x\":0.06666968723264813,\"y\":-0.5866668701171875}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
-      "custom39CameraOffsetZRange": "{\"min\":1,\"max\":10}",
+      "custom39CameraOffsetZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.023914119430193358,\"y\":0.1230209350585938}},{\"x\":0.08333710212981416,\"y\":0.3163541158040364,\"h1\":{\"x\":0.06666968723264813,\"y\":0.5866668701171875},\"h2\":{\"x\":0.002898692870804513,\"y\":-0.20000000000000007}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.9190925389800837,\"y\":0}}]",
+      "custom39CameraOffsetZRange": "{\"min\":-10,\"max\":-1}",
       "custom39RotationCurveVisibleOnly": true,
       "custom39RotationCurveXOrigin": "Global Setting",
       "custom39RotationXCurveEnabled": false,
@@ -52976,7 +53009,7 @@
       "custom39Trig6RotationMode": "Rotation at Crop",
       "custom39Trig6TargetPose": "",
       "custom39Trig6SkipIfSamePose": false,
-      "custom39Trig6TweenSelector": "PALM FAN",
+      "custom39Trig6TweenSelector": "PALM FAN - FAST FAN",
       "custom39Trig6ReverseSequence": false,
       "custom39Trig6GlideToFirstPose": true,
       "custom39Trig6FirstGlideTimeScale": 2,
@@ -54121,7 +54154,7 @@
       "custom50RotationMode": "Rotation at Crop",
       "custom50TargetPose": "Max Palm -20",
       "custom50SkipIfSamePose": false,
-      "custom50TweenSelector": "FIST PALM + 30",
+      "custom50TweenSelector": "FIST PALM",
       "custom50ReverseSequence": false,
       "custom50GlideToFirstPose": true,
       "custom50FirstGlideTimeScale": 1.55,
@@ -54132,7 +54165,7 @@
       "custom50SequenceCount": 1,
       "custom50SequenceCountMode": "Loop",
       "custom50SequenceLoopTransition": true,
-      "custom50LoopWrapScale": 1,
+      "custom50LoopWrapScale": 3,
       "custom50SequenceHoldMs": 0,
       "custom50TransitionSpeedMs": 400,
       "custom50EasingCurveEnabled": true,
@@ -54174,9 +54207,9 @@
       "custom50RetransitionStartTimeCurveXOrigin": "Global Setting",
       "custom50RetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.35160602290248916,\"y\":0}},{\"x\":1,\"y\":1}]",
       "custom50RetransitionStartTimeRange": "{\"min\":0,\"max\":465}",
-      "custom50MultiTriggerEnabled": false,
+      "custom50MultiTriggerEnabled": true,
       "custom50MultiTriggers": "[{\"prefix\":\"custom50Trig1\",\"title\":\"Trigger 1\"}]",
-      "custom50Trig1Enabled": true,
+      "custom50Trig1Enabled": false,
       "custom50Trig1Mode": "Single Pose",
       "custom50Trig1OffsetEnabled": false,
       "custom50Trig1OffsetMode": "XYZ Offset",
@@ -56760,7 +56793,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -57276,14 +57309,6 @@
                     "loadingPreviewEndPauseMs"
                   ]
                 }
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewFloorEnabled"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewFloorZOffset"
               }
             ],
             "settings": [
@@ -57296,9 +57321,7 @@
               "loadingPreviewSequenceLoopWrapScale",
               "loadingPreviewPosX",
               "loadingPreviewPosY",
-              "loadingPreviewLayout",
-              "loadingPreviewFloorEnabled",
-              "loadingPreviewFloorZOffset"
+              "loadingPreviewLayout"
             ]
           }
         }
@@ -58126,7 +58149,7 @@
           "type": "group",
           "group": {
             "key": "Tween",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -59457,7 +59480,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -59476,7 +59499,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -64480,8 +64503,8 @@
     "desktop": {
       "left": 122.375,
       "top": 69,
-      "width": 395.3500061035156,
-      "height": 572.1875
+      "width": 398.5500183105469,
+      "height": 573.7875366210938
     }
   }
 }
