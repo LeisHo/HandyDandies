@@ -267,7 +267,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -626,7 +626,7 @@
       "midTwistPinky": 0,
       "baseTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": 30,
+      "wristSplay": 0,
       "wristRotation": 0,
       "elbowBend": 0,
       "elbowSideBend": 0,
@@ -635,8 +635,8 @@
       "modelRotY": 180,
       "modelRotZ": 180,
       "baseRotationX": 0,
-      "baseRotationY": 180,
-      "baseRotationZ": 180,
+      "baseRotationY": 0,
+      "baseRotationZ": 0,
       "poseOffsetX": 0,
       "poseOffsetY": 0,
       "poseOffsetZ": 0,
@@ -14146,15 +14146,15 @@
           }
         }
       ],
-      "cameraX": 1.953488372093023,
-      "cameraY": 2.1869146971580583e-13,
-      "cameraZ": 27.7216884521726,
+      "cameraX": 1.9534883720930232,
+      "cameraY": 2.041020698109996e-13,
+      "cameraZ": 245.9004898795015,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.041020698109996e-13,\"cameraZ\":245.9004898795015,\"cameraFov\":20,\"cameraZoom\":121.5,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 27.73422983503636,
+      "cameraZoom": 121.5,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -19338,7 +19338,7 @@
       "midTwistPinky": 0,
       "baseTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": 30,
+      "wristSplay": 0,
       "wristRotation": 0,
       "elbowBend": 0,
       "elbowSideBend": 0,
@@ -19347,8 +19347,8 @@
       "modelRotY": 180,
       "modelRotZ": 180,
       "baseRotationX": 0,
-      "baseRotationY": 180,
-      "baseRotationZ": 180,
+      "baseRotationY": 0,
+      "baseRotationZ": 0,
       "poseOffsetX": 0,
       "poseOffsetY": 0,
       "poseOffsetZ": 0,
@@ -37691,7 +37691,7 @@
       "loadingPreviewEnabled": true,
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
-      "loadingPreviewShowLive": true,
+      "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -38050,7 +38050,7 @@
       "midTwistPinky": 0,
       "baseTwistPinky": 0,
       "wristBend": 0,
-      "wristSplay": 30,
+      "wristSplay": 0,
       "wristRotation": 0,
       "elbowBend": 0,
       "elbowSideBend": 0,
@@ -38059,8 +38059,8 @@
       "modelRotY": 180,
       "modelRotZ": 180,
       "baseRotationX": 0,
-      "baseRotationY": 180,
-      "baseRotationZ": 180,
+      "baseRotationY": 0,
+      "baseRotationZ": 0,
       "poseOffsetX": 0,
       "poseOffsetY": 0,
       "poseOffsetZ": 0,
@@ -56703,7 +56703,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -56834,7 +56834,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -57185,14 +57185,14 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > End Sequence",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
                       "type": "group",
                       "group": {
                         "key": "Loading Preview > End Sequence > Sequence",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -57695,7 +57695,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (8)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -57722,7 +57722,7 @@
                 "type": "group",
                 "group": {
                   "key": "Whole-Hand Rotation & Thumb",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -57764,7 +57764,7 @@
                 "type": "group",
                 "group": {
                   "key": "Wrist",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -58155,7 +58155,7 @@
           "type": "group",
           "group": {
             "key": "Tween",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -58894,7 +58894,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -58947,7 +58947,7 @@
           "type": "group",
           "group": {
             "key": "New Group (16)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -59084,7 +59084,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -59195,7 +59195,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -59486,7 +59486,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -64509,8 +64509,8 @@
     "desktop": {
       "left": 122.375,
       "top": 69,
-      "width": 414.5500183105469,
-      "height": 581.7875366210938
+      "width": 417.75,
+      "height": 583.3875122070312
     }
   }
 }
