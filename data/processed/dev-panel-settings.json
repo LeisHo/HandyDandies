@@ -268,8 +268,6 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
-      "loadingPreviewFloorEnabled": false,
-      "loadingPreviewFloorZOffset": -1.35,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -466,14 +464,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65.00000000000001,
+      "loadingPreviewRotationX": -65.00000000000003,
       "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043628,
+      "loadingPreviewCameraZoom": 554.0259642043627,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -482,7 +480,7 @@
       "loadingPreviewTextFont": "Cormorant Garamond",
       "loadingPreviewTextOffsetX": -660,
       "loadingPreviewTextOffsetY": 318,
-      "loadingPreviewProgressCropEnabled": false,
+      "loadingPreviewProgressCropEnabled": true,
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
@@ -14147,14 +14145,14 @@
         }
       ],
       "cameraX": 1.56250016685404,
-      "cameraY": 5.925005421171129e-13,
-      "cameraZ": 0.8221816597274405,
+      "cameraY": 5.928128391110669e-13,
+      "cameraZ": 0.6563939463614747,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.0272434216195883e-13,\"cameraZ\":223.4004898795015,\"cameraFov\":20,\"cameraZoom\":99,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 1.7432878812271186,
+      "cameraZoom": 1.5895405102726934,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -18980,8 +18978,6 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
-      "loadingPreviewFloorEnabled": false,
-      "loadingPreviewFloorZOffset": -1.35,
       "loadingMinTimeMs": 0,
       "loadingPreviewTweenSelector": "2 Twids - 2H",
       "loadingPreviewTwoHandTweens": [
@@ -19178,14 +19174,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65.00000000000001,
+      "loadingPreviewRotationX": -65.00000000000003,
       "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043628,
+      "loadingPreviewCameraZoom": 554.0259642043627,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -37692,8 +37688,6 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
-      "loadingPreviewFloorEnabled": false,
-      "loadingPreviewFloorZOffset": -1.35,
       "loadingMinTimeMs": 5000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
@@ -37890,14 +37884,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65.00000000000001,
+      "loadingPreviewRotationX": -65.00000000000003,
       "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.0259642043628,
+      "loadingPreviewCameraZoom": 554.0259642043627,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -37906,7 +37900,7 @@
       "loadingPreviewTextFont": "Cormorant Garamond",
       "loadingPreviewTextOffsetX": 0,
       "loadingPreviewTextOffsetY": 0,
-      "loadingPreviewProgressCropEnabled": false,
+      "loadingPreviewProgressCropEnabled": true,
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
@@ -56799,7 +56793,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -57315,14 +57309,6 @@
                     "loadingPreviewEndPauseMs"
                   ]
                 }
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewFloorEnabled"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewFloorZOffset"
               }
             ],
             "settings": [
@@ -57335,9 +57321,7 @@
               "loadingPreviewSequenceLoopWrapScale",
               "loadingPreviewPosX",
               "loadingPreviewPosY",
-              "loadingPreviewLayout",
-              "loadingPreviewFloorEnabled",
-              "loadingPreviewFloorZOffset"
+              "loadingPreviewLayout"
             ]
           }
         }
@@ -57346,7 +57330,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -59496,7 +59480,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -59515,7 +59499,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -64519,8 +64503,8 @@
     "desktop": {
       "left": 122.375,
       "top": 69,
-      "width": 395.3500061035156,
-      "height": 572.1875
+      "width": 398.5500183105469,
+      "height": 573.7875366210938
     }
   }
 }
