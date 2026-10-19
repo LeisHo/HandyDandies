@@ -48850,7 +48850,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
