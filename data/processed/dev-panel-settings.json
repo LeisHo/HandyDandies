@@ -14624,8 +14624,8 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2629951569928289,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6333038503700656,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1646,\"max\":1664}",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4938046282697179,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.8487971421342522,\"y\":0}}]",
+      "startupFnSpeedCurveRange": "{\"min\":978,\"max\":1471}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -34160,9 +34160,9 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2629951569928289,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6333038503700656,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1646,\"max\":1664}",
-      "startupFnStartTimeCurveEnabled": true,
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4938046282697179,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.8487971421342522,\"y\":0}}]",
+      "startupFnSpeedCurveRange": "{\"min\":978,\"max\":1471}",
+      "startupFnStartTimeCurveEnabled": false,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
       "startupFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -53696,8 +53696,8 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2629951569928289,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6333038503700656,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1646,\"max\":1664}",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4938046282697179,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.8487971421342522,\"y\":0}}]",
+      "startupFnSpeedCurveRange": "{\"min\":978,\"max\":1471}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -62315,7 +62315,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -67103,10 +67103,10 @@
       "height": 550.5750122070312
     },
     "mobile": {
-      "left": 45.17857360839844,
-      "top": 146.67857360839844,
+      "left": 41.75,
+      "top": 82.82738494873047,
       "width": 349.2440490722656,
-      "height": 35.52381134033203
+      "height": 517.5059814453125
     }
   }
 }
