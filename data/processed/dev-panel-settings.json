@@ -447,11 +447,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -480,14 +480,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -14607,7 +14607,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 3800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.30542144726256226,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.33988114294774197,\"y\":0}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":100}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":190}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -14616,14 +14616,14 @@
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2482019308794308,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2482019308794308,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2855323597061714,\"y\":0}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6199570475757077,\"y\":0.3539583841959636},{\"x\":1,\"y\":1}]",
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1067,\"max\":1173}",
+      "startupFnSpeedCurveRange": "{\"min\":893,\"max\":972}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -19981,11 +19981,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 3",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -20014,14 +20014,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -33695,14 +33695,14 @@
         }
       ],
       "cameraX": -3.422222222222221,
-      "cameraY": 1.4497873725372922e-12,
-      "cameraZ": 495.9881938061232,
+      "cameraY": 1.2675599288241649e-12,
+      "cameraZ": 495.9881938061244,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":-3.4222222222222225,\"cameraY\":1.7419533236278442e-13,\"cameraZ\":495.98765636647585,\"cameraFov\":20,\"cameraZoom\":496,\"cameraRoll\":0,\"targetX\":-3.4222222222222225,\"targetY\":1.4382409174393005e-13,\"targetZ\":-0.012343633524153574}",
-      "cameraZoom": 495.99999999999983,
+      "cameraZoom": 495.9999999999999,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -34116,7 +34116,7 @@
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
       "startupHandMaxClicks": 2,
-      "startupHandOffsetZ": -15,
+      "startupHandOffsetZ": -22,
       "startupHandWaitForAll": false,
       "startupTrackArm": false,
       "startupTrackPalm": false,
@@ -34141,7 +34141,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 5000,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.30542144726256226,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.33988114294774197,\"y\":0}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":100}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":190}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -34150,14 +34150,14 @@
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2482019308794308,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2482019308794308,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2855323597061714,\"y\":0}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6199570475757077,\"y\":0.3539583841959636},{\"x\":1,\"y\":1}]",
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1067,\"max\":1173}",
+      "startupFnSpeedCurveRange": "{\"min\":893,\"max\":972}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -39515,11 +39515,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -39548,14 +39548,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -53675,7 +53675,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 3800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.30542144726256226,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.33988114294774197,\"y\":0}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":100}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":190}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -53684,14 +53684,14 @@
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2482019308794308,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-1,\"y\":0}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2482019308794308,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2855323597061714,\"y\":0}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6199570475757077,\"y\":0.3539583841959636},{\"x\":1,\"y\":1}]",
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1067,\"max\":1173}",
+      "startupFnSpeedCurveRange": "{\"min\":893,\"max\":972}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -59285,7 +59285,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -59320,7 +59320,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -59434,7 +59434,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -61994,7 +61994,7 @@
     {
       "key": "Starting State",
       "collapsed": false,
-      "locked": true,
+      "locked": false,
       "items": [
         {
           "type": "row",
@@ -62013,7 +62013,7 @@
           "group": {
             "key": "Hand Offset On Startup",
             "collapsed": false,
-            "locked": true,
+            "locked": false,
             "items": [
               {
                 "type": "row",
@@ -62060,7 +62060,7 @@
                 "group": {
                   "key": "Startup > Animation Tween",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62127,7 +62127,7 @@
                 "group": {
                   "key": "Startup > Retransition",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62138,7 +62138,7 @@
                       "group": {
                         "key": "Startup > Retransition Speed Curve",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -62170,7 +62170,7 @@
                       "group": {
                         "key": "Startup > Retransition Start Time Curve",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -62202,7 +62202,7 @@
                       "group": {
                         "key": "Startup > Retransition Easing Curve",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -62219,7 +62219,7 @@
                       "group": {
                         "key": "Startup > Retransition Distance Curve",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -62241,7 +62241,7 @@
                       "group": {
                         "key": "Startup > Retransition Distance Scaler",
                         "collapsed": true,
-                        "locked": true,
+                        "locked": false,
                         "items": [
                           {
                             "type": "row",
@@ -62282,8 +62282,8 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Easing",
-                  "collapsed": true,
-                  "locked": true,
+                  "collapsed": false,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62300,7 +62300,7 @@
                 "group": {
                   "key": "Startup > Animation Speed Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62308,11 +62308,11 @@
                     },
                     {
                       "type": "row",
-                      "key": "startupFnSpeedCurveRange"
+                      "key": "startupFnSpeedCurve"
                     },
                     {
                       "type": "row",
-                      "key": "startupFnSpeedCurve"
+                      "key": "startupFnSpeedCurveRange"
                     },
                     {
                       "type": "row",
@@ -62321,8 +62321,8 @@
                   ],
                   "settings": [
                     "startupFnSpeedCurveVisibleOnly",
-                    "startupFnSpeedCurveRange",
                     "startupFnSpeedCurve",
+                    "startupFnSpeedCurveRange",
                     "startupFnSpeedCurveXOrigin"
                   ]
                 }
@@ -62331,8 +62331,8 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": false,
-                  "locked": true,
+                  "collapsed": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62374,7 +62374,7 @@
                 "group": {
                   "key": "Startup > Start Distance Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62406,7 +62406,7 @@
                 "group": {
                   "key": "Startup > Hand Z Offset Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62428,7 +62428,7 @@
                 "group": {
                   "key": "Startup > Hand Scale Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62450,7 +62450,7 @@
                 "group": {
                   "key": "Startup > Clamp Distance from Cursor",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62488,7 +62488,7 @@
           "group": {
             "key": "Field Grid Sphere Sequence",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [
               {
                 "type": "row",
@@ -62515,7 +62515,7 @@
                 "group": {
                   "key": "Sphere > Animation Speed Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62547,7 +62547,7 @@
                 "group": {
                   "key": "Sphere > Easing",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62564,7 +62564,7 @@
                 "group": {
                   "key": "Sphere > Start Time Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62596,7 +62596,7 @@
                 "group": {
                   "key": "Sphere > Start Distance Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62628,7 +62628,7 @@
                 "group": {
                   "key": "Sphere > Sphere Radius Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -62650,7 +62650,7 @@
                 "group": {
                   "key": "Sphere > Sphere Z Offset Curve",
                   "collapsed": true,
-                  "locked": true,
+                  "locked": false,
                   "items": [
                     {
                       "type": "row",
@@ -64067,7 +64067,7 @@
     "startupFnRetransitionEasingCurveEnabled": false,
     "startupFnTweenSpeedMs": true,
     "startupFnTransitionSpeedMs": true,
-    "startupFnEasingCurveEnabled": false,
+    "startupFnEasingCurveEnabled": true,
     "startupFnSpeedCurveEnabled": true,
     "startupFnSpeedCurveVisibleOnly": true,
     "startupFnStartTimeCurveEnabled": true,
