@@ -19758,7 +19758,7 @@
       ],
       "smallScaleModelsEnabled": false,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
-      "skipOffScreenPoseWork": true,
+      "skipOffScreenPoseWork": false,
       "retainRotationArmWork": false,
       "fieldRows": 45,
       "fieldCols": 30,
