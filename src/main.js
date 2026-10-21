@@ -13781,6 +13781,7 @@ function parseClickHoldConfig(p) {
   try { t.tweenStopDelayRangeParsed = JSON.parse(cfg[`${p}TweenStopDelayRange`]) } catch (e) { /* keep last-good value */ }
 }
 function getOrInitHandCHP(hand) {
+  if (hand._chp && hand._chpKeyN === CLICK_HOLD_KEYS.length && hand._chpKeyLast === CLICK_HOLD_KEYS[CLICK_HOLD_KEYS.length - 1]) return hand._chp // same shortcut as getOrInitHandCP()
   if (!hand._chp) hand._chp = {}
   // `pendingClaimAt`/`armedForHoldStartTime`/`pendingFrozenSplayDeg`:
   // the deferred-claim mechanism (direct request -- see
@@ -13798,6 +13799,7 @@ function getOrInitHandCHP(hand) {
     if (hand._chp[p]) return
     hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingLoopBaseSegments: null, stoppingFreezeAtEnd: false, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1, fromSplayDeg: 0, pendingFromSplayDeg: 0, retransitionFromSplayDeg: 0 }
   })
+  hand._chpKeyN = CLICK_HOLD_KEYS.length; hand._chpKeyLast = CLICK_HOLD_KEYS[CLICK_HOLD_KEYS.length - 1]
   return hand._chp
 }
 // Linearly interpolates every POSE_PRESET_KEYS value, INCLUDING
@@ -16768,6 +16770,7 @@ function parseClickPoseConfig(p) {
   try { t.cursorOffsetDistanceRangeParsed = JSON.parse(cfg[`${p}CursorOffsetDistanceCurveRange`]) } catch (e) { /* keep last-good value */ }
 }
 function getOrInitHandCP(hand) {
+  if (hand._cp && hand._cpKeyN === CLICK_POSE_KEYS.length && hand._cpKeyLast === CLICK_POSE_KEYS[CLICK_POSE_KEYS.length - 1]) return hand._cp // key list unchanged since the last backfill (2026-10-21: the forEach below was 686 ms of a 35 s trace)
   if (!hand._cp) hand._cp = {}
   // `pendingClaimAt`/`pendingForwardSnapshot`/`pendingNamedPoses`/
   // `pendingFrozenSplayDeg`: the deferred-claim mechanism (direct
@@ -16786,6 +16789,7 @@ function getOrInitHandCP(hand) {
     if (hand._cp[p]) return
     hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1, fromSplayDeg: 0, pendingFromSplayDeg: 0, retransitionFromSplayDeg: 0 }
   })
+  hand._cpKeyN = CLICK_POSE_KEYS.length; hand._cpKeyLast = CLICK_POSE_KEYS[CLICK_POSE_KEYS.length - 1]
   return hand._cp
 }
 // Right Click's own Sequence mode (cfg.rcMode === 'Sequence') shares this exact
@@ -22028,6 +22032,7 @@ function relayoutField() {
 // framing (direct request: "Field layout shouldn't affect view scale") --
 // that framing is derived from the field's size exactly ONCE (framedOnce),
 // the very first time hands are built, and never revisited after that.
+function noopQuatChange() {}
 function createFieldHand() {
   const clone = cloneSkeletal(modelRoot)
   clone.quaternion.copy(alignQuat)
@@ -22116,6 +22121,10 @@ function createFieldHand() {
   if (skinnedMesh) skinnedMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
   if (outlineMesh) outlineMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
   if (emissionMesh) emissionMesh.onBeforeRender = (r) => { updateWristClipPlaneForHand(hand); r.clearDepth() }
+  // 2026-10-21: every write to an Object3D's quaternion makes three.js recompute its Euler `rotation` (onQuaternionChange -> setFromQuaternion -> setFromRotationMatrix). In a 35 s Chrome trace on the 2,475-hand field
+  // that was 1,842 ms (5.2% of all sampled time, 1,503 ms of it in setFromRotationMatrix). Nothing in this project reads or writes a hand object's / bone's `.rotation` (the one `.rotation` use is the grid helper),
+  // so the callback is replaced by a no-op on the wrapper, the clone and every bone. The quaternion stays the only source of truth; `.rotation` on these objects is now stale and must not be read.
+  wrapper.traverse((o) => { if (o.quaternion && o.quaternion._onChangeCallback) o.quaternion._onChangeCallback = noopQuatChange })
   return hand
 }
 function finishRebuildField() {
