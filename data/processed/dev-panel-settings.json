@@ -36607,15 +36607,15 @@
           "group": "FLOWER"
         }
       ],
-      "cameraX": 3.749999999999999,
-      "cameraY": 1.3762008805344007e-13,
-      "cameraZ": 449.4843574621996,
+      "cameraX": 4,
+      "cameraY": 3.061616997868383e-14,
+      "cameraZ": 499.9843574621996,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":-3.4222222222222225,\"cameraY\":1.7419533236278442e-13,\"cameraZ\":495.98765636647585,\"cameraFov\":20,\"cameraZoom\":496,\"cameraRoll\":0,\"targetX\":-3.4222222222222225,\"targetY\":1.4382409174393005e-13,\"targetZ\":-0.012343633524153574}",
-      "cameraZoom": 449.5,
+      "cameraZoom": 500,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -67513,7 +67513,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -67624,7 +67624,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -73301,10 +73301,10 @@
       "collapsed": false
     },
     "mobile": {
-      "left": 39.5773811340332,
+      "left": 32.726192474365234,
       "top": 105.89881134033203,
-      "width": 354.8452453613281,
-      "height": 237.4761962890625,
+      "width": 361.702392578125,
+      "height": 526.4642944335938,
       "collapsed": false
     }
   }
