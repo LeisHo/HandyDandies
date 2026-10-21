@@ -1393,7 +1393,8 @@ function advanceFieldWarmup() {
     // visible, so the field render - and with it every frame of the loading preview - kept getting longer through the last stretch of loading, up to the full field's draw time.)
     fieldWarmBaseMs = Math.min(fieldWarmBaseMs, fieldWarmLastRenderMs)
     const added = fieldWarmLastRenderMs - fieldWarmBaseMs
-    if (added < 10) fieldWarmBatch = Math.min(hands.length, Math.max(4, fieldWarmBatch * 2)); else if (added > 25) fieldWarmBatch = Math.max(4, Math.floor(fieldWarmBatch / 2))
+    const warmBudget = Math.max(cfg.loadingWarmBudgetMs || 25, 2) // Loading Warm-Up Budget (Ms): the most a batch may add to a frame; doubled below 40% of it. The old fixed 10 / 25 ms thresholds are the default 25.
+    if (added < warmBudget * 0.4) fieldWarmBatch = Math.min(hands.length, Math.max(4, fieldWarmBatch * 2)); else if (added > warmBudget) fieldWarmBatch = Math.max(4, Math.floor(fieldWarmBatch / 2))
   }
   fieldWarmPrevRenderMs = fieldWarmLastRenderMs
   // The previous batch has been drawn once (its program, buffers and uniforms are on the GPU): hide it again so the next frames stay cheap. Everything is shown together at the end.
@@ -2894,6 +2895,9 @@ const DEV_GROUPS = [
       // on (see tryStartField()'s own gate) -- an artificial delay with
       // nothing to show for it isn't what was asked for.
       { key: 'loadingMinTimeMs', label: 'Min Loading Time (Ms)', type: 'slider', min: 0, max: 5000, step: 100, def: 1200 },
+      // Loading Warm-Up Budget (2026-10-21): while the hands are drawn once, a few per frame, behind the loading screen, each batch is sized so it adds at most this much to a frame (the loading preview keeps animating in the same frames). Lower = smoother
+      // preview but a longer warm-up; 25 is the old behaviour (batches grew while they added under 10 ms and shrank above 25 ms; those two numbers were judgment calls, never measured).
+      { key: 'loadingWarmBudgetMs', label: 'Loading Warm-Up Budget (Ms Per Frame)', type: 'slider', min: 2, max: 60, step: 1, def: 25 },
       { key: 'loadingPreviewTweenSelector', label: 'Loading Tween Sequence', type: 'select', def: '', options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })), onChange: () => { try { refreshListPickerMarksByKey('loadingPreviewTwoHandTweens') } catch (e) { /* no panel */ } } },
       // Imported Two-Hand Tweens (import 2026-10-13, item selector 2026-10-18, reworked the same day): the Import button of this item selector reads a HANDO "hando-two-hand-tween" export from the clipboard and ADDS it - its poses go to
       // Saved Poses, its sequence (flagged twoHand: the preview then renders the second hand, see updateLoadingPreviewHand2()) to Saved Tween Sequences - without selecting or using it anywhere; importing the same name again overwrites it.
@@ -4376,6 +4380,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('placeHandModelRows', placeHandModelRows)
     prof('placeSmallScaleModelRows', placeSmallScaleModelRows)
     prof('loadCameraDefaultFromCfg', loadCameraDefaultFromCfg)
+    prof('reconcileCameraAfterRestore', reconcileCameraAfterRestore)
     try { const dr = document.querySelector('.dp-row[data-key="cameraDefaultPreset"]'); if (dr) dr.style.display = 'none' } catch (e) { /* no panel */ }
     prof('refreshItemSelectorMarks', refreshAllItemSelectorMarks)
     prof('syncHandModelWithSettings', syncHandModelWithSettings)
@@ -9498,6 +9503,26 @@ function cameraDirFromCfg() {
   _camEuler.set(THREE.MathUtils.degToRad(cfg.cameraPitch || 0), THREE.MathUtils.degToRad(cfg.cameraYaw || 0), 0, 'YXZ')
   _camQ.setFromEuler(_camEuler)
   return new THREE.Vector3(0, 0, -1).applyQuaternion(_camQ)
+}
+// 2026-10-21 (direct report: a hard refresh alternates between the right camera and a wrong one). The restore applied the saved camera sliders one by one, each relative to whatever the camera was a moment before: Z moves the camera AND the pan
+// target by the same amount, Yaw / Pitch re-aim the target at the current distance, and Zoom then moves the CAMERA along the line to the target. The saved Z and Zoom therefore only agree when the camera STARTED the restore at a distance from the
+// (never saved) target equal to the saved Zoom: final Z = saved Z - start distance + saved Zoom. The start distance is the Z the startup cache held, which is the live camera Z of the previous load, so a good load (Z 242.98) made the next one
+// land on Z 131.49 (= Zoom), whose cache made the one after it good again - exactly the alternation seen in the log (saved cameraZ 242.98, loaded 131.49, saved cameraZoom 131.5, start distance 242.98).
+// After the restore the view is now set directly from the saved numbers: position X / Y / Z, Field Of View, Yaw / Pitch / Roll, and the target = position + view direction x Zoom. Nothing saved for the camera = left as it is.
+function reconcileCameraAfterRestore() {
+  if (fieldRevealed) return // the visitor may already be panning
+  const num = (k) => { const v = peekRestoredValue(k); return typeof v === 'number' && isFinite(v) ? v : undefined }
+  const x = num('cameraX'), y = num('cameraY'), z = num('cameraZ'), zoom = num('cameraZoom')
+  if (x === undefined || y === undefined || z === undefined || zoom === undefined) return
+  const fov = num('cameraFov')
+  camera.position.set(x, y, z)
+  if (fov !== undefined) { camera.fov = fov; cfg.cameraFov = fov }
+  camera.updateProjectionMatrix()
+  cfg.cameraYaw = num('cameraYaw') ?? 0; cfg.cameraPitch = num('cameraPitch') ?? 0; cfg.cameraRoll = num('cameraRoll') ?? 0
+  controls.target.set(x, y, z - Math.max(zoom, 1e-3))
+  applyCameraOrientation() // aims the target along the saved yaw / pitch / roll at the current distance (= the saved Zoom)
+  syncCameraPanelFromLive()
+  sceneNeedsRedraw = true
 }
 // The Default camera of the settings now in cfg: the stored full view when there is one, else the camera sliders (an older setting, which never stored it).
 function loadCameraDefaultFromCfg() {
