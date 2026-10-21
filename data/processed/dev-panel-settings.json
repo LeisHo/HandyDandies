@@ -482,14 +482,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.0259642043629,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -587,8 +587,8 @@
           "group": "20 FOV TEST"
         }
       ],
-      "holdConfirmMs": 400,
-      "multiClickWindowMs": 400,
+      "holdConfirmMs": 300,
+      "multiClickWindowMs": 250,
       "distCurveXOrigin": "Closest Hand",
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
@@ -14163,7 +14163,7 @@
         }
       ],
       "cameraX": 1.907706141586066,
-      "cameraY": 5.78396182203617e-13,
+      "cameraY": 6.007153701180772e-13,
       "cameraZ": 242.98502235780893,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -20018,14 +20018,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.0259642043629,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -20123,8 +20123,8 @@
           "group": "20 FOV TEST"
         }
       ],
-      "holdConfirmMs": 400,
-      "multiClickWindowMs": 400,
+      "holdConfirmMs": 300,
+      "multiClickWindowMs": 250,
       "distCurveXOrigin": "Closest Hand",
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
@@ -39554,14 +39554,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.0259642043629,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -39659,8 +39659,8 @@
           "group": "20 FOV TEST"
         }
       ],
-      "holdConfirmMs": 400,
-      "multiClickWindowMs": 400,
+      "holdConfirmMs": 300,
+      "multiClickWindowMs": 250,
       "distCurveXOrigin": "Closest Hand",
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
@@ -61417,7 +61417,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -62009,7 +62009,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -62028,7 +62028,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -62142,7 +62142,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -62217,7 +62217,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Easing Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": true,
                         "items": [
                           {
@@ -62347,7 +62347,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -63241,8 +63241,8 @@
     "custom18Trig1RetransitionSpeedMs": true,
     "custom18Trig1RetransitionSpeedCurveEnabled": true,
     "custom18Trig1RetransitionStartTimeCurveEnabled": true,
-    "holdConfirmMs": true,
-    "multiClickWindowMs": true,
+    "holdConfirmMs": false,
+    "multiClickWindowMs": false,
     "custom19Enabled": true,
     "custom19Type": true,
     "custom19TouchPointCount": true,
@@ -67099,8 +67099,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 615.3500366210938,
-      "height": 552.1749877929688
+      "width": 618.5499877929688,
+      "height": 553.7750244140625
     },
     "mobile": {
       "left": 28.035715103149414,
