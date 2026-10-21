@@ -14161,8 +14161,8 @@
         }
       ],
       "cameraX": 1.9077061415860694,
-      "cameraY": 4.444810547168558e-13,
-      "cameraZ": 242.98502235780893,
+      "cameraY": 4.668002426313162e-13,
+      "cameraZ": 242.98502235780896,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -14699,6 +14699,7 @@
       "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 10,
       "logFrameProfileEnabled": true,
+      "logRendererEnabled": false,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
@@ -33460,6 +33461,7 @@
       "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 10,
       "logFrameProfileEnabled": true,
+      "logRendererEnabled": false,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
@@ -52221,6 +52223,7 @@
       "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 10,
       "logFrameProfileEnabled": true,
+      "logRendererEnabled": false,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
@@ -56803,6 +56806,10 @@
               "snapshotTakeBtn"
             ]
           }
+        },
+        {
+          "type": "row",
+          "key": "logRendererEnabled"
         }
       ],
       "settings": [
@@ -56838,7 +56845,8 @@
         "showFieldCenterPoint",
         "showRenderOrderPoints",
         "logRenderReorderEnabled",
-        "clearRenderReorderLogBtn"
+        "clearRenderReorderLogBtn",
+        "logRendererEnabled"
       ]
     },
     {
@@ -64705,8 +64713,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 596.1500244140625,
-      "height": 542.5750122070312
+      "width": 599.3500366210938,
+      "height": 544.1749877929688
     }
   }
 }
