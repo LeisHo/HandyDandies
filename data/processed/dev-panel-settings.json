@@ -21691,8 +21691,8 @@
       "offScreenPositionEvery": 2,
       "throttleOffScreenPose": false,
       "offScreenPoseEvery": 2,
-      "fieldRows": 45,
-      "fieldCols": 15,
+      "fieldRows": 44,
+      "fieldCols": 13,
       "rowSpacing": 7.5,
       "columnSpacing": 15,
       "handScale": 1,
@@ -21721,8 +21721,8 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-220}",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.21830206454793544,\"y\":-0.19709192911783857}}]",
+      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-320}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -36614,14 +36614,14 @@
         }
       ],
       "cameraX": 3.7499999999999996,
-      "cameraY": 5.125483892930744e-14,
-      "cameraZ": 837.0426989304715,
+      "cameraY": 4.887441139719535e-14,
+      "cameraZ": 798.1673671406129,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":3.7499999999999996,\"cameraY\":3.490243377569957e-14,\"cameraZ\":569.9876563664759,\"cameraFov\":20,\"cameraZoom\":570,\"cameraRoll\":0,\"targetX\":3.7499999999999996,\"targetY\":0,\"targetZ\":-0.012343633524153574}",
-      "cameraZoom": 837.0550425639956,
+      "cameraZoom": 798.179710774137,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -73343,11 +73343,11 @@
       "height": 533.7750244140625
     },
     "mobile": {
-      "left": 26.470237731933594,
-      "top": 206.94642639160156,
-      "width": 291.98809814453125,
-      "height": 457.5535888671875,
-      "collapsed": true
+      "left": 61.63095474243164,
+      "top": 195.89881896972656,
+      "width": 305.702392578125,
+      "height": 463.6488037109375,
+      "collapsed": false
     }
   }
 }
