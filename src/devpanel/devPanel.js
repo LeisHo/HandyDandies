@@ -273,10 +273,22 @@ function curveGateCtrl(ctrl) {
   for (const c of cands) { if (c === k) continue; const g = findCtrl(c); if (g) return g }
   return null
 }
+// A curve and its Min / Max range are two controls drawn as one widget (sphereRadiusCurve + sphereRadiusRange, <p>SpeedCurve + <p>SpeedCurveRange, ...). 2026-10-20 (direct report: with Independent from Desktop ticked, editing a curve on the
+// Mobile tab still changed Desktop - only the curve's Min / Max row had been ticked, and the curve itself still mirrored Desktop): the two are one unit, so ticking either one covers both.
+function curvePartnerCtrl(ctrl) {
+  if (!isCurveTextCtrl(ctrl)) return null
+  const k = ctrl.key
+  const cands = /Range$/.test(k) ? [k.replace(/Range$/, 'Curve'), k.replace(/Range$/, '')] : [k + 'Range', k.replace(/Curve$/, 'Range')]
+  for (const c of cands) { if (c === k) continue; const p = findCtrl(c); if (p && isCurveTextCtrl(p)) return p }
+  return null
+}
 function isDevRowIndependent(tab, ctrl) {
   const explicit = devIndependence[tab] && devIndependence[tab][ctrl.key]
   if (explicit !== undefined) return !!explicit
   if (isCurveTextCtrl(ctrl)) {
+    const partner = curvePartnerCtrl(ctrl)
+    const pe = partner && devIndependence[tab] && devIndependence[tab][partner.key]
+    if (pe !== undefined) return !!pe
     const g = curveGateCtrl(ctrl)
     const ge = g && devIndependence[tab] && devIndependence[tab][g.key]
     if (ge !== undefined) return !!ge
@@ -1625,6 +1637,11 @@ export function buildRow(ctrl) {
     indepCheckbox.addEventListener('change', () => {
       if (editingDevice === 'desktop') return // defensive -- hidden on this tab, never real-clickable
       devIndependence[editingDevice][ctrl.key] = indepCheckbox.checked
+      const partnerCtrl = curvePartnerCtrl(ctrl) // a curve and its Min / Max range switch together
+      if (partnerCtrl) {
+        devIndependence[editingDevice][partnerCtrl.key] = indepCheckbox.checked
+        if (!indepCheckbox.checked) store[editingDevice][partnerCtrl.key] = store.desktop[partnerCtrl.key]
+      }
       // Unchecking immediately snaps this row back to Desktop's current
       // value (matching the template's own identical behavior) -- while
       // CHECKED, store[editingDevice][ctrl.key] already holds whatever
