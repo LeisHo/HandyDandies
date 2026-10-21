@@ -239,7 +239,7 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8094147628703802,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8094147628703802,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2420058724230193,\"y\":-0.2793750762939453}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
@@ -43195,7 +43195,7 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8094147628703802,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8094147628703802,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2420058724230193,\"y\":-0.2793750762939453}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
@@ -65876,7 +65876,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
