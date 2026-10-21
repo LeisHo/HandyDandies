@@ -19743,12 +19743,13 @@ function lpLoadPreviewModel(id) {
   if (!id) return Promise.resolve(null)
   let p = lpModelLoads.get(id)
   if (p) return p
-  p = lpPreviewModelUrl(id).then((url) => new Promise((resolve, reject) => gltfLoader.load(url, resolve, undefined, reject))).then((gltf) => {
+  p = lpPreviewModelUrl(id).then((url) => new Promise((resolve, reject) => gltfLoader.load(url, resolve, undefined, reject))).then(async (gltf) => {
     const root = gltf.scene
     const skinned = findSkinnedMesh(root)
     if (!skinned) throw new Error('no skinned mesh')
     const missing = HAND_MODEL_BONES.filter((n) => !skinned.skeleton.getBoneByName(n))
     if (missing.length) throw new Error('missing rig bones ' + missing.join(', '))
+    if (!findClipBlockNode(root)) { const b = await loadBorrowedClipBlock(); if (b) addBorrowedClipBlock(root, b) } // the same borrowed crop block as the Hand model (see addBorrowedClipBlock)
     root.traverse((o) => { if (o.isMesh && o !== skinned) o.visible = false }) // the outline / crop-block meshes, like the Hand model's own load
     root.updateMatrixWorld(true)
     lpLoadedRoots.set(id, root)
@@ -22233,10 +22234,36 @@ const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('https://unpkg.com/three@0.169.0/examples/jsm/libs/draco/gltf/')
 const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
+// Clipping Block for models that do not carry one (2026-10-20, direct request: "for cursor tracking wrist cropping, make sure the cropping object is the previous geometry, instead of a whole plane"). The wrist crop is the
+// "Clipping Block" box mesh (see makeClipRig); a model without it (the saved Hand model, HD IK 1k, has none - nor do HandipantsFixedBone and the other HD IK exports) fell back to ONE flat plane across the whole forearm, which
+// looks like a plane cutting the arm. All of these share the rig of HandipantsOL_Clip (rForearmBend at the origin, rHand 0.2452 up the same axis, measured from the files), so the block of HandipantsOL_Clip - a scene-root
+// sibling of the Armature - is borrowed: its geometry and transform are read once and a copy is added to the loaded root, where every clone picks it up like a native block. Models that have their own keep it.
+let borrowedClipBlockPromise = null
+function findClipBlockNode(root) { return root.getObjectByName('Clipping_Block') || root.getObjectByName('Clipping Block') || null }
+function loadBorrowedClipBlock() {
+  if (!borrowedClipBlockPromise) {
+    borrowedClipBlockPromise = gltfLoader.loadAsync(MODEL_URL).then((g) => {
+      const b = findClipBlockNode(g.scene)
+      return b && b.geometry ? { geometry: b.geometry, position: b.position.clone(), quaternion: b.quaternion.clone(), scale: b.scale.clone() } : null
+    }).catch((err) => { console.warn('Borrowed Clipping Block unavailable - the wrist crop falls back to a plane:', err); return null })
+  }
+  return borrowedClipBlockPromise
+}
+function addBorrowedClipBlock(root, src) {
+  const mesh = new THREE.Mesh(src.geometry, new THREE.MeshBasicMaterial())
+  mesh.name = 'Clipping_Block'
+  mesh.position.copy(src.position); mesh.quaternion.copy(src.quaternion); mesh.scale.copy(src.scale)
+  mesh.visible = false
+  root.add(mesh)
+}
 resolveHandModelUrl().then((handModelUrl) => gltfLoader.load(
   handModelUrl,
-  (gltf) => {
+  function onHandModelLoaded(gltf) {
     const root = gltf.scene
+    if (!gltf.__clipBlockChecked) { // a model without a Clipping Block borrows one, then this same callback runs again
+      gltf.__clipBlockChecked = true
+      if (!findClipBlockNode(root)) { loadBorrowedClipBlock().then((b) => { if (b) addBorrowedClipBlock(root, b); onHandModelLoaded(gltf) }); return }
+    }
     const skinned = findSkinnedMesh(root)
     if (!skinned) {
       if (revertHandModelAndReload('no skinned mesh')) return
