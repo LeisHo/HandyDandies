@@ -268,7 +268,7 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 4000,
+      "loadingMinTimeMs": 3000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
         {
@@ -333,9 +333,9 @@
         },
         {
           "name": "LOADING 4 - MOBILE",
-          "cameraX": 53.026763262219646,
-          "cameraY": 1163.4835866086019,
-          "cameraZ": -521.35399701831,
+          "cameraX": 54.83602713069657,
+          "cameraY": 1163.4835866086023,
+          "cameraZ": -521.3506172987283,
           "cameraFov": 15,
           "targetX": 53.02676326221959,
           "targetY": -20.931088163546605,
@@ -447,11 +447,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -480,14 +480,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 180,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713571,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -14197,15 +14197,15 @@
         },
         {
           "name": "HD - Mobile - 20 FOV",
-          "cameraX": 3.6666666666666665,
-          "cameraY": 3.0371240618854355e-14,
-          "cameraZ": 495.9881938061244,
+          "cameraX": -3.4222222222222225,
+          "cameraY": 1.7419533236278442e-13,
+          "cameraZ": 495.98765636647585,
           "cameraFov": 20,
-          "cameraZoom": 495.9999999999999,
+          "cameraZoom": 496,
           "cameraRoll": 0,
-          "targetX": 3.6666666666666665,
-          "targetY": 0,
-          "targetZ": -0.011806193875486313
+          "targetX": -3.4222222222222225,
+          "targetY": 1.4382409174393005e-13,
+          "targetZ": -0.012343633524153574
         }
       ],
       "lockCameraPan": true,
@@ -19735,13 +19735,13 @@
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
       "fieldRows": 45,
       "fieldCols": 30,
-      "rowSpacing": 10,
-      "columnSpacing": 15,
+      "rowSpacing": 8,
+      "columnSpacing": 12,
       "handScale": 1,
-      "alternateRowOffset": 7.5,
+      "alternateRowOffset": 6,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
-      "hideHands": true,
+      "hideHands": false,
       "fieldOffsetX": 0,
       "fieldOffsetY": 0,
       "fieldOffsetZ": 0,
@@ -19867,9 +19867,9 @@
         },
         {
           "name": "LOADING 4 - MOBILE",
-          "cameraX": 53.026763262219646,
-          "cameraY": 1163.4835866086019,
-          "cameraZ": -521.35399701831,
+          "cameraX": 54.83602713069657,
+          "cameraY": 1163.4835866086023,
+          "cameraZ": -521.3506172987283,
           "cameraFov": 15,
           "targetX": 53.02676326221959,
           "targetY": -20.931088163546605,
@@ -19981,11 +19981,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 3",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -20014,14 +20014,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 180,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713571,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -33694,14 +33694,14 @@
           }
         }
       ],
-      "cameraX": 3.6666666666666665,
-      "cameraY": 3.0371240618854355e-14,
+      "cameraX": -3.422222222222221,
+      "cameraY": 1.2675599288241649e-12,
       "cameraZ": 495.9881938061244,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":3.6666666666666665,\"cameraY\":3.0371240618854355e-14,\"cameraZ\":495.9881938061244,\"cameraFov\":20,\"cameraZoom\":495.9999999999999,\"cameraRoll\":0,\"targetX\":3.6666666666666665,\"targetY\":0,\"targetZ\":-0.011806193875486313}",
+      "cameraDefaultPreset": "{\"cameraX\":-3.4222222222222225,\"cameraY\":1.7419533236278442e-13,\"cameraZ\":495.98765636647585,\"cameraFov\":20,\"cameraZoom\":496,\"cameraRoll\":0,\"targetX\":-3.4222222222222225,\"targetY\":1.4382409174393005e-13,\"targetZ\":-0.012343633524153574}",
       "cameraZoom": 495.9999999999999,
       "cameraZoomSpeed": 1,
       "savedCameras": [
@@ -33731,15 +33731,15 @@
         },
         {
           "name": "HD - Mobile - 20 FOV",
-          "cameraX": 3.6666666666666665,
-          "cameraY": 3.0371240618854355e-14,
-          "cameraZ": 495.9881938061244,
+          "cameraX": -3.4222222222222225,
+          "cameraY": 1.7419533236278442e-13,
+          "cameraZ": 495.98765636647585,
           "cameraFov": 20,
-          "cameraZoom": 495.9999999999999,
+          "cameraZoom": 496,
           "cameraRoll": 0,
-          "targetX": 3.6666666666666665,
-          "targetY": 0,
-          "targetZ": -0.011806193875486313
+          "targetX": -3.4222222222222225,
+          "targetY": 1.4382409174393005e-13,
+          "targetZ": -0.012343633524153574
         }
       ],
       "lockCameraPan": true,
@@ -39336,7 +39336,7 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
-      "loadingMinTimeMs": 4000,
+      "loadingMinTimeMs": 3000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
         {
@@ -39401,9 +39401,9 @@
         },
         {
           "name": "LOADING 4 - MOBILE",
-          "cameraX": 53.026763262219646,
-          "cameraY": 1163.4835866086019,
-          "cameraZ": -521.35399701831,
+          "cameraX": 54.83602713069657,
+          "cameraY": 1163.4835866086023,
+          "cameraZ": -521.3506172987283,
           "cameraFov": 15,
           "targetX": 53.02676326221959,
           "targetY": -20.931088163546605,
@@ -39515,11 +39515,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -39548,14 +39548,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 180,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713571,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -53265,15 +53265,15 @@
         },
         {
           "name": "HD - Mobile - 20 FOV",
-          "cameraX": 3.6666666666666665,
-          "cameraY": 3.0371240618854355e-14,
-          "cameraZ": 495.9881938061244,
+          "cameraX": -3.4222222222222225,
+          "cameraY": 1.7419533236278442e-13,
+          "cameraZ": 495.98765636647585,
           "cameraFov": 20,
-          "cameraZoom": 495.9999999999999,
+          "cameraZoom": 496,
           "cameraRoll": 0,
-          "targetX": 3.6666666666666665,
-          "targetY": 0,
-          "targetZ": -0.011806193875486313
+          "targetX": -3.4222222222222225,
+          "targetY": 1.4382409174393005e-13,
+          "targetZ": -0.012343633524153574
         }
       ],
       "lockCameraPan": false,
@@ -59320,7 +59320,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -59434,7 +59434,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -59459,15 +59459,15 @@
                     },
                     {
                       "type": "row",
-                      "key": "loadingPreviewSavedCameras"
-                    },
-                    {
-                      "type": "row",
                       "key": "loadingPreviewOffsetZ"
                     },
                     {
                       "type": "row",
                       "key": "loadingPreviewCameraFov"
+                    },
+                    {
+                      "type": "row",
+                      "key": "loadingPreviewSavedCameras"
                     },
                     {
                       "type": "row",
@@ -59484,9 +59484,9 @@
                     "loadingPreviewRotationZ",
                     "loadingPreviewOffsetX",
                     "loadingPreviewOffsetY",
-                    "loadingPreviewSavedCameras",
                     "loadingPreviewOffsetZ",
                     "loadingPreviewCameraFov",
+                    "loadingPreviewSavedCameras",
                     "loadingPreviewCameraZoom",
                     "loadingPreviewCenterHandsBtn"
                   ]
@@ -61591,7 +61591,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -61993,7 +61993,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -62012,7 +62012,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -62059,7 +62059,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -62137,7 +62137,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -62169,7 +62169,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -62201,7 +62201,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Easing Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -62427,7 +62427,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Hand Scale Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -62514,7 +62514,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -62546,7 +62546,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Easing",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -62563,7 +62563,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
