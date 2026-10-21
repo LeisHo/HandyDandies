@@ -205,7 +205,7 @@
       "skipOffScreenCursorTracking": true,
       "renderOrderSkipOffScreen": true,
       "throttleOffScreenTimelines": true,
-      "offScreenTimelineEvery": 10,
+      "offScreenTimelineEvery": 5,
       "fieldRows": 45,
       "fieldCols": 55,
       "rowSpacing": 8,
