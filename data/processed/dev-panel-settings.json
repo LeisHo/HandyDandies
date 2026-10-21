@@ -64752,7 +64752,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -65655,7 +65655,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -65961,7 +65961,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Velocity",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -66155,7 +66155,7 @@
                       "type": "group",
                       "group": {
                         "key": "Displacement Angle to Velocity 1",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": false,
                         "items": [
                           {
@@ -66304,7 +66304,7 @@
                             "type": "group",
                             "group": {
                               "key": "Velocity Finger Curl",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
