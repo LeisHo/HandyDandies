@@ -204,7 +204,7 @@
       "skipOffScreenSceneUpdate": true,
       "skipOffScreenCursorTracking": true,
       "renderOrderSkipOffScreen": true,
-      "throttleOffScreenTimelines": true,
+      "throttleOffScreenTimelines": false,
       "offScreenTimelineEvery": 3,
       "fieldRows": 45,
       "fieldCols": 55,
@@ -65497,7 +65497,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -65508,7 +65508,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -67090,7 +67090,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
