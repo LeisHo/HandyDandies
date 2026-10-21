@@ -24126,6 +24126,7 @@ function updateRenderOrder() {
     rlsAdd('uro: per-hand update, hands in view', tIn, nIn)
     rlsAdd('uro: per-hand update, hands outside every camera', tOut, nOut)
     rlsAllocAdd('uro: per-hand update (all hands)', __hP)
+    if (performance.memory) rlog.heapPrev = performance.memory.usedJSHeapSize // the next lap must not count the per-hand loop's growth again (the first captures showed the same number for both)
     __u = performance.now()
   } else hands.forEach(__perHand)
   rvApplyDisplacement() // Responsive Velocity displacement, once every hand's pose is final
