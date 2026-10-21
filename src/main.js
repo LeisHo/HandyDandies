@@ -14856,10 +14856,14 @@ const _baseRotDecay = new THREE.Quaternion(), _wrV2 = new THREE.Vector3()
 // Positional Retransition (see the control): the progress the OFFSET / ROTATION unwind uses during p's retransition. On = the pose's own progress, as always. Off = the unwind runs on its own clock at the Retransition Speed of
 // lastPositionalFn (the last triggered function with it on); with no such function it stays at 0, so the offset / rotation stay and the hand remains in this retransition phase until another function takes over.
 function positionalRetransitionOn(p) { return cfg[`${p}PositionalRetransition`] !== false }
-function notePositionalFn(p) { if (isStagePrefix(p)) return; if (positionalRetransitionOn(p) && cfg[`${p}RetransitionEnabled`] !== false) lastPositionalFn = p }
-function positionalProgressFor(p, poseProgress, st) {
+// 2026-10-21 (direct report: a function with Positional Retransition off did not seem to inherit the previous click function's). This used to be called when a trigger was pressed / armed (startClickHoldPose(), triggerClickPose()), i.e. for EVERY enabled hold function on every
+// press and for every function of a Multi Trigger cycle, whether or not it ever ran on a hand, so the last one pressed - usually not the function that had just run - was borrowed. It is now called where a function really commits on a hand (the phase leaves idle): the function
+// is remembered for THAT hand (hand._posFn) and as the global fallback for hands it never moved (lastPositionalFn).
+function notePositionalCommit(hand, p) { if (isStagePrefix(p)) return; if (positionalRetransitionOn(p) && cfg[`${p}RetransitionEnabled`] !== false) { lastPositionalFn = p; hand._posFn = p } }
+function borrowedPositionalFn(hand) { return hand._posFn || lastPositionalFn }
+function positionalProgressFor(p, poseProgress, st, hand) {
   if (positionalRetransitionOn(p)) return poseProgress
-  const q = lastPositionalFn
+  const q = borrowedPositionalFn(hand)
   const qTrig = q ? (CLICK_HOLD_KEYS.includes(q) ? clickHoldPoseTriggers[q] : clickPoseTriggers[q]) : null
   if (!qTrig || !(st.posProg > 0)) return 0
   // the borrowed function's own Retransition Easing Curve shapes it too
@@ -15717,7 +15721,7 @@ function retTimingFor(hand, p, trig, isTw) {
 // Distance Curve and Scaler - on the same clock (st.retElapsed) as p's own retransition. No such function: it stays 0.
 function advancePositionalProgress(st, hand, p, dt) {
   if (positionalRetransitionOn(p)) return
-  const q = lastPositionalFn
+  const q = borrowedPositionalFn(hand)
   const qTrig = q ? (CLICK_HOLD_KEYS.includes(q) ? clickHoldPoseTriggers[q] : clickPoseTriggers[q]) : null
   if (!qTrig) { st.posProg = 0; return }
   if (st._posSeenStart !== st.retransitionStartTime) { st._posSeenStart = st.retransitionStartTime; st.posProg = 0 }
@@ -15916,6 +15920,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.glideTimeFactor = applyFirstGlideScale(p, chp.tweenSegments)
     chp.phase = 'forward'
     chp.forwardStartTime = now
+    notePositionalCommit(hand, p)
     chp.fwdNom = 0; chp.liveTick = now
     chp.frozenSplayDeg = chp.pendingFrozenSplayDeg
     chp.fromSplayDeg = chp.pendingFromSplayDeg // CORRECTED 2026-09-27 -- see the arm-time capture's own comment
@@ -16303,14 +16308,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // (snapshotted at retransition-start by snapshotOffsetRotationAccumForRetransition())
     // back to zero, not just this function's own last increment -- and
     // clears the real accumulator once progress reaches 1.
-    const posProgressH = positionalProgressFor(p, easedProgress, chp)
+    const posProgressH = positionalProgressFor(p, easedProgress, chp, hand)
     applyOffsetRotationRetransition(hand, posProgressH, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart, chp.retransitionBaseAccumStart, chp.retransitionCursorAccumStart)
     if (progress >= 1 && (positionalRetransitionOn(p) || chp.posProg >= 1)) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
 }
 function startClickHoldPose(p) {
   if (!cfg[`${p}Enabled`]) return
-  notePositionalFn(p)
+  // (Positional Retransition: the function to borrow from is noted when a function commits on a hand, see notePositionalCommit())
   captureClickCursorPivot(p)
   if (startupBlocksClickFunctions()) return
   releaseStartupHold() // (startupBlocksClickFunctions() is true until every visible hand has finished its startup sequence, so this click is the one that starts cursor tracking)
@@ -16997,6 +17002,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     if (!cp.tweenSegments) cp.glideTimeFactor = poseGlideTimeFactor(p, cp.tweenPoses)
     cp.phase = 'forward'
     cp.triggerTime = now
+    notePositionalCommit(hand, p)
     cp.fwdNom = 0; cp.liveTick = now
     cp.frozenSplayDeg = cp.pendingFrozenSplayDeg
     cp.fromSplayDeg = cp.pendingFromSplayDeg // CORRECTED 2026-09-27 -- see the arm-time capture's own comment
@@ -17265,7 +17271,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // (snapshotted above at retransition-start) back to zero, not just
     // this function's own last increment -- and clears the real
     // accumulator once progress reaches 1, a genuinely fresh start.
-    const posProgressC = positionalProgressFor(p, easedProgress, cp)
+    const posProgressC = positionalProgressFor(p, easedProgress, cp, hand)
     applyOffsetRotationRetransition(hand, posProgressC, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart, cp.retransitionBaseAccumStart, cp.retransitionCursorAccumStart)
     if (progress >= 1 && (positionalRetransitionOn(p) || cp.posProg >= 1)) cp.phase = 'idle'
   }
@@ -17334,7 +17340,7 @@ function assignHandsToCycle(cycle, startIdx) {
   return groups
 }
 function triggerClickPose(p, onlyHands = null) {
-  notePositionalFn(p)
+  // (Positional Retransition: the function to borrow from is noted when a function commits on a hand, see notePositionalCommit())
   if (!cfg[`${p}Enabled`]) return
   captureClickCursorPivot(p)
   if (p !== STARTUP_FN) {
