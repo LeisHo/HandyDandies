@@ -12782,6 +12782,24 @@ const CURVE_TOUCH_PREVIEW_HANDLE_RADIUS_PX = 20 // the dim preview handle (grabb
 const CURVE_DOUBLE_TAP_MS = 400
 const CURVE_TAP_MAX_MOVE_PX = 12
 const CURVE_TAP_MAX_MS = 350
+// The Y (0..1) that stands for the real value `v` in a curve's own Min / Max range: (v - min) / (max - min), clamped. The range row of a curve is found by name (<key>Range or <key without Curve>Range, e.g.
+// sphereRadiusCurve -> sphereRadiusRange, ${p}SpeedCurve -> ${p}SpeedCurveRange) and read live from cfg. A curve without a Min / Max range (Easing, ...) has no real value to aim at: 1 = the top of the graph.
+// (2026-10-20, direct request: right-click / triple-tap sets a node to the value 1 within Min / Max, not to the top of the Y axis.)
+function curveYForRealValue(curveKey, v) {
+  for (const k of [curveKey + 'Range', curveKey.replace(/Curve$/, 'Range')]) {
+    if (k === curveKey) continue
+    const raw = cfg[k]
+    if (typeof raw !== 'string') continue
+    let rg = null
+    try { rg = JSON.parse(raw) } catch (e) { rg = null }
+    if (rg && Number.isFinite(rg.min) && Number.isFinite(rg.max)) {
+      const span = rg.max - rg.min
+      if (Math.abs(span) < 1e-9) return 1
+      return THREE.MathUtils.clamp((v - rg.min) / span, 0, 1)
+    }
+  }
+  return 1
+}
 function attachCurveTouchAssist(svg, api) {
   // api: { points: () => [{ el, p }], handles: () => [{ el, p, kind, real }], remove: (p) => void, removable: (p) => boolean, setTop: (p) => void }
   const st = { redispatching: false, suppressClickUntil: 0, lastTouchDownAt: 0, lastTap: null, down: null }
@@ -12923,7 +12941,7 @@ function buildArmLengthCurveWidget(row) {
   // startHandleDrag()/redraw()'s own handle-rendering block below, ported
   // verbatim from buildGenericCurveWidget() (the one widget that already
   // had this) -- same hint caption, same gesture, same data format.
-  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove  ·  Right-click / triple-tap a point: Y = 1' })
+  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove  ·  Right-click / triple-tap a point: set it to the value 1 (within Min / Max)' })
   row.appendChild(svg)
   row.appendChild(caption)
   row.appendChild(handleHint)
@@ -13074,7 +13092,7 @@ function buildArmLengthCurveWidget(row) {
       // the curve always needs a value at both x=0 and x=1), added
       // alongside it rather than replacing it. preventDefault() suppresses
       // the browser's own native right-click context menu over the dot.
-      // 2026-10-20, direct request: right-click on a node sets its Y to 1 (it used to delete the node; double-click still does). Mobile: a triple-tap does it (see attachCurveTouchAssist()).
+      // 2026-10-20, direct request: right-click on a node sets it to the value 1 within the curve's Min / Max (it used to delete the node; double-click still does). Mobile: a triple-tap does it (see attachCurveTouchAssist()).
       hit.addEventListener('contextmenu', (ctxEv) => {
         ctxEv.preventDefault()
         ctxEv.stopPropagation()
@@ -13098,10 +13116,11 @@ function buildArmLengthCurveWidget(row) {
     redraw()
     commitPoints()
   }
-  // Y = 1 (the top of the graph) for one node, any node including the two end points (their X stays where it is).
+  // Sets one node to the real VALUE 1 within this curve's own Min / Max range (see curveYForRealValue()), any node including the two end points (their X stays where it is).
   function setPointToTop(p) {
-    if (points.indexOf(p) < 0 || p.y === 1) return
-    p.y = 1
+    const y1 = curveYForRealValue(row.dataset.key, 1)
+    if (points.indexOf(p) < 0 || p.y === y1) return
+    p.y = y1
     redraw()
     commitPoints()
   }
@@ -13269,7 +13288,7 @@ function buildWristSplayCurveWidget(row) {
   // Bezier handles (2026-10-11) -- see buildArmLengthCurveWidget()'s own
   // matching comment; same port, same reasoning, same verbatim source
   // (buildGenericCurveWidget()).
-  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove  ·  Right-click / triple-tap a point: Y = 1' })
+  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove  ·  Right-click / triple-tap a point: set it to the value 1 (within Min / Max)' })
   row.appendChild(svg)
   row.appendChild(caption)
   row.appendChild(handleHint)
@@ -13413,7 +13432,7 @@ function buildWristSplayCurveWidget(row) {
         if (touchAssist.recentTouch()) return // touch: the touch assist deletes on a double-tap itself (and waits for a possible third tap)
         deletePointIfRemovable()
       })
-      // 2026-10-20, direct request: right-click on a node sets its Y to 1 (it used to delete the node; double-click still does). Mobile: a triple-tap does it (see attachCurveTouchAssist()).
+      // 2026-10-20, direct request: right-click on a node sets it to the value 1 within the curve's Min / Max (it used to delete the node; double-click still does). Mobile: a triple-tap does it (see attachCurveTouchAssist()).
       hit.addEventListener('contextmenu', (ctxEv) => {
         ctxEv.preventDefault()
         ctxEv.stopPropagation()
@@ -13437,10 +13456,11 @@ function buildWristSplayCurveWidget(row) {
     redraw()
     commitPoints()
   }
-  // Y = 1 (the top of the graph) for one node, any node including the two end points (their X stays where it is).
+  // Sets one node to the real VALUE 1 within this curve's own Min / Max range (see curveYForRealValue()), any node including the two end points (their X stays where it is).
   function setPointToTop(p) {
-    if (points.indexOf(p) < 0 || p.y === 1) return
-    p.y = 1
+    const y1 = curveYForRealValue(row.dataset.key, 1)
+    if (points.indexOf(p) < 0 || p.y === y1) return
+    p.y = y1
     redraw()
     commitPoints()
   }
@@ -17717,7 +17737,7 @@ function buildGenericCurveWidget(row, opts) {
   // 2026-09-28 change ("i want bezier handles to be visible at all
   // times") that superseded the original invisible-until-dragged
   // behavior this caption alone used to compensate for.
-  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove  ·  Right-click / triple-tap a point: Y = 1' })
+  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove  ·  Right-click / triple-tap a point: set it to the value 1 (within Min / Max)' })
   row.appendChild(svg)
   row.appendChild(caption)
   row.appendChild(handleHint)
@@ -17897,7 +17917,7 @@ function buildGenericCurveWidget(row, opts) {
         if (touchAssist.recentTouch()) return // touch: the touch assist deletes on a double-tap itself (and waits for a possible third tap)
         deletePointIfRemovable()
       })
-      // 2026-10-20, direct request: right-click on a node sets its Y to 1 (it used to delete the node; double-click still does). Mobile: a triple-tap does it (see attachCurveTouchAssist()).
+      // 2026-10-20, direct request: right-click on a node sets it to the value 1 within the curve's Min / Max (it used to delete the node; double-click still does). Mobile: a triple-tap does it (see attachCurveTouchAssist()).
       hit.addEventListener('contextmenu', (ctxEv) => {
         ctxEv.preventDefault()
         ctxEv.stopPropagation()
@@ -17921,10 +17941,11 @@ function buildGenericCurveWidget(row, opts) {
     redraw()
     commitPoints()
   }
-  // Y = 1 (the top of the graph) for one node, any node including the two end points (their X stays where it is).
+  // Sets one node to the real VALUE 1 within this curve's own Min / Max range (see curveYForRealValue()), any node including the two end points (their X stays where it is).
   function setPointToTop(p) {
-    if (points.indexOf(p) < 0 || p.y === 1) return
-    p.y = 1
+    const y1 = curveYForRealValue(row.dataset.key, 1)
+    if (points.indexOf(p) < 0 || p.y === y1) return
+    p.y = y1
     redraw()
     commitPoints()
   }
