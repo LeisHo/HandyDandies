@@ -199,6 +199,7 @@
       ],
       "smallScaleModelsEnabled": true,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
+      "skipOffScreenFingerCurls": true,
       "skipOffScreenPoseWork": true,
       "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": true,
@@ -456,11 +457,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.000000000000014,
+      "loadingPreviewKeyAzimuth": 314,
+      "loadingPreviewKeyElevation": 47,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 311,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -489,14 +490,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65,
-      "loadingPreviewRotationY": 179.99999999999997,
+      "loadingPreviewRotationX": -67.76155881846029,
+      "loadingPreviewRotationY": 179.78594228722,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.025964204363,
+      "loadingPreviewCameraZoom": 1279.5949475713576,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -15542,7 +15543,6 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
@@ -21014,6 +21014,7 @@
       ],
       "smallScaleModelsEnabled": false,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
+      "skipOffScreenFingerCurls": true,
       "skipOffScreenPoseWork": true,
       "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": true,
@@ -21025,10 +21026,10 @@
       "offScreenPoseEvery": 5,
       "fieldRows": 50,
       "fieldCols": 40,
-      "rowSpacing": 8,
-      "columnSpacing": 12,
+      "rowSpacing": 10,
+      "columnSpacing": 15,
       "handScale": 1,
-      "alternateRowOffset": 6,
+      "alternateRowOffset": 7.5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
       "hideHands": false,
@@ -21271,11 +21272,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 3",
-      "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.000000000000014,
+      "loadingPreviewKeyAzimuth": 314,
+      "loadingPreviewKeyElevation": 47,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 311,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -21304,14 +21305,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65,
-      "loadingPreviewRotationY": 179.99999999999997,
+      "loadingPreviewRotationX": -67.76155881846029,
+      "loadingPreviewRotationY": 179.78594228722,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.025964204363,
+      "loadingPreviewCameraZoom": 1279.5949475713576,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -35941,7 +35942,7 @@
         }
       ],
       "cameraX": -3.422222222222221,
-      "cameraY": 1.4497873725372912e-12,
+      "cameraY": 1.5409010943938541e-12,
       "cameraZ": 495.9881938061244,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -36357,7 +36358,6 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
@@ -41829,6 +41829,7 @@
       ],
       "smallScaleModelsEnabled": false,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
+      "skipOffScreenFingerCurls": true,
       "skipOffScreenPoseWork": false,
       "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": false,
@@ -42086,11 +42087,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.000000000000014,
+      "loadingPreviewKeyAzimuth": 314,
+      "loadingPreviewKeyElevation": 47,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 311,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -42119,14 +42120,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65,
-      "loadingPreviewRotationY": 179.99999999999997,
+      "loadingPreviewRotationX": -67.76155881846029,
+      "loadingPreviewRotationY": 179.78594228722,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.025964204363,
+      "loadingPreviewCameraZoom": 1279.5949475713576,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -57172,7 +57173,6 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
@@ -62779,7 +62779,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -63751,7 +63751,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -63762,7 +63762,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -63986,40 +63986,66 @@
                 "key": "handModelId"
               },
               {
-                "type": "row",
-                "key": "skipOffScreenPoseWork"
-              },
-              {
-                "type": "row",
-                "key": "retainRotationArmWork"
-              },
-              {
-                "type": "row",
-                "key": "skipOffScreenSceneUpdate"
-              },
-              {
-                "type": "row",
-                "key": "skipOffScreenCursorTracking"
-              },
-              {
-                "type": "row",
-                "key": "renderOrderSkipOffScreen"
-              },
-              {
-                "type": "row",
-                "key": "throttleOffScreenPosition"
-              },
-              {
-                "type": "row",
-                "key": "offScreenPositionEvery"
-              },
-              {
-                "type": "row",
-                "key": "throttleOffScreenPose"
-              },
-              {
-                "type": "row",
-                "key": "offScreenPoseEvery"
+                "type": "group",
+                "group": {
+                  "key": "Off-Screen Hands",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "skipOffScreenFingerCurls"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skipOffScreenPoseWork"
+                    },
+                    {
+                      "type": "row",
+                      "key": "retainRotationArmWork"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skipOffScreenSceneUpdate"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skipOffScreenCursorTracking"
+                    },
+                    {
+                      "type": "row",
+                      "key": "renderOrderSkipOffScreen"
+                    },
+                    {
+                      "type": "row",
+                      "key": "throttleOffScreenPosition"
+                    },
+                    {
+                      "type": "row",
+                      "key": "offScreenPositionEvery"
+                    },
+                    {
+                      "type": "row",
+                      "key": "throttleOffScreenPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "offScreenPoseEvery"
+                    }
+                  ],
+                  "settings": [
+                    "skipOffScreenFingerCurls",
+                    "skipOffScreenPoseWork",
+                    "retainRotationArmWork",
+                    "skipOffScreenSceneUpdate",
+                    "skipOffScreenCursorTracking",
+                    "renderOrderSkipOffScreen",
+                    "throttleOffScreenPosition",
+                    "offScreenPositionEvery",
+                    "throttleOffScreenPose",
+                    "offScreenPoseEvery"
+                  ]
+                }
               }
             ],
             "settings": [
@@ -64044,16 +64070,7 @@
               "fieldBoundsYMax",
               "fieldBoundsZMin",
               "fieldBoundsZMax",
-              "handModelId",
-              "skipOffScreenPoseWork",
-              "retainRotationArmWork",
-              "skipOffScreenSceneUpdate",
-              "skipOffScreenCursorTracking",
-              "renderOrderSkipOffScreen",
-              "throttleOffScreenPosition",
-              "offScreenPositionEvery",
-              "throttleOffScreenPose",
-              "offScreenPoseEvery"
+              "handModelId"
             ]
           }
         },
@@ -65899,17 +65916,12 @@
               {
                 "type": "row",
                 "key": "qualityPreset"
-              },
-              {
-                "type": "row",
-                "key": "skipOffScreenFingerCurls"
               }
             ],
             "settings": [
               "pixelRatio",
               "resolutionScale",
-              "qualityPreset",
-              "skipOffScreenFingerCurls"
+              "qualityPreset"
             ]
           }
         },
@@ -71291,10 +71303,10 @@
       "height": 576.1749877929688
     },
     "mobile": {
-      "left": 28.035715103149414,
+      "left": 21.178571701049805,
       "top": 82.82738494873047,
-      "width": 366.38690185546875,
-      "height": 257.7678527832031
+      "width": 373.2440490722656,
+      "height": 556.625
     }
   }
 }
