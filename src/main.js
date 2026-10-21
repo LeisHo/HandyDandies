@@ -477,6 +477,10 @@ let fieldCenterPoint = null // Debug > FIELD CENTER POINT: one red dot at the ce
 let loadingPreviewTwoHandActive = false // the selected Loading Tween Sequence is a two-hand one (set by ensureLoadingPreviewHand2())
 let loadingPreviewHand2 = null // second hand of a two-hand loading tween (built lazily, see ensureLoadingPreviewHand2())
 let floorMesh = null // Floor group: one plane behind the hands
+// UI Buttons Tween (2026-10-20): the corner buttons (Pause, Reset, Color Presets) animate in when the loading screen is gone. Only the shared Animation Speed / Start Time / Easing / Retransition curve rows (prefix uiBtnFn)
+// are borrowed from the pose-kind click function factory; the runtime (startUiButtonsTween / updateUiButtonsTween) is its own and tiny.
+const UIBTN_FN = 'uiBtnFn'
+const uiBtn = { running: false, items: [] }
 const SPHERE_FN = 'sphereFn' // Field Grid Sphere Sequence: only the shared Speed / Easing / Start Time / Start Distance curve controls and their parsed caches are borrowed from the click functions
 let sphereStage = 2 // 0 = waiting for the first click (floor only, hands hidden), 1 = spheres running / shown, 2 = done or feature off
 let sphereMesh = null, sphereOn = null, sphereStart = null, sphereDur = null, sphereCap = null, sphereDone = null // sphereDone[i] = 1 once sphere i has reached its target scale and position (Wait For All Spheres)
@@ -1526,6 +1530,7 @@ function finalizeReveal() {
   syncLoadingPreviewBackground() // drops the loading-screen blocker
   loadingEl.classList.add('hidden')
   updateLoadingPreviewText()
+  try { startUiButtonsTween() } catch (e) { console.error('UI Buttons Tween failed to start', e) } // sets the buttons' starting scale before they become visible
   document.body.classList.add('hd-revealed') // shows the Pause / Reset / Color Presets buttons (style.css hides them until now)
   if (startupEarlyClick) { startupEarlyClick = false; setTimeout(() => { try { onStartupPointerDown({ button: 0, target: null }) } catch (err) { console.error('early startup click replay failed', err) } }, 0) } // the click that came too early
   // The loading-preview canvas is a top-level sibling of #loading now
@@ -3982,6 +3987,21 @@ const DEV_GROUPS = [
       { key: 'sphereZRange', label: 'Min / Max Sphere Z (World Units)', type: 'text', def: '{"min":-30,"max":0}' }
     ]
   },
+  // UI Buttons Tween (2026-10-20, direct request), nested into Starting State: with it on, the corner buttons (Pause, Reset, Color Presets) animate in once the loading screen is gone instead of appearing at once. Each button
+  // gets its own start time and duration from its distance to the cursor (X axis: 0 = the button closest to the cursor, 100% = the farthest of the buttons), and its scale follows the Scale Curve over its own progress.
+  // The Animation Speed / Start Time / Easing / Retransition rows are the click functions' own (prefix uiBtnFn, built by makeClickPoseGroup()). Retransition = after the animation the scale returns to the default 1.
+  {
+    title: 'UI Buttons Tween',
+    controls: [
+      { key: 'uiBtnTweenEnabled', label: 'UI Buttons Tween On/Off', type: 'checkbox', def: false, onChange: () => onUiBtnTweenToggled() },
+      { key: 'runUiBtnTweenBtn', label: 'Run UI Buttons Tween', type: 'button', onClick: () => startUiButtonsTween() },
+      { key: 'uiBtnDurationMs', label: 'UI Button Animation Duration (Ms)', type: 'slider', min: 0, max: 10000, step: 10, def: 600 },
+      ...uiBtnFnControls(),
+      { key: 'uiBtnScaleCurveEnabled', label: 'UI Button Scale Curve On/Off', type: 'checkbox', def: true },
+      { key: 'uiBtnScaleCurve', label: 'UI Button Scale Curve (Animation Progress -> Scale)', type: 'text', def: '[{"x":0,"y":0},{"x":1,"y":1}]' },
+      { key: 'uiBtnScaleRange', label: 'Min / Max UI Button Scale (x)', type: 'text', def: '{"min":0,"max":1}' }
+    ]
+  },
   {
     title: 'Debug',
     controls: [
@@ -4261,6 +4281,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
       renderColorPresetPanel()
       placeStartupRetransitionGroup(); gateGroupHeader('Hand Offset On Startup', 'handOffsetOnStartupEnabled'); nestGroupInto('Hand Offset On Startup', 'Starting State'); updateHandOffsetGroupVisibility(); applyStartupHandOffset()
       gateGroupHeader('Field Grid Sphere Sequence', 'sphereSeqEnabled'); nestGroupInto('Field Grid Sphere Sequence', 'Starting State'); updateGroupContentsVisibility('Field Grid Sphere Sequence', !!cfg.sphereSeqEnabled)
+      gateGroupHeader('UI Buttons Tween', 'uiBtnTweenEnabled'); nestGroupInto('UI Buttons Tween', 'Starting State'); updateGroupContentsVisibility('UI Buttons Tween', !!cfg.uiBtnTweenEnabled)
       if (cfg.sphereSeqEnabled && sphereStage === 2 && !startupConsumeActive) { sphereStage = 0; updateHandsVisibility() } // a saved-on sequence starts waiting for its first click
     } catch (e) { /* panel not built */ }
     // Each step timed when ?debugTiming=1 (see devPanel.js dpTime()).
@@ -4934,6 +4955,17 @@ function sphereFnControls() {
     .filter((c) => keep.test(c.key.slice(SPHERE_FN.length)))
     .map((c) => (c.key === SPHERE_FN + 'StartTimeCurveEnabled' ? { ...c, def: false } : c))
 }
+// UI Buttons Tween's borrowed click-function rows: Animation Speed Curve, Start Time Curve, Easing and Retransition (Speed / Start Time / Easing). The rows that only mean something for hands are left out (Visible Only and X Origin
+// switches: the X axis here is simply the distance rank among the buttons; Retransition Distance Curve / Distance Scaler / Positional Retransition: they measure a hand's distance from the camera or its field point).
+function uiBtnFnControls() {
+  const keep = new Set(['SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange', 'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'EasingCurveEnabled', 'EasingCurve',
+    'RetransitionEnabled', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve',
+    'RetransitionStartTimeRange', 'RetransitionEasingCurveEnabled', 'RetransitionEasingCurve'])
+  const off = new Set(['StartTimeCurveEnabled', 'RetransitionEnabled', 'RetransitionStartTimeCurveEnabled']) // nothing extra turned on by default: the buttons start together and stay at the animation's end scale
+  return makeClickPoseGroup(UIBTN_FN, 'UI Buttons Tween', {}).controls
+    .filter((c) => keep.has(c.key.slice(UIBTN_FN.length)))
+    .map((c) => (off.has(c.key.slice(UIBTN_FN.length)) ? { ...c, def: false } : c))
+}
 function sphereParse(str, fallback) {
   let v = sphereParseCache.get(str)
   if (v !== undefined) return v
@@ -5033,6 +5065,100 @@ function updateSphereSequence() {
   sphereMesh.instanceMatrix.needsUpdate = true
   if (keep && remaining === 0) { sphereKeepForHands = false; sphereMesh.visible = false } // every hand has finished: the spheres are gone
   sceneNeedsRedraw = true
+}
+// ---- UI Buttons Tween runtime (2026-10-20) ----
+function uiBtnElements() { return ['pauseButton', 'resetButton', 'presetButton'].map((id) => document.getElementById(id)).filter(Boolean) }
+// Y of a curve (0..1) mapped into a { min, max } range: the same maths as computeStartDelayMs() without its distance normalisation.
+function uiBtnCurveMs(curveParsed, rangeParsed, x) {
+  return rangeParsed.min + (rangeParsed.max - rangeParsed.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, x), 0, 1)
+}
+function uiBtnScaleAt(prog) {
+  const pts = sphereParse(cfg.uiBtnScaleCurve, [{ x: 0, y: 0 }, { x: 1, y: 1 }]), rg = sphereParse(cfg.uiBtnScaleRange, { min: 0, max: 1 })
+  return Math.max(rg.min + (rg.max - rg.min) * THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, prog), 0, 1), 0)
+}
+function uiBtnEnsureTrigger() {
+  clickPoseTriggers[UIBTN_FN] = clickPoseTriggers[UIBTN_FN] || {
+    startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
+    speedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], speedRangeParsed: { min: 50, max: 2000 },
+    tweenStartCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], tweenStartRangeParsed: { min: 0, max: 300 },
+    startDistanceCurveParsed: [{ x: 0, y: 1 }, { x: 1, y: 1 }], easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }],
+    retransitionCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionRangeParsed: { min: 0, max: 300 },
+    retransitionSpeedCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], retransitionSpeedRangeParsed: { min: 50, max: 2000 },
+    cursorOffsetDistanceCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], cursorOffsetDistanceRangeParsed: { min: -50, max: 50 }
+  }
+  return clickPoseTriggers[UIBTN_FN]
+}
+// (Re)starts the animation: each button gets its place in the distance order (0 = closest to the cursor ... 1 = farthest of the buttons), its start time (Start Time Curve) and duration (Animation Speed Curve or the Duration
+// slider), and waits at the scale of progress 0 until its start time. Called when the loading screen goes away, by Run UI Buttons Tween, and by Run Starting State.
+function startUiButtonsTween() {
+  stopUiButtonsTween(true)
+  if (!cfg.uiBtnTweenEnabled) return
+  const els = uiBtnElements()
+  if (!els.length) return
+  const trig = uiBtnEnsureTrigger()
+  cfg[UIBTN_FN + 'Mode'] = 'Single Pose'
+  parseClickPoseConfig(UIBTN_FN)
+  const cx = (cursorNDC.x * 0.5 + 0.5) * window.innerWidth, cy = (-cursorNDC.y * 0.5 + 0.5) * window.innerHeight
+  const d = els.map((el) => { const r = el.getBoundingClientRect(); return Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy) })
+  const dMin = Math.min(...d), dMax = Math.max(...d)
+  const now = nowVirtual()
+  uiBtn.items = els.map((el, i) => {
+    const x = dMax - dMin > 1e-6 ? (d[i] - dMin) / (dMax - dMin) : 0
+    const delay = cfg[UIBTN_FN + 'StartTimeCurveEnabled'] ? uiBtnCurveMs(trig.startCurveParsed, trig.startRangeParsed, x) : 0
+    const dur = cfg[UIBTN_FN + 'SpeedCurveEnabled'] ? uiBtnCurveMs(trig.speedCurveParsed, trig.speedRangeParsed, x) : (cfg.uiBtnDurationMs ?? 600)
+    return { el, x, start: now + Math.max(delay, 0), dur: Math.max(dur, 1), phase: 'wait', retStart: 0, retDur: 1, from: 1 }
+  })
+  uiBtn.running = true
+  updateUiButtonsTween()
+}
+// Puts the buttons back to their normal scale. keepState = true when called from startUiButtonsTween() (it sets the state again right after).
+function stopUiButtonsTween(keepState) {
+  uiBtn.running = false
+  uiBtnElements().forEach((el) => { el.style.scale = '' })
+  uiBtn.items = []
+}
+function onUiBtnTweenToggled() {
+  try { updateGroupContentsVisibility('UI Buttons Tween', !!cfg.uiBtnTweenEnabled) } catch (e) { /* panel not built */ }
+  if (!document.body || !document.body.classList.contains('hd-revealed')) return // not revealed yet: finalizeReveal() starts it
+  if (cfg.uiBtnTweenEnabled) startUiButtonsTween(); else stopUiButtonsTween()
+}
+// Every frame while running: forward (the Scale Curve over the eased progress) -> retransition (back to scale 1, after its own start time, over its own speed, eased) -> done. A button that is waiting sits at the scale of
+// progress 0 (0 with the Scale Curve off); with the Scale Curve off the button pops to 1 at its start time. With Retransition off the button stays at the animation's end scale.
+function updateUiButtonsTween() {
+  if (!uiBtn.running) return
+  const trig = clickPoseTriggers[UIBTN_FN], now = nowVirtual()
+  const scaleOn = cfg.uiBtnScaleCurveEnabled !== false, retOn = !!cfg[UIBTN_FN + 'RetransitionEnabled']
+  const easing = cfg[UIBTN_FN + 'EasingCurveEnabled'] ? getEasingProfile(UIBTN_FN, false, trig) : null
+  const retEasing = cfg[UIBTN_FN + 'RetransitionEasingCurveEnabled'] ? getEasingProfile(UIBTN_FN, false, trig, true) : null
+  let active = 0
+  for (let i = 0; i < uiBtn.items.length; i++) {
+    const b = uiBtn.items[i]
+    if (b.phase === 'done') continue
+    let sc
+    if (b.phase === 'wait' && now >= b.start) b.phase = 'forward'
+    if (b.phase === 'wait') {
+      sc = scaleOn ? uiBtnScaleAt(0) : 0
+    } else if (b.phase === 'forward') {
+      const raw = THREE.MathUtils.clamp((now - b.start) / b.dur, 0, 1)
+      const e = easing ? easingProfilePAt(easing, raw) : raw
+      sc = scaleOn ? uiBtnScaleAt(e) : 1
+      if (raw >= 1) {
+        if (retOn && Math.abs(sc - 1) > 1e-3) {
+          const delay = cfg[UIBTN_FN + 'RetransitionStartTimeCurveEnabled'] ? uiBtnCurveMs(trig.retransitionCurveParsed, trig.retransitionRangeParsed, b.x) : 0
+          const dur = cfg[UIBTN_FN + 'RetransitionSpeedCurveEnabled'] ? uiBtnCurveMs(trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed, b.x) : cfg[UIBTN_FN + 'RetransitionSpeedMs']
+          b.phase = 'retransition'; b.from = sc; b.retStart = now + Math.max(delay, 0); b.retDur = Math.max(dur || 0, 1)
+        } else b.phase = 'done'
+      }
+    } else {
+      const u = THREE.MathUtils.clamp((now - b.retStart) / b.retDur, 0, 1)
+      const e = retEasing ? easingProfilePAt(retEasing, u) : u
+      sc = b.from + (1 - b.from) * e
+      if (u >= 1) { b.phase = 'done'; sc = 1 }
+    }
+    b.el.style.scale = (b.phase === 'done' && Math.abs(sc - 1) < 1e-3) ? '' : String(sc)
+    if (b.phase !== 'done') active++
+  }
+  if (!active) uiBtn.running = false
 }
 function sphereSeqActive() { return !!cfg.sphereSeqEnabled && sphereStage < 2 }
 // Click 1 spawns the spheres, click 2 removes them and shows the hands; Hand Offset On Startup (if on) then waits for ITS first click as before.
@@ -5144,6 +5270,7 @@ function restartStartingState() {
   startupStaticReleased = false
   onHandOffsetOnStartupToggled() // stage 0, startupFloorHidden off, per-hand startup flags cleared, offset displacement re-applied
   onSphereSeqToggled() // sphereStage back to 0 (or 2 when the sequence is off), spheres hidden, hands shown, offset re-applied
+  if (document.body.classList.contains('hd-revealed')) startUiButtonsTween() // plays the corner buttons' animation again
   updateFloor()
   sceneNeedsRedraw = true
 }
@@ -5316,6 +5443,42 @@ function setupSphereSequenceGroup() {
   gateGroupHeader('Field Grid Sphere Sequence', 'sphereSeqEnabled')
   nestGroupInto('Field Grid Sphere Sequence', 'Starting State')
   updateGroupContentsVisibility('Field Grid Sphere Sequence', !!cfg.sphereSeqEnabled)
+}
+function setupUiButtonsTweenGroup() {
+  uiBtnEnsureTrigger()
+  cfg[UIBTN_FN + 'Enabled'] = true
+  cfg[UIBTN_FN + 'Mode'] = 'Single Pose' // updateSingleTimingGateVisibility() shows the Start Time Curve rows by Mode (see setupSphereSequenceGroup())
+  parseClickPoseConfig(UIBTN_FN)
+  buildClickPoseWidgets(UIBTN_FN) // curve + range widgets of the borrowed rows
+  updateSingleTimingGateVisibility(UIBTN_FN)
+  const p = UIBTN_FN
+  const scCurveRow = document.querySelector('.dp-row[data-key="uiBtnScaleCurve"]'), scRangeRow = document.querySelector('.dp-row[data-key="uiBtnScaleRange"]')
+  if (scCurveRow) buildGenericCurveWidget(scCurveRow, { caption: 'X: Button Animation Progress (0 = Not Started, 100% = Animation End)  ·  Y: Scale (0=Min, 1=Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  if (scRangeRow) buildGenericRangeBarWidget(scRangeRow, { trackMin: 0, trackMax: 4, unit: 'x', decimals: 2, defaultValue: { min: 0, max: 1 } })
+  wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurve`, `${p}SpeedCurveRange`], 'UI Button Animation Speed Curve')
+  wrapGatedSubgroup(`${p}StartTimeCurveEnabled`, [`${p}StartTimeCurve`, `${p}StartTimeRange`], 'UI Button Start Time Curve')
+  wrapGatedSubgroup('uiBtnScaleCurveEnabled', ['uiBtnScaleCurve', 'uiBtnScaleRange'], 'UI Button Scale Curve')
+  wrapGatedSubgroup(`${p}EasingCurveEnabled`, [`${p}EasingCurve`], 'UI Button Easing')
+  wrapGatedSubgroup(`${p}RetransitionEnabled`, [`${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`,
+    `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`, `${p}RetransitionEasingCurveEnabled`, `${p}RetransitionEasingCurve`], 'UI Button Retransition')
+  // nested inside Retransition (these run AFTER the outer wrap, see wrapClickFunctionGatedSubgroups())
+  wrapGatedSubgroup(`${p}RetransitionSpeedCurveEnabled`, [`${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`], 'UI Button Retransition Speed Curve')
+  wrapGatedSubgroup(`${p}RetransitionEasingCurveEnabled`, [`${p}RetransitionEasingCurve`], 'UI Button Retransition Easing Curve')
+  wrapGatedSubgroup(`${p}RetransitionStartTimeCurveEnabled`, [`${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`], 'UI Button Retransition Start Time Curve')
+  const g = document.querySelector('.dp-group[data-key="UI Buttons Tween"]')
+  const body = g && g.querySelector(':scope > .dp-group-body')
+  if (body) {
+    // the order the request lists them in
+    ;['UI Button Animation Speed Curve', 'UI Button Start Time Curve', 'UI Button Scale Curve', 'UI Button Easing', 'UI Button Retransition'].forEach((t) => {
+      const sg = body.querySelector(':scope > .dp-group[data-key="' + t + '"]')
+      if (sg) body.appendChild(sg)
+    })
+    // unique internal keys (a saved layout matches groups by their internal key, see setupSphereSequenceGroup())
+    body.querySelectorAll('.dp-group').forEach((sg) => { if (!sg.dataset.key.startsWith('UiBtn > ')) sg.dataset.key = 'UiBtn > ' + sg.dataset.key })
+  }
+  gateGroupHeader('UI Buttons Tween', 'uiBtnTweenEnabled')
+  nestGroupInto('UI Buttons Tween', 'Starting State')
+  updateGroupContentsVisibility('UI Buttons Tween', !!cfg.uiBtnTweenEnabled)
 }
 function updateFloorRowVisibility() {
   const on = !!cfg.floorEnabled
@@ -22810,6 +22973,7 @@ function animate(dt, now) {
     __s2 = rlsLap('hand number labels', __s2)
     updateSphereSequence()
     rlsLap('sphere sequence', __s2)
+    updateUiButtonsTween()
     // Global Pause (Debug group, see setPaused()'s own declaration) --
     // skipping cursor-target tracking, the cursor-follow rotation step,
     // and updateRenderOrder() (which drives every Click Pose/Click-Hold-
@@ -23261,6 +23425,7 @@ updateFloorRowVisibility()
 updateFloor()
 setupHandOffsetStartupGroup()
 setupSphereSequenceGroup()
+setupUiButtonsTweenGroup()
 setupLoadingPreviewEasingGroup()
 setupLoadingPreviewSpeedCurveGroup()
 safeRefreshSelectOptions('trackingPoint')
