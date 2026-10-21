@@ -261,7 +261,7 @@
       "armRotationTargetDepth": 55,
       "armRotationDefault": 100,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6472180947889452,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6388002085864525,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":60}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -21737,7 +21737,7 @@
       "armRotationTargetDepth": 5.6,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6472180947889452,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6388002085864525,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":60}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -43213,7 +43213,7 @@
       "armRotationTargetDepth": 3.4,
       "armRotationDefault": 100,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6472180947889452,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6388002085864525,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":60}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -73312,11 +73312,11 @@
       "collapsed": false
     },
     "mobile": {
-      "left": 25.863096237182617,
+      "left": 22.428571701049805,
       "top": 105.89881134033203,
-      "width": 368.56549072265625,
-      "height": 535.6011962890625,
-      "collapsed": false
+      "width": 371.9940490722656,
+      "height": 537.125,
+      "collapsed": true
     }
   }
 }
