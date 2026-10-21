@@ -197,7 +197,7 @@
           "source": "local"
         }
       ],
-      "smallScaleModelsEnabled": true,
+      "smallScaleModelsEnabled": false,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
       "fieldRows": 35,
       "fieldCols": 35,
@@ -57504,7 +57504,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -59042,7 +59042,7 @@
           "type": "group",
           "group": {
             "key": "Small Scale Models",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -59252,7 +59252,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -59654,7 +59654,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -59673,7 +59673,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -62321,7 +62321,24 @@
     "loadingPreviewSequenceLoopWrapScale": false,
     "pixelRatio": false,
     "resolutionScale": false,
-    "qualityPreset": false
+    "qualityPreset": false,
+    "startupHandMaxClicks": false,
+    "startupHandWaitForAll": false,
+    "startupFnLoopWrapScale": false,
+    "startupTrackArm": false,
+    "startupTrackPalm": false,
+    "startupTrackSplay": false,
+    "startupTrackCrop": false,
+    "startupFnOffsetLoopRetransition": false,
+    "startupFnRetransitionSpeedCurveXOrigin": false,
+    "startupFnRetransitionStartTimeCurveXOrigin": false,
+    "startupFnRetransitionDistCurveEnabled": false,
+    "startupFnRetransitionScalerEnabled": false,
+    "startupFnPositionalRetransition": false,
+    "startupFnSpeedCurveXOrigin": false,
+    "startupFnStartTimeCurveXOrigin": false,
+    "startupFnStartDistanceXOrigin": false,
+    "startupFnCursorClampEnabled": false
   },
   "devIndependence": {
     "mobile": {
