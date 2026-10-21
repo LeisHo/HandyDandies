@@ -199,8 +199,8 @@
       ],
       "smallScaleModelsEnabled": true,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
-      "skipOffScreenPoseWork": false,
-      "retainRotationArmWork": false,
+      "skipOffScreenPoseWork": true,
+      "retainRotationArmWork": true,
       "fieldRows": 35,
       "fieldCols": 35,
       "rowSpacing": 8,
@@ -14163,7 +14163,7 @@
         }
       ],
       "cameraX": 1.907706141586066,
-      "cameraY": 6.230345580325375e-13,
+      "cameraY": 6.453537459469977e-13,
       "cameraZ": 242.98502235780893,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -14686,6 +14686,29 @@
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.15416666666666667,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":15}",
+      "uiBtnTweenEnabled": false,
+      "uiBtnDurationMs": 600,
+      "uiBtnFnEasingCurveEnabled": false,
+      "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
+      "uiBtnFnRetransitionEasingCurveEnabled": false,
+      "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
+      "uiBtnFnSpeedCurveEnabled": false,
+      "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnSpeedCurveRange": "{\"min\":500,\"max\":1500}",
+      "uiBtnFnStartTimeCurveEnabled": false,
+      "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
+      "uiBtnFnRetransitionEnabled": false,
+      "uiBtnFnRetransitionSpeedMs": 400,
+      "uiBtnFnRetransitionSpeedCurveEnabled": false,
+      "uiBtnFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "uiBtnFnRetransitionStartTimeCurveEnabled": false,
+      "uiBtnFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "uiBtnScaleCurveEnabled": true,
+      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnScaleRange": "{\"min\":0,\"max\":1}",
       "showTrackingPoints": false,
       "showFieldCenterPoint": false,
       "showRenderOrderPoints": false,
@@ -34222,6 +34245,29 @@
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.15416666666666667,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":15}",
+      "uiBtnTweenEnabled": false,
+      "uiBtnDurationMs": 600,
+      "uiBtnFnEasingCurveEnabled": false,
+      "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
+      "uiBtnFnRetransitionEasingCurveEnabled": false,
+      "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
+      "uiBtnFnSpeedCurveEnabled": false,
+      "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnSpeedCurveRange": "{\"min\":500,\"max\":1500}",
+      "uiBtnFnStartTimeCurveEnabled": false,
+      "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
+      "uiBtnFnRetransitionEnabled": false,
+      "uiBtnFnRetransitionSpeedMs": 400,
+      "uiBtnFnRetransitionSpeedCurveEnabled": false,
+      "uiBtnFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "uiBtnFnRetransitionStartTimeCurveEnabled": false,
+      "uiBtnFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "uiBtnScaleCurveEnabled": true,
+      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnScaleRange": "{\"min\":0,\"max\":1}",
       "showTrackingPoints": false,
       "showFieldCenterPoint": false,
       "showRenderOrderPoints": false,
@@ -53758,6 +53804,29 @@
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.15416666666666667,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":15}",
+      "uiBtnTweenEnabled": false,
+      "uiBtnDurationMs": 600,
+      "uiBtnFnEasingCurveEnabled": false,
+      "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
+      "uiBtnFnRetransitionEasingCurveEnabled": false,
+      "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
+      "uiBtnFnSpeedCurveEnabled": false,
+      "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnSpeedCurveRange": "{\"min\":500,\"max\":1500}",
+      "uiBtnFnStartTimeCurveEnabled": false,
+      "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
+      "uiBtnFnRetransitionEnabled": false,
+      "uiBtnFnRetransitionSpeedMs": 400,
+      "uiBtnFnRetransitionSpeedCurveEnabled": false,
+      "uiBtnFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnRetransitionSpeedCurveRange": "{\"min\":50,\"max\":25000}",
+      "uiBtnFnRetransitionStartTimeCurveEnabled": false,
+      "uiBtnFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
+      "uiBtnScaleCurveEnabled": true,
+      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
+      "uiBtnScaleRange": "{\"min\":0,\"max\":1}",
       "showTrackingPoints": false,
       "showFieldCenterPoint": false,
       "showRenderOrderPoints": false,
@@ -59849,7 +59918,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -59860,7 +59929,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -62695,6 +62764,189 @@
               "sphereWaitForAll",
               "sphereColor",
               "sphereMaxClicks"
+            ]
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "UI Buttons Tween",
+            "collapsed": false,
+            "locked": false,
+            "items": [
+              {
+                "type": "row",
+                "key": "runUiBtnTweenBtn"
+              },
+              {
+                "type": "row",
+                "key": "uiBtnDurationMs"
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "UiBtn > UI Button Animation Speed Curve",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "uiBtnFnSpeedCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "uiBtnFnSpeedCurveRange"
+                    }
+                  ],
+                  "settings": [
+                    "uiBtnFnSpeedCurve",
+                    "uiBtnFnSpeedCurveRange"
+                  ]
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "UiBtn > UI Button Start Time Curve",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "uiBtnFnStartTimeCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "uiBtnFnStartTimeRange"
+                    }
+                  ],
+                  "settings": [
+                    "uiBtnFnStartTimeCurve",
+                    "uiBtnFnStartTimeRange"
+                  ]
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "UiBtn > UI Button Scale Curve",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "uiBtnScaleCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "uiBtnScaleRange"
+                    }
+                  ],
+                  "settings": [
+                    "uiBtnScaleCurve",
+                    "uiBtnScaleRange"
+                  ]
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "UiBtn > UI Button Easing",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "uiBtnFnEasingCurve"
+                    }
+                  ],
+                  "settings": [
+                    "uiBtnFnEasingCurve"
+                  ]
+                }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "UiBtn > UI Button Retransition",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "uiBtnFnRetransitionSpeedMs"
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "UiBtn > UI Button Retransition Speed Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "uiBtnFnRetransitionSpeedCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "uiBtnFnRetransitionSpeedCurveRange"
+                          }
+                        ],
+                        "settings": [
+                          "uiBtnFnRetransitionSpeedCurve",
+                          "uiBtnFnRetransitionSpeedCurveRange"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "UiBtn > UI Button Retransition Start Time Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "uiBtnFnRetransitionStartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "uiBtnFnRetransitionStartTimeRange"
+                          }
+                        ],
+                        "settings": [
+                          "uiBtnFnRetransitionStartTimeCurve",
+                          "uiBtnFnRetransitionStartTimeRange"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "UiBtn > UI Button Retransition Easing Curve",
+                        "collapsed": false,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "uiBtnFnRetransitionEasingCurve"
+                          }
+                        ],
+                        "settings": [
+                          "uiBtnFnRetransitionEasingCurve"
+                        ]
+                      }
+                    }
+                  ],
+                  "settings": [
+                    "uiBtnFnRetransitionSpeedMs"
+                  ]
+                }
+              }
+            ],
+            "settings": [
+              "runUiBtnTweenBtn",
+              "uiBtnDurationMs"
             ]
           }
         }
@@ -67099,8 +67351,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 621.75,
-      "height": 555.375
+      "width": 624.9500122070312,
+      "height": 556.9750366210938
     },
     "mobile": {
       "left": 28.035715103149414,
