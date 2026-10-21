@@ -15326,7 +15326,7 @@ function beginOnRelease(hand, chp, p, values, now) {
 function stageParentOf(p) { const m = /^(custom\d+(?:Trig\d+)?)(?:Clk|Rel)$/.exec(p); return m ? m[1] : null } // a custom function (customN) or one of its hold-kind Multi Triggers (customNTrigM)
 function isStagePrefix(p) { return stageParentOf(p) !== null }
 function triggerStateOf(p) { return clickHoldPoseTriggers[p] || clickPoseTriggers[p] }
-function onClickOn(p) { return cfg[`${p}ClkEnabled`] === true && !!clickPoseTriggers[`${p}Clk`] }
+function onClickOn(p) { return cfg[`${p}ClkEnabled`] === true && !!clickPoseTriggers[`${p}Clk`] && CLICK_HOLD_KEYS.includes(p) } // only a Click+Hold function runs it (a function switched to plain Click keeps a saved value that no longer does anything)
 function onClickCtxFor(p, stamp) {
   const clk = `${p}Clk`
   let c = onClickCtxCache[clk]
@@ -19105,7 +19105,7 @@ async function renderCustomClickFunctionGroup(id, title, kind, family, yielder) 
     profAgg('updateSequencePlayModeVisibility', () => updateSequencePlayModeVisibility(id))
     profAgg('updateChainModeVisibility', () => updateChainModeVisibility(id))
     { const mt = profAgg('setupMultiTriggerGroupForFunction', () => setupMultiTriggerGroupForFunction(id, 'pose', yielder)); if (yielder) await mt }
-    { const ocl = profAgg('setupOnClickGroupForFunction', () => setupOnClickGroupForFunction(id, yielder)); if (yielder) await ocl } // On Click (2026-10-20)
+    // On Click / On Release exist only for Click+Hold functions (2026-10-21, direct request): a plain Click function gets neither group.
   }
   // Same mandatory Offset/Rotation/Animation Speed Curve/Start Time
   // Curve/Retransition gated-subgroup wrapping the 10 static triggers

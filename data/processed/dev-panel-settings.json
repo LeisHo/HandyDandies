@@ -200,11 +200,11 @@
       "smallScaleModelsEnabled": true,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
       "skipOffScreenPoseWork": true,
-      "retainRotationArmWork": true,
+      "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": true,
       "skipOffScreenCursorTracking": true,
       "renderOrderSkipOffScreen": true,
-      "throttleOffScreenTimelines": true,
+      "throttleOffScreenTimelines": false,
       "offScreenTimelineEvery": 3,
       "fieldRows": 45,
       "fieldCols": 55,
@@ -15084,10 +15084,10 @@
         {
           "name": "FLOWER CHARGE",
           "tweenPoses": [
-            "Closed Flower - 0",
-            "Closed Flower - 1",
-            "Closed Flower - 2",
-            "Closed Flower - 1"
+            "CLOSED FLOWER - 0",
+            "CLOSED FLOWER - 1",
+            "CLOSED FLOWER - 2",
+            "CLOSED FLOWER - 1"
           ],
           "group": "FLOWER"
         },
@@ -15110,6 +15110,17 @@
             "2 TWIDS - 75"
           ],
           "group": "2 TWIDS - 1ST HAND"
+        },
+        {
+          "name": "FLOWER",
+          "tweenPoses": [
+            "CLOSED FLOWER - 0",
+            "CLOSED FLOWER - 2",
+            "NEUTRAL",
+            "Max Palm -20",
+            "Max Palm -40"
+          ],
+          "group": "FLOWER"
         }
       ],
       "cameraX": 1.9077061415860657,
@@ -15636,7 +15647,7 @@
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.2222222222222222,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":15}",
-      "uiBtnTweenEnabled": false,
+      "uiBtnTweenEnabled": true,
       "uiBtnDurationMs": 600,
       "uiBtnFnEasingCurveEnabled": false,
       "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
@@ -18774,7 +18785,7 @@
       "custom41RotationMode": "Rotation at Crop",
       "custom41TargetPose": "",
       "custom41SkipIfSamePose": false,
-      "custom41TweenSelector": "NEUTRAL NNBB",
+      "custom41TweenSelector": "FLOWER CHARGE",
       "custom41ReverseSequence": false,
       "custom41GlideToFirstPose": true,
       "custom41FirstGlideTimeScale": 2.4,
@@ -19169,7 +19180,7 @@
       "custom41RelRotationLoopRetransition": false,
       "custom41RelRotationMode": "Rotation at Crop",
       "custom41RelTargetPose": "",
-      "custom41RelTweenSelector": "2 TWIDS",
+      "custom41RelTweenSelector": "FLOWER",
       "custom41RelReverseSequence": false,
       "custom41RelGlideToFirstPose": false,
       "custom41RelFirstGlideTimeScale": 1,
@@ -19181,13 +19192,13 @@
       "custom41RelLoopWrapScale": 1,
       "custom41RelSequenceHoldMs": 0,
       "custom41RelTransitionSpeedMs": 400,
-      "custom41RelEasingCurveEnabled": false,
-      "custom41RelEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "custom41RelSpeedCurveEnabled": false,
+      "custom41RelEasingCurveEnabled": true,
+      "custom41RelEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4985989100361708,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.38897948861371423,\"y\":0}}]",
+      "custom41RelSpeedCurveEnabled": true,
       "custom41RelSpeedCurveVisibleOnly": true,
       "custom41RelSpeedCurveXOrigin": "Global Setting",
-      "custom41RelSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom41RelSpeedCurveRange": "{\"min\":500,\"max\":1500}",
+      "custom41RelSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.477185295995236,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom41RelSpeedCurveRange": "{\"min\":970,\"max\":1082}",
       "custom41ClkEnabled": false,
       "custom41ClkMode": "Single Pose",
       "custom41ClkOffsetEnabled": false,
@@ -36470,10 +36481,10 @@
         {
           "name": "FLOWER CHARGE",
           "tweenPoses": [
-            "Closed Flower - 0",
-            "Closed Flower - 1",
-            "Closed Flower - 2",
-            "Closed Flower - 1"
+            "CLOSED FLOWER - 0",
+            "CLOSED FLOWER - 1",
+            "CLOSED FLOWER - 2",
+            "CLOSED FLOWER - 1"
           ],
           "group": "FLOWER"
         },
@@ -36496,6 +36507,17 @@
             "2 TWIDS - 75"
           ],
           "group": "2 TWIDS - 1ST HAND"
+        },
+        {
+          "name": "FLOWER",
+          "tweenPoses": [
+            "CLOSED FLOWER - 0",
+            "CLOSED FLOWER - 2",
+            "NEUTRAL",
+            "Max Palm -20",
+            "Max Palm -40"
+          ],
+          "group": "FLOWER"
         }
       ],
       "cameraX": -3.422222222222221,
@@ -37022,7 +37044,7 @@
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.2222222222222222,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":15}",
-      "uiBtnTweenEnabled": false,
+      "uiBtnTweenEnabled": true,
       "uiBtnDurationMs": 600,
       "uiBtnFnEasingCurveEnabled": false,
       "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
@@ -40160,7 +40182,7 @@
       "custom41RotationMode": "Rotation at Crop",
       "custom41TargetPose": "",
       "custom41SkipIfSamePose": false,
-      "custom41TweenSelector": "NEUTRAL NNBB",
+      "custom41TweenSelector": "FLOWER CHARGE",
       "custom41ReverseSequence": false,
       "custom41GlideToFirstPose": true,
       "custom41FirstGlideTimeScale": 2.4,
@@ -40555,7 +40577,7 @@
       "custom41RelRotationLoopRetransition": false,
       "custom41RelRotationMode": "Rotation at Crop",
       "custom41RelTargetPose": "",
-      "custom41RelTweenSelector": "2 TWIDS",
+      "custom41RelTweenSelector": "FLOWER",
       "custom41RelReverseSequence": false,
       "custom41RelGlideToFirstPose": false,
       "custom41RelFirstGlideTimeScale": 1,
@@ -40567,13 +40589,13 @@
       "custom41RelLoopWrapScale": 1,
       "custom41RelSequenceHoldMs": 0,
       "custom41RelTransitionSpeedMs": 400,
-      "custom41RelEasingCurveEnabled": false,
-      "custom41RelEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "custom41RelSpeedCurveEnabled": false,
+      "custom41RelEasingCurveEnabled": true,
+      "custom41RelEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4985989100361708,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.38897948861371423,\"y\":0}}]",
+      "custom41RelSpeedCurveEnabled": true,
       "custom41RelSpeedCurveVisibleOnly": true,
       "custom41RelSpeedCurveXOrigin": "Global Setting",
-      "custom41RelSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom41RelSpeedCurveRange": "{\"min\":500,\"max\":1500}",
+      "custom41RelSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.477185295995236,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom41RelSpeedCurveRange": "{\"min\":970,\"max\":1082}",
       "custom41ClkEnabled": false,
       "custom41ClkMode": "Single Pose",
       "custom41ClkOffsetEnabled": false,
@@ -57856,10 +57878,10 @@
         {
           "name": "FLOWER CHARGE",
           "tweenPoses": [
-            "Closed Flower - 0",
-            "Closed Flower - 1",
-            "Closed Flower - 2",
-            "Closed Flower - 1"
+            "CLOSED FLOWER - 0",
+            "CLOSED FLOWER - 1",
+            "CLOSED FLOWER - 2",
+            "CLOSED FLOWER - 1"
           ],
           "group": "FLOWER"
         },
@@ -57882,6 +57904,17 @@
             "2 TWIDS - 75"
           ],
           "group": "2 TWIDS - 1ST HAND"
+        },
+        {
+          "name": "FLOWER",
+          "tweenPoses": [
+            "CLOSED FLOWER - 0",
+            "CLOSED FLOWER - 2",
+            "NEUTRAL",
+            "Max Palm -20",
+            "Max Palm -40"
+          ],
+          "group": "FLOWER"
         }
       ],
       "cameraX": 6.6385295949156875,
@@ -58408,7 +58441,7 @@
       "sphereZCurveEnabled": true,
       "sphereZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.45532200522949196,\"y\":0.03206227620442714}},{\"x\":0.530303849945888,\"y\":1,\"h2\":{\"x\":-0.13005225587133062,\"y\":0},\"h1\":{\"x\":0.1274864391737438,\"y\":-0.15593744913736973}},{\"x\":1,\"y\":0.2222222222222222,\"h2\":{\"x\":-0.43229694032532007,\"y\":0.24000015258789065}}]",
       "sphereZRange": "{\"min\":-3,\"max\":15}",
-      "uiBtnTweenEnabled": false,
+      "uiBtnTweenEnabled": true,
       "uiBtnDurationMs": 600,
       "uiBtnFnEasingCurveEnabled": false,
       "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
@@ -61546,7 +61579,7 @@
       "custom41RotationMode": "Rotation at Crop",
       "custom41TargetPose": "",
       "custom41SkipIfSamePose": false,
-      "custom41TweenSelector": "NEUTRAL NNBB",
+      "custom41TweenSelector": "FLOWER CHARGE",
       "custom41ReverseSequence": false,
       "custom41GlideToFirstPose": true,
       "custom41FirstGlideTimeScale": 2.4,
@@ -61941,7 +61974,7 @@
       "custom41RelRotationLoopRetransition": false,
       "custom41RelRotationMode": "Rotation at Crop",
       "custom41RelTargetPose": "",
-      "custom41RelTweenSelector": "2 TWIDS",
+      "custom41RelTweenSelector": "FLOWER",
       "custom41RelReverseSequence": false,
       "custom41RelGlideToFirstPose": false,
       "custom41RelFirstGlideTimeScale": 1,
@@ -61953,13 +61986,13 @@
       "custom41RelLoopWrapScale": 1,
       "custom41RelSequenceHoldMs": 0,
       "custom41RelTransitionSpeedMs": 400,
-      "custom41RelEasingCurveEnabled": false,
-      "custom41RelEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "custom41RelSpeedCurveEnabled": false,
+      "custom41RelEasingCurveEnabled": true,
+      "custom41RelEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4985989100361708,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.38897948861371423,\"y\":0}}]",
+      "custom41RelSpeedCurveEnabled": true,
       "custom41RelSpeedCurveVisibleOnly": true,
       "custom41RelSpeedCurveXOrigin": "Global Setting",
-      "custom41RelSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom41RelSpeedCurveRange": "{\"min\":500,\"max\":1500}",
+      "custom41RelSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.477185295995236,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "custom41RelSpeedCurveRange": "{\"min\":970,\"max\":1082}",
       "custom41ClkEnabled": false,
       "custom41ClkMode": "Single Pose",
       "custom41ClkOffsetEnabled": false,
@@ -65464,7 +65497,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -65475,7 +65508,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -67648,7 +67681,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -68341,7 +68374,7 @@
           "type": "group",
           "group": {
             "key": "UI Buttons Tween",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -70591,7 +70624,30 @@
     "startupFnSpeedCurveXOrigin": true,
     "startupFnStartTimeCurveXOrigin": true,
     "startupFnStartDistanceXOrigin": false,
-    "startupFnCursorClampEnabled": true
+    "startupFnCursorClampEnabled": true,
+    "uiBtnTweenEnabled": false,
+    "uiBtnDurationMs": false,
+    "uiBtnFnSpeedCurveEnabled": false,
+    "uiBtnFnSpeedCurve": false,
+    "uiBtnFnSpeedCurveRange": false,
+    "uiBtnFnStartTimeCurveEnabled": false,
+    "uiBtnFnStartTimeCurve": false,
+    "uiBtnFnStartTimeRange": false,
+    "uiBtnScaleCurveEnabled": false,
+    "uiBtnScaleCurve": false,
+    "uiBtnScaleRange": false,
+    "uiBtnFnEasingCurveEnabled": false,
+    "uiBtnFnEasingCurve": false,
+    "uiBtnFnRetransitionEnabled": false,
+    "uiBtnFnRetransitionSpeedMs": false,
+    "uiBtnFnRetransitionSpeedCurveEnabled": false,
+    "uiBtnFnRetransitionSpeedCurve": false,
+    "uiBtnFnRetransitionSpeedCurveRange": false,
+    "uiBtnFnRetransitionStartTimeCurveEnabled": false,
+    "uiBtnFnRetransitionStartTimeCurve": false,
+    "uiBtnFnRetransitionStartTimeRange": false,
+    "uiBtnFnRetransitionEasingCurveEnabled": false,
+    "uiBtnFnRetransitionEasingCurve": false
   },
   "devIndependence": {
     "mobile": {
