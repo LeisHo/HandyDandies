@@ -34208,7 +34208,7 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
       "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7169769080541867,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionSpeedCurveRange": "{\"min\":700,\"max\":850}",
+      "startupFnRetransitionSpeedCurveRange": "{\"min\":700,\"max\":800}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionDistRange": "{\"min\":50,\"max\":2000}",
@@ -34220,7 +34220,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveXOrigin": "Global Setting",
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3567004088400583,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":161}",
+      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":0}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
@@ -62337,7 +62337,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": true,
                         "items": [
                           {
