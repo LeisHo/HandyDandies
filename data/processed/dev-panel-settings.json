@@ -21161,8 +21161,8 @@
       "rvSet1CropDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7355748425958465,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.33029751545677,\"y\":0}}]",
       "rvSet1CropDistCurveXOrigin": "Global Setting",
       "rvSet1CurlEnabled": true,
-      "rvSet1CurlTargetPose": "",
-      "rvSet1CurlCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.39374633574359974,\"y\":0.3945309956868489}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.7763532938611492,\"y\":0}}]",
+      "rvSet1CurlTargetPose": "Max Palm -30",
+      "rvSet1CurlCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1831059220706147,\"y\":0.5346875508626302}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.7763532938611492,\"y\":0}}]",
       "rvSet1CurlDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.29043726696818106,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3736173539183115,\"y\":0.0625}}]",
       "rvSet1CurlDistCurveXOrigin": "Global Setting",
       "rvSets": "[{\"prefix\":\"rvSet1\",\"title\":\"Displacement Angle to Velocity 1\"}]"
