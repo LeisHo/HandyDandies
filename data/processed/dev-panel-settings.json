@@ -19735,10 +19735,10 @@
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
       "fieldRows": 45,
       "fieldCols": 30,
-      "rowSpacing": 8,
-      "columnSpacing": 12,
+      "rowSpacing": 10,
+      "columnSpacing": 15,
       "handScale": 1,
-      "alternateRowOffset": 6,
+      "alternateRowOffset": 7.5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
       "hideHands": false,
@@ -33695,7 +33695,7 @@
         }
       ],
       "cameraX": -3.422222222222221,
-      "cameraY": 1.2675599288241649e-12,
+      "cameraY": 1.3586736506807276e-12,
       "cameraZ": 495.9881938061244,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -67085,6 +67085,12 @@
       "top": 69,
       "width": 612.1500244140625,
       "height": 550.5750122070312
+    },
+    "mobile": {
+      "left": 20,
+      "top": 215.0654754638672,
+      "width": 401.2857360839844,
+      "height": 569.9285888671875
     }
   }
 }
