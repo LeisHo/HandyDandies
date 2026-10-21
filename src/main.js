@@ -12553,6 +12553,7 @@ function attachCurveEditorExtras(row, svg, ctx) {
   sync()
   return { sync }
 }
+// (2026-10-20: a third quick tap on the same node sets its Y to 1 instead; so the double-tap delete now waits one double-tap window for a possible third tap.)
 // Touch assist for the curve editors (2026-10-18, direct request: on mobile a double-tap meant to delete a node often ADDED one instead, and nodes / bezier handles took several tries to grab).
 // Why it happened: a node is a 16-unit transparent circle and a bezier handle a 7 px square, so a finger that lands a little off one hits the bare graph, whose click adds a node. This layer only acts on
 // TOUCH input (a mouse is unchanged) and only fills the gaps: a touch that lands on a node circle or a handle square is left to that element's own handler.
@@ -12568,7 +12569,7 @@ const CURVE_DOUBLE_TAP_MS = 400
 const CURVE_TAP_MAX_MOVE_PX = 12
 const CURVE_TAP_MAX_MS = 350
 function attachCurveTouchAssist(svg, api) {
-  // api: { points: () => [{ el, p }], handles: () => [{ el, p, kind, real }], remove: (p) => void, removable: (p) => boolean }
+  // api: { points: () => [{ el, p }], handles: () => [{ el, p, kind, real }], remove: (p) => void, removable: (p) => boolean, setTop: (p) => void }
   const st = { redispatching: false, suppressClickUntil: 0, lastTouchDownAt: 0, lastTap: null, down: null }
   const center = (el) => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } }
   function pick(x, y) {
@@ -12598,11 +12599,28 @@ function attachCurveTouchAssist(svg, api) {
     if (!isTap || !d.p) { st.lastTap = null; return }
     const prev = st.lastTap
     if (prev && prev.p === d.p && now - prev.t <= CURVE_DOUBLE_TAP_MS) {
-      st.lastTap = null
-      if (api.removable(d.p)) { st.suppressClickUntil = now + 600; api.remove(d.p) }
+      if (prev.count >= 2) {
+        // third quick tap: Y = 1, and the delete the second tap scheduled is cancelled
+        if (st.pendingDelete) { clearTimeout(st.pendingDelete.timer); st.pendingDelete = null }
+        st.lastTap = null
+        st.suppressClickUntil = now + 600
+        if (api.setTop) api.setTop(d.p)
+        return
+      }
+      // second quick tap: delete the node, but one double-tap window later, in case a third tap follows
+      st.lastTap = { p: d.p, t: now, count: 2 }
+      const p2 = d.p
+      st.pendingDelete = {
+        p: p2,
+        timer: setTimeout(() => {
+          st.pendingDelete = null
+          st.lastTap = null
+          if (api.removable(p2)) { st.suppressClickUntil = performance.now() + 600; api.remove(p2) }
+        }, CURVE_DOUBLE_TAP_MS)
+      }
       return
     }
-    st.lastTap = { p: d.p, t: now }
+    st.lastTap = { p: d.p, t: now, count: 1 }
   }
   svg.addEventListener('pointerdown', (e) => {
     if (st.redispatching || e.pointerType !== 'touch' || !e.isPrimary) return
@@ -12629,6 +12647,8 @@ function attachCurveTouchAssist(svg, api) {
     window.addEventListener('pointercancel', onUp)
   }, true)
   return {
+    // true for ~0.8 s after a touch: a dblclick / contextmenu raised by that touch (a double-tap, a long-press) is not a mouse double-click / right-click
+    recentTouch() { return performance.now() - st.lastTouchDownAt < 800 },
     // true when the click that follows a touch must NOT add a node
     blocksAdd(clickEv) {
       const now = performance.now()
@@ -12689,7 +12709,7 @@ function buildArmLengthCurveWidget(row) {
   // startHandleDrag()/redraw()'s own handle-rendering block below, ported
   // verbatim from buildGenericCurveWidget() (the one widget that already
   // had this) -- same hint caption, same gesture, same data format.
-  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove' })
+  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove  ·  Right-click / triple-tap a point: Y = 1' })
   row.appendChild(svg)
   row.appendChild(caption)
   row.appendChild(handleHint)
@@ -12832,6 +12852,7 @@ function buildArmLengthCurveWidget(row) {
       function deletePointIfRemovable() { removePointObj(p) }
       hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
+        if (touchAssist.recentTouch()) return // touch: the touch assist deletes on a double-tap itself (and waits for a possible third tap)
         deletePointIfRemovable()
       })
       // Direct request: "allow right click to delete curve dots" -- same
@@ -12839,10 +12860,12 @@ function buildArmLengthCurveWidget(row) {
       // the curve always needs a value at both x=0 and x=1), added
       // alongside it rather than replacing it. preventDefault() suppresses
       // the browser's own native right-click context menu over the dot.
+      // 2026-10-20, direct request: right-click on a node sets its Y to 1 (it used to delete the node; double-click still does). Mobile: a triple-tap does it (see attachCurveTouchAssist()).
       hit.addEventListener('contextmenu', (ctxEv) => {
         ctxEv.preventDefault()
         ctxEv.stopPropagation()
-        deletePointIfRemovable()
+        if (touchAssist.recentTouch()) return // a touch long-press raises contextmenu too: not a right-click
+        setPointToTop(p)
       })
       svg.appendChild(hit)
       circles.push(hit)
@@ -12861,7 +12884,14 @@ function buildArmLengthCurveWidget(row) {
     redraw()
     commitPoints()
   }
-  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable })
+  // Y = 1 (the top of the graph) for one node, any node including the two end points (their X stays where it is).
+  function setPointToTop(p) {
+    if (points.indexOf(p) < 0 || p.y === 1) return
+    p.y = 1
+    redraw()
+    commitPoints()
+  }
+  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable, setTop: setPointToTop })
   svg.addEventListener('click', (clickEv) => {
     if (clickEv.target.tagName === 'circle') return
     if (touchAssist.blocksAdd(clickEv)) return // a tap near a node / handle grabs or deletes it, it never adds one
@@ -13025,7 +13055,7 @@ function buildWristSplayCurveWidget(row) {
   // Bezier handles (2026-10-11) -- see buildArmLengthCurveWidget()'s own
   // matching comment; same port, same reasoning, same verbatim source
   // (buildGenericCurveWidget()).
-  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove' })
+  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove  ·  Right-click / triple-tap a point: Y = 1' })
   row.appendChild(svg)
   row.appendChild(caption)
   row.appendChild(handleHint)
@@ -13166,12 +13196,15 @@ function buildWristSplayCurveWidget(row) {
       function deletePointIfRemovable() { removePointObj(p) }
       hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
+        if (touchAssist.recentTouch()) return // touch: the touch assist deletes on a double-tap itself (and waits for a possible third tap)
         deletePointIfRemovable()
       })
+      // 2026-10-20, direct request: right-click on a node sets its Y to 1 (it used to delete the node; double-click still does). Mobile: a triple-tap does it (see attachCurveTouchAssist()).
       hit.addEventListener('contextmenu', (ctxEv) => {
         ctxEv.preventDefault()
         ctxEv.stopPropagation()
-        deletePointIfRemovable()
+        if (touchAssist.recentTouch()) return // a touch long-press raises contextmenu too: not a right-click
+        setPointToTop(p)
       })
       svg.appendChild(hit)
       circles.push(hit)
@@ -13190,7 +13223,14 @@ function buildWristSplayCurveWidget(row) {
     redraw()
     commitPoints()
   }
-  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable })
+  // Y = 1 (the top of the graph) for one node, any node including the two end points (their X stays where it is).
+  function setPointToTop(p) {
+    if (points.indexOf(p) < 0 || p.y === 1) return
+    p.y = 1
+    redraw()
+    commitPoints()
+  }
+  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable, setTop: setPointToTop })
   svg.addEventListener('click', (clickEv) => {
     if (clickEv.target.tagName === 'circle') return
     if (touchAssist.blocksAdd(clickEv)) return // a tap near a node / handle grabs or deletes it, it never adds one
@@ -17460,7 +17500,7 @@ function buildGenericCurveWidget(row, opts) {
   // 2026-09-28 change ("i want bezier handles to be visible at all
   // times") that superseded the original invisible-until-dragged
   // behavior this caption alone used to compensate for.
-  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove' })
+  const handleHint = elLocal('div', { fontSize: '9px', opacity: '0.5', marginTop: '2px', textAlign: 'center', fontStyle: 'italic' }, { text: 'Alt+Drag a point: Out Handle  ·  Shift+Drag a point: In Handle  ·  Drag a handle back onto its point: Remove  ·  Right-click / triple-tap a point: Y = 1' })
   row.appendChild(svg)
   row.appendChild(caption)
   row.appendChild(handleHint)
@@ -17637,12 +17677,15 @@ function buildGenericCurveWidget(row, opts) {
       function deletePointIfRemovable() { removePointObj(p) }
       hit.addEventListener('dblclick', (dblEv) => {
         dblEv.stopPropagation()
+        if (touchAssist.recentTouch()) return // touch: the touch assist deletes on a double-tap itself (and waits for a possible third tap)
         deletePointIfRemovable()
       })
+      // 2026-10-20, direct request: right-click on a node sets its Y to 1 (it used to delete the node; double-click still does). Mobile: a triple-tap does it (see attachCurveTouchAssist()).
       hit.addEventListener('contextmenu', (ctxEv) => {
         ctxEv.preventDefault()
         ctxEv.stopPropagation()
-        deletePointIfRemovable()
+        if (touchAssist.recentTouch()) return // a touch long-press raises contextmenu too: not a right-click
+        setPointToTop(p)
       })
       svg.appendChild(hit)
       circles.push(hit)
@@ -17661,7 +17704,14 @@ function buildGenericCurveWidget(row, opts) {
     redraw()
     commitPoints()
   }
-  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable })
+  // Y = 1 (the top of the graph) for one node, any node including the two end points (their X stays where it is).
+  function setPointToTop(p) {
+    if (points.indexOf(p) < 0 || p.y === 1) return
+    p.y = 1
+    redraw()
+    commitPoints()
+  }
+  const touchAssist = attachCurveTouchAssist(svg, { points: () => pointHits, handles: () => allHandleHits, remove: removePointObj, removable: pointRemovable, setTop: setPointToTop })
   svg.addEventListener('click', (clickEv) => {
     if (clickEv.target.tagName === 'circle') return
     if (touchAssist.blocksAdd(clickEv)) return // a tap near a node / handle grabs or deletes it, it never adds one
