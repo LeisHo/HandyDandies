@@ -281,6 +281,7 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 3000,
+      "loadingWarmBudgetMs": 25,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
         {
@@ -460,7 +461,7 @@
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
       "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.000000000000014,
+      "loadingPreviewKeyElevation": 51.00000000000002,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
       "loadingPreviewKeyTargetHeight": 392,
@@ -15131,7 +15132,7 @@
         }
       ],
       "cameraX": 1.9077061415860646,
-      "cameraY": 9.373409365814608e-13,
+      "cameraY": 9.453929892858547e-13,
       "cameraZ": 242.97867319851795,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -21448,6 +21449,7 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 3000,
+      "loadingWarmBudgetMs": 25,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
         {
@@ -21627,7 +21629,7 @@
       ],
       "loadingPreviewLightingSelector": "LOADING 3",
       "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.000000000000014,
+      "loadingPreviewKeyElevation": 51.00000000000002,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
       "loadingPreviewKeyTargetHeight": 392,
@@ -42615,6 +42617,7 @@
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": false,
       "loadingMinTimeMs": 3000,
+      "loadingWarmBudgetMs": 25,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
         {
@@ -42794,7 +42797,7 @@
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
       "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.000000000000014,
+      "loadingPreviewKeyElevation": 51.00000000000002,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
       "loadingPreviewKeyTargetHeight": 392,
@@ -64731,6 +64734,10 @@
                   ],
                   "settings": []
                 }
+              },
+              {
+                "type": "row",
+                "key": "loadingWarmBudgetMs"
               }
             ],
             "settings": [
@@ -64743,7 +64750,8 @@
               "loadingPreviewSequenceLoopWrapScale",
               "loadingPreviewPosX",
               "loadingPreviewPosY",
-              "loadingPreviewLayout"
+              "loadingPreviewLayout",
+              "loadingWarmBudgetMs"
             ]
           }
         }
@@ -66372,7 +66380,7 @@
           "type": "group",
           "group": {
             "key": "Small Scale Models",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -72347,8 +72355,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 672.9500122070312,
-      "height": 580.9750366210938,
+      "width": 676.1500244140625,
+      "height": 582.5750122070312,
       "collapsed": false
     },
     "mobile": {
