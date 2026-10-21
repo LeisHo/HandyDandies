@@ -8611,6 +8611,12 @@ function offsetExtraControls(p, parseFn) {
   // Retransition Between Loops (2026-10-14): see loopLapProgress(). One checkbox per group so each can be set on its own.
   rows.push({ key: `${p}OffsetLoopRetransition`, label: 'Offset: Retransition Between Loops', type: 'checkbox', def: false })
   rows.push({ key: `${p}CameraOffsetLoopRetransition`, label: 'Offset To Camera: Retransition Between Loops', type: 'checkbox', def: false })
+  // Progression Curve (2026-10-21, direct request): one toggleable curve per group (Offset, Offset To Camera, Rotation). X = how far through the sequence's ramp / lap (0..100 %), Y = how much of the group's amount is applied
+  // (1 = all of it, 0 = none) - replaces the straight 0 -> 1 rise. See shapeOffsetProgress().
+  ;[['Offset', 'Offset'], ['CameraOffset', 'Offset To Camera'], ['Rotation', 'Rotation']].forEach(([pre, name]) => {
+    rows.push({ key: `${p}${pre}ProgressionCurveEnabled`, label: `${name} Progression Curve On/Off`, type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) })
+    rows.push({ key: `${p}${pre}ProgressionCurve`, label: `${name} Progression Curve (Sequence Progression -> Amount Applied)`, type: 'text', def: linear, onChange: () => parseFn(p) })
+  })
   return rows
 }
 function makeClickHoldPoseGroup(p, title, defaults = {}) {
@@ -13843,6 +13849,10 @@ function parseOffsetAxisCurves(t, p) {
     try { slot.curve = JSON.parse(cfg[`${p}Rotation${ax}Curve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
     try { slot.range = JSON.parse(cfg[`${p}Rotation${ax}CurveRange`]) } catch (e) { /* keep last-good value */ }
   })
+  if (!t.progCurve) t.progCurve = { o: OFFSET_LINEAR_CURVE, c: OFFSET_LINEAR_CURVE, r: OFFSET_LINEAR_CURVE } // Progression Curves (see shapeOffsetProgress())
+  ;[['o', 'Offset'], ['c', 'CameraOffset'], ['r', 'Rotation']].forEach(([k, pre]) => {
+    try { const pts = JSON.parse(cfg[`${p}${pre}ProgressionCurve`]).sort((a, b) => a.x - b.x); if (Array.isArray(pts) && pts.length >= 2) t.progCurve[k] = pts } catch (e) { /* keep last-good value */ }
+  })
 }
 function parseClickHoldConfig(p) {
   const t = clickHoldPoseTriggers[p]
@@ -14588,6 +14598,21 @@ function mulWrapperRot(hand, q) {
 // `progressIn` is a plain number (every group follows it) or { o, c, r, b } = Offset / Offset To Camera / Rotation / Rotation at Base, so each group can follow its own
 // Retransition Between Loops shape (see loopLapProgress()). A negative value is the inverse (Oscillate, every other loop).
 function normOffsetProgress(v) { return typeof v === 'number' ? { o: v, c: v, r: v } : v }
+// Progression Curve (2026-10-21, direct request): with a group's Progression Curve on, the fraction of that group's amount that is applied follows the curve (X = progress through the ramp / lap, 0..1; Y = amount applied)
+// instead of the straight rise. Applied to what is SHOWN (applyOffsetRotationToHand) and to what is BAKED when a ramp / lap ends or is cut short (bakeOffsetRotationIntoAccum), so the end of the curve - not always 1 - is what stays,
+// and a release mid-ramp keeps exactly the shaped amount that was on screen. The sign (Oscillate's inverse laps) is kept; the raw progress is what is recorded and compared, only the amount is shaped.
+function shapeOffsetProgress(p, pr) {
+  const offOn = cfg[`${p}OffsetProgressionCurveEnabled`], camOn = cfg[`${p}CameraOffsetProgressionCurveEnabled`], rotOn = cfg[`${p}RotationProgressionCurveEnabled`]
+  if (!offOn && !camOn && !rotOn) return pr
+  const t = triggerStateOf(p), pc = t && t.progCurve
+  if (!pc) return pr
+  const sh = (on, curve, v) => {
+    if (!on || typeof v !== 'number' || v === 0) return v
+    const y = evaluateArmLengthCurve(curve, Math.min(Math.abs(v), 1))
+    return Number.isFinite(y) ? (v < 0 ? -y : y) : v
+  }
+  return { ...pr, o: sh(offOn, pc.o, pr.o), c: sh(camOn, pc.c, pr.c), r: sh(rotOn, pc.r, pr.r) }
+}
 function applyOffsetRotationToHand(hand, p, progressIn) {
   const pr = normOffsetProgress(progressIn)
   const progress = pr.o // plain number for the startup-only curves below
@@ -14619,6 +14644,7 @@ function applyOffsetRotationToHand(hand, p, progressIn) {
   // own comment for the full account of the bug this closes).
   if (!hand._lastOffsetRotationProgress) hand._lastOffsetRotationProgress = {}
   hand._lastOffsetRotationProgress[p] = pr
+  const ps = shapeOffsetProgress(p, pr) // Progression Curves: the amounts actually applied below (pr stays the raw progress for the startup curves and the in-flight record)
   if (p === STARTUP_FN && startupHandScaleActive(hand) && !hand._poseThrApplied) hand.clone.scale.multiplyScalar(startupHandScale(progress)) // Hand Scale Curve (applyPoseValuesToHand() has just set the plain scale this frame)
   _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
   _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
@@ -14636,7 +14662,7 @@ function applyOffsetRotationToHand(hand, p, progressIn) {
     hand.wrapper.position.addScaledVector(_offsetForwardVec, hand._customOffsetAccum.z)
   }
   if (cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) {
-    const o = computeCombinedOffsetAt(hand, p, pr.o, pr.c)
+    const o = computeCombinedOffsetAt(hand, p, ps.o, ps.c)
     const ox = o.x
     const oy = o.y
     let oz = o.z
@@ -14657,7 +14683,7 @@ function applyOffsetRotationToHand(hand, p, progressIn) {
   let liveMode = null
   if (cfg[`${p}RotationEnabled`]) {
     const rd = rotationDegAt(hand, p)
-    const rx = rd.x * pr.r, ry = rd.y * pr.r, rz = rd.z * pr.r
+    const rx = rd.x * ps.r, ry = rd.y * ps.r, rz = rd.z * ps.r
     if (rx !== 0 || ry !== 0 || rz !== 0) {
       _offsetEuler.set(THREE.MathUtils.degToRad(rx), THREE.MathUtils.degToRad(ry), THREE.MathUtils.degToRad(rz), 'XYZ')
       _liveRotQ.setFromEuler(_offsetEuler)
@@ -14785,7 +14811,7 @@ function isIdentityQuat(q) { return q.x === 0 && q.y === 0 && q.z === 0 && q.w =
 // machine, at the instant a ramp/lap's own progress crosses 1. See
 // applyOffsetRotationToHand()'s own comment for the full model.
 function bakeOffsetRotationIntoAccum(hand, p, fracIn = 1) {
-  const f = normOffsetProgress(fracIn) // the full amount by default; a loop's end value (0, or +/-1 for Oscillate) when Retransition Between Loops is on
+  const f = shapeOffsetProgress(p, normOffsetProgress(fracIn)) // the full amount by default; a loop's end value (0, or +/-1 for Oscillate) when Retransition Between Loops is on; shaped by the group's Progression Curve
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   if (!hand._customBaseRotAccum) hand._customBaseRotAccum = new THREE.Quaternion()
@@ -18268,6 +18294,10 @@ function buildOffsetAxisWidgets(p) {
       if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: -50, trackMax: 50, unit: 'wu', defaultValue: prefix === 'CameraOffset' ? { min: 0, max: 10 } : { min: 0, max: 0 } })
     })
   })
+  ;['Offset', 'CameraOffset', 'Rotation'].forEach((pre) => {
+    const row = document.querySelector(`.dp-row[data-key="${p}${pre}ProgressionCurve"]`)
+    if (row) buildGenericCurveWidget(row, { caption: 'X: Progression Through The Sequence (0 = Start, 100% = End Of The Ramp / Lap)  ·  Y: Amount Applied (1 = The Full Amount, 0 = None)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+  })
 }
 function buildClickHoldPoseWidgets(p) {
   // Animation Speed Curve's own curve/range widgets -- a real gap left
@@ -20243,7 +20273,8 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'OffsetZ', 'CursorOffsetXCurve', 'CursorOffsetXRange', 'CursorOffsetYCurve', 'CursorOffsetYRange', 'CursorOffsetZCurve', 'CursorOffsetZRange',
   'CameraOffsetEnabled', 'CameraOffsetXEnabled', 'CameraOffsetYEnabled', 'CameraOffsetZEnabled', 'CameraOffsetXCurve', 'CameraOffsetXRange', 'CameraOffsetYCurve', 'CameraOffsetYRange', 'CameraOffsetZCurve', 'CameraOffsetZRange',
   'RotationEnabled', 'RotationX', 'RotationY', 'RotationZ',
-  'OffsetLoopRetransition', 'CameraOffsetLoopRetransition', 'RotationLoopRetransition', 'RotationMode', 'RotationCurveVisibleOnly', 'RotationCurveXOrigin', 'RotationCurveContinual',
+  'OffsetLoopRetransition', 'CameraOffsetLoopRetransition', 'RotationLoopRetransition', 'RotationMode',
+  'OffsetProgressionCurveEnabled', 'OffsetProgressionCurve', 'CameraOffsetProgressionCurveEnabled', 'CameraOffsetProgressionCurve', 'RotationProgressionCurveEnabled', 'RotationProgressionCurve', 'RotationCurveVisibleOnly', 'RotationCurveXOrigin', 'RotationCurveContinual',
   'RotationXCurveEnabled', 'RotationXCurve', 'RotationXCurveRange', 'RotationYCurveEnabled', 'RotationYCurve', 'RotationYCurveRange', 'RotationZCurveEnabled', 'RotationZCurve', 'RotationZCurveRange',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'SpeedCurveVisibleOnly', 'SpeedCurveXOrigin', 'SpeedCurveContinual', 'StartTimeCurveVisibleOnly', 'StartTimeCurveXOrigin', 'StartTimeCurveContinual', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionSpeedCurveXOrigin', 'RetransitionSpeedCurveContinual', 'RetransitionStartTimeCurveVisibleOnly', 'RetransitionStartTimeCurveXOrigin', 'RetransitionStartTimeCurveContinual', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveXOrigin', 'TweenStopStartTimeCurveContinual', 'TweenStopDelayCurveVisibleOnly', 'TweenStopDelayCurveXOrigin', 'TweenStopDelayCurveContinual', 'CameraOffsetVisibleOnly', 'CameraOffsetXOrigin', 'CameraOffsetContinual', 'CursorOffsetVisibleOnly', 'CursorOffsetXOrigin', 'CursorOffsetContinual',
@@ -21513,6 +21544,17 @@ function updateOffsetRotationVisibility(p) {
   })
   const modeRow = document.querySelector(`.dp-row[data-key="${p}RotationMode"]`)
   if (modeRow) modeRow.style.display = rotationOn ? '' : 'none'
+  // Progression Curve subgroups: the whole subgroup follows its group's own on/off, its curve row follows the subgroup's checkbox.
+  ;[['Offset', offsetOn], ['CameraOffset', cameraOffsetOn], ['Rotation', rotationOn]].forEach(([pre, on]) => {
+    const en = document.querySelector(`.dp-row[data-key="${p}${pre}ProgressionCurveEnabled"]`)
+    if (en) {
+      const gEl = en.classList.contains('dp-group-gate-row') ? en.closest('.dp-group') : null // wrapped into its own group yet?
+      if (gEl) gEl.style.display = on ? '' : 'none'
+      else en.style.display = on ? '' : 'none'
+    }
+    const cv = document.querySelector(`.dp-row[data-key="${p}${pre}ProgressionCurve"]`)
+    if (cv) cv.style.display = on && cfg[`${p}${pre}ProgressionCurveEnabled`] ? '' : 'none'
+  })
 }
 cfg.startupFnEnabled = true
 CLICK_POSE_KEYS.forEach((p) => { parseClickPoseConfig(p); buildClickPoseWidgets(p) })
@@ -21593,12 +21635,17 @@ function wrapClickFunctionGatedSubgroups(p) {
   if (offsetGroup && clampGroup) offsetGroup.querySelector(':scope > .dp-group-body').appendChild(clampGroup)
   // "Offset To Camera" (2026-10-02) -- its own mandatory gated subgroup,
   // independent of (and stackable with) "Offset" above.
-  wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetLoopRetransition`, `${p}CameraOffsetVisibleOnly`, `${p}CameraOffsetXOrigin`, `${p}CameraOffsetContinual`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
+  const cameraGroup = wrapGatedSubgroup(`${p}CameraOffsetEnabled`, [`${p}CameraOffsetLoopRetransition`, `${p}CameraOffsetVisibleOnly`, `${p}CameraOffsetXOrigin`, `${p}CameraOffsetContinual`, ...['X', 'Y', 'Z'].flatMap((ax) => [`${p}CameraOffset${ax}Enabled`, `${p}CameraOffset${ax}Curve`, `${p}CameraOffset${ax}Range`])], 'Offset To Camera')
   const rotationGroup = wrapGatedSubgroup(`${p}RotationEnabled`, [`${p}RotationMode`, `${p}RotationLoopRetransition`, `${p}RotationCurveVisibleOnly`, `${p}RotationCurveXOrigin`, `${p}RotationCurveContinual`, `${p}RotationX`, `${p}RotationY`, `${p}RotationZ`], 'Rotation')
   // Rotation Curve X / Y / Z: one toggleable group per axis inside Rotation (titles carry the axis so the three have distinct keys)
   ;['X', 'Y', 'Z'].forEach((ax) => {
     const axisGroup = wrapGatedSubgroup(`${p}Rotation${ax}CurveEnabled`, [`${p}Rotation${ax}Curve`, `${p}Rotation${ax}CurveRange`], `Rotation Curve ${ax}`)
     if (rotationGroup && axisGroup) rotationGroup.querySelector(':scope > .dp-group-body').appendChild(axisGroup)
+  })
+  // Progression Curve: a toggleable subgroup inside each of Offset, Offset To Camera and Rotation (2026-10-21).
+  ;[[offsetGroup, 'Offset'], [cameraGroup, 'CameraOffset'], [rotationGroup, 'Rotation']].forEach(([parentGroup, pre]) => {
+    const pg = wrapGatedSubgroup(`${p}${pre}ProgressionCurveEnabled`, [`${p}${pre}ProgressionCurve`], 'Progression Curve')
+    if (parentGroup && pg) parentGroup.querySelector(':scope > .dp-group-body').appendChild(pg)
   })
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurveVisibleOnly`, `${p}SpeedCurveXOrigin`, `${p}SpeedCurveContinual`, `${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
