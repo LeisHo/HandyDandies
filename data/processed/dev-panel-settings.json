@@ -14166,7 +14166,7 @@
         }
       ],
       "cameraX": 1.907706141586066,
-      "cameraY": 7.346304976048385e-13,
+      "cameraY": 7.569496855192987e-13,
       "cameraZ": 242.98502235780893,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -14611,7 +14611,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3142887799074889,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3144176829050783,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.04699056297833701,\"y\":0.05843760172526047}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3144176829050783,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":200}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -34173,7 +34173,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3142887799074889,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3144176829050783,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.04699056297833701,\"y\":0.05843760172526047}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3144176829050783,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":280}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -53735,7 +53735,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3142887799074889,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3144176829050783,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.04699056297833701,\"y\":0.05843760172526047}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3144176829050783,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":200}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -62294,7 +62294,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -67443,8 +67443,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 637.75,
-      "height": 563.375
+      "width": 640.9500122070312,
+      "height": 564.9750366210938
     },
     "mobile": {
       "left": 28.035715103149414,
