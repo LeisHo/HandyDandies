@@ -14575,7 +14575,7 @@
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
-      "resolutionScale": 50,
+      "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
@@ -33336,7 +33336,7 @@
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
-      "resolutionScale": 50,
+      "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
@@ -52097,7 +52097,7 @@
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
-      "resolutionScale": 50,
+      "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
@@ -62318,7 +62318,10 @@
     "loadingPreviewKeyDistance": false,
     "loadingPreviewSpeedCurveEnabled": false,
     "loadingPreviewEndLoopWrapScale": false,
-    "loadingPreviewSequenceLoopWrapScale": false
+    "loadingPreviewSequenceLoopWrapScale": false,
+    "pixelRatio": false,
+    "resolutionScale": false,
+    "qualityPreset": false
   },
   "devIndependence": {
     "mobile": {
