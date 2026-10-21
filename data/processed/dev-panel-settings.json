@@ -261,7 +261,7 @@
       "armRotationTargetDepth": 55,
       "armRotationDefault": 100,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.17416267799011878,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6472180947889452,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6472180947889452,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":60}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -21737,7 +21737,7 @@
       "armRotationTargetDepth": 5.6,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.17416267799011878,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6472180947889452,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6472180947889452,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":60}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -43213,7 +43213,7 @@
       "armRotationTargetDepth": 3.4,
       "armRotationDefault": 100,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.17416267799011878,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6472180947889452,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6472180947889452,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":60}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -65695,7 +65695,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -65870,7 +65870,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -66587,7 +66587,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -66610,7 +66610,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -67513,7 +67513,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -67624,7 +67624,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -67910,7 +67910,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -67929,7 +67929,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -67976,7 +67976,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -73312,10 +73312,10 @@
       "collapsed": false
     },
     "mobile": {
-      "left": 29.291667938232422,
+      "left": 25.863096237182617,
       "top": 105.89881134033203,
-      "width": 365.13690185546875,
-      "height": 534.0833129882812,
+      "width": 368.56549072265625,
+      "height": 535.6011962890625,
       "collapsed": false
     }
   }
