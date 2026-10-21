@@ -14618,7 +14618,7 @@
       "startupFnEasingCurveEnabled": true,
       "startupFnEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3791018402513092,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.22388297794701073,\"y\":0.08000005086263018}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
-      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
+      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6199570475757077,\"y\":0.3539583841959636},{\"x\":1,\"y\":1}]",
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
@@ -14641,7 +14641,7 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
       "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7169769080541867,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionSpeedCurveRange": "{\"min\":900,\"max\":1100}",
+      "startupFnRetransitionSpeedCurveRange": "{\"min\":700,\"max\":850}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionDistRange": "{\"min\":50,\"max\":2000}",
@@ -14653,7 +14653,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveXOrigin": "Global Setting",
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":20}",
+      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":213}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
@@ -14662,7 +14662,7 @@
       "sphereMaxClicks": 2,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
-      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0.35864588419596355,\"h1\":{\"x\":0.4122650674970208,\"y\":0.17406234741210935}},{\"x\":0.5008438316877292,\"y\":1,\"h1\":{\"x\":0.21963354271552937,\"y\":0},\"h2\":{\"x\":-0.224651357220149,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2713254844522799,\"y\":0}}]",
+      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3776634014167311,\"y\":0}},{\"x\":0.7013170503235198,\"y\":1,\"h1\":{\"x\":0.18465017196373468,\"y\":0},\"h2\":{\"x\":-0.14763427456929518,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.09298306857513239,\"y\":0}}]",
       "sphereFnSpeedCurveEnabled": true,
       "sphereFnSpeedCurveVisibleOnly": true,
       "sphereFnSpeedCurveXOrigin": "Global Setting",
@@ -33381,7 +33381,7 @@
       "startupFnEasingCurveEnabled": true,
       "startupFnEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3791018402513092,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.22388297794701073,\"y\":0.08000005086263018}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
-      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
+      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6199570475757077,\"y\":0.3539583841959636},{\"x\":1,\"y\":1}]",
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
@@ -33404,7 +33404,7 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
       "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7169769080541867,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionSpeedCurveRange": "{\"min\":900,\"max\":1100}",
+      "startupFnRetransitionSpeedCurveRange": "{\"min\":700,\"max\":850}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionDistRange": "{\"min\":50,\"max\":2000}",
@@ -33416,7 +33416,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveXOrigin": "Global Setting",
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":20}",
+      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":213}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
@@ -33425,7 +33425,7 @@
       "sphereMaxClicks": 2,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
-      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0.35864588419596355,\"h1\":{\"x\":0.4122650674970208,\"y\":0.17406234741210935}},{\"x\":0.5008438316877292,\"y\":1,\"h1\":{\"x\":0.21963354271552937,\"y\":0},\"h2\":{\"x\":-0.224651357220149,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2713254844522799,\"y\":0}}]",
+      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3776634014167311,\"y\":0}},{\"x\":0.7013170503235198,\"y\":1,\"h1\":{\"x\":0.18465017196373468,\"y\":0},\"h2\":{\"x\":-0.14763427456929518,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.09298306857513239,\"y\":0}}]",
       "sphereFnSpeedCurveEnabled": true,
       "sphereFnSpeedCurveVisibleOnly": true,
       "sphereFnSpeedCurveXOrigin": "Global Setting",
@@ -52144,7 +52144,7 @@
       "startupFnEasingCurveEnabled": true,
       "startupFnEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3791018402513092,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.22388297794701073,\"y\":0.08000005086263018}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
-      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.4554235972960167,\"y\":0.8331250508626302},{\"x\":1,\"y\":0}]",
+      "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6199570475757077,\"y\":0.3539583841959636},{\"x\":1,\"y\":1}]",
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
@@ -52167,7 +52167,7 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
       "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7169769080541867,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionSpeedCurveRange": "{\"min\":900,\"max\":1100}",
+      "startupFnRetransitionSpeedCurveRange": "{\"min\":700,\"max\":850}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionDistRange": "{\"min\":50,\"max\":2000}",
@@ -52179,7 +52179,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveXOrigin": "Global Setting",
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":20}",
+      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":213}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
@@ -52188,7 +52188,7 @@
       "sphereMaxClicks": 2,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
-      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0.35864588419596355,\"h1\":{\"x\":0.4122650674970208,\"y\":0.17406234741210935}},{\"x\":0.5008438316877292,\"y\":1,\"h1\":{\"x\":0.21963354271552937,\"y\":0},\"h2\":{\"x\":-0.224651357220149,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2713254844522799,\"y\":0}}]",
+      "sphereFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3776634014167311,\"y\":0}},{\"x\":0.7013170503235198,\"y\":1,\"h1\":{\"x\":0.18465017196373468,\"y\":0},\"h2\":{\"x\":-0.14763427456929518,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.09298306857513239,\"y\":0}}]",
       "sphereFnSpeedCurveEnabled": true,
       "sphereFnSpeedCurveVisibleOnly": true,
       "sphereFnSpeedCurveXOrigin": "Global Setting",
@@ -59684,7 +59684,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -59798,7 +59798,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -59809,7 +59809,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -59841,7 +59841,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -59873,7 +59873,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Easing Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": false,
                         "items": [
                           {
@@ -59954,7 +59954,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Easing",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -59971,7 +59971,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -60003,7 +60003,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -60159,7 +60159,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -60218,7 +60218,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Easing",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
