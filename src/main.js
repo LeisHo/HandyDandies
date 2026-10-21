@@ -564,8 +564,12 @@ const frameRateLogEntries = []
 let frameRateLogEl = null
 // Log Renderer (2026-10-20, direct request: "log all info that is relevant to render speed"). All state in ONE object, declared here with the other Frame Rate Log state (module top-level / animate() both touch it).
 // active mirrors cfg.logRendererEnabled and is re-synced lazily from animate() (rendererLogSync()), so no onChange is needed (a restored onChange fires before the renderer exists).
+const RENDERER_LOG_MAX_ENTRIES = 300
+const rendererLogEntries = []
+let rendererLogEl = null
+const _rendererLogFlushFlag = { scheduled: false }
 const rlog = {
-  active: false, lastAt: 0, setupDone: false, lastTargetSig: '',
+  active: false, lastAt: 0, setupDone: false, handsSetupDone: false, lastTargetSig: '',
   dts: [], over33: 0, over100: 0, gaps: 0,
   renderFrames: 0, renderMs: 0, renderMaxMs: 0,
   calls: 0, callsMax: 0, tris: 0, trisMax: 0, lines: 0, points: 0,
@@ -4089,7 +4093,7 @@ const DEV_GROUPS = [
       // Added 2026-09-30, direct request: "provide a clear all logs
       // button." Clears all 3 logs' own buffers via their existing
       // individual clear functions -- no new clearing logic needed.
-      { key: 'clearAllLogsBtn', label: 'Clear All Logs', type: 'button', onClick: () => { clearMouseTrackingLog(); clearHandBehaviourLog(); clearFrameRateLog(); clearLoadingPreviewLog(); clearPoseJumpLog(); clearRenderReorderLog() } },
+      { key: 'clearAllLogsBtn', label: 'Clear All Logs', type: 'button', onClick: () => { clearMouseTrackingLog(); clearHandBehaviourLog(); clearFrameRateLog(); clearRendererLog(); clearLoadingPreviewLog(); clearPoseJumpLog(); clearRenderReorderLog() } },
       // Added 2026-09-30, direct request: "provide a pause and resume
       // logs button in the debug group." A single toggle button (same
       // pattern as the main Pause Button's own dynamic label, not 2
@@ -4400,6 +4404,7 @@ updateArmRotationGateVisibility()
 buildMouseTrackingLogWidget()
 buildHandBehaviourLogWidget()
 buildFrameRateLogWidget()
+buildRendererLogWidget()
 buildLoadingPreviewLogWidget()
 buildPoseJumpLogWidget()
 buildRenderReorderLogWidget()
@@ -5845,6 +5850,7 @@ function rendererLogSync() {
         rlog.ltObserver.observe({ entryTypes: ['longtask'] })
       }
     } catch (e) { rlog.ltObserver = null }
+    rlog.handsSetupDone = false
     rendererLogSetup()
   } else {
     renderer.info.autoReset = true
@@ -5916,13 +5922,14 @@ function rendererLogGeometryMix() {
     if (!e) { e = { n: 0, verts: g.attributes.position ? g.attributes.position.count : 0, tris: g.index ? g.index.count / 3 : (g.attributes.position ? g.attributes.position.count / 3 : 0) }; m.set(g.uuid, e) }
     e.n++
   }
-  return Array.from(m.values()).sort((a, b) => b.tris - a.tris).map((e) => e.n + 'x' + Math.round(e.tris / 1000) + 'k tris (' + Math.round(e.verts / 1000) + 'k verts)').join(', ')
+  return Array.from(m.values()).sort((a, b) => b.tris - a.tris).map((e) => e.n + 'x' + (e.tris >= 10000 ? Math.round(e.tris / 1000) + 'k' : Math.round(e.tris)) + ' tris (' + (e.verts >= 10000 ? Math.round(e.verts / 1000) + 'k' : Math.round(e.verts)) + ' verts)').join(', ')
 }
-function rendererLogSetup() {
-  if (rlog.setupDone) return
-  rlog.setupDone = true
-  const L = (txt) => appendFrameRateLogLine('[' + new Date().toLocaleTimeString() + '] RENDERER setup -- ' + txt)
+function rendererLogSetup(handsOnly) {
+  if (!handsOnly) { if (rlog.setupDone) return; rlog.setupDone = true }
+  if (hands.length) rlog.handsSetupDone = true
+  const L = (txt) => appendRendererLogLine('[' + new Date().toLocaleTimeString() + '] RENDERER setup -- ' + txt)
   try {
+    if (!handsOnly) {
     const gl = renderer.getContext()
     let gpu = 'unknown (browser hides it)'
     try { const x = gl.getExtension('WEBGL_debug_renderer_info'); if (x) gpu = gl.getParameter(x.UNMASKED_VENDOR_WEBGL) + ' / ' + gl.getParameter(x.UNMASKED_RENDERER_WEBGL) } catch (e) { /* ignore */ }
@@ -5932,6 +5939,7 @@ function rendererLogSetup() {
       ' | context: antialias ' + attrs.antialias + ', alpha ' + attrs.alpha + ', powerPreference ' + attrs.powerPreference + ' | GPU timer ' + (renderer.getContext().getExtension('EXT_disjoint_timer_query_webgl2') ? 'available' : 'NOT available (no GPU time in the timing line)'))
     L('device -- ' + (navigator.hardwareConcurrency || '?') + ' logical cores, deviceMemory ' + (navigator.deviceMemory || '?') + ' GB, devicePixelRatio ' + window.devicePixelRatio + ', screen ' + screen.width + 'x' + screen.height + ', viewport ' + window.innerWidth + 'x' + window.innerHeight +
       ', three r' + THREE.REVISION + ' | ' + navigator.userAgent.slice(0, 120))
+    }
     let lights = 0, shadowLights = 0, meshes = 0, skinned = 0, objs = 0
     scene.traverse((o) => { objs++; if (o.isLight) { lights++; if (o.castShadow) shadowLights++ } if (o.isMesh) meshes++; if (o.isSkinnedMesh) skinned++ })
     const h0 = hands[0]
@@ -5946,6 +5954,7 @@ function rendererLogSetup() {
 function rendererLogFlush(elapsedMs) {
   const t = '[' + new Date().toLocaleTimeString() + '] RENDERER '
   try {
+    if (!rlog.handsSetupDone && hands.length) rendererLogSetup(true)
     const f1 = (x) => x.toFixed(1)
     const n = rlog.dts.length
     let timing = 'timing -- '
@@ -5959,7 +5968,7 @@ function rendererLogFlush(elapsedMs) {
     else timing += ' | GPU time ' + (rlog.gpuBroken ? 'failed (disabled)' : 'unavailable')
     timing += ' | main-thread long tasks (over 50 ms): ' + (rlog.ltObserver ? rlog.ltCount + (rlog.ltCount ? ' totalling ' + Math.round(rlog.ltMs) + ' ms, worst ' + Math.round(rlog.ltMax) : '') : 'not supported')
     if (performance.memory) timing += ' | JS heap ' + Math.round(performance.memory.usedJSHeapSize / 1048576) + ' of ' + Math.round(performance.memory.totalJSHeapSize / 1048576) + ' MB'
-    appendFrameRateLogLine(t + timing)
+    appendRendererLogLine(t + timing)
 
     const rf = Math.max(1, rlog.renderFrames), info = renderer.info
     let total = 0, shown = 0, skipped = 0, posed = 0
@@ -5971,7 +5980,7 @@ function rendererLogFlush(elapsedMs) {
       if (h._wasOverriddenLastFrame) posed++
       if (h.skinnedMesh) mats.add(h.skinnedMesh.material)
     }
-    appendFrameRateLogLine(t + 'work -- per rendered frame: draw calls avg ' + Math.round(rlog.calls / rf) + ' (max ' + rlog.callsMax + '), triangles avg ' + (rlog.tris / rf / 1e6).toFixed(2) + ' M (max ' + (rlog.trisMax / 1e6).toFixed(2) + ' M)' +
+    appendRendererLogLine(t + 'work -- per rendered frame: draw calls avg ' + Math.round(rlog.calls / rf) + ' (max ' + rlog.callsMax + '), triangles avg ' + (rlog.tris / rf / 1e6).toFixed(2) + ' M (max ' + (rlog.trisMax / 1e6).toFixed(2) + ' M)' +
       (rlog.lines || rlog.points ? ', lines ' + Math.round(rlog.lines / rf) + ', points ' + Math.round(rlog.points / rf) : '') + ', rendered frames ' + rlog.renderFrames +
       ' | GPU objects: ' + info.memory.geometries + ' geometries, ' + info.memory.textures + ' textures, ' + (info.programs ? info.programs.length : '?') + ' programs' +
       ' | hands: ' + total + ' total, ' + shown + ' shown, ' + skipped + ' outside every camera (finger curl skipped), ' + posed + ' driven by a click function, ' + mats.size + ' distinct materials' +
@@ -5982,10 +5991,61 @@ function rendererLogFlush(elapsedMs) {
     const sig = sz.x + 'x' + sz.y + '|' + renderer.getPixelRatio() + '|' + passes + '|' + cfg.resolutionScale + '|' + canvas.clientWidth + 'x' + canvas.clientHeight
     if (sig !== rlog.lastTargetSig) {
       rlog.lastTargetSig = sig
-      appendFrameRateLogLine(t + 'target -- drawing buffer ' + sz.x + 'x' + sz.y + ' (' + (sz.x * sz.y / 1e6).toFixed(2) + ' M pixels), canvas ' + canvas.clientWidth + 'x' + canvas.clientHeight + ' CSS px, renderer pixel ratio ' + renderer.getPixelRatio() + ', Resolution Scale ' + cfg.resolutionScale + '% | composer passes: ' + passes)
+      appendRendererLogLine(t + 'target -- drawing buffer ' + sz.x + 'x' + sz.y + ' (' + (sz.x * sz.y / 1e6).toFixed(2) + ' M pixels), canvas ' + canvas.clientWidth + 'x' + canvas.clientHeight + ' CSS px, renderer pixel ratio ' + renderer.getPixelRatio() + ', Resolution Scale ' + cfg.resolutionScale + '% | composer passes: ' + passes)
     }
-  } catch (e) { appendFrameRateLogLine(t + 'FAILED while collecting (' + (e && e.message) + ')') }
+  } catch (e) { appendRendererLogLine(t + 'FAILED while collecting (' + (e && e.message) + ')') }
   rendererLogResetWindow()
+}
+function appendRendererLogLine(line) {
+  if (logsPaused) return
+  rendererLogEntries.push(line)
+  if (rendererLogEntries.length > RENDERER_LOG_MAX_ENTRIES) rendererLogEntries.shift()
+  scheduleLogDomFlush(_rendererLogFlushFlag, () => rendererLogEl, rendererLogEntries)
+}
+function clearRendererLog() {
+  rendererLogEntries.length = 0
+  if (rendererLogEl) rendererLogEl.textContent = ''
+}
+// Renderer Log text box (2026-10-20, direct request: "add a log text box in the group so I can see the output of the Log Renderer"): same box as the other logs (Copy / Save / Clear, collapsible).
+function buildRendererLogWidget() {
+  const body = document.querySelector('.dp-group[data-key="Debug"] .dp-group-body')
+  if (!body) return
+  const wrap = elLocal('div', { padding: '4px 6px' })
+  const headerRow = elLocal('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' })
+  const label = elLocal('div', { fontSize: '11px', opacity: '0.85' }, { text: 'Renderer Log' })
+  const mkBtn = (text) => elLocal('button', { fontSize: '10px', padding: '2px 8px', background: '#3a3a4a', color: 'inherit', border: 'none', borderRadius: '4px', cursor: 'pointer' }, { text, type: 'button' })
+  const copyBtn = mkBtn('Copy'), saveBtn = mkBtn('Save'), clearBtn = mkBtn('Clear')
+  headerRow.appendChild(label)
+  const btnRow = elLocal('div', { display: 'flex', gap: '4px' })
+  btnRow.appendChild(copyBtn); btnRow.appendChild(saveBtn); btnRow.appendChild(clearBtn)
+  headerRow.appendChild(btnRow)
+  rendererLogEl = elLocal('pre', {
+    height: '110px', overflowY: 'auto', margin: '0', padding: '4px 6px',
+    background: 'rgba(255,255,255,0.06)', borderRadius: '4px', fontSize: '10px',
+    whiteSpace: 'pre-wrap', wordBreak: 'break-word'
+  })
+  const flash = (btn, msg) => { const orig = btn.dataset.origText || btn.textContent; btn.dataset.origText = orig; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 900) }
+  copyBtn.addEventListener('click', () => {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(rendererLogEntries.join('\n')).then(() => flash(copyBtn, 'Copied!')).catch(() => flash(copyBtn, 'Copy failed'))
+    else flash(copyBtn, 'Copy failed')
+  })
+  saveBtn.addEventListener('click', () => {
+    const blob = new Blob([rendererLogEntries.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'renderer-log-' + new Date().toISOString().replace(/[:.]/g, '-') + '.txt'
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+    flash(saveBtn, 'Saved!')
+  })
+  clearBtn.addEventListener('click', () => clearRendererLog())
+  wrap.appendChild(headerRow)
+  wrap.appendChild(rendererLogEl)
+  makeLogBoxCollapsible(rendererLogEl, 'Log')
+  body.appendChild(wrap)
 }
 function clearFrameRateLog() {
   frameRateLogEntries.length = 0
@@ -6035,7 +6095,8 @@ function exportDebugLogs(btn) {
   const defs = [
     ['mouseTracking', 'Mouse Tracking Log', true, mouseTrackingLogEntries],
     ['handBehaviour', 'Hand Behaviour Log', !!(cfg.logHandBehaviourEnabled || cfg.logHandBehaviourDetailedEnabled), handBehaviourLogEntries],
-    ['frameRate', 'Frame Rate Log', !!(cfg.logFrameRateDropsEnabled || cfg.logFrameProfileEnabled || cfg.logRendererEnabled), frameRateLogEntries],
+    ['frameRate', 'Frame Rate Log', !!(cfg.logFrameRateDropsEnabled || cfg.logFrameProfileEnabled), frameRateLogEntries],
+    ['renderer', 'Renderer Log', !!cfg.logRendererEnabled, rendererLogEntries],
     ['loadingPreview', 'Loading Preview Log', true, loadingPreviewLogEntries],
     ['poseJumps', 'Pose Jump Log', !!cfg.logPoseJumpsEnabled, poseJumpLogEntries],
     ['renderReordering', 'Render Reordering Log', !!cfg.logRenderReorderEnabled, renderReorderLogEntries],
