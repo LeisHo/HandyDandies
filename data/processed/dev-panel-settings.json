@@ -34137,8 +34137,8 @@
       "startupFnTargetPose": "",
       "startupFnTweenSelector": "FIST PALM",
       "startupFnReverseSequence": false,
-      "startupFnGlideToFirstPose": false,
-      "startupFnFirstGlideTimeScale": 1,
+      "startupFnGlideToFirstPose": true,
+      "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 5000,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2755326802833462,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.611041768391927}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":237}",
@@ -62012,7 +62012,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -62487,7 +62487,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -62627,7 +62627,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Sphere Radius Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -64992,18 +64992,18 @@
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
       "startupHandOffsetZ": true,
-      "startupHandTweenEnabled": true,
-      "startupFnMode": true,
-      "startupFnTargetPose": true,
-      "startupFnTweenSelector": true,
-      "startupFnReverseSequence": true,
-      "startupFnGlideToFirstPose": true,
-      "startupFnFirstGlideTimeScale": true,
-      "startupFnSequencePlayMode": true,
-      "startupFnSequenceCount": true,
-      "startupFnSequenceCountMode": true,
-      "startupFnSequenceLoopTransition": true,
-      "startupFnSequenceHoldMs": true,
+      "startupHandTweenEnabled": false,
+      "startupFnMode": false,
+      "startupFnTargetPose": false,
+      "startupFnTweenSelector": false,
+      "startupFnReverseSequence": false,
+      "startupFnGlideToFirstPose": false,
+      "startupFnFirstGlideTimeScale": false,
+      "startupFnSequencePlayMode": false,
+      "startupFnSequenceCount": false,
+      "startupFnSequenceCountMode": false,
+      "startupFnSequenceLoopTransition": false,
+      "startupFnSequenceHoldMs": false,
       "startupFnRetransitionEnabled": true,
       "startupFnRetransitionSpeedMs": true,
       "startupFnRetransitionSpeedCurveEnabled": true,
