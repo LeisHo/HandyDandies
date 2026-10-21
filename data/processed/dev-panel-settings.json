@@ -14608,7 +14608,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 3800,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5316610577845217,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5798319419113245,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.15032345019725493,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5798319419113245,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":150}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -14625,7 +14625,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2629951569928289,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6333038503700656,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1323,\"max\":1664}",
+      "startupFnSpeedCurveRange": "{\"min\":1646,\"max\":1664}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -34144,7 +34144,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5316610577845217,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5798319419113245,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.15032345019725493,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5798319419113245,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":150}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -34161,7 +34161,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2629951569928289,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6333038503700656,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1323,\"max\":1664}",
+      "startupFnSpeedCurveRange": "{\"min\":1646,\"max\":1664}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -53680,7 +53680,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 3800,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5316610577845217,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5798319419113245,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.15032345019725493,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5798319419113245,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":150}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -53697,7 +53697,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2629951569928289,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6333038503700656,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1323,\"max\":1664}",
+      "startupFnSpeedCurveRange": "{\"min\":1646,\"max\":1664}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -62315,7 +62315,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -67105,8 +67105,8 @@
     "mobile": {
       "left": 20,
       "top": 34.19047546386719,
-      "width": 415,
-      "height": 339.8452453613281
+      "width": 418.4285888671875,
+      "height": 632.4166870117188
     }
   }
 }
