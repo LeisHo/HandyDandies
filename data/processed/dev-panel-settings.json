@@ -14595,7 +14595,7 @@
       "startupHandZRange": "{\"min\":0,\"max\":5}",
       "startupHandScaleCurveEnabled": true,
       "startupHandScaleCurve": "[{\"x\":0,\"y\":0.0023956298828125,\"bg\":0,\"h1\":{\"x\":0.39492491435982724,\"y\":-0.0023956298828125}},{\"x\":0.6970016789468613,\"y\":1,\"h2\":{\"x\":-0.13809221329061727,\"y\":-0.014895884195963549},\"h1\":{\"x\":0.09925381602776662,\"y\":0}},{\"x\":1,\"y\":0.7717707316080729,\"h2\":{\"x\":-0.21956760657035224,\"y\":0.006666564941406272}}]",
-      "startupHandScaleRange": "{\"min\":0,\"max\":1.2}",
+      "startupHandScaleRange": "{\"min\":0,\"max\":1.5}",
       "startupHandTweenEnabled": true,
       "startupFnMode": "Sequence",
       "startupFnCursorClampEnabled": false,
@@ -14608,7 +14608,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38169187015282546,\"y\":0.9489766438802083}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.01849882161118599,\"y\":-0.9094340006510416}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07006186612980903,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.5727083841959636}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":400}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -34131,7 +34131,7 @@
       "startupHandZRange": "{\"min\":0,\"max\":5}",
       "startupHandScaleCurveEnabled": true,
       "startupHandScaleCurve": "[{\"x\":0,\"y\":0.0023956298828125,\"bg\":0,\"h1\":{\"x\":0.39492491435982724,\"y\":-0.0023956298828125}},{\"x\":0.6970016789468613,\"y\":1,\"h2\":{\"x\":-0.13809221329061727,\"y\":-0.014895884195963549},\"h1\":{\"x\":0.09925381602776662,\"y\":0}},{\"x\":1,\"y\":0.7717707316080729,\"h2\":{\"x\":-0.21956760657035224,\"y\":0.006666564941406272}}]",
-      "startupHandScaleRange": "{\"min\":0,\"max\":1.2}",
+      "startupHandScaleRange": "{\"min\":0,\"max\":1.5}",
       "startupHandTweenEnabled": true,
       "startupFnMode": "Sequence",
       "startupFnCursorClampEnabled": false,
@@ -34144,7 +34144,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38169187015282546,\"y\":0.9489766438802083}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.01849882161118599,\"y\":-0.9094340006510416}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07006186612980903,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.5727083841959636}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":400}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -53667,7 +53667,7 @@
       "startupHandZRange": "{\"min\":0,\"max\":5}",
       "startupHandScaleCurveEnabled": true,
       "startupHandScaleCurve": "[{\"x\":0,\"y\":0.0023956298828125,\"bg\":0,\"h1\":{\"x\":0.39492491435982724,\"y\":-0.0023956298828125}},{\"x\":0.6970016789468613,\"y\":1,\"h2\":{\"x\":-0.13809221329061727,\"y\":-0.014895884195963549},\"h1\":{\"x\":0.09925381602776662,\"y\":0}},{\"x\":1,\"y\":0.7717707316080729,\"h2\":{\"x\":-0.21956760657035224,\"y\":0.006666564941406272}}]",
-      "startupHandScaleRange": "{\"min\":0,\"max\":1.2}",
+      "startupHandScaleRange": "{\"min\":0,\"max\":1.5}",
       "startupHandTweenEnabled": true,
       "startupFnMode": "Sequence",
       "startupFnCursorClampEnabled": false,
@@ -53680,7 +53680,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38169187015282546,\"y\":0.9489766438802083}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.01849882161118599,\"y\":-0.9094340006510416}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.07006186612980903,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.5727083841959636}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":400}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -61417,7 +61417,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -62009,7 +62009,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -62028,7 +62028,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -62443,7 +62443,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Hand Scale Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
