@@ -21026,10 +21026,10 @@
       "offScreenPoseEvery": 5,
       "fieldRows": 60,
       "fieldCols": 40,
-      "rowSpacing": 10,
-      "columnSpacing": 18,
+      "rowSpacing": 8,
+      "columnSpacing": 16,
       "handScale": 1,
-      "alternateRowOffset": 9,
+      "alternateRowOffset": 8,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
       "hideHands": false,
@@ -71307,8 +71307,8 @@
     "mobile": {
       "left": 20,
       "top": 82.82738494873047,
-      "width": 381.2857360839844,
-      "height": 579.6845092773438
+      "width": 384.71429443359375,
+      "height": 581.2083740234375
     }
   }
 }
