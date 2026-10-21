@@ -14160,8 +14160,8 @@
           }
         }
       ],
-      "cameraX": 1.9077061415860705,
-      "cameraY": 3.5520430305901453e-13,
+      "cameraX": 1.9077061415860703,
+      "cameraY": 3.7752349097347476e-13,
       "cameraZ": 242.98502235780893,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -14575,7 +14575,7 @@
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
-      "resolutionScale": 100,
+      "resolutionScale": 75,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
@@ -52097,7 +52097,7 @@
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
-      "resolutionScale": 100,
+      "resolutionScale": 75,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
@@ -56850,7 +56850,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -56981,7 +56981,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -59062,7 +59062,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -59115,7 +59115,7 @@
           "type": "group",
           "group": {
             "key": "New Group (16)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -59252,7 +59252,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -59594,7 +59594,7 @@
           "type": "group",
           "group": {
             "key": "Quality / Performance",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -64685,8 +64685,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 583.3500366210938,
-      "height": 536.1749877929688
+      "width": 586.5499877929688,
+      "height": 537.7750244140625
     }
   }
 }
