@@ -18416,3 +18416,10 @@ Direct request: On Click and On Release should only be available when the functi
   throttled. Per-hand breakdown line now reports "N with the click-function position held this frame, N with the click-function pose held this frame". Checked with node --check, tests/top-level-load-check.js and a quaternion harness
   (cursor-tracking orientation changing every frame, two functions applying per frame, N=3): held-frame orientation equals tracking * click rotation to 1.4e-16; NOT checked live. Disclosed limits: a held frame's accumulators
   (offset/rotation) can be up to N-1 frames stale if another function claims the hand on that frame; positions are not re-derived from a moving camera on held frames.
+
+2026-10-21 -- Off-screen checkboxes gathered into one "Off-Screen Hands" subgroup inside Field Layout (main.js?v=538)
+  Direct request: put Skip Finger Curls For Off-Screen Hands in the same group as the other off-screen checkboxes, then put all of them in their own group within the Hand Field group. The finger-curl control moved from Quality / Performance
+  to Field Layout (control key unchanged, so its saved value and per-device values carry over). New FIELD_LAYOUT_SUBGROUP_SPECS entry "Off-Screen Hands" holds: Skip Finger Curls, Skip Pose Work, Retain Rotation / Arm Work, Skip Scene Update,
+  Skip Cursor Tracking, Render Order Skip, and the positional / pose throttle boxes with their N sliders. renestRenderOrderRows() (run on restore) nests them, and pulls the finger-curl row out of its old saved home -- the user's saved order
+  lists it in the group saved as "New Group (11)" (THREE.JS) -- but only from 'New Group (11)' / 'Quality / Performance', so a row the user placed anywhere else stays put. The subgroup is created on the first load; Save records it in the saved
+  order. Checked with node --check and tests/top-level-load-check.js; NOT checked in the browser.

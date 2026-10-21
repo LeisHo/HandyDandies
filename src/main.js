@@ -2154,7 +2154,15 @@ function renestSubgroupRows(parentTitle, spec) {
   return gb
 }
 function renestRenderOrderRows() {
+  // 2026-10-21: Skip Finger Curls For Off-Screen Hands used to live in Quality / Performance; a saved order still lists it there (the user's copy: the group saved as 'New Group (11)'). It is pulled into Field Layout
+  // from exactly those two old homes (a row the user placed anywhere else is left alone), then every off-screen row is gathered into the 'Off-Screen Hands' subgroup.
+  const fcRow = document.querySelector('.dp-row[data-key="skipOffScreenFingerCurls"]')
+  const flGroup = document.querySelector('.dp-group[data-key="Field Layout"]')
+  const flBody = flGroup && flGroup.querySelector(':scope > .dp-group-body')
+  const fcOld = fcRow && fcRow.closest('.dp-group')
+  if (flBody && fcOld && (fcOld.dataset.key === 'New Group (11)' || fcOld.dataset.key === 'Quality / Performance')) flBody.appendChild(fcRow)
   renestSubgroupRows('Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS[0])
+  renestSubgroupRows('Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS[1])
   const gb = renestSubgroupRows('Debug', SNAPSHOT_SUBGROUP_SPECS[0])
   const w = document.getElementById('dpSnapshotWidget')
   if (gb && w && w.parentElement !== gb) gb.appendChild(w)
@@ -2637,6 +2645,8 @@ const DEV_GROUPS = [
       // Skip Pose Work For Hands Outside The Camera (2026-10-20, direct request): a hand outside every camera (the same test as Skip Finger Curls For Off-Screen Hands, which has to stay on) skips the wrist-bone pose work and, unless
       // "Retain Rotation And Arm Work" is on, the pose's Whole-Hand Rotation / Rotation at Base and the arm length (wrist crop) work. Its position is still worked out in full (grid position, Pose Offset, click-function Offset and
       // Rotation, scale), the click-function timelines keep running, and cursor tracking is untouched. The frame a hand comes back into view it gets a full catch-up (a full repose, the arm length snaps to its target). Off by default.
+      // Off-screen finger-curl skip (2026-10-15, direct request): a hand outside every camera's view (plus a margin) keeps updating all its pose numbers but does not write its finger bones until it is back in view.
+      { key: 'skipOffScreenFingerCurls', label: 'Skip Finger Curls For Off-Screen Hands', type: 'checkbox', def: true, perDevice: true },
       { key: 'skipOffScreenPoseWork', label: 'Skip Pose Work For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
       { key: 'retainRotationArmWork', label: 'Retain Rotation And Arm Work', type: 'checkbox', def: false, perDevice: true },
       // Remove Hands Outside The Camera From The Scene (2026-10-20, direct request): a hand outside every camera (the same test as Skip Finger Curls For Off-Screen Hands, which has to stay on) is taken out of the three.js scene after
@@ -3942,8 +3952,6 @@ const DEV_GROUPS = [
         qualityState.resolutionScale = preset.resolutionScale / 100
         applyQualityState()
       } },
-      // Off-screen finger-curl skip (2026-10-15, direct request): a hand outside every camera's view (plus a margin) keeps updating all its pose numbers but does not write its finger bones until it is back in view.
-      { key: 'skipOffScreenFingerCurls', label: 'Skip Finger Curls For Off-Screen Hands', type: 'checkbox', def: true, perDevice: true }
     ]
   },
   // Starting State (2026-10-11, direct request): with Static Pose On Startup on, the hands stay in their default pose - no cursor tracking (arm / palm rotation, reactive wrist splay, reactive arm length) - until the first
@@ -4229,7 +4237,8 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 // whatever was last interacted with there, not a deliberate choice worth
 // preserving).
 const FIELD_LAYOUT_SUBGROUP_SPECS = [
-  { title: 'Render Order', collapsed: false, keys: ['renderOrderRules', 'renderOrderFlipLock'] }
+  { title: 'Render Order', collapsed: false, keys: ['renderOrderRules', 'renderOrderFlipLock'] },
+  { title: 'Off-Screen Hands', collapsed: false, keys: ['skipOffScreenFingerCurls', 'skipOffScreenPoseWork', 'retainRotationArmWork', 'skipOffScreenSceneUpdate', 'skipOffScreenCursorTracking', 'renderOrderSkipOffScreen', 'throttleOffScreenPosition', 'offScreenPositionEvery', 'throttleOffScreenPose', 'offScreenPoseEvery'] }
 ]
 const CAMERA_SUBGROUP_SPECS = [
   { title: 'Preview Camera', collapsed: true, keys: ['cameraPreviewEnabled', 'cameraPreviewX', 'cameraPreviewY', 'cameraPreviewZ', 'cameraPreviewFov', 'cameraPreviewZoom', 'lockCameraPreviewPan', 'lockCameraPreviewZoom', 'lockCameraPreviewRotate', 'cameraPreviewYaw', 'cameraPreviewPitch', 'savedCameraPreviews', 'addCameraPreviewBtn', 'cameraPreviewCount', 'deleteAllCameraPreviewsBtn'] }
