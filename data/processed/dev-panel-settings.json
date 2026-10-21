@@ -15180,8 +15180,8 @@
         }
       ],
       "lockCameraPan": true,
-      "lockCameraZoom": false,
-      "cameraMaxExtentsEnabled": false,
+      "lockCameraZoom": true,
+      "cameraMaxExtentsEnabled": true,
       "cameraPreviewEnabled": false,
       "cameraPreviewX": 0,
       "cameraPreviewY": 0,
