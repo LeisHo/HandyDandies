@@ -17717,7 +17717,7 @@
       "custom43RotationMode": "Rotation at Crop",
       "custom43TargetPose": "",
       "custom43SkipIfSamePose": false,
-      "custom43TweenSelector": "FISH - ARM",
+      "custom43TweenSelector": "NEUTRAL NNBB",
       "custom43ReverseSequence": false,
       "custom43GlideToFirstPose": true,
       "custom43FirstGlideTimeScale": 2.7,
@@ -38885,7 +38885,7 @@
       "custom43RotationMode": "Rotation at Crop",
       "custom43TargetPose": "",
       "custom43SkipIfSamePose": false,
-      "custom43TweenSelector": "FISH - ARM",
+      "custom43TweenSelector": "NEUTRAL NNBB",
       "custom43ReverseSequence": false,
       "custom43GlideToFirstPose": true,
       "custom43FirstGlideTimeScale": 2.7,
@@ -60053,7 +60053,7 @@
       "custom43RotationMode": "Rotation at Crop",
       "custom43TargetPose": "",
       "custom43SkipIfSamePose": false,
-      "custom43TweenSelector": "FISH - ARM",
+      "custom43TweenSelector": "NEUTRAL NNBB",
       "custom43ReverseSequence": false,
       "custom43GlideToFirstPose": true,
       "custom43FirstGlideTimeScale": 2.7,
@@ -66400,7 +66400,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
