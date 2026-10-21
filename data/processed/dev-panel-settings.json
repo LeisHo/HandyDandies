@@ -15657,7 +15657,7 @@
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnSpeedCurveEnabled": true,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "uiBtnFnSpeedCurveRange": "{\"min\":706,\"max\":786}",
+      "uiBtnFnSpeedCurveRange": "{\"min\":617,\"max\":678}",
       "uiBtnFnStartTimeCurveEnabled": false,
       "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -15670,7 +15670,7 @@
       "uiBtnFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "uiBtnScaleCurveEnabled": true,
-      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29708980478298125,\"y\":0.240624745686849}},{\"x\":0.6606363425919645,\"y\":1,\"h2\":{\"x\":-0.15411212720797063,\"y\":0},\"h1\":{\"x\":0.09483823599314356,\"y\":0}},{\"x\":1,\"y\":0.8333333333333334,\"h2\":{\"x\":-0.19183751811282346,\"y\":0.11395772298177076}}]",
+      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29708980478298125,\"y\":0.240624745686849}},{\"x\":0.6606363425919645,\"y\":1,\"h2\":{\"x\":-0.15411212720797063,\"y\":0},\"h1\":{\"x\":0.20356398713084267,\"y\":0}},{\"x\":1,\"y\":0.8333333333333334,\"h2\":{\"x\":-0.12007608201573672,\"y\":0.01395835876464846}}]",
       "uiBtnScaleRange": "{\"min\":0,\"max\":1.15}",
       "showTrackingPoints": false,
       "showFieldCenterPoint": false,
@@ -36472,7 +36472,7 @@
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnSpeedCurveEnabled": true,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "uiBtnFnSpeedCurveRange": "{\"min\":706,\"max\":786}",
+      "uiBtnFnSpeedCurveRange": "{\"min\":617,\"max\":678}",
       "uiBtnFnStartTimeCurveEnabled": false,
       "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -36485,7 +36485,7 @@
       "uiBtnFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "uiBtnScaleCurveEnabled": true,
-      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29708980478298125,\"y\":0.240624745686849}},{\"x\":0.6606363425919645,\"y\":1,\"h2\":{\"x\":-0.15411212720797063,\"y\":0},\"h1\":{\"x\":0.09483823599314356,\"y\":0}},{\"x\":1,\"y\":0.8333333333333334,\"h2\":{\"x\":-0.19183751811282346,\"y\":0.11395772298177076}}]",
+      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29708980478298125,\"y\":0.240624745686849}},{\"x\":0.6606363425919645,\"y\":1,\"h2\":{\"x\":-0.15411212720797063,\"y\":0},\"h1\":{\"x\":0.20356398713084267,\"y\":0}},{\"x\":1,\"y\":0.8333333333333334,\"h2\":{\"x\":-0.12007608201573672,\"y\":0.01395835876464846}}]",
       "uiBtnScaleRange": "{\"min\":0,\"max\":1.15}",
       "showTrackingPoints": false,
       "showFieldCenterPoint": false,
@@ -57287,7 +57287,7 @@
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnSpeedCurveEnabled": true,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "uiBtnFnSpeedCurveRange": "{\"min\":706,\"max\":786}",
+      "uiBtnFnSpeedCurveRange": "{\"min\":617,\"max\":678}",
       "uiBtnFnStartTimeCurveEnabled": false,
       "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -57300,7 +57300,7 @@
       "uiBtnFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "uiBtnScaleCurveEnabled": true,
-      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29708980478298125,\"y\":0.240624745686849}},{\"x\":0.6606363425919645,\"y\":1,\"h2\":{\"x\":-0.15411212720797063,\"y\":0},\"h1\":{\"x\":0.09483823599314356,\"y\":0}},{\"x\":1,\"y\":0.8333333333333334,\"h2\":{\"x\":-0.19183751811282346,\"y\":0.11395772298177076}}]",
+      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29708980478298125,\"y\":0.240624745686849}},{\"x\":0.6606363425919645,\"y\":1,\"h2\":{\"x\":-0.15411212720797063,\"y\":0},\"h1\":{\"x\":0.20356398713084267,\"y\":0}},{\"x\":1,\"y\":0.8333333333333334,\"h2\":{\"x\":-0.12007608201573672,\"y\":0.01395835876464846}}]",
       "uiBtnScaleRange": "{\"min\":0,\"max\":1.15}",
       "showTrackingPoints": false,
       "showFieldCenterPoint": false,
@@ -62779,7 +62779,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -65945,7 +65945,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -66638,7 +66638,7 @@
           "type": "group",
           "group": {
             "key": "UI Buttons Tween",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -66653,7 +66653,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -66697,7 +66697,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Scale Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
