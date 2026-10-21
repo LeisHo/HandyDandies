@@ -14624,7 +14624,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4938046282697179,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.8487971421342522,\"y\":0}}]",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.12451116051656308,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.8487971421342522,\"y\":0}}]",
       "startupFnSpeedCurveRange": "{\"min\":978,\"max\":1157}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
@@ -53742,7 +53742,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4938046282697179,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.8487971421342522,\"y\":0}}]",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.12451116051656308,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.8487971421342522,\"y\":0}}]",
       "startupFnSpeedCurveRange": "{\"min\":978,\"max\":1157}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
@@ -62078,7 +62078,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
