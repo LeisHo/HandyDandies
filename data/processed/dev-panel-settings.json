@@ -239,8 +239,8 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5312260086631311,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.23642045056497685,\"y\":-0.15937500000000004}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-180}",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5312260086631311,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.20225734860456546,\"y\":-0.40604159037272136}}]",
+      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-190}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -15132,14 +15132,14 @@
         }
       ],
       "cameraX": 3.6923076923076925,
-      "cameraY": 2.5847786977328528e-14,
-      "cameraZ": 335.46368781808053,
+      "cameraY": 2.99723827982584e-14,
+      "cameraZ": 402.82344940487565,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":3.6923076923076925,\"cameraY\":1.2923893488664274e-14,\"cameraZ\":335.46368781808087,\"cameraFov\":20,\"cameraZoom\":211.06319793857938,\"cameraRoll\":0,\"targetX\":3.6923076923076925,\"targetY\":0,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 211.06319793857904,
+      "cameraZoom": 278.42295952537415,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -43195,8 +43195,8 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5312260086631311,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.23642045056497685,\"y\":-0.15937500000000004}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-180}",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5312260086631311,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.20225734860456546,\"y\":-0.40604159037272136}}]",
+      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-190}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -73323,8 +73323,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 768.9500122070312,
-      "height": 597.7750244140625,
+      "width": 620.9500122070312,
+      "height": 532.1749877929688,
       "collapsed": false
     },
     "mobile": {
