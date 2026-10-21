@@ -11,7 +11,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { nestImportedGroups, DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible, mergeImportedItem } from './devpanel/devPanel.js?v=104'
+import { nestImportedGroups, DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible, mergeImportedItem } from './devpanel/devPanel.js?v=105'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -21697,6 +21697,7 @@ function makeClipRig(clone) {
     clone,
     scaleY0: block.scale.y,
     maxY: bb.max.y,
+    minY: bb.min.y,
     baseY: block.position.y,
     topY0: block.position.y + block.scale.y * bb.max.y, // top of the box as authored, in the clone's frame
     planes: [0, 1, 2, 3, 4, 5].map(() => new THREE.Plane()),
@@ -21725,9 +21726,13 @@ function setClipRigT(rig, t, modelT = 0) {
   const topWrist = tt <= 0 ? 0 : tt * rig.topY0
   const topModel = modelT > 0 ? clipRigModelEndY(rig) * Math.min(modelT, 1) : 0
   const top = Math.max(topWrist, topModel)
-  if (top > rig.topY0 && rig.topY0 > rig.baseY) {
-    rig.block.position.y = rig.baseY
-    rig.block.scale.y = rig.scaleY0 * (top - rig.baseY) / (rig.topY0 - rig.baseY)
+  // The box's own origin is NOT its bottom (on the shipped models its local top is below the origin: maxY < 0), so stretch it about its authored BOTTOM at the full-wrist state, B: height scales so the top lands on `top`,
+  // and the position follows so the bottom stays at B. (A first version scaled about the origin and, with maxY < 0, never grew past the wrist: Hide Model 100% hid the same as Hide Wrist 100%.)
+  const bottom = rig.baseY + rig.scaleY0 * rig.minY
+  if (top > rig.topY0 && rig.topY0 > bottom) {
+    const k = (top - bottom) / (rig.topY0 - bottom)
+    rig.block.scale.y = rig.scaleY0 * k
+    rig.block.position.y = bottom - rig.block.scale.y * rig.minY
     return
   }
   const te = rig.topY0 > 0 ? Math.min(top / rig.topY0, 1) : tt

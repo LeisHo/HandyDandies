@@ -5208,7 +5208,23 @@ export function initDevPanel(groups, opts = {}) {
   if (!devHotkeyIsTouchDevice) {
     panel.addEventListener('click', (e) => {
       if (!devSetHotkeyArmed) return
-      if (e.target.closest('.dp-icon-btn')) return
+      // CORRECTED 2026-10-20, direct report: this used to just `return`
+      // for ANY .dp-icon-btn (including the Set Hotkey button itself,
+      // which has no id and so is harmlessly skipped below too) --
+      // meaning a header button (Sync/Copy/Reset/Undo/Redo/etc.) while
+      // armed always fired its own real action instead of opening the
+      // hotkey editor. Header buttons have no `.dp-row`/`dataset.key`
+      // at all, so they need their own branch here, same shape as
+      // HANDO's/the template's own already-correct
+      // startHotkeyEditForHeaderBtn() path.
+      const headerBtn = e.target.closest('.dp-icon-btn')
+      if (headerBtn && headerBtn.id) {
+        e.preventDefault()
+        e.stopPropagation()
+        startHotkeyEditForHeaderBtn(headerBtn)
+        return
+      }
+      if (headerBtn) return // the Set Hotkey button itself (no id) -- let it toggle armed state normally
       const eligible = getHotkeyEligibleTarget(e)
       if (!eligible) return
       e.preventDefault()
@@ -5280,7 +5296,61 @@ export function initDevPanel(groups, opts = {}) {
     if (exact) triggerHotkey(exact)
     resetHotkeyBuffer()
   }
+  // Header buttons (Sync/Copy/Reset/Undo/Redo/etc.) have no `.dp-row`/
+  // `dataset.key` for startHotkeyEdit()'s own row-based flow to use --
+  // this is their own parallel capture path, modal-based (no inline
+  // badge slot to grow into), storing `entry.key` as the button's real
+  // DOM id and `entry.type` as the literal string 'headerButton' so
+  // triggerHotkey()/refreshHotkeysListSubgroup() can tell the 2 entry
+  // shapes apart. Added 2026-10-20, ported from HANDO's/the shared
+  // template's own already-correct version of this.
+  function startHotkeyEditForHeaderBtn(btnEl) {
+    const modal = el('div', 'dp-hotkey-modal')
+    document.body.appendChild(modal)
+    const existingSeq = findExistingHotkeyKeyForControl(btnEl.id)
+    const input = el('input', 'dp-hotkey-input', { type: 'text' })
+    input.maxLength = 2
+    if (existingSeq) input.value = existingSeq
+    modal.appendChild(input)
+    input.focus(); input.select()
+    let settled = false
+    function finish() { if (settled) return; settled = true; input.remove(); modal.remove() }
+    function commit() {
+      if (settled) return
+      const typed = input.value.trim().toLowerCase()
+      if (typed) {
+        pushDevPanelUndoSnapshot(); devRedoStack = []
+        if (existingSeq && existingSeq !== typed) delete devHotkeys[existingSeq]
+        devHotkeys[typed] = { key: btnEl.id, type: 'headerButton' }
+      } else if (existingSeq) {
+        pushDevPanelUndoSnapshot(); devRedoStack = []
+        delete devHotkeys[existingSeq]
+      }
+      finish()
+      refreshHotkeysListSubgroup()
+    }
+    function cancel() { if (settled) return; settled = true; input.remove(); modal.remove() }
+    input.addEventListener('blur', commit)
+    input.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); return }
+      if (ev.key === 'Escape') { ev.preventDefault(); cancel(); return }
+      if (ev.key === 'Backspace' || ev.key === 'Delete') { ev.preventDefault(); input.value = ''; commit(); return }
+      if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) {
+        ev.preventDefault()
+        const modPrefix = (ev.ctrlKey || ev.metaKey ? 'ctrl+' : '') + (ev.shiftKey ? 'shift+' : '') + (ev.altKey ? 'alt+' : '')
+        const keyName = ev.key === ' ' ? 'space' : (ev.key.toLowerCase().match(/^[a-z0-9]$/) ? ev.key.toLowerCase() : null)
+        const capturedKey = modPrefix && keyName ? modPrefix + keyName : ''
+        if (capturedKey) input.value = capturedKey.toUpperCase()
+      }
+    })
+    input.addEventListener('click', (ev) => ev.stopPropagation())
+  }
   function triggerHotkey(entry) {
+    if (entry.type === 'headerButton') {
+      const btnEl = document.getElementById(entry.key)
+      if (btnEl) { pushDevPanelUndoSnapshot(); devRedoStack = []; btnEl.click() }
+      return
+    }
     const row = findHotkeyRow(entry.key)
     const el = findHotkeyControlEl(row, entry.type)
     if (!el) return
@@ -5416,15 +5486,20 @@ export function initDevPanel(groups, opts = {}) {
       return
     }
     entries.forEach(([seq, entry]) => {
-      const row = findHotkeyRow(entry.key)
-      const label = row?.querySelector('label')?.textContent || entry.key
+      const isHeaderBtn = entry.type === 'headerButton'
+      const row = isHeaderBtn ? null : findHotkeyRow(entry.key)
+      const headerBtnEl = isHeaderBtn ? document.getElementById(entry.key) : null
+      const label = isHeaderBtn
+        ? ((headerBtnEl && headerBtnEl.title) || entry.key).replace(/\s*\([^)]*key\)\s*$/i, '')
+        : (row?.querySelector('label')?.textContent || entry.key)
       const line = el('div', null, { })
       line.style.cssText = 'display:flex; align-items:center; gap:6px;'
       const badge = el('span', 'dp-hotkey-badge', { textContent: seq, title: 'Double-click to edit, double-right-click to delete' })
       let lastContextmenuAt = 0
       badge.addEventListener('dblclick', (e) => {
         e.preventDefault(); e.stopPropagation()
-        if (row) startHotkeyEdit(row, entry.key, entry.type, seq)
+        if (isHeaderBtn) { if (headerBtnEl) startHotkeyEditForHeaderBtn(headerBtnEl) }
+        else if (row) startHotkeyEdit(row, entry.key, entry.type, seq)
       })
       badge.addEventListener('contextmenu', (e) => {
         e.preventDefault(); e.stopPropagation()
