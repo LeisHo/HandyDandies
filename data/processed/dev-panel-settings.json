@@ -200,7 +200,7 @@
       "smallScaleModelsEnabled": true,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
       "skipOffScreenPoseWork": true,
-      "retainRotationArmWork": false,
+      "retainRotationArmWork": true,
       "skipOffScreenSceneUpdate": true,
       "skipOffScreenCursorTracking": true,
       "renderOrderSkipOffScreen": true,
