@@ -59594,7 +59594,7 @@
           "type": "group",
           "group": {
             "key": "Quality / Performance",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -59654,7 +59654,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -59673,7 +59673,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -59693,10 +59693,34 @@
                 "key": "startupHandWaitForAll"
               },
               {
+                "type": "row",
+                "key": "startupFnLoopWrapScale"
+              },
+              {
+                "type": "row",
+                "key": "startupTrackArm"
+              },
+              {
+                "type": "row",
+                "key": "startupTrackPalm"
+              },
+              {
+                "type": "row",
+                "key": "startupTrackSplay"
+              },
+              {
+                "type": "row",
+                "key": "startupTrackCrop"
+              },
+              {
+                "type": "row",
+                "key": "startupFnOffsetLoopRetransition"
+              },
+              {
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -59742,10 +59766,6 @@
                     {
                       "type": "row",
                       "key": "startupFnSequenceHoldMs"
-                    },
-                    {
-                      "type": "row",
-                      "key": "startupFnLoopWrapScale"
                     }
                   ],
                   "settings": [
@@ -59759,8 +59779,7 @@
                     "startupFnSequenceCount",
                     "startupFnSequenceCountMode",
                     "startupFnSequenceLoopTransition",
-                    "startupFnSequenceHoldMs",
-                    "startupFnLoopWrapScale"
+                    "startupFnSequenceHoldMs"
                   ]
                 }
               },
@@ -60088,26 +60107,6 @@
                 }
               },
               {
-                "type": "row",
-                "key": "startupTrackArm"
-              },
-              {
-                "type": "row",
-                "key": "startupTrackPalm"
-              },
-              {
-                "type": "row",
-                "key": "startupTrackSplay"
-              },
-              {
-                "type": "row",
-                "key": "startupTrackCrop"
-              },
-              {
-                "type": "row",
-                "key": "startupFnOffsetLoopRetransition"
-              },
-              {
                 "type": "group",
                 "group": {
                   "key": "Startup > Clamp Distance from Cursor",
@@ -60135,12 +60134,13 @@
               "startupFnTweenSpeedMs",
               "startupHandMaxClicks",
               "startupHandWaitForAll",
-              "startupFnTransitionSpeedMs",
+              "startupFnLoopWrapScale",
               "startupTrackArm",
               "startupTrackPalm",
               "startupTrackSplay",
               "startupTrackCrop",
-              "startupFnOffsetLoopRetransition"
+              "startupFnOffsetLoopRetransition",
+              "startupFnTransitionSpeedMs"
             ]
           }
         },
