@@ -203,7 +203,7 @@
       "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": true,
       "skipOffScreenCursorTracking": true,
-      "renderOrderSkipOffScreen": true,
+      "renderOrderSkipOffScreen": false,
       "fieldRows": 45,
       "fieldCols": 55,
       "rowSpacing": 8,
@@ -59998,7 +59998,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
