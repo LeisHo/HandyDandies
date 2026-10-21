@@ -209,8 +209,8 @@
       "offScreenPositionEvery": 2,
       "throttleOffScreenPose": true,
       "offScreenPoseEvery": 5,
-      "fieldRows": 29,
-      "fieldCols": 35,
+      "fieldRows": 32,
+      "fieldCols": 30,
       "rowSpacing": 8,
       "columnSpacing": 15,
       "handScale": 1,
@@ -73325,7 +73325,7 @@
       "top": 69,
       "width": 768.9500122070312,
       "height": 597.7750244140625,
-      "collapsed": true
+      "collapsed": false
     },
     "mobile": {
       "left": 20,
