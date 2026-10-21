@@ -204,6 +204,8 @@
       "skipOffScreenSceneUpdate": true,
       "skipOffScreenCursorTracking": true,
       "renderOrderSkipOffScreen": true,
+      "throttleOffScreenTimelines": true,
+      "offScreenTimelineEvery": 3,
       "fieldRows": 45,
       "fieldCols": 55,
       "rowSpacing": 8,
@@ -15110,9 +15112,9 @@
           "group": "2 TWIDS - 1ST HAND"
         }
       ],
-      "cameraX": 1.9077061415860666,
-      "cameraY": 8.685456250915997e-13,
-      "cameraZ": 242.98502235780896,
+      "cameraX": 1.9077061415860657,
+      "cameraY": 8.908648130060598e-13,
+      "cameraZ": 242.98502235780893,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -15675,6 +15677,7 @@
       "logRendererEnabled": true,
       "logFrameSectionsEnabled": true,
       "logSystemEnabled": true,
+      "logHandBreakdownEnabled": false,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
@@ -21587,6 +21590,8 @@
       "skipOffScreenSceneUpdate": true,
       "skipOffScreenCursorTracking": true,
       "renderOrderSkipOffScreen": true,
+      "throttleOffScreenTimelines": false,
+      "offScreenTimelineEvery": 3,
       "fieldRows": 50,
       "fieldCols": 40,
       "rowSpacing": 8,
@@ -37058,6 +37063,7 @@
       "logRendererEnabled": true,
       "logFrameSectionsEnabled": true,
       "logSystemEnabled": true,
+      "logHandBreakdownEnabled": false,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
@@ -42970,6 +42976,8 @@
       "skipOffScreenSceneUpdate": false,
       "skipOffScreenCursorTracking": false,
       "renderOrderSkipOffScreen": false,
+      "throttleOffScreenTimelines": false,
+      "offScreenTimelineEvery": 3,
       "fieldRows": 15,
       "fieldCols": 3,
       "rowSpacing": 9.5,
@@ -58441,6 +58449,7 @@
       "logRendererEnabled": true,
       "logFrameSectionsEnabled": true,
       "logSystemEnabled": true,
+      "logHandBreakdownEnabled": false,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
@@ -64685,6 +64694,10 @@
         {
           "type": "row",
           "key": "saveFrameRecordingBtn"
+        },
+        {
+          "type": "row",
+          "key": "logHandBreakdownEnabled"
         }
       ],
       "settings": [
@@ -64724,7 +64737,8 @@
         "logRendererEnabled",
         "logFrameSectionsEnabled",
         "logSystemEnabled",
-        "saveFrameRecordingBtn"
+        "saveFrameRecordingBtn",
+        "logHandBreakdownEnabled"
       ]
     },
     {
@@ -65461,7 +65475,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -65703,6 +65717,14 @@
               {
                 "type": "row",
                 "key": "renderOrderSkipOffScreen"
+              },
+              {
+                "type": "row",
+                "key": "throttleOffScreenTimelines"
+              },
+              {
+                "type": "row",
+                "key": "offScreenTimelineEvery"
               }
             ],
             "settings": [
@@ -65732,7 +65754,9 @@
               "retainRotationArmWork",
               "skipOffScreenSceneUpdate",
               "skipOffScreenCursorTracking",
-              "renderOrderSkipOffScreen"
+              "renderOrderSkipOffScreen",
+              "throttleOffScreenTimelines",
+              "offScreenTimelineEvery"
             ]
           }
         },
@@ -72943,8 +72967,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 656.9500122070312,
-      "height": 572.9750366210938
+      "width": 660.1500244140625,
+      "height": 574.5750122070312
     },
     "mobile": {
       "left": 28.035715103149414,
