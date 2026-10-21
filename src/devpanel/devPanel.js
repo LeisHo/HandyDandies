@@ -4597,6 +4597,15 @@ export function initDevPanel(groups, opts = {}) {
   window.addEventListener('keydown', (e) => {
     const tag = document.activeElement && document.activeElement.tagName
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+    // 2026-10-20 (direct report: pressing the hotkey for Run Starting State froze the app for a couple of seconds). The hotkey was "rs": its first key, R, is also this panel's Reset shortcut, so every press ran
+    // resetSettings() (re-fetches and re-applies every setting) before the S arrived. A letter that is part of an assigned hotkey (alone, in a sequence, or as a modifier combo) now belongs to that hotkey and does
+    // not also fire D (hide) / R (reset).
+    if (e.key === 'd' || e.key === 'D' || e.key === 'r' || e.key === 'R') {
+      const k = e.key.toLowerCase()
+      const mod = (e.ctrlKey || e.metaKey ? 'ctrl+' : '') + (e.shiftKey ? 'shift+' : '') + (e.altKey ? 'alt+' : '')
+      const owned = mod ? !!devHotkeys[mod + k] : Object.keys(devHotkeys).some((s) => !s.includes('+') && s.includes(k))
+      if (owned) return
+    }
     if (e.key === 'd' || e.key === 'D') panel.classList.toggle('hidden')
     else if (e.key === 'r' || e.key === 'R') resetSettings()
   })
