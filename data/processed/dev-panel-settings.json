@@ -474,7 +474,7 @@
       "loadingPreviewEasingCurveEnabled": false,
       "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4562103709998403,\"y\":0}}]",
       "loadingPreviewSpeedCurveEnabled": true,
-      "loadingPreviewSpeedCurveRange": "{\"min\":200,\"max\":5000}",
+      "loadingPreviewSpeedCurveRange": "{\"min\":200,\"max\":7000}",
       "loadingPreviewSpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.37150769363563235,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3963246859526347,\"y\":0}}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
@@ -21642,7 +21642,7 @@
       "loadingPreviewEasingCurveEnabled": true,
       "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4562103709998403,\"y\":0}}]",
       "loadingPreviewSpeedCurveEnabled": true,
-      "loadingPreviewSpeedCurveRange": "{\"min\":200,\"max\":5000}",
+      "loadingPreviewSpeedCurveRange": "{\"min\":200,\"max\":7000}",
       "loadingPreviewSpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.37150769363563235,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3963246859526347,\"y\":0}}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
@@ -42810,7 +42810,7 @@
       "loadingPreviewEasingCurveEnabled": false,
       "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4562103709998403,\"y\":0}}]",
       "loadingPreviewSpeedCurveEnabled": true,
-      "loadingPreviewSpeedCurveRange": "{\"min\":200,\"max\":5000}",
+      "loadingPreviewSpeedCurveRange": "{\"min\":200,\"max\":7000}",
       "loadingPreviewSpeedCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.37150769363563235,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3963246859526347,\"y\":0}}]",
       "loadingPreviewHand2ExtraX": 0,
       "loadingPreviewHand2ExtraY": 0,
@@ -64232,7 +64232,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -64303,7 +64303,7 @@
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": true,
                         "items": [
                           {
