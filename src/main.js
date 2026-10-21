@@ -390,6 +390,7 @@ let loadingPreviewEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y
 // Loading Preview End Sequence (2026-10-18): state + its own easing trig, declared up here (the restore can reach the onChange handlers at top level - TDZ). lpLastValues / lpHand2LastValues = the last pose applied to each preview hand.
 let loadingPreviewEndEasingTrig = { easingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], retransitionEasingCurveParsed: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }], speedRangeParsed: null }
 let lastPositionalFn = null // the last click function that was triggered with Positional Retransition on (its Retransition Speed unwinds the offset / rotation of functions that have it off)
+const onClickCtxCache = {} // On Click: the pieces shared by every hand of one press (pose snapshot, resolved sequence), keyed by the shadow prefix and stamped with the press time
 let lpLapNom = 0, lpLapNomStart = -1, lpLapNomLastMs = 0 // Animation Speed Curve: the lap's own progress clock (0..1), advanced per frame so the speed can change while a lap plays
 let lpLastLapOnLast = false // the loading animation's most recently completed lap ended on the sequence's LAST pose (not on pose 1 after a wrap-back)
 let lpHideModel1 = 0, lpHideModel2 = 0 // the Hide Model % of the pose each loading-preview hand is showing right now (kept so the Real Time Loading crop, which re-applies the clip on its own, does not lose it)
@@ -4331,7 +4332,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // each a no-op for the case the other one handles.
   // RULE: any group the host builds at runtime and keeps its own bookkeeping for (a list in cfg, registered keys / trigger state, saved values) must be torn down here when the delete tool removes it - the tool only
   // removes the DOM node, so without a cleanup the group comes back on the next load (a Multi Trigger did, 2026-10-16). If Undo must rebuild it, also list it in deleteUsesSnapshot below and reconcile it in undoApplyExtra.
-  onGroupDeleted: (target) => { cleanupDeletedMultiTriggerGroups(target); cleanupDeletedOnReleaseGroups(target); cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target); cleanupDeletedVelocityGroup(target) },
+  onGroupDeleted: (target) => { cleanupDeletedMultiTriggerGroups(target); cleanupDeletedOnReleaseGroups(target); cleanupDeletedOnClickGroups(target); cleanupDeletedCustomClickFunction(target); disableDeletedStaticClickTrigger(target); cleanupDeletedVelocityGroup(target) },
   deleteUsesSnapshot: (target) => !!(target && target.querySelector && (target.dataset.multiTriggerPrefix || target.querySelector('.dp-group[data-multi-trigger-prefix]')) && !target.dataset.customFunctionFamily), // Multi Trigger groups: Undo rebuilds them through undoApplyExtra
   // Real bug found live 2026-09-24: Custom Click Functions' own tab-
   // dependent visibility (Touch Point Count hidden on Desktop, a
@@ -14326,7 +14327,7 @@ const _baseRotDecay = new THREE.Quaternion(), _wrV2 = new THREE.Vector3()
 // Positional Retransition (see the control): the progress the OFFSET / ROTATION unwind uses during p's retransition. On = the pose's own progress, as always. Off = the unwind runs on its own clock at the Retransition Speed of
 // lastPositionalFn (the last triggered function with it on); with no such function it stays at 0, so the offset / rotation stay and the hand remains in this retransition phase until another function takes over.
 function positionalRetransitionOn(p) { return cfg[`${p}PositionalRetransition`] !== false }
-function notePositionalFn(p) { if (positionalRetransitionOn(p) && cfg[`${p}RetransitionEnabled`] !== false) lastPositionalFn = p }
+function notePositionalFn(p) { if (isStagePrefix(p)) return; if (positionalRetransitionOn(p) && cfg[`${p}RetransitionEnabled`] !== false) lastPositionalFn = p }
 function positionalProgressFor(p, poseProgress, st) {
   if (positionalRetransitionOn(p)) return poseProgress
   const q = lastPositionalFn
@@ -14912,8 +14913,9 @@ function snapshotOffsetRotationAccumForRetransition(hand, chp) {
 // ---- On Release (2026-10-17, direct request) ----
 // Every custom Click+Hold function can carry an "On Release" group: a fire-and-forget pose-kind function (prefix `${id}Rel`, built through the same registerMultiTriggerTrigger() machinery a Multi Trigger uses, so it has the
 // same Mode / Single Pose / Sequence + loop, Offset, Rotation, curves and Start Time Curve controls) that is triggered, for each hand, when that hand's hold has finished winding down. The hold's own Tween Stop still runs first.
-// It REPLACES the hold's Retransition: with On Release on, the hold never retransitions; whatever the hand does afterwards is the On Release function's own Retransition (the two Retransition toggles exclude each other, see
-// retransitionExclusion()). Only a base custom hold function has one (not a Multi Trigger sub-trigger), and the static hold keys do not, so `${p}RelEnabled` is simply undefined for them.
+// UPDATE 2026-10-20: On Release has no Retransition / Start Time Curve / Start Distance Curve of its own - it inherits the hold's Start Time and Start Distance, and when its sequence has finished the hold's OWN Retransition
+// unwinds the hand (beginHoldRetransition). It replaces Tween Stop instead (turning one on turns the other off, see tweenStopReleaseExclusion()). Only a base custom hold function has one (not a Multi Trigger sub-trigger), and
+// the static hold keys do not, so `${p}RelEnabled` is simply undefined for them.
 function onReleaseOn(p) { return cfg[`${p}RelEnabled`] === true && !!clickPoseTriggers[`${p}Rel`] }
 function beginOnRelease(hand, chp, p, values, now) {
   if (values) chp.lastAppliedValues = values
@@ -14921,6 +14923,95 @@ function beginOnRelease(hand, chp, p, values, now) {
   chp.releasePending = false
   logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'hold finished -> On Release begins')
   triggerClickPose(`${p}Rel`, new Set([hand])) // schedules the On Release claim for this hand (its Start Time Curve delay applies); the hand keeps its pose until that claim commits
+}
+// ---- Stage functions: On Click / On Release (2026-10-20) ----
+// Shadow pose-kind functions `${id}Clk` and `${id}Rel` of a custom click function. They have no Retransition, Start Time Curve or Start Distance Curve of their own: the main function's apply (Start Time / Start Distance
+// when they are armed, Retransition after On Release). Helpers are plain function declarations (hoisted) and use no module-level constants, so they are safe to call from anywhere.
+function stageParentOf(p) { const m = /^(custom\d+)(?:Clk|Rel)$/.exec(p); return m ? m[1] : null }
+function isStagePrefix(p) { return stageParentOf(p) !== null }
+function triggerStateOf(p) { return clickHoldPoseTriggers[p] || clickPoseTriggers[p] }
+function onClickOn(p) { return cfg[`${p}ClkEnabled`] === true && !!clickPoseTriggers[`${p}Clk`] }
+function onClickCtxFor(p, stamp) {
+  const clk = `${p}Clk`
+  let c = onClickCtxCache[clk]
+  if (c && c.stamp === stamp) return c
+  const snap = {}
+  POSE_PRESET_KEYS.forEach((key) => { snap[key] = cfg[key] })
+  let namedPoses = null, rawEntries = null
+  if (isSequenceOrChainMode(clk)) {
+    rawEntries = selectedSequenceEntries(clk)
+    const resolved = resolveTweenSequencePoses(rawEntries, true)
+    if (resolved.length >= 1) namedPoses = resolved
+  }
+  c = { stamp, snap, namedPoses, rawEntries }
+  onClickCtxCache[clk] = c
+  return c
+}
+// Schedules this hand's On Click sequence to start at claimAt (the moment the main function would have started). The main function's own pending fields stay as they are; it waits (awaitClk) and starts when On Click is done.
+function armOnClickForHand(hand, p, claimAt, pressAt, parentIsTween, cap, frozenSplay) {
+  const clk = `${p}Clk`
+  const trig = clickPoseTriggers[clk]
+  const kcp = trig ? getOrInitHandCP(hand)[clk] : null
+  if (!kcp) return false
+  const c = onClickCtxFor(p, pressAt)
+  kcp.pendingClaimAt = claimAt
+  kcp.pendingPressAt = pressAt; kcp.pendingIsTween = parentIsTween // live Start Time of the MAIN function (liveStartDelayMs redirects)
+  kcp.pendingForwardSnapshot = c.snap
+  kcp.pendingNamedPoses = c.namedPoses
+  kcp.pendingRawEntries = c.rawEntries
+  kcp.pendingTweenFractionCap = cap
+  kcp.pendingFrozenSplayDeg = frozenSplay
+  kcp.pendingFromSplayDeg = hand.currentSplayDeg
+  kcp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand, clk)
+  kcp.pendingFrozenHandQuat = hand.wrapper.quaternion.clone()
+  kcp.pendingFrozenSpeedMs = cfg[`${clk}SpeedCurveEnabled`] ? curveByDomain(clk, 'SpeedCurveVisibleOnly', handXYDist(hand), trig.speedCurveParsed, trig.speedRangeParsed) : 0
+  return true
+}
+// Called every frame for a main function that is waiting on its On Click sequence. isHold: the main function is a Click+Hold one (chp state) instead of a Click one (cp state).
+function resolveAwaitClk(hand, st, p, now, isHold) {
+  const kcp = hand._cp && hand._cp[`${p}Clk`]
+  if (!kcp || !onClickOn(p)) { st.awaitClk = false; st.pendingPressAt = undefined; st.pendingClaimAt = now; return } // On Click gone / switched off meanwhile: start the main function now
+  if (kcp.pendingClaimAt) return // On Click has not started yet (its Start Time delay)
+  if (kcp.phase === 'paused') {
+    // On Click has played to its end (it never retransitions): the main function starts from that pose
+    st.awaitClk = false
+    if (isHold && st.clkReleased) { st.clkReleased = false; finishHoldAfterOnClick(hand, st, p, now); return }
+    st.pendingPressAt = undefined; st.pendingClaimAt = now
+    return
+  }
+  if (kcp.phase === 'idle') {
+    // On Click never started for this hand (a startup lock, or something else took the hand): carry on with the main function unless the hold was already released
+    st.awaitClk = false
+    if (isHold && st.clkReleased) { st.clkReleased = false; return }
+    st.pendingPressAt = undefined; st.pendingClaimAt = now
+  }
+}
+// A hold released while its On Click sequence was playing: now that sequence is done, the hold ends exactly as a released hold does (On Release, else its Retransition).
+function finishHoldAfterOnClick(hand, chp, p, now) {
+  const kcp = hand._cp[`${p}Clk`]
+  const values = (kcp && kcp.lastAppliedValues) || hand._lastPoseValues || { ...poseDefaultValues }
+  chp.lastAppliedValues = values
+  chp.frozenSplayDeg = kcp ? kcp.frozenSplayDeg : 0
+  if (onReleaseOn(p)) { beginOnRelease(hand, chp, p, values, now); return }
+  beginHoldRetransition(hand, chp, clickHoldPoseTriggers[p], p, values, now)
+}
+// Starts the hold's Retransition (its own settings) from the given pose - used after On Release / On Click have played. With Retransition off the hand just stays where the stage function left it.
+function beginHoldRetransition(hand, chp, trig, p, values, now) {
+  chp.retransitionIsTween = isSequenceOrChainMode(p)
+  chp.releasePending = false
+  if (cfg[`${p}RetransitionEnabled`] === false) { chp.phase = 'idle'; return }
+  releaseHandFromOtherFunctions(hand, p) // idles the stage function that was holding the pose
+  const d = handXYDist(hand), tw = chp.retransitionIsTween
+  chp.retransitionStart = values || { ...poseDefaultValues }
+  chp.retransitionStartTime = now
+  chp.retransitionDelay = cfg[`${p}RetransitionStartTimeCurveEnabled`] === false ? 0
+    : (tw ? curveByDomain(p, 'RetransitionStartTimeCurveVisibleOnly', d, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed) : curveByDomain(p, 'RetransitionStartTimeCurveVisibleOnly', d, trig.retransitionCurveParsed, trig.retransitionRangeParsed))
+  chp.retransitionSpeedMs = cfg[`${p}RetransitionSpeedCurveEnabled`]
+    ? (tw ? curveByDomain(p, 'RetransitionSpeedCurveVisibleOnly', d, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed) : curveByDomain(p, 'RetransitionSpeedCurveVisibleOnly', d, trig.retransitionSpeedCurveParsed, trig.retransitionSpeedRangeParsed))
+    : 0
+  chp.phase = 'retransition'
+  snapshotOffsetRotationAccumForRetransition(hand, chp)
+  logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), 'stage sequence finished -> retransition begins')
 }
 function beginTweenReleaseStop(hand, chp, trig, p, values, live, minLiveDist, liveDistRange, now) {
   if (onReleaseOn(p)) { chp.releasePending = false; beginOnRelease(hand, chp, p, values, now); return } // the sequence ran to its natural end after the release: On Release takes over instead of the retransition
@@ -15007,9 +15098,11 @@ function isSequenceOrChainMode(p) {
 // so an in-progress-but-not-yet-visually-committed hold isn't force-
 // released by an unrelated click firing in the meantime.
 function releaseHandFromOtherFunctions(hand, exceptId) {
+  const stageOf = stageParentOf(exceptId) // On Click / On Release: their main function keeps waiting for them
   CLICK_POSE_KEYS.forEach((id) => {
     if (id === exceptId) return
     const cp = hand._cp && hand._cp[id]
+    if (cp && cp.awaitClk && stageOf !== id) cp.awaitClk = false
     if (cp && (cp.phase !== 'idle' || cp.pendingClaimAt)) {
       // CORRECTED 2026-09-27 -- same bug/fix as endClickHoldPose()'s own
       // 2 exit points (see bakeInFlightOffsetRotation()'s own comment).
@@ -15025,13 +15118,15 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
       // interrupts this one mid-retransition/mid-tween" moment this
       // project's own real jump-bug investigation has repeatedly needed
       // to correlate against the Mouse Tracking Log by hand and by time.
-      logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(exceptId), `interrupted ${handLogTriggerLabel(id)} (was mid-"${cp.phase}")`)
+      if (stageParentOf(id) !== exceptId) logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(exceptId), `interrupted ${handLogTriggerLabel(id)} (was mid-"${cp.phase}")`)
       cp.phase = 'idle'; cp.pendingClaimAt = 0
     }
   })
   CLICK_HOLD_KEYS.forEach((id) => {
     if (id === exceptId) return
     const chp = hand._chp && hand._chp[id]
+    if (chp && chp.awaitClk && stageOf !== id) { chp.awaitClk = false; chp.clkReleased = false }
+    if (chp && chp.phase === 'awaitingRelease' && exceptId === `${id}Rel`) return // the hold waits in this phase while its own On Release function plays
     if (chp && (chp.phase !== 'idle' || chp.pendingClaimAt)) {
       bakeInFlightOffsetRotation(hand, id)
       logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(exceptId), `interrupted ${handLogTriggerLabel(id)} (was mid-"${chp.phase}")`)
@@ -15066,6 +15161,8 @@ function liveTempo(nominalMs, liveMs) {
   return THREE.MathUtils.clamp(nominalMs / liveMs, 0.02, 50)
 }
 function liveStartDelayMs(hand, p, trig, isTween) {
+  const sp = stageParentOf(p)
+  if (sp) { p = sp; trig = triggerStateOf(sp) || trig } // On Click / On Release inherit the main function's Start Time Curve
   if (cfg[`${p}StartTimeCurveEnabled`] === false) return 0
   return isTween ? liveCurveValue(hand, trig.tweenStartCurveParsed, trig.tweenStartRangeParsed, p, 'StartTimeCurveVisibleOnly') : liveCurveValue(hand, trig.startCurveParsed, trig.startRangeParsed, p, 'StartTimeCurveVisibleOnly')
 }
@@ -15104,8 +15201,10 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
   // Values that are plain functions of distance (no rate): Offset To Camera amount, Start Distance tween amount.
   if (cfg[`${p}CameraOffsetEnabled`]) st.frozenOffsetNorm = captureCameraOffsetNorm(hand, p)
   if (rotationCurvesOn(p)) st.rotationNorm = captureRotationNorm(hand, p)
-  if (cfg[`${p}StartDistanceCurveEnabled`]) {
-    const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, nearestFor(hand, p), `${p}StartDistanceXOrigin`)
+  const sdp = stageParentOf(p) || p // On Click / On Release inherit the main function's Start Distance Curve
+  const sdt = sdp === p ? trig : (triggerStateOf(sdp) || trig)
+  if (cfg[`${sdp}StartDistanceCurveEnabled`]) {
+    const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${sdp}StartDistanceMin`], cfg[`${sdp}StartDistanceMax`], sdt.startDistanceCurveParsed, nearestFor(hand, p), `${sdp}StartDistanceXOrigin`)
     if (cap !== null) st.frozenTweenFractionCap = cap // out of range keeps the last cap rather than snapping
   }
   // Rates. Animation Speed Curve -> tempo of the forward / loop / lap clocks (nominal speed = the value at commit).
@@ -15143,6 +15242,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
   const trig = clickHoldPoseTriggers[p]
   const chp = getOrInitHandCHP(hand)[p]
   refreshLiveDistanceState(chp, hand, p, trig, now, 'hold')
+  if (chp.awaitClk) resolveAwaitClk(hand, chp, p, now, true)
   // CORRECTED 2026-09-30, direct request: "for all click functions, even
   // if i set start time to 0 ms, make sure that that is after any hold or
   // click confirm duration setting. so that if im doing a triple click,
@@ -15223,6 +15323,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       chp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand, p)
       chp.pendingFrozenHandQuat = hand.wrapper.quaternion.clone() // Hand Axes Offset (2026-10-04)
       chp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? curveByDomain(p, 'SpeedCurveVisibleOnly', handXYDist(hand), trig.speedCurveParsed, trig.speedRangeParsed) : 0
+      // On Click (2026-10-20): the hold waits for its On Click sequence, which starts when the hold would have.
+      chp.awaitClk = false; chp.clkReleased = false
+      if (chp.pendingClaimAt && onClickOn(p) && armOnClickForHand(hand, p, chp.pendingClaimAt, now, isTweenStart, tweenFractionCap, chp.pendingFrozenSplayDeg)) { chp.awaitClk = true; chp.pendingClaimAt = 0 }
     }
   }
   if (chp.pendingClaimAt && p !== STARTUP_FN && handStartupLocked(hand)) chp.pendingClaimAt = 0 // never claims a hand that is still in its startup sequence
@@ -15585,10 +15688,16 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
   } else if (chp.phase === 'awaitingRelease') {
     // On Release (2026-10-17): this hand's hold is over and its On Release function has been scheduled for it (beginOnRelease). Until that function commits (which force-idles this phase through releaseHandFromOtherFunctions)
     // the hand keeps showing the pose it ended on. If the On Release function never claims it (Start Distance Curve / Skip If Same Pose left it out, or the function was switched off meanwhile) the hand simply goes idle.
+    // 2026-10-20: the hold stays in this phase while the On Release function runs (releaseHandFromOtherFunctions keeps it), and when that sequence has finished the hold's OWN Retransition settings unwind the hand
+    // (On Release has no Retransition of its own).
     const relCp = hand._cp && hand._cp[`${p}Rel`]
     if (!relCp || (relCp.phase === 'idle' && !relCp.pendingClaimAt)) { chp.phase = 'idle'; return }
-    applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
-    applyOffsetRotationToHand(hand, p, 0)
+    if (relCp.pendingClaimAt) {
+      applyPoseValuesToHand(hand, chp.lastAppliedValues, chp.frozenSplayDeg)
+      applyOffsetRotationToHand(hand, p, 0)
+    } else if (relCp.phase === 'paused') {
+      beginHoldRetransition(hand, chp, trig, p, relCp.lastAppliedValues || chp.lastAppliedValues, now)
+    }
   } else if (chp.phase === 'retransition') {
     // Tween mode's own dedicated Retransition Speed (direct request --
     // see makeClickHoldPoseGroup()'s own comment) -- `chp.retransitionIsTween`
@@ -15797,7 +15906,15 @@ function endClickHoldPose(p) {
     // actually claimed by this hold at all; whatever it was doing before
     // (idle, or mid some OTHER trigger's own transition, untouched this
     // whole time) simply continues on its own.
-    if (chp.phase === 'idle') { chp.pendingClaimAt = 0; return }
+    if (chp.phase === 'idle') {
+      if (chp.awaitClk) {
+        // Released while the hold was still waiting for its On Click sequence (2026-10-20): if that sequence already started, let it finish, then the hold ends (its Retransition / On Release); if not, the hold never visibly started.
+        const kcp = hand._cp && hand._cp[`${p}Clk`]
+        if (kcp && kcp.phase !== 'idle') chp.clkReleased = true
+        else { chp.awaitClk = false; if (kcp) kcp.pendingClaimAt = 0 }
+      }
+      chp.pendingClaimAt = 0; return
+    }
     // CORRECTED 2026-09-28 (10th round of the hands-jump investigation --
     // the real, measured root cause). A hand already in 'stopping' or
     // 'retransition' is NOT being driven by the hold that's ending right
@@ -16290,6 +16407,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
   const cp = getOrInitHandCP(hand)[p]
   const isTween = isSequenceOrChainMode(p)
   refreshLiveDistanceState(cp, hand, p, clickPoseTriggers[p], now, 'pose')
+  if (cp.awaitClk) resolveAwaitClk(hand, cp, p, now, false)
   if (cp.pendingClaimAt && p !== STARTUP_FN && handStartupLocked(hand)) cp.pendingClaimAt = 0 // never claims a hand that is still in its startup sequence
   if (cp.pendingClaimAt && now >= cp.pendingClaimAt) {
     // FIX 2026-10-04 (direct report: "when i interrupt a offset to camera
@@ -16546,7 +16664,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // fire-and-forget pose-kind family never got the same update. Now
     // symmetric with the hold family: RetransitionEnabled governs both
     // modes here too.
-    if (cfg[`${p}RetransitionEnabled`] === false) return
+    if (cfg[`${p}RetransitionEnabled`] === false || isStagePrefix(p)) return // On Click / On Release never retransition themselves: the main function's does (Hold) or the main sequence takes over (Click)
     // The startup transition never holds at its end (2026-10-15, direct report: the hands paused before retransitioning). Its Pause Duration row is gone and its saved value (the 500 ms factory default) is ignored.
     const pauseDurationMs = p === STARTUP_FN ? 0 : Math.max(cfg[`${p}PauseDurationMs`], 0)
     if (now - cp.pauseStartTime >= pauseDurationMs) {
@@ -16691,6 +16809,10 @@ function triggerClickPose(p, onlyHands = null) {
   const forwardSnapshot = {}
   POSE_PRESET_KEYS.forEach((key) => { forwardSnapshot[key] = cfg[key] })
   const isTween = isSequenceOrChainMode(p)
+  // On Click / On Release (shadow functions) take their Start Time Curve and Start Distance Curve from the main function (2026-10-20).
+  const sp0 = stageParentOf(p) || p
+  const sTrig = sp0 === p ? trig : (triggerStateOf(sp0) || trig)
+  const sTween = sp0 === p ? isTween : isSequenceOrChainMode(sp0)
   let namedPoses = null
   let rawEntries = null // the sequence's raw entries, Hold objects intact (2026-10-15: pose-kind functions now play Holds)
   if (isTween) {
@@ -16729,8 +16851,8 @@ function triggerClickPose(p, onlyHands = null) {
     // user-set domain, not the live field's own min/max like every other
     // curve here.
     let tweenFractionCap = 1
-    if (cfg[`${p}StartDistanceCurveEnabled`] && !(p === STARTUP_FN && startupIgnoreStartDistance)) {
-      const cap = computeTweenFractionCap(dists[i], cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, minD, `${p}StartDistanceXOrigin`)
+    if (cfg[`${sp0}StartDistanceCurveEnabled`] && !(p === STARTUP_FN && startupIgnoreStartDistance)) {
+      const cap = computeTweenFractionCap(dists[i], cfg[`${sp0}StartDistanceMin`], cfg[`${sp0}StartDistanceMax`], sTrig.startDistanceCurveParsed, minD, `${sp0}StartDistanceXOrigin`)
       if (cap === null) return // outside the eligible range -- this hand never triggers
       tweenFractionCap = cap
     }
@@ -16743,13 +16865,13 @@ function triggerClickPose(p, onlyHands = null) {
     // updateSingleTimingGateVisibility()'s own comment for the full
     // account). Off means no distance-based stagger, every hand starts
     // immediately, regardless of Mode.
-    const startTimeCurveOff = cfg[`${p}StartTimeCurveEnabled`] === false
-    const delay = startTimeCurveOff ? 0 : (isTween
-      ? curveByDomain(p, 'StartTimeCurveVisibleOnly', dists[i], trig.tweenStartCurveParsed, trig.tweenStartRangeParsed)
-      : curveByDomain(p, 'StartTimeCurveVisibleOnly', dists[i], trig.startCurveParsed, trig.startRangeParsed))
+    const startTimeCurveOff = cfg[`${sp0}StartTimeCurveEnabled`] === false
+    const delay = startTimeCurveOff ? 0 : (sTween
+      ? curveByDomain(sp0, 'StartTimeCurveVisibleOnly', dists[i], sTrig.tweenStartCurveParsed, sTrig.tweenStartRangeParsed)
+      : curveByDomain(sp0, 'StartTimeCurveVisibleOnly', dists[i], sTrig.startCurveParsed, sTrig.startRangeParsed))
     cp.pendingClaimAt = now + delay
     if (p === STARTUP_FN) { hand._startupTriggered = true; hand._startupClick = { dist: dists[i], min: xyFieldMinDist, range: xyFieldDistRange, minAll: xyAllMinDist, rangeAll: xyAllDistRange } } // frozen click-point distance + domain
-    cp.pendingPressAt = now; cp.pendingIsTween = isTween // live Start Time (refreshLiveDistanceState)
+    cp.pendingPressAt = now; cp.pendingIsTween = sTween // live Start Time (refreshLiveDistanceState)
     cp.pendingForwardSnapshot = forwardSnapshot
     cp.pendingNamedPoses = namedPoses
     cp.pendingRawEntries = rawEntries
@@ -16767,6 +16889,9 @@ function triggerClickPose(p, onlyHands = null) {
     cp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand, p)
     cp.pendingFrozenHandQuat = hand.wrapper.quaternion.clone() // Hand Axes Offset (2026-10-04)
     cp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? curveByDomain(p, 'SpeedCurveVisibleOnly', dists[i], trig.speedCurveParsed, trig.speedRangeParsed) : 0
+    // On Click (2026-10-20): the main function waits for its On Click sequence, which starts at the moment the main one would have (same Start Time / Start Distance).
+    cp.awaitClk = false
+    if (cp.pendingClaimAt && onClickOn(p) && armOnClickForHand(hand, p, cp.pendingClaimAt, now, sTween, tweenFractionCap, cp.pendingFrozenSplayDeg)) { cp.awaitClk = true; cp.pendingClaimAt = 0 }
   })
 }
 // Click / Double / Triple / Quadruple-Click Pose disambiguation: N
@@ -18091,6 +18216,7 @@ function cleanupDeletedCustomClickFunctionGroup(target) {
   // function that got the deleted one's number back (the next number is max id + 1 after a reload) started with its old values.
   forgetControlsWithPrefix(id)
   unregisterMultiTriggerRuntime(`${id}Rel`) // its On Release function (2026-10-17)
+  unregisterMultiTriggerRuntime(`${id}Clk`) // its On Click function (2026-10-20)
   delete customFunctionPendingGroup[id]
   persistCustomClickFunctionIds()
   const keys = kind === 'hold' ? CLICK_HOLD_KEYS : CLICK_POSE_KEYS
@@ -18518,7 +18644,7 @@ async function renderCustomClickFunctionGroup(id, title, kind, family, yielder) 
   // always re-showed Touch Point Count even for a plain 'Click' function)
   // so Type-specific visibility is re-applied right after.
   const enabledCtrl = controls.find((c) => c.key === `${id}Enabled`)
-  if (kind === 'hold') { const rtCtrl = controls.find((c) => c.key === `${id}RetransitionEnabled`); if (rtCtrl) { const rtBase = rtCtrl.onChange; rtCtrl.onChange = (v) => { if (rtBase) rtBase(v); retransitionExclusion(id, 'parent') } } } // On Release (2026-10-17)
+  if (kind === 'hold') { const tsCtrl = controls.find((c) => c.key === `${id}TweenStopEnabled`); if (tsCtrl) { const tsBase = tsCtrl.onChange; tsCtrl.onChange = (v) => { if (tsBase) tsBase(v); tweenStopReleaseExclusion(id, 'stop', v) } } } // On Release (2026-10-17) and Tween Stop switch each other off (2026-10-20)
   if (enabledCtrl) {
     const baseOnChange = enabledCtrl.onChange
     enabledCtrl.onChange = () => { if (baseOnChange) baseOnChange(); updateCustomFunctionTypeVisibility(id) }
@@ -18561,6 +18687,7 @@ async function renderCustomClickFunctionGroup(id, title, kind, family, yielder) 
     // Retransition.
     { const mt = profAgg('setupMultiTriggerGroupForFunction', () => setupMultiTriggerGroupForFunction(id, 'hold', yielder)); if (yielder) await mt }
     { const orl = profAgg('setupOnReleaseGroupForFunction', () => setupOnReleaseGroupForFunction(id, yielder)); if (yielder) await orl } // On Release (2026-10-17)
+    { const ocl = profAgg('setupOnClickGroupForFunction', () => setupOnClickGroupForFunction(id, yielder)); if (yielder) await ocl } // On Click (2026-10-20)
   } else {
     profAgg('parseClickPoseConfig', () => parseClickPoseConfig(id))
     profAgg('buildClickPoseWidgets', () => buildClickPoseWidgets(id))
@@ -18571,6 +18698,7 @@ async function renderCustomClickFunctionGroup(id, title, kind, family, yielder) 
     profAgg('updateSequencePlayModeVisibility', () => updateSequencePlayModeVisibility(id))
     profAgg('updateChainModeVisibility', () => updateChainModeVisibility(id))
     { const mt = profAgg('setupMultiTriggerGroupForFunction', () => setupMultiTriggerGroupForFunction(id, 'pose', yielder)); if (yielder) await mt }
+    { const ocl = profAgg('setupOnClickGroupForFunction', () => setupOnClickGroupForFunction(id, yielder)); if (yielder) await ocl } // On Click (2026-10-20)
   }
   // Same mandatory Offset/Rotation/Animation Speed Curve/Start Time
   // Curve/Retransition gated-subgroup wrapping the 10 static triggers
@@ -18802,7 +18930,7 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   // Distance Curve, Retransition, Multi Trigger. The 2 groups that were
   // missing from this list ('Offset To Camera', 'Easing') are new since
   // this layout was captured; the flat rows above already matched.
-  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Easing' },
+  { type: 'group', title: 'On Click' }, { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Easing' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' }, { type: 'group', title: 'Retransition' },
   { type: 'group', title: 'Multi Trigger' }
 ]
@@ -18831,7 +18959,7 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' }, { type: 'row', suffix: 'LoopWrapScale' },
   // 2026-10-04 -- same group order as CUSTOM_FUNCTION_POSE_LAYOUT (taken
   // from Click Offset Test); Tween Stop stays last, hold-kind only.
-  { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Easing' },
+  { type: 'group', title: 'On Click' }, { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Easing' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' },
   // Multi Trigger last, as in Click Offset Test (2026-10-04, direct request "fix my
   // group setting order"): it was missing from this list, so hold-kind
@@ -19693,30 +19821,44 @@ async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kin
 // state gets rebuilt from scratch each load (renderDynamicGroup()'s own
 // DOM/CLICK_POSE_KEYS registration is pure runtime state, gone on every
 // reload -- see restoreCustomClickFunctions()'s own matching comment).
-// ---- On Release group (2026-10-17): see onReleaseOn() ----
-// The hold's own Retransition and the On Release function's Retransition replace each other: turning either one on turns the other off (and switching On Release on turns the hold's off when its own is on).
-// The hold never retransitions while On Release is on (the runtime ignores its toggle then); the toggle exclusion just keeps the panel from showing two contradictory "on"s. Ignored while a saved state is being applied.
-function retransitionExclusion(id, from) {
-  if (isApplyingPanelState()) return
+// ---- On Release / On Click groups (2026-10-17 / 2026-10-20): see onReleaseOn() / onClickOn() ----
+// Both are shadow pose-kind functions with their on/off in the group label. Neither has a Retransition, Start Time Curve or Start Distance Curve control: those come from the main function.
+function stageDropsControl(suffix) { return /^(Retransition|PositionalRetransition|TweenRetransition|StartTime|TweenStartTime|StartDistance|PauseDurationMs|SkipIfSamePose)/.test(suffix) }
+// On Release and Tween Stop replace each other: turning one on turns the other off, live (2026-10-20). Ignored while a saved state is being applied.
+function tweenStopReleaseExclusion(id, from, on) {
+  if (!on || isApplyingPanelState()) return
   const rel = `${id}Rel`
-  const off = (key, owner) => {
-    if (cfg[key] === false) return
-    cfg[key] = false
-    try { syncValue(key, false) } catch (e) { /* no panel */ }
-    updateSingleTimingGateVisibility(owner)
+  if (from === 'rel') {
+    if (cfg[`${id}TweenStopEnabled`]) {
+      cfg[`${id}TweenStopEnabled`] = false
+      try { syncValue(`${id}TweenStopEnabled`, false) } catch (e) { /* no panel */ }
+      updateTweenStopGateVisibility(id)
+    }
+  } else if (cfg[`${rel}Enabled`] === true) {
+    cfg[`${rel}Enabled`] = false
+    try { syncValue(`${rel}Enabled`, false) } catch (e) { /* no panel */ }
+    updateClickFunctionEnabledVisibility(rel)
   }
-  if (from === 'parent') { if (cfg[`${id}RetransitionEnabled`] !== false) off(`${rel}RetransitionEnabled`, rel) }
-  else if (from === 'rel') { if (cfg[`${rel}RetransitionEnabled`] !== false) off(`${id}RetransitionEnabled`, id) }
-  else if (from === 'enabled') { if (cfg[`${rel}Enabled`] === true && cfg[`${rel}RetransitionEnabled`] !== false) off(`${id}RetransitionEnabled`, id) }
 }
-function onReleaseControlsHook(id) {
+function stageControlsHook(id, stage) {
   return (controls) => {
-    const rel = `${id}Rel`
-    const en = controls.find((c) => c.key === `${rel}Enabled`)
-    if (en) { const base = en.onChange; en.label = 'On Release (On/Off)'; en.onChange = (v) => { if (base) base(v); retransitionExclusion(id, 'enabled') } }
-    const rt = controls.find((c) => c.key === `${rel}RetransitionEnabled`)
-    if (rt) { const base = rt.onChange; rt.onChange = (v) => { if (base) base(v); retransitionExclusion(id, 'rel') } }
+    const sp = `${id}${stage}`
+    for (let i = controls.length - 1; i >= 0; i--) if (stageDropsControl(controls[i].key.slice(sp.length))) controls.splice(i, 1)
+    const en = controls.find((c) => c.key === `${sp}Enabled`)
+    if (en) { const base = en.onChange; en.label = stage === 'Rel' ? 'On Release (On/Off)' : 'On Click (On/Off)'; en.onChange = (v) => { if (base) base(v); if (stage === 'Rel') tweenStopReleaseExclusion(id, 'rel', v) } }
+    if (stage === 'Clk') { const pm = controls.find((c) => c.key === `${sp}SequencePlayMode`); if (pm) { pm.options = () => ['Count']; pm.def = 'Count' } } // a click's loop is a count, never an endless loop
   }
+}
+function onReleaseControlsHook(id) { return stageControlsHook(id, 'Rel') }
+// Puts a group's on/off row into the group HEADER (the group element given, since every function has its own "On Release" / "On Click").
+function gateGroupHeaderEl(g, enabledKey) {
+  const enabledRow = g.querySelector(`.dp-row[data-key="${enabledKey}"]`)
+  const header = g.querySelector(':scope > .dp-group-header')
+  if (!enabledRow || !header || header.contains(enabledRow)) return
+  enabledRow.classList.add('dp-group-gate-row')
+  enabledRow.querySelectorAll('.dp-dynamic-device-checkbox, .dp-row-handle').forEach((el) => el.remove())
+  const t = header.querySelector(':scope > .dp-group-title-text')
+  if (t) t.insertAdjacentElement('afterend', enabledRow)
 }
 async function setupOnReleaseGroupForFunction(id, yielder) {
   const rel = `${id}Rel`
@@ -19729,6 +19871,7 @@ async function setupOnReleaseGroupForFunction(id, yielder) {
   const g = functionBody ? functionBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${rel}"]`) : null
   if (g) {
     g.dataset.onReleaseFor = id
+    gateGroupHeaderEl(g, `${rel}Enabled`)
     // Sits just above the Multi Trigger group (below Tween Stop), not at the very top of the function.
     const mt = functionBody.querySelector(':scope > .dp-group[data-key="Multi Trigger"]')
     if (mt && g.nextElementSibling !== mt) functionBody.insertBefore(g, mt)
@@ -19740,6 +19883,29 @@ function cleanupDeletedOnReleaseGroups(target) {
   const groups = (target.dataset.onReleaseFor ? [target] : []).concat(Array.from(target.querySelectorAll('.dp-group[data-on-release-for]')))
   groups.forEach((g) => {
     const key = `${g.dataset.onReleaseFor}RelEnabled`
+    cfg[key] = false
+    try { syncValue(key, false) } catch (e) { /* no panel */ }
+  })
+}
+async function setupOnClickGroupForFunction(id, yielder) {
+  const clk = `${id}Clk`
+  const enabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
+  const functionBody = enabledRow ? enabledRow.parentElement : null
+  if (functionBody) functionBody.querySelectorAll(':scope > .dp-group[data-key="On Click"]').forEach((g) => g.remove()) // a saved layout may already have made an empty ghost one
+  const r = registerMultiTriggerTrigger(clk, 'On Click', functionBody, null, 'pose', undefined, yielder, stageControlsHook(id, 'Clk'))
+  if (yielder) await r
+  const g = functionBody ? functionBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${clk}"]`) : null
+  if (g) {
+    g.dataset.onClickFor = id
+    gateGroupHeaderEl(g, `${clk}Enabled`)
+  }
+}
+// Deleting the On Click group with the panel's delete tool only removes its panel group; switch it off too so it cannot keep running with no UI.
+function cleanupDeletedOnClickGroups(target) {
+  if (!target || !target.classList || !target.classList.contains('dp-group')) return
+  const groups = (target.dataset.onClickFor ? [target] : []).concat(Array.from(target.querySelectorAll('.dp-group[data-on-click-for]')))
+  groups.forEach((g) => {
+    const key = `${g.dataset.onClickFor}ClkEnabled`
     cfg[key] = false
     try { syncValue(key, false) } catch (e) { /* no panel */ }
   })
@@ -23291,7 +23457,7 @@ function updateRenderOrder() {
       const chpAll = getOrInitHandCHP(hand)
       let overridden = false
       CLICK_HOLD_KEYS.forEach((p) => {
-        if (clickHoldPoseTriggers[p].active || chpAll[p].phase !== 'idle') {
+        if (clickHoldPoseTriggers[p].active || chpAll[p].phase !== 'idle' || chpAll[p].awaitClk) {
           updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs)
           overridden = true
         }
@@ -23310,7 +23476,7 @@ function updateRenderOrder() {
         // updateClickPoseForHand()'s own top comment); it still needs to
         // be called every frame so that pending claim actually gets
         // checked/committed once its own delay elapses.
-        if (cpAll[p].phase !== 'idle' || cpAll[p].pendingClaimAt) {
+        if (cpAll[p].phase !== 'idle' || cpAll[p].pendingClaimAt || cpAll[p].awaitClk) {
           updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs)
           // Re-checked AFTER the call (not just the pre-call condition
           // above) -- a hand that was ONLY waiting on a pending claim,
