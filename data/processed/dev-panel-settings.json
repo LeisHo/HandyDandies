@@ -19917,7 +19917,7 @@
       ],
       "smallScaleModelsEnabled": false,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"},{\"z\":-300,\"model\":\"repo:HD_IK_100\"}]",
-      "fieldRows": 30,
+      "fieldRows": 45,
       "fieldCols": 35,
       "rowSpacing": 8,
       "columnSpacing": 16,
