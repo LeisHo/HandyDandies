@@ -599,7 +599,7 @@
         }
       ],
       "holdConfirmMs": 300,
-      "multiClickWindowMs": 250,
+      "multiClickWindowMs": 350,
       "distCurveXOrigin": "Closest Hand",
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
@@ -21767,7 +21767,7 @@
         }
       ],
       "holdConfirmMs": 300,
-      "multiClickWindowMs": 250,
+      "multiClickWindowMs": 350,
       "distCurveXOrigin": "Closest Hand",
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
@@ -42935,7 +42935,7 @@
         }
       ],
       "holdConfirmMs": 300,
-      "multiClickWindowMs": 250,
+      "multiClickWindowMs": 350,
       "distCurveXOrigin": "Closest Hand",
       "zoomGestureThresholdPx": 40,
       "scrollGestureThresholdPx": 40,
