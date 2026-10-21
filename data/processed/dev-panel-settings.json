@@ -209,8 +209,8 @@
       "offScreenPositionEvery": 2,
       "throttleOffScreenPose": true,
       "offScreenPoseEvery": 5,
-      "fieldRows": 65,
-      "fieldCols": 80,
+      "fieldRows": 45,
+      "fieldCols": 60,
       "rowSpacing": 8,
       "columnSpacing": 15,
       "handScale": 1,
@@ -15132,7 +15132,7 @@
         }
       ],
       "cameraX": 3.6923076923076925,
-      "cameraY": 1.8124772627380827e-14,
+      "cameraY": 2.718715894107124e-14,
       "cameraZ": 272.4004898795015,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -73307,8 +73307,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 759.3500366210938,
-      "height": 592.9750366210938,
+      "width": 762.5499877929688,
+      "height": 594.5750122070312,
       "collapsed": false
     },
     "mobile": {
