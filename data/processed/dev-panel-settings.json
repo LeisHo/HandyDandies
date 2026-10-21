@@ -204,8 +204,8 @@
       "skipOffScreenSceneUpdate": true,
       "skipOffScreenCursorTracking": true,
       "renderOrderSkipOffScreen": true,
-      "fieldRows": 35,
-      "fieldCols": 35,
+      "fieldRows": 45,
+      "fieldCols": 55,
       "rowSpacing": 8,
       "columnSpacing": 13,
       "handScale": 0.6,
@@ -59987,7 +59987,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -59998,7 +59998,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
