@@ -15571,7 +15571,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.08326286664053996,\"y\":0.5332290649414062}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5934091414835809,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.08064450122265251,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5934091414835809,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":200}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -15588,7 +15588,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3087881405465225,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29516545825625473,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":978,\"max\":1157}",
+      "startupFnSpeedCurveRange": "{\"min\":978,\"max\":1054}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -15606,7 +15606,7 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
       "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7169769080541867,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionSpeedCurveRange": "{\"min\":700,\"max\":800}",
+      "startupFnRetransitionSpeedCurveRange": "{\"min\":700,\"max\":700}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionDistRange": "{\"min\":50,\"max\":2000}",
@@ -36386,7 +36386,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.08326286664053996,\"y\":0.5332290649414062}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5934091414835809,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.08064450122265251,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5934091414835809,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":280}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -57201,7 +57201,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.08326286664053996,\"y\":0.5332290649414062}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5934091414835809,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.08064450122265251,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5934091414835809,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":200}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -57218,7 +57218,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3087881405465225,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29516545825625473,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":978,\"max\":1157}",
+      "startupFnSpeedCurveRange": "{\"min\":978,\"max\":1054}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -57236,7 +57236,7 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
       "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7169769080541867,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionSpeedCurveRange": "{\"min\":700,\"max\":800}",
+      "startupFnRetransitionSpeedCurveRange": "{\"min\":700,\"max\":700}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionDistRange": "{\"min\":50,\"max\":2000}",
@@ -65964,7 +65964,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -66153,7 +66153,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Easing Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": true,
                         "items": [
                           {
@@ -66251,7 +66251,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -66283,7 +66283,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -66638,7 +66638,7 @@
           "type": "group",
           "group": {
             "key": "UI Buttons Tween",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -66653,7 +66653,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -66697,7 +66697,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Scale Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
