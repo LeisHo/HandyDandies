@@ -21024,7 +21024,7 @@
       "offScreenPositionEvery": 2,
       "throttleOffScreenPose": true,
       "offScreenPoseEvery": 5,
-      "fieldRows": 50,
+      "fieldRows": 60,
       "fieldCols": 40,
       "rowSpacing": 10,
       "columnSpacing": 15,
@@ -63751,7 +63751,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -71305,8 +71305,8 @@
     "mobile": {
       "left": 20,
       "top": 82.82738494873047,
-      "width": 383.5357360839844,
-      "height": 564.232177734375
+      "width": 386.96429443359375,
+      "height": 565.7559814453125
     }
   }
 }
