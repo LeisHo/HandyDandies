@@ -13920,14 +13920,14 @@
         {
           "name": "PALM FAN - FAST FAN",
           "tweenPoses": [
-            "Max Palm -10",
-            "Max Palm -20",
-            "Max Palm -30",
-            "Max Palm -40",
-            "Max Palm -50",
             "SOFT NNN +60",
             "SOFT NEUTRAL +30",
-            "NEUTRAL +15"
+            "NEUTRAL +15",
+            "Mid Palm",
+            "Mid Palm -15",
+            "Max Palm -30",
+            "Max Palm -40",
+            "Max Palm -50"
           ],
           "group": "FANNING"
         },
@@ -14006,9 +14006,9 @@
           "group": "2 TWIDS - 1ST HAND"
         }
       ],
-      "cameraX": 1.907706141586066,
-      "cameraY": 8.462264371771392e-13,
-      "cameraZ": 242.98502235780893,
+      "cameraX": 1.9077061415860666,
+      "cameraY": 8.685456250915997e-13,
+      "cameraZ": 242.98502235780896,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -34199,14 +34199,14 @@
         {
           "name": "PALM FAN - FAST FAN",
           "tweenPoses": [
-            "Max Palm -10",
-            "Max Palm -20",
-            "Max Palm -30",
-            "Max Palm -40",
-            "Max Palm -50",
             "SOFT NNN +60",
             "SOFT NEUTRAL +30",
-            "NEUTRAL +15"
+            "NEUTRAL +15",
+            "Mid Palm",
+            "Mid Palm -15",
+            "Max Palm -30",
+            "Max Palm -40",
+            "Max Palm -50"
           ],
           "group": "FANNING"
         },
@@ -54478,14 +54478,14 @@
         {
           "name": "PALM FAN - FAST FAN",
           "tweenPoses": [
-            "Max Palm -10",
-            "Max Palm -20",
-            "Max Palm -30",
-            "Max Palm -40",
-            "Max Palm -50",
             "SOFT NNN +60",
             "SOFT NEUTRAL +30",
-            "NEUTRAL +15"
+            "NEUTRAL +15",
+            "Mid Palm",
+            "Mid Palm -15",
+            "Max Palm -30",
+            "Max Palm -40",
+            "Max Palm -50"
           ],
           "group": "FANNING"
         },
@@ -62138,7 +62138,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -62982,7 +62982,7 @@
           "type": "group",
           "group": {
             "key": "Tween",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -69631,8 +69631,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 653.75,
-      "height": 571.375
+      "width": 656.9500122070312,
+      "height": 572.9750366210938
     },
     "mobile": {
       "left": 28.035715103149414,
