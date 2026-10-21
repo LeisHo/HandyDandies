@@ -15655,7 +15655,7 @@
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnSpeedCurveEnabled": true,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "uiBtnFnSpeedCurveRange": "{\"min\":872,\"max\":966}",
+      "uiBtnFnSpeedCurveRange": "{\"min\":706,\"max\":786}",
       "uiBtnFnStartTimeCurveEnabled": false,
       "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -37052,7 +37052,7 @@
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnSpeedCurveEnabled": true,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "uiBtnFnSpeedCurveRange": "{\"min\":872,\"max\":966}",
+      "uiBtnFnSpeedCurveRange": "{\"min\":706,\"max\":786}",
       "uiBtnFnStartTimeCurveEnabled": false,
       "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -58449,7 +58449,7 @@
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnSpeedCurveEnabled": true,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "uiBtnFnSpeedCurveRange": "{\"min\":872,\"max\":966}",
+      "uiBtnFnSpeedCurveRange": "{\"min\":706,\"max\":786}",
       "uiBtnFnStartTimeCurveEnabled": false,
       "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
@@ -68389,7 +68389,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
