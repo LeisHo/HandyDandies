@@ -19758,8 +19758,8 @@
       ],
       "smallScaleModelsEnabled": false,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
-      "skipOffScreenPoseWork": false,
-      "retainRotationArmWork": false,
+      "skipOffScreenPoseWork": true,
+      "retainRotationArmWork": true,
       "fieldRows": 45,
       "fieldCols": 30,
       "rowSpacing": 8,
@@ -59918,7 +59918,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -59929,7 +59929,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -61486,7 +61486,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
