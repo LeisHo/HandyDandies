@@ -15171,10 +15171,10 @@
         {
           "name": "HD - Mobile - 20 FOV",
           "cameraX": 3.7499999999999996,
-          "cameraY": 3.5759686535102714e-14,
-          "cameraZ": 583.9876563664759,
+          "cameraY": 3.490243377569957e-14,
+          "cameraZ": 569.9876563664759,
           "cameraFov": 20,
-          "cameraZoom": 584,
+          "cameraZoom": 570,
           "cameraRoll": 0,
           "targetX": 3.7499999999999996,
           "targetY": 0,
@@ -36614,14 +36614,14 @@
         }
       ],
       "cameraX": 3.7499999999999996,
-      "cameraY": 6.65927255365391e-14,
-      "cameraZ": 1087.5293962853416,
+      "cameraY": 3.490243377569957e-14,
+      "cameraZ": 569.9876563664759,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":3.7499999999999996,\"cameraY\":3.5759686535102714e-14,\"cameraZ\":583.9876563664759,\"cameraFov\":20,\"cameraZoom\":584,\"cameraRoll\":0,\"targetX\":3.7499999999999996,\"targetY\":0,\"targetZ\":-0.012343633524153574}",
-      "cameraZoom": 1087.5417399188657,
+      "cameraDefaultPreset": "{\"cameraX\":3.7499999999999996,\"cameraY\":3.490243377569957e-14,\"cameraZ\":569.9876563664759,\"cameraFov\":20,\"cameraZoom\":570,\"cameraRoll\":0,\"targetX\":3.7499999999999996,\"targetY\":0,\"targetZ\":-0.012343633524153574}",
+      "cameraZoom": 570,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -36651,10 +36651,10 @@
         {
           "name": "HD - Mobile - 20 FOV",
           "cameraX": 3.7499999999999996,
-          "cameraY": 3.5759686535102714e-14,
-          "cameraZ": 583.9876563664759,
+          "cameraY": 3.490243377569957e-14,
+          "cameraZ": 569.9876563664759,
           "cameraFov": 20,
-          "cameraZoom": 584,
+          "cameraZoom": 570,
           "cameraRoll": 0,
           "targetX": 3.7499999999999996,
           "targetY": 0,
@@ -58131,10 +58131,10 @@
         {
           "name": "HD - Mobile - 20 FOV",
           "cameraX": 3.7499999999999996,
-          "cameraY": 3.5759686535102714e-14,
-          "cameraZ": 583.9876563664759,
+          "cameraY": 3.490243377569957e-14,
+          "cameraZ": 569.9876563664759,
           "cameraFov": 20,
-          "cameraZoom": 584,
+          "cameraZoom": 570,
           "cameraRoll": 0,
           "targetX": 3.7499999999999996,
           "targetY": 0,
@@ -67721,7 +67721,7 @@
                 "type": "group",
                 "group": {
                   "key": "Preview Camera",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -73345,8 +73345,8 @@
     "mobile": {
       "left": 20,
       "top": 105.89881134033203,
-      "width": 404.71429443359375,
-      "height": 524.4702758789062,
+      "width": 408.1428527832031,
+      "height": 525.9880981445312,
       "collapsed": false
     }
   }
