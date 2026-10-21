@@ -2624,6 +2624,11 @@ const DEV_GROUPS = [
       // Small Scale Models (2026-10-15): swap a hand's mesh for a lower-resolution model of the same rig once its world Z reaches a level's Z. The levels are a JSON list edited by the widget (buildSmallScaleModelWidget()).
       { key: 'smallScaleModelsEnabled', label: 'Small Scale Models', type: 'checkbox', def: false, perDevice: true, onChange: () => updateSmallScaleModelsGroupVisibility() },
       { key: 'smallScaleModelLevels', label: 'Small Scale Model Levels', type: 'text', def: '[]' },
+      // Skip Pose Work For Hands Outside The Camera (2026-10-20, direct request): a hand outside every camera (the same test as Skip Finger Curls For Off-Screen Hands, which has to stay on) skips the wrist-bone pose work and, unless
+      // "Retain Rotation And Arm Work" is on, the pose's Whole-Hand Rotation / Rotation at Base and the arm length (wrist crop) work. Its position is still worked out in full (grid position, Pose Offset, click-function Offset and
+      // Rotation, scale), the click-function timelines keep running, and cursor tracking is untouched. The frame a hand comes back into view it gets a full catch-up (a full repose, the arm length snaps to its target). Off by default.
+      { key: 'skipOffScreenPoseWork', label: 'Skip Pose Work For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
+      { key: 'retainRotationArmWork', label: 'Retain Rotation And Arm Work', type: 'checkbox', def: false, perDevice: true },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -6166,16 +6171,17 @@ function rendererLogFlushFrame(t, f1) {
   const fr = Math.max(1, rlog.secFrames), totalAvg = rlog.secTotalMs / fr
   timing += ' | animate() work avg ' + f1(totalAvg) + ' ms over ' + rlog.secFrames + ' frames'
   appendRendererLogLine(t + timing)
-  let total = 0, shown = 0, skipped = 0, posed = 0
+  let total = 0, shown = 0, skipped = 0, posed = 0, poseSkipped = 0
   const mats = new Set()
   for (let i = 0; i < hands.length; i++) {
     const h = hands[i]; total++
+    if (h._poseSkip) poseSkipped++
     if (h.wrapper && h.wrapper.visible) shown++
     if (h._curlSkip) skipped++
     if (h._wasOverriddenLastFrame) posed++
     if (h.skinnedMesh) mats.add(h.skinnedMesh.material)
   }
-  appendRendererLogLine(t + 'hands -- ' + total + ' total, ' + shown + ' shown, ' + skipped + ' outside every camera (finger curl skipped), ' + posed + ' driven by a click function, ' + mats.size + ' distinct materials, Small Scale Models used by ' + (smallScaleActiveCount || 0) + ' hands')
+  appendRendererLogLine(t + 'hands -- ' + total + ' total, ' + shown + ' shown, ' + skipped + ' outside every camera (finger curl skipped), ' + poseSkipped + ' with pose work skipped, ' + posed + ' driven by a click function, ' + mats.size + ' distinct materials, Small Scale Models used by ' + (smallScaleActiveCount || 0) + ' hands')
   const names = Object.keys(rlog.secs)
   const fmt = (name, base) => {
     const e = rlog.secs[name]
@@ -13686,11 +13692,14 @@ function applyPoseOffsetToPosition(positionTarget, basePosition, cam, values, ha
 function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   if (!hand.skinnedMesh) return
   hand._idleCurlSig = null // fingers are about to be posed by something other than the idle path
-  hand.currentBaseQuat.copy(computeBaseQuatFromValues(poseValues))
-  if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
-  hand.currentBaseRb.copy(_poseBaseRb)
+  const poseSkipHere = hand._poseSkip === true // Skip Pose Work For Hands Outside The Camera (set per hand by updateRenderOrder())
+  if (!poseSkipHere || hand._poseRetain === true) {
+    hand.currentBaseQuat.copy(computeBaseQuatFromValues(poseValues))
+    if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
+    hand.currentBaseRb.copy(_poseBaseRb)
+  }
   // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment.
-  applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, rvCurlValues(hand, poseValues), extraSplayDeg + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay (hand.currentSplayDeg below stays the plain value)
+  if (!poseSkipHere) applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, rvCurlValues(hand, poseValues), extraSplayDeg + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay (hand.currentSplayDeg below stays the plain value)
   // CORRECTED 2026-09-27 -- direct report: releasing a Click-Hold, waiting
   // a moment, then clicking elsewhere made the wrist visibly SNAP instead
   // of transitioning smoothly. Root cause: `extraSplayDeg` (Responsive
@@ -23499,9 +23508,23 @@ function updateRenderOrder() {
   if (!loadingWarmMode) computeRenderOrderRanks()
   __u = rlsLap('uro: render order ranks', __u)
   const warmReposeDeadline = loadingWarmMode ? performance.now() + 6 : 0 // 6 ms: the same slice the field build uses (a judgment call, not a measurement)
+  const __skipPose = cfg.skipOffScreenPoseWork === true && cfg.skipOffScreenFingerCurls !== false // hands outside every camera need Skip Finger Curls For Off-Screen Hands on (it defines "outside the camera")
+  const __retainRot = cfg.retainRotationArmWork === true
   const __perHand = (hand, i) => {
     if (loadingWarmMode && (hand.everReposed || performance.now() > warmReposeDeadline)) return
     const live = liveDistances[i]
+    // Skip Pose Work For Hands Outside The Camera: hand._poseSkip / _poseRetain are read by applyPoseValuesToHand() (and below). The frame a skipped hand is no longer skipped (it came into view, or the box was
+    // switched off) it gets a catch-up: a full idle repose with the splay snapping to its target (everReposed = false), the arm length snapping to its target, the finger curls recomputed.
+    const poseSkip = __skipPose && hand._curlSkip === true
+    hand._poseSkip = poseSkip
+    hand._poseRetain = __retainRot
+    if (poseSkip) hand._poseWasSkipped = true
+    else if (hand._poseWasSkipped) {
+      hand._poseWasSkipped = false
+      hand.everReposed = false
+      hand.currentArmLengthT = undefined
+      hand._idleCurlSig = null
+    }
     // Render order (2026-10-11): this hand's position in the per-frame sort (see computeRenderOrderRanks()).
     const roBase = hand._roRank || 0
     if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = roBase
@@ -23526,6 +23549,7 @@ function updateRenderOrder() {
     // mirrors applyHandArmLength()'s own existing "no prior value yet"
     // fallback, so a hand's very first frame still applies its target
     // instantly rather than lerping from nothing.
+    if (!poseSkip || __retainRot) {
     const targetArmLengthT0 = cfg.armLengthUseDepth === false
       ? computeArmLengthT(hand, hand._trkXY ?? handXYDist(hand), cfg.armLengthVisibleOnly !== false ? trkXYFieldMin : trkXYAllMin, cfg.armLengthVisibleOnly !== false ? trkXYFieldRange : trkXYAllRange) // Wrist Cropping Use Cursor Target Depth off: screen-space XY only
       : computeArmLengthT(hand, hand._cropDist ?? live, hand._cropDist === undefined ? minLiveDist : (cfg.armLengthVisibleOnly !== false ? cropFieldMin : cropAllMin), hand._cropDist === undefined ? liveDistRange : (cfg.armLengthVisibleOnly !== false ? cropFieldRange : cropAllRange)) // distance to the cursor at Wrist Cropping's own depth
@@ -23536,6 +23560,7 @@ function updateRenderOrder() {
       ? hand.currentArmLengthT + (targetArmLengthT - hand.currentArmLengthT) * armLengthDampingAmt
       : targetArmLengthT
     if (hand.skinnedMesh) applyHandArmLength(hand, hand.currentArmLengthT)
+    }
     // Click-Hold Pose takes over BOTH finger curls and wrist pose for
     // this hand whenever either trigger is globally active OR this hand
     // is still finishing its own retransition after release (checking
@@ -23740,10 +23765,12 @@ function updateRenderOrder() {
         // currentBaseQuat's own existence. A hand that just finished a
         // transition syncs back to the shared value the very next frame,
         // same as it would have before this per-hand basis existed.
-        hand.currentBaseQuat.copy(cloneBaseQuat)
-        if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
-        hand.currentBaseRb.copy(cloneBaseRb)
-        applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, rvCurlValues(hand, cfg), extraSplay + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay
+        if (!poseSkip || __retainRot) {
+          hand.currentBaseQuat.copy(cloneBaseQuat)
+          if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
+          hand.currentBaseRb.copy(cloneBaseRb)
+        }
+        if (!poseSkip) applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, rvCurlValues(hand, cfg), extraSplay + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay
         // Keeps `hand.currentSplayDeg` (see applyPoseValuesToHand()'s own
         // 2026-09-27 comment) current for idle hands too -- this is the
         // ONLY splay-applying path in this file that doesn't already run
