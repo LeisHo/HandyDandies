@@ -14160,8 +14160,8 @@
           }
         }
       ],
-      "cameraX": 1.9077061415860703,
-      "cameraY": 3.7752349097347476e-13,
+      "cameraX": 1.9077061415860699,
+      "cameraY": 3.9984267888793494e-13,
       "cameraZ": 242.98502235780893,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -14575,7 +14575,7 @@
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
-      "resolutionScale": 75,
+      "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
@@ -52097,7 +52097,7 @@
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
-      "resolutionScale": 75,
+      "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
@@ -64685,8 +64685,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 586.5499877929688,
-      "height": 537.7750244140625
+      "width": 589.75,
+      "height": 539.375
     }
   }
 }
