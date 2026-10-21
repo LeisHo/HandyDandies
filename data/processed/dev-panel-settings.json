@@ -209,8 +209,8 @@
       "offScreenPositionEvery": 2,
       "throttleOffScreenPose": true,
       "offScreenPoseEvery": 20,
-      "fieldRows": 55,
-      "fieldCols": 55,
+      "fieldRows": 65,
+      "fieldCols": 85,
       "rowSpacing": 8,
       "columnSpacing": 15,
       "handScale": 1,
@@ -65684,7 +65684,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -65695,7 +65695,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -73307,8 +73307,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 685.75,
-      "height": 587.375,
+      "width": 752.9500122070312,
+      "height": 588.9750366210938,
       "collapsed": false
     },
     "mobile": {
