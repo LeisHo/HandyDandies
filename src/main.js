@@ -3874,13 +3874,13 @@ const DEV_GROUPS = [
           high: { pixelRatio: Math.min(window.devicePixelRatio || 1, 2), resolutionScale: 100 },
           ultra: { pixelRatio: Math.min(window.devicePixelRatio || 1, 3), resolutionScale: 100 }
         }
+        // Restoring saved settings (page load, Reset, Undo, Use) fires this handler too, AFTER Pixel Ratio and Resolution Scale were restored: the preset's own values then overwrote the saved ones in every device's slot, so
+        // Quality / Performance changes were lost on reload (2026-10-20, direct report). Only a real pick of the dropdown applies a preset.
+        if (isApplyingPanelState()) return
         const preset = QUALITY_PRESETS[v]
         if (!preset) return
         syncValue('pixelRatio', preset.pixelRatio)
         syncValue('resolutionScale', preset.resolutionScale)
-        // Restoring saved settings (page load, Reset, Undo, Use) fires this handler too, AFTER Pixel Ratio and Resolution Scale were restored: the preset's own values then overwrote the saved ones in every device's slot, so
-        // Quality / Performance changes were lost on reload (2026-10-20, direct report). Only a real pick of the dropdown applies a preset.
-        if (isApplyingPanelState()) return
         qualityState.pixelRatio = preset.pixelRatio
         qualityState.resolutionScale = preset.resolutionScale / 100
         applyQualityState()
