@@ -232,9 +232,13 @@ function findCtrl(key) {
 // descendant walk, refreshRowDisplaysForEditingTab()) reads this
 // instead of the raw `ctrl.dynamicDevice` flag now.
 const NO_DYNAMIC_DEVICE_TYPES = ['text', 'list-picker', 'multi-select', 'button']
+// 2026-10-20 (direct report: startup sequence settings did not stay individual to Desktop and Mobile with the Independent boxes ticked). The curve / range controls (type 'text', a JSON string drawn as a widget) were excluded
+// from device independence with the other non-uniform types, so every curve and Min / Max range was one value shared by all three devices whatever the boxes said. A text control whose key ends in Curve or Range is a
+// curve widget and now takes part like any other control; other text controls (lists, bookkeeping JSON) stay shared.
+function isCurveTextCtrl(ctrl) { return ctrl.type === 'text' && /(Curve|Range)$/.test(ctrl.key) }
 function isDynamicDeviceCtrl(ctrl) {
   if (ctrl.perDevice) return false
-  if (NO_DYNAMIC_DEVICE_TYPES.includes(ctrl.type)) return false
+  if (NO_DYNAMIC_DEVICE_TYPES.includes(ctrl.type) && !isCurveTextCtrl(ctrl)) return false
   return ctrl.dynamicDevice !== false
 }
 // Visibility-only checkbox (direct request 2026-10-14, Camera group): a perDevice control keeps its own value per device (so it has no Independent checkbox), but can opt into the Show in Mobile/Landscape checkbox with
@@ -261,9 +265,23 @@ export function setDevVisibility(key, value) { devVisibility[key] = value }
 // mirrored, which is a no-op for it (all 3 devices already hold the
 // same value). Takes `ctrl` (not a bare key) specifically so this
 // default has the control's own `perDevice` flag to read.
+// A curve / range text control that was never ticked on its own follows its on/off box (StartTimeRange -> StartTimeCurveEnabled, SpeedCurveRange -> SpeedCurveEnabled, EasingCurve -> EasingCurveEnabled, ...), so a group
+// whose boxes were already ticked keeps its curves independent without ticking each again. An explicit entry (from its own box or a group box) always wins.
+function curveGateCtrl(ctrl) {
+  const k = ctrl.key, base = k.replace(/Tween/, '')
+  const cands = [k, base].flatMap((s) => [s.replace(/(Curve)?Range$/, 'CurveEnabled'), s.replace(/Curve$/, 'CurveEnabled')])
+  for (const c of cands) { if (c === k) continue; const g = findCtrl(c); if (g) return g }
+  return null
+}
 function isDevRowIndependent(tab, ctrl) {
   const explicit = devIndependence[tab] && devIndependence[tab][ctrl.key]
-  return explicit !== undefined ? !!explicit : !!ctrl.perDevice
+  if (explicit !== undefined) return !!explicit
+  if (isCurveTextCtrl(ctrl)) {
+    const g = curveGateCtrl(ctrl)
+    const ge = g && devIndependence[tab] && devIndependence[tab][g.key]
+    if (ge !== undefined) return !!ge
+  }
+  return !!ctrl.perDevice
 }
 const otherDynamicDeviceTab = (tab) => (tab === 'mobile' ? 'landscape' : 'mobile')
 
