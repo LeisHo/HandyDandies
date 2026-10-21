@@ -66240,7 +66240,7 @@
                             "type": "group",
                             "group": {
                               "key": "Velocity Wrist Splay",
-                              "collapsed": false,
+                              "collapsed": true,
                               "locked": false,
                               "items": [
                                 {
@@ -66304,7 +66304,7 @@
                             "type": "group",
                             "group": {
                               "key": "Velocity Finger Curl",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
