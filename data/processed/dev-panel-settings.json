@@ -242,7 +242,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5312260086631311,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.14555210124165918,\"y\":-0.8024897257486979}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-450,\"max\":-250}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-200}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -43202,7 +43202,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5312260086631311,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.14555210124165918,\"y\":-0.8024897257486979}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-450,\"max\":-250}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-200}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -65696,7 +65696,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -65707,7 +65707,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -65882,7 +65882,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -67535,7 +67535,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -67646,7 +67646,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -73338,9 +73338,9 @@
   "panelGeometry": {
     "desktop": {
       "left": 4.762500286102295,
-      "top": 69,
-      "width": 627.3500366210938,
-      "height": 535.375,
+      "top": 176.1999969482422,
+      "width": 578.5499877929688,
+      "height": 429.7749938964844,
       "collapsed": false
     },
     "mobile": {
