@@ -2665,6 +2665,9 @@ const DEV_GROUPS = [
       // Rotation, scale), the click-function timelines keep running, and cursor tracking is untouched. The frame a hand comes back into view it gets a full catch-up (a full repose, the arm length snaps to its target). Off by default.
       // Off-screen finger-curl skip (2026-10-15, direct request): a hand outside every camera's view (plus a margin) keeps updating all its pose numbers but does not write its finger bones until it is back in view.
       { key: 'skipOffScreenFingerCurls', label: 'Skip Finger Curls For Off-Screen Hands', type: 'checkbox', def: true, perDevice: true },
+      // Off-Screen Buffer (2026-10-21, direct request): a hand counts as outside the camera only once it is farther than this beyond the view boundary. The test already allows 3 hand sizes; with the box on, this distance (world units, measured at the hand) is added to that.
+      { key: 'offScreenBufferEnabled', label: 'Off-Screen Buffer', type: 'checkbox', def: false, perDevice: true, onChange: () => updateOffScreenBufferRow() },
+      { key: 'offScreenBufferDistance', label: 'Off-Screen Buffer Distance (World Units)', type: 'slider', min: 0, max: 300, step: 1, def: 30, perDevice: true },
       { key: 'skipOffScreenPoseWork', label: 'Skip Pose Work For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
       { key: 'retainRotationArmWork', label: 'Retain Rotation And Arm Work', type: 'checkbox', def: false, perDevice: true },
       // Remove Hands Outside The Camera From The Scene (2026-10-20, direct request): a hand outside every camera (the same test as Skip Finger Curls For Off-Screen Hands, which has to stay on) is taken out of the three.js scene after
@@ -4267,7 +4270,7 @@ DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
 // preserving).
 const FIELD_LAYOUT_SUBGROUP_SPECS = [
   { title: 'Render Order', collapsed: false, keys: ['renderOrderRules', 'renderOrderFlipLock'] },
-  { title: 'Off-Screen Hands', collapsed: false, keys: ['skipOffScreenFingerCurls', 'skipOffScreenPoseWork', 'retainRotationArmWork', 'skipOffScreenSceneUpdate', 'skipOffScreenCursorTracking', 'renderOrderSkipOffScreen', 'throttleOffScreenPosition', 'offScreenPositionEvery', 'throttleOffScreenPose', 'offScreenPoseEvery'] }
+  { title: 'Off-Screen Hands', collapsed: false, keys: ['skipOffScreenFingerCurls', 'offScreenBufferEnabled', 'offScreenBufferDistance', 'skipOffScreenPoseWork', 'retainRotationArmWork', 'skipOffScreenSceneUpdate', 'skipOffScreenCursorTracking', 'renderOrderSkipOffScreen', 'throttleOffScreenPosition', 'offScreenPositionEvery', 'throttleOffScreenPose', 'offScreenPoseEvery'] }
 ]
 const CAMERA_SUBGROUP_SPECS = [
   { title: 'Preview Camera', collapsed: true, keys: ['cameraPreviewEnabled', 'cameraPreviewX', 'cameraPreviewY', 'cameraPreviewZ', 'cameraPreviewFov', 'cameraPreviewZoom', 'lockCameraPreviewPan', 'lockCameraPreviewZoom', 'lockCameraPreviewRotate', 'cameraPreviewYaw', 'cameraPreviewPitch', 'savedCameraPreviews', 'addCameraPreviewBtn', 'cameraPreviewCount', 'deleteAllCameraPreviewsBtn'] }
@@ -4386,6 +4389,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('loadCameraDefaultFromCfg', loadCameraDefaultFromCfg)
     prof('reconcileCameraAfterRestore', reconcileCameraAfterRestore)
     prof('updateCameraFrame', updateCameraFrame)
+    prof('updateOffScreenBufferRow', updateOffScreenBufferRow)
     try { const dr = document.querySelector('.dp-row[data-key="cameraDefaultPreset"]'); if (dr) dr.style.display = 'none' } catch (e) { /* no panel */ }
     prof('refreshItemSelectorMarks', refreshAllItemSelectorMarks)
     prof('syncHandModelWithSettings', syncHandModelWithSettings)
@@ -14320,11 +14324,17 @@ function updateScreenUnitsPerPx() {
 const _cullMat = new THREE.Matrix4()
 const _cullSphere = new THREE.Sphere()
 const _cullFrustums = []
+// Shows the Off-Screen Buffer Distance slider only while the Off-Screen Buffer box is on.
+function updateOffScreenBufferRow() {
+  const row = document.querySelector('.dp-row[data-key="offScreenBufferDistance"]')
+  if (row) row.style.display = cfg.offScreenBufferEnabled === true ? '' : 'none'
+}
 function updateFingerCurlSkip() {
   if (cfg.skipOffScreenFingerCurls === false || !(handBoundsRadiusLocal > 0)) {
     for (let i = 0; i < hands.length; i++) { hands[i]._curlResumed = !!hands[i]._curlSkip; hands[i]._curlSkip = false }
     return
   }
+  const cullBuffer = cfg.offScreenBufferEnabled === true ? Math.max(cfg.offScreenBufferDistance || 0, 0) : 0 // Off-Screen Buffer: extra distance beyond the view boundary before a hand counts as outside
   const cams = [camera]
   if (typeof cameraPreviews !== 'undefined' && cameraPreviews && cameraPreviews.length) for (const pc of cameraPreviews) if (pc && pc.camera) cams.push(pc.camera)
   for (let k = 0; k < cams.length; k++) {
@@ -14339,7 +14349,7 @@ function updateFingerCurlSkip() {
     let visible = !h.wrapper
     if (!visible) {
       _cullSphere.center.copy(h.wrapper.position)
-      _cullSphere.radius = handBoundsRadiusLocal * (h.clone ? h.clone.scale.x : 1) * 3
+      _cullSphere.radius = handBoundsRadiusLocal * (h.clone ? h.clone.scale.x : 1) * 3 + cullBuffer
       for (let k = 0; k < cams.length; k++) if (_cullFrustums[k].intersectsSphere(_cullSphere)) { visible = true; break }
     }
     h._curlSkip = !visible
