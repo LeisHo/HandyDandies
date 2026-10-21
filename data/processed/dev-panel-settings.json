@@ -15665,7 +15665,7 @@
       "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnRetransitionEasingCurveEnabled": false,
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "uiBtnFnSpeedCurveEnabled": true,
+      "uiBtnFnSpeedCurveEnabled": false,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnSpeedCurveRange": "{\"min\":617,\"max\":678}",
       "uiBtnFnStartTimeCurveEnabled": false,
@@ -36833,7 +36833,7 @@
       "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnRetransitionEasingCurveEnabled": false,
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "uiBtnFnSpeedCurveEnabled": true,
+      "uiBtnFnSpeedCurveEnabled": false,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnSpeedCurveRange": "{\"min\":617,\"max\":678}",
       "uiBtnFnStartTimeCurveEnabled": false,
@@ -58001,7 +58001,7 @@
       "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnRetransitionEasingCurveEnabled": false,
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
-      "uiBtnFnSpeedCurveEnabled": true,
+      "uiBtnFnSpeedCurveEnabled": false,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnSpeedCurveRange": "{\"min\":617,\"max\":678}",
       "uiBtnFnStartTimeCurveEnabled": false,
@@ -66986,7 +66986,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -67704,7 +67704,7 @@
           "type": "group",
           "group": {
             "key": "UI Buttons Tween",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -67719,7 +67719,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
