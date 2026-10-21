@@ -36403,7 +36403,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1685528265308713,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4175697061138417,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":978,\"max\":1082}",
+      "startupFnSpeedCurveRange": "{\"min\":975,\"max\":975}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -66263,7 +66263,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
