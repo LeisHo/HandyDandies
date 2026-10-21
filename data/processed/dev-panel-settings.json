@@ -21692,7 +21692,7 @@
       "throttleOffScreenPose": false,
       "offScreenPoseEvery": 2,
       "fieldRows": 45,
-      "fieldCols": 13,
+      "fieldCols": 15,
       "rowSpacing": 7.5,
       "columnSpacing": 15,
       "handScale": 1,
@@ -21722,7 +21722,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-160}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-220}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -36614,14 +36614,14 @@
         }
       ],
       "cameraX": 3.7499999999999996,
-      "cameraY": 9.20422463543885e-14,
-      "cameraZ": 1503.1516121857683,
+      "cameraY": 5.125483892930744e-14,
+      "cameraZ": 837.0426989304715,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":3.7499999999999996,\"cameraY\":3.490243377569957e-14,\"cameraZ\":569.9876563664759,\"cameraFov\":20,\"cameraZoom\":570,\"cameraRoll\":0,\"targetX\":3.7499999999999996,\"targetY\":0,\"targetZ\":-0.012343633524153574}",
-      "cameraZoom": 1503.1639558192924,
+      "cameraZoom": 837.0550425639956,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -67535,7 +67535,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -73345,9 +73345,9 @@
     "mobile": {
       "left": 26.470237731933594,
       "top": 206.94642639160156,
-      "width": 257.702392578125,
-      "height": 442.327392578125,
-      "collapsed": false
+      "width": 291.98809814453125,
+      "height": 457.5535888671875,
+      "collapsed": true
     }
   }
 }
