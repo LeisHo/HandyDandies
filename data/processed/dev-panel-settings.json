@@ -63045,7 +63045,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -63141,7 +63141,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -63530,7 +63530,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > Progress Crop",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -63770,7 +63770,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
