@@ -14438,7 +14438,7 @@
       "startupHandZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5028094731409108,\"y\":0}},{\"x\":0.6984401726543635,\"y\":1,\"h1\":{\"x\":0.13521528074853695,\"y\":0},\"h2\":{\"x\":-0.22460186748376249,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2339522144078301,\"y\":0.01583340962727864}}]",
       "startupHandZRange": "{\"min\":0,\"max\":5}",
       "startupHandScaleCurveEnabled": true,
-      "startupHandScaleCurve": "[{\"x\":0,\"y\":0.0023956298828125,\"bg\":0,\"h1\":{\"x\":0.39492491435982724,\"y\":-0.0023956298828125}},{\"x\":0.7375647978899076,\"y\":1,\"h2\":{\"x\":-0.13809221329061727,\"y\":-0.014895884195963549},\"h1\":{\"x\":0.09925381602776662,\"y\":0}},{\"x\":1,\"y\":0.6666666666666666,\"h2\":{\"x\":-0.18791196986336256,\"y\":0.006666564941406272}}]",
+      "startupHandScaleCurve": "[{\"x\":0,\"y\":0.0023956298828125,\"bg\":0,\"h1\":{\"x\":0.39492491435982724,\"y\":-0.0023956298828125}},{\"x\":0.6244040265436304,\"y\":1,\"h2\":{\"x\":-0.30915935265873323,\"y\":0},\"h1\":{\"x\":0.1780008262592796,\"y\":0}},{\"x\":1,\"y\":0.6666666666666666,\"h2\":{\"x\":-0.18791196986336256,\"y\":0.006666564941406272}}]",
       "startupHandScaleRange": "{\"min\":0,\"max\":1.5}",
       "startupHandTweenEnabled": true,
       "startupFnMode": "Sequence",
@@ -14462,7 +14462,7 @@
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7402117950336252,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2855323597061714,\"y\":0}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9844207253131044,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2855323597061714,\"y\":0}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7360012575922343,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnSpeedCurveEnabled": true,
@@ -34741,7 +34741,7 @@
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7402117950336252,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.11555098560865429,\"y\":0}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9844207253131044,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2855323597061714,\"y\":0}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4854643031820735,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnSpeedCurveEnabled": true,
@@ -54996,7 +54996,7 @@
       "startupHandZCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5028094731409108,\"y\":0}},{\"x\":0.6984401726543635,\"y\":1,\"h1\":{\"x\":0.13521528074853695,\"y\":0},\"h2\":{\"x\":-0.22460186748376249,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2339522144078301,\"y\":0.01583340962727864}}]",
       "startupHandZRange": "{\"min\":0,\"max\":5}",
       "startupHandScaleCurveEnabled": true,
-      "startupHandScaleCurve": "[{\"x\":0,\"y\":0.0023956298828125,\"bg\":0,\"h1\":{\"x\":0.39492491435982724,\"y\":-0.0023956298828125}},{\"x\":0.7375647978899076,\"y\":1,\"h2\":{\"x\":-0.13809221329061727,\"y\":-0.014895884195963549},\"h1\":{\"x\":0.09925381602776662,\"y\":0}},{\"x\":1,\"y\":0.6666666666666666,\"h2\":{\"x\":-0.18791196986336256,\"y\":0.006666564941406272}}]",
+      "startupHandScaleCurve": "[{\"x\":0,\"y\":0.0023956298828125,\"bg\":0,\"h1\":{\"x\":0.39492491435982724,\"y\":-0.0023956298828125}},{\"x\":0.6244040265436304,\"y\":1,\"h2\":{\"x\":-0.30915935265873323,\"y\":0},\"h1\":{\"x\":0.1780008262592796,\"y\":0}},{\"x\":1,\"y\":0.6666666666666666,\"h2\":{\"x\":-0.18791196986336256,\"y\":0.006666564941406272}}]",
       "startupHandScaleRange": "{\"min\":0,\"max\":1.5}",
       "startupHandTweenEnabled": true,
       "startupFnMode": "Sequence",
@@ -55020,7 +55020,7 @@
       "startupFnSequenceHoldMs": 0,
       "startupFnTransitionSpeedMs": 1000,
       "startupFnEasingCurveEnabled": true,
-      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7402117950336252,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2855323597061714,\"y\":0}}]",
+      "startupFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9844207253131044,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2855323597061714,\"y\":0}}]",
       "startupFnRetransitionEasingCurveEnabled": true,
       "startupFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7360012575922343,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnSpeedCurveEnabled": true,
@@ -64601,7 +64601,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Easing",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -64746,7 +64746,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Hand Scale Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
