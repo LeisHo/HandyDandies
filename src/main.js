@@ -563,19 +563,25 @@ const FRAME_RATE_LOG_MAX_ENTRIES = 200
 const frameRateLogEntries = []
 let frameRateLogEl = null
 // Log Renderer (2026-10-20, direct request: "log all info that is relevant to render speed"). All state in ONE object, declared here with the other Frame Rate Log state (module top-level / animate() both touch it).
-// active mirrors cfg.logRendererEnabled and is re-synced lazily from animate() (rendererLogSync()), so no onChange is needed (a restored onChange fires before the renderer exists).
+// r / f / s mirror cfg.logRendererEnabled / logFrameSectionsEnabled / logSystemEnabled and are re-synced lazily from animate() (rendererLogSync()), so no onChange is needed (a restored onChange fires before the renderer exists); active = any of the three.
 const RENDERER_LOG_MAX_ENTRIES = 300
 const rendererLogEntries = []
 let rendererLogEl = null
 const _rendererLogFlushFlag = { scheduled: false }
 const rlog = {
-  active: false, lastAt: 0, setupDone: false, handsSetupDone: false, lastTargetSig: '',
+  active: false, r: false, f: false, s: false, secOn: false, lastAt: 0, lastDt: 0,
+  setupRDone: false, setupSDone: false, handsSetupDone: false, lastTargetSig: '',
   dts: [], over33: 0, over100: 0, gaps: 0,
   renderFrames: 0, renderMs: 0, renderMaxMs: 0,
-  calls: 0, callsMax: 0, tris: 0, trisMax: 0, lines: 0, points: 0,
+  calls: 0, callsMax: 0, tris: 0, trisMax: 0, lines: 0, points: 0, lastCalls: -1, lastTris: -1,
   gl: null, gpuExt: null, gpuTried: false, gpuBroken: false, gpuCur: null, gpuPending: [], gpuNs: 0, gpuN: 0, gpuMaxNs: 0,
-  ltObserver: null, ltCount: 0, ltMs: 0, ltMax: 0
+  secs: {}, frameSec: {}, secFrames: 0, secTotalMs: 0, worstMs: 0, worstDt: 0, worstSecs: null, worstAt: '', worstAction: '',
+  ring: [], ringPos: 0,
+  ltObserver: null, ltCount: 0, ltMs: 0, ltMax: 0,
+  loafObserver: null, loafN: 0, loafMs: 0, loafMax: 0, loafStyleMs: 0, loafScripts: {},
+  heapLast: 0, heapAllocBytes: 0, gcEvents: 0, panelUpdates: 0
 }
+const RLOG_RING_MAX = 900 // frames kept by the Frame Sections recording (about 15 s at 60 fps; a judgment call)
 // Loading Preview Log (2026-10-04, direct request: "provide a loading preview
 // log in the debug group"). Declared here, not next to its functions, because
 // buildLoadingPreviewLogWidget() is called at module top level -- see the
@@ -4062,10 +4068,16 @@ const DEV_GROUPS = [
       // Log, plus the drawing-buffer size, pixel ratio and hand count, so the cost of a slow frame can be
       // read from a pasted log instead of the browser console.
       { key: 'logFrameProfileEnabled', label: 'Log Frame Profile', type: 'checkbox', def: false },
-      // Log Renderer (2026-10-20): with it on, the Frame Rate Log also gets (once per second) a RENDERER timing line (frame interval average / 95th percentile / worst, long frames, render() CPU time, GPU time when the
-      // browser exposes the timer, main-thread long tasks, JS heap), a RENDERER work line (draw calls, triangles, geometries / textures / programs, hands in view / posed / curl-skipped, geometry mix per hand), and a
-      // RENDERER target line whenever the drawing buffer, pixel ratio or composer passes change; plus one RENDERER setup line when it is switched on (GPU, WebGL limits, cores, per-hand model size, lights, clipping).
+      // Performance logs (2026-10-20): three independent checkboxes, one "Renderer Log" box (lines start with RENDERER / FRAME / SYSTEM), so the data gathering can be split.
+      // Log Renderer = the GPU / draw side: render() CPU time, GPU time (when the browser exposes the timer), draw calls, triangles, GPU objects, geometry mix per hand, drawing buffer and composer passes, GPU / WebGL setup.
+      // Log Frame Sections = the CPU side of the frame: frame intervals (average / 95th percentile / worst), hands in view / outside every camera / driven by a click function, a section timer (ms per frame for each
+      //   part of animate() and of the hand update, hands in view vs outside every camera), the slowest frame of each second with its sections and the last action, and a raw per-frame recording (Save Frame Recording).
+      // Log System = the browser and machine around the page: main-thread long tasks, Chrome's long-animation-frame script attribution, JS memory (allocation rate, garbage-collection drops), DOM size, dev-panel activity,
+      //   visibility / focus, device and scene setup, and every setting that differs from its default.
       { key: 'logRendererEnabled', label: 'Log Renderer', type: 'checkbox', def: false },
+      { key: 'logFrameSectionsEnabled', label: 'Log Frame Sections', type: 'checkbox', def: false },
+      { key: 'logSystemEnabled', label: 'Log System', type: 'checkbox', def: false },
+      { key: 'saveFrameRecordingBtn', label: 'Save Frame Recording', type: 'button', onClick: () => saveFrameRecording() },
       { key: 'clearFrameRateLogBtn', label: 'Clear Frame Rate Log', type: 'button', onClick: () => clearFrameRateLog() },
       // Pose Jump Log (2026-10-04): logs any frame where a hand's bone rotation or position
       // changes more than the thresholds below between two consecutive frames -- i.e. a pop, not
@@ -4356,7 +4368,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   // sync below) -- marking the paused render loop dirty so it redraws
   // promptly instead of waiting for its own throttle interval, or
   // (normally) not redrawing at all while nothing has actually changed.
-  onAnyValueChange: () => { sceneNeedsRedraw = true },
+  onAnyValueChange: () => { sceneNeedsRedraw = true; rlog.panelUpdates++ },
   // Undo/Redo leaves the live camera sliders alone unless the step was itself a camera-slider edit (2026-10-06).
   onSavedStateApplied: (state) => applySavedStateDefaults(state),
   sanitizeOrder: (order) => sanitizeVelocitySavedOrder(order),
@@ -5833,50 +5845,144 @@ function appendFrameRateLogLine(line) {
   if (frameRateLogEntries.length > FRAME_RATE_LOG_MAX_ENTRIES) frameRateLogEntries.shift()
   scheduleLogDomFlush(_frameRateLogFlushFlag, () => frameRateLogEl, frameRateLogEntries)
 }
-// ---- Log Renderer (2026-10-20) ----
+// ---- Performance logs (2026-10-20): Log Renderer / Log Frame Sections / Log System ----
+// Three checkboxes, one Renderer Log box (each line starts with RENDERER, FRAME or SYSTEM). RENDERER = the GPU and draw side; FRAME = the CPU time of each part of the frame, the frame intervals, the hands, the slowest
+// frame and a raw per-frame recording; SYSTEM = the browser and machine around the page. Everything costs nothing while its checkbox is off (one flag test per timed section).
 function rendererLogSync() {
-  const on = cfg.logRendererEnabled === true
-  if (on === rlog.active) return
-  rlog.active = on
-  if (on) {
+  const r = cfg.logRendererEnabled === true, f = cfg.logFrameSectionsEnabled === true, s = cfg.logSystemEnabled === true
+  if (r === rlog.r && f === rlog.f && s === rlog.s) return
+  const was = { r: rlog.r, f: rlog.f, s: rlog.s }
+  rlog.r = r; rlog.f = f; rlog.s = s
+  rlog.active = r || f || s
+  rlog.secOn = f
+  rlog.lastAt = 0
+  rendererLogResetWindow()
+  if (r && !was.r) {
     // composer.render() runs several renderer.render() calls per frame (one per pass); three.js resets renderer.info before EACH of them (autoReset), which would leave only the last pass in the numbers.
     // With autoReset off we reset once per frame ourselves (rendererLogBeforeRender()) and read the whole frame's totals afterwards.
     renderer.info.autoReset = false
-    rlog.lastAt = 0; rlog.setupDone = false; rlog.lastTargetSig = ''
-    rendererLogResetWindow()
-    try {
-      if (typeof PerformanceObserver !== 'undefined' && (PerformanceObserver.supportedEntryTypes || []).includes('longtask')) {
-        rlog.ltObserver = new PerformanceObserver((list) => { list.getEntries().forEach((e) => { rlog.ltCount++; rlog.ltMs += e.duration; if (e.duration > rlog.ltMax) rlog.ltMax = e.duration }) })
-        rlog.ltObserver.observe({ entryTypes: ['longtask'] })
-      }
-    } catch (e) { rlog.ltObserver = null }
-    rlog.handsSetupDone = false
-    rendererLogSetup()
-  } else {
+    rlog.lastTargetSig = ''
+    rendererLogSetupRenderer()
+  } else if (!r && was.r) {
     renderer.info.autoReset = true
-    if (rlog.ltObserver) { try { rlog.ltObserver.disconnect() } catch (e) { /* ignore */ } rlog.ltObserver = null }
     if (rlog.gl) { rlog.gpuPending.forEach((q) => { try { rlog.gl.deleteQuery(q) } catch (e) { /* ignore */ } }); if (rlog.gpuCur) { try { rlog.gl.endQuery(rlog.gpuExt.TIME_ELAPSED_EXT); rlog.gl.deleteQuery(rlog.gpuCur) } catch (e) { /* ignore */ } } }
     rlog.gpuPending = []; rlog.gpuCur = null
   }
+  if (f && !was.f) { rlog.secs = {}; rlog.frameSec = {}; rlog.ring = []; rlog.ringPos = 0; rlog.worstMs = 0 }
+  if (s && !was.s) {
+    rlog.heapLast = 0; rlog.handsSetupDone = false; rlog.panelUpdates = 0
+    rendererLogStartObservers()
+    rendererLogSetupSystem(false)
+  } else if (!s && was.s) rendererLogStopObservers()
 }
 function rendererLogResetWindow() {
   rlog.dts = []; rlog.over33 = 0; rlog.over100 = 0; rlog.gaps = 0
   rlog.renderFrames = 0; rlog.renderMs = 0; rlog.renderMaxMs = 0
   rlog.calls = 0; rlog.callsMax = 0; rlog.tris = 0; rlog.trisMax = 0; rlog.lines = 0; rlog.points = 0
   rlog.gpuNs = 0; rlog.gpuN = 0; rlog.gpuMaxNs = 0
+  rlog.secs = {}; rlog.secFrames = 0; rlog.secTotalMs = 0; rlog.worstMs = 0; rlog.worstSecs = null
   rlog.ltCount = 0; rlog.ltMs = 0; rlog.ltMax = 0
+  rlog.loafN = 0; rlog.loafMs = 0; rlog.loafMax = 0; rlog.loafStyleMs = 0; rlog.loafScripts = {}
+  rlog.heapAllocBytes = 0; rlog.gcEvents = 0; rlog.panelUpdates = 0
+}
+function rendererLogStartObservers() {
+  try {
+    const types = (typeof PerformanceObserver !== 'undefined' && PerformanceObserver.supportedEntryTypes) || []
+    if (types.includes('longtask')) {
+      rlog.ltObserver = new PerformanceObserver((list) => { list.getEntries().forEach((e) => { rlog.ltCount++; rlog.ltMs += e.duration; if (e.duration > rlog.ltMax) rlog.ltMax = e.duration }) })
+      rlog.ltObserver.observe({ type: 'longtask', buffered: false })
+    }
+    // Chrome's long-animation-frame entries (a frame over 50 ms) name the scripts that ran in it and how long style / layout took, so the cost can be attributed without instrumenting the code.
+    if (types.includes('long-animation-frame')) {
+      rlog.loafObserver = new PerformanceObserver((list) => {
+        list.getEntries().forEach((e) => {
+          rlog.loafN++; rlog.loafMs += e.duration; if (e.duration > rlog.loafMax) rlog.loafMax = e.duration
+          const sl = e.startTime + e.duration - (e.styleAndLayoutStart || (e.startTime + e.duration))
+          if (sl > 0) rlog.loafStyleMs += sl
+          ;(e.scripts || []).forEach((sc) => {
+            const label = (sc.sourceFunctionName || sc.invoker || sc.invokerType || 'script') + (sc.sourceURL ? ' @' + String(sc.sourceURL).split('/').pop().split('?')[0] : '')
+            rlog.loafScripts[label] = (rlog.loafScripts[label] || 0) + sc.duration
+          })
+        })
+      })
+      rlog.loafObserver.observe({ type: 'long-animation-frame', buffered: false })
+    }
+  } catch (e) { /* an unsupported observer simply reports "not supported" */ }
+}
+function rendererLogStopObservers() {
+  if (rlog.ltObserver) { try { rlog.ltObserver.disconnect() } catch (e) { /* ignore */ } rlog.ltObserver = null }
+  if (rlog.loafObserver) { try { rlog.loafObserver.disconnect() } catch (e) { /* ignore */ } rlog.loafObserver = null }
+}
+// ---- the section timer (Log Frame Sections). rlsT() is 0 while it is off, so every rlsE / rlsLap on that value is a no-op. ----
+function rlsT() { return rlog.secOn ? performance.now() : 0 }
+function rlsAdd(name, ms, n) {
+  let e = rlog.secs[name]
+  if (!e) e = rlog.secs[name] = { ms: 0, n: 0, max: 0 }
+  e.ms += ms; e.n += (n === undefined ? 1 : n); if (ms > e.max) e.max = ms
+  rlog.frameSec[name] = (rlog.frameSec[name] || 0) + ms
+}
+function rlsE(name, t0) { if (t0) rlsAdd(name, performance.now() - t0) }
+// Contiguous laps: adds the time since t0 to `name` and returns the new start, so a run of laps covers a whole function with no gaps.
+function rlsLap(name, t0) {
+  if (!t0) return 0
+  const t = performance.now()
+  rlsAdd(name, t - t0)
+  return t
+}
+function rlsFrameEnd(totalMs) {
+  rlog.secFrames++; rlog.secTotalMs += totalMs
+  const fs0 = rlog.frameSec
+  if (totalMs > rlog.worstMs) {
+    rlog.worstMs = totalMs; rlog.worstSecs = fs0; rlog.worstDt = rlog.lastDt; rlog.worstAt = new Date().toLocaleTimeString()
+    const age = lastTrackedActionText ? Math.round(performance.now() - lastTrackedActionAt) : null
+    rlog.worstAction = age !== null && age < 5000 ? lastTrackedActionText + ' (' + age + ' ms earlier)' : 'no tracked action in the last 5 s'
+  }
+  const rec = { t: Math.round(performance.now()), dt: rlog.lastDt, total: totalMs, calls: rlog.r ? rlog.lastCalls : -1, tris: rlog.r ? rlog.lastTris : -1, secs: fs0 }
+  if (rlog.ring.length < RLOG_RING_MAX) rlog.ring.push(rec)
+  else { rlog.ring[rlog.ringPos] = rec; rlog.ringPos = (rlog.ringPos + 1) % RLOG_RING_MAX }
+}
+// "Save Frame Recording": the last ~900 frames as JSON (time, wall-clock interval, animate() total, draw calls, triangles and every timed section), plus the settings that differ from their defaults, so a capture can be
+// analysed offline for any question without a new log line.
+function saveFrameRecording() {
+  if (!rlog.ring.length) { appendRendererLogLine('[' + new Date().toLocaleTimeString() + '] FRAME recording is empty -- tick Log Frame Sections, use the page for a few seconds, then save') ; return }
+  const ordered = rlog.ring.length < RLOG_RING_MAX ? rlog.ring.slice() : rlog.ring.slice(rlog.ringPos).concat(rlog.ring.slice(0, rlog.ringPos))
+  const r2 = (x) => Math.round(x * 100) / 100
+  const frames = ordered.map((r) => { const secs = {}; Object.keys(r.secs).forEach((k) => { secs[k] = r2(r.secs[k]) }); return { t: r.t, dt: r2(r.dt), total: r2(r.total), calls: r.calls, tris: r.tris, secs } })
+  const out = {
+    app: 'Handy Dandies', exportedAt: new Date().toISOString(),
+    page: { url: location.href, viewport: [window.innerWidth, window.innerHeight], pixelRatio: window.devicePixelRatio, hands: hands.length, drawingBuffer: (() => { const z = renderer.getDrawingBufferSize(new THREE.Vector2()); return [z.x, z.y] })() },
+    note: 'frames are oldest first; t = performance.now() ms; dt = wall-clock gap since the previous animate() call; total = ms spent inside animate(); calls / tris = renderer.info (-1 when Log Renderer was off); secs = ms per timed section in that frame',
+    settingsDifferingFromDefaults: rendererLogNonDefaults(),
+    frames
+  }
+  const blob = new Blob([JSON.stringify(out)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'handy-dandies-frame-recording-' + new Date().toISOString().replace(/[:.]/g, '-') + '.json'
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
 }
 // Wall-clock gap between two animate() calls. A paused / hidden tab, or a gap over 1 s, is not a frame (it is counted as a gap instead).
 function rendererLogFrameStart(t) {
   const last = rlog.lastAt
   if (isPaused) { rlog.lastAt = 0; return }
   rlog.lastAt = t
+  if (rlog.f) { rlog.frameSec = {}; rlog.lastDt = 0 }
+  if (rlog.r) { rlog.lastCalls = -1; rlog.lastTris = -1 }
+  if (rlog.s && performance.memory) {
+    // approximate: Chrome coarsens these numbers. A rise is counted as allocation, a drop over 1 MB as a garbage collection.
+    const hp = performance.memory.usedJSHeapSize
+    if (rlog.heapLast) { const dh = hp - rlog.heapLast; if (dh > 0) rlog.heapAllocBytes += dh; else if (dh < -1048576) rlog.gcEvents++ }
+    rlog.heapLast = hp
+  }
   if (last === 0) return
   const dt = t - last
   if (dt > 1000) { rlog.gaps++; return }
-  rlog.dts.push(dt)
-  if (dt > 33.4) rlog.over33++
-  if (dt > 100) rlog.over100++
+  rlog.lastDt = dt
+  if (rlog.f) { rlog.dts.push(dt); if (dt > 33.4) rlog.over33++; if (dt > 100) rlog.over100++ }
 }
 function rendererLogBeforeRender() {
   renderer.info.reset()
@@ -5894,6 +6000,7 @@ function rendererLogAfterRender(ms) {
   rlog.calls += r.calls; if (r.calls > rlog.callsMax) rlog.callsMax = r.calls
   rlog.tris += r.triangles; if (r.triangles > rlog.trisMax) rlog.trisMax = r.triangles
   rlog.lines += r.lines; rlog.points += r.points
+  rlog.lastCalls = r.calls; rlog.lastTris = r.triangles
   if (rlog.gpuCur) {
     try { rlog.gl.endQuery(rlog.gpuExt.TIME_ELAPSED_EXT); rlog.gpuPending.push(rlog.gpuCur) } catch (e) { rlog.gpuBroken = true }
     rlog.gpuCur = null
@@ -5922,79 +6029,147 @@ function rendererLogGeometryMix() {
     if (!e) { e = { n: 0, verts: g.attributes.position ? g.attributes.position.count : 0, tris: g.index ? g.index.count / 3 : (g.attributes.position ? g.attributes.position.count / 3 : 0) }; m.set(g.uuid, e) }
     e.n++
   }
-  return Array.from(m.values()).sort((a, b) => b.tris - a.tris).map((e) => e.n + 'x' + (e.tris >= 10000 ? Math.round(e.tris / 1000) + 'k' : Math.round(e.tris)) + ' tris (' + (e.verts >= 10000 ? Math.round(e.verts / 1000) + 'k' : Math.round(e.verts)) + ' verts)').join(', ')
+  const k = (v) => (v >= 10000 ? Math.round(v / 1000) + 'k' : String(Math.round(v)))
+  return Array.from(m.values()).sort((a, b) => b.tris - a.tris).map((e) => e.n + 'x' + k(e.tris) + ' tris (' + k(e.verts) + ' verts)').join(', ')
 }
-function rendererLogSetup(handsOnly) {
-  if (!handsOnly) { if (rlog.setupDone) return; rlog.setupDone = true }
-  if (hands.length) rlog.handsSetupDone = true
+// Every setting that differs from its default (DEV_GROUPS' own def), so a capture says what it was run with.
+function rendererLogNonDefaults() {
+  const out = []
+  DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
+    if (c.def === undefined || c.type === 'button') return
+    const v = cfg[c.key]
+    if (v === undefined) return
+    let same = true
+    try { same = JSON.stringify(v) === JSON.stringify(c.def) } catch (e) { same = true }
+    if (same) return
+    let sv = typeof v === 'string' ? v : JSON.stringify(v)
+    if (sv && sv.length > 40) sv = sv.slice(0, 37) + '...'
+    out.push(c.key + '=' + sv)
+  }))
+  return out
+}
+function rendererLogSetupRenderer() {
   const L = (txt) => appendRendererLogLine('[' + new Date().toLocaleTimeString() + '] RENDERER setup -- ' + txt)
   try {
-    if (!handsOnly) {
     const gl = renderer.getContext()
     let gpu = 'unknown (browser hides it)'
     try { const x = gl.getExtension('WEBGL_debug_renderer_info'); if (x) gpu = gl.getParameter(x.UNMASKED_VENDOR_WEBGL) + ' / ' + gl.getParameter(x.UNMASKED_RENDERER_WEBGL) } catch (e) { /* ignore */ }
     const attrs = gl.getContextAttributes() || {}
     const cap = renderer.capabilities
     L('GPU ' + gpu + ' | ' + (cap.isWebGL2 ? 'WebGL2' : 'WebGL1') + ', max texture ' + cap.maxTextureSize + ', max vertex uniforms ' + cap.maxVertexUniforms + ', max fragment uniforms ' + cap.maxFragmentUniforms + ', precision ' + cap.precision +
-      ' | context: antialias ' + attrs.antialias + ', alpha ' + attrs.alpha + ', powerPreference ' + attrs.powerPreference + ' | GPU timer ' + (renderer.getContext().getExtension('EXT_disjoint_timer_query_webgl2') ? 'available' : 'NOT available (no GPU time in the timing line)'))
-    L('device -- ' + (navigator.hardwareConcurrency || '?') + ' logical cores, deviceMemory ' + (navigator.deviceMemory || '?') + ' GB, devicePixelRatio ' + window.devicePixelRatio + ', screen ' + screen.width + 'x' + screen.height + ', viewport ' + window.innerWidth + 'x' + window.innerHeight +
-      ', three r' + THREE.REVISION + ' | ' + navigator.userAgent.slice(0, 120))
+      ' | context: antialias ' + attrs.antialias + ', alpha ' + attrs.alpha + ', powerPreference ' + attrs.powerPreference + ' | GPU timer ' + (gl.getExtension('EXT_disjoint_timer_query_webgl2') ? 'available' : 'NOT available (no GPU time in the timing line)') +
+      ' | three r' + THREE.REVISION + ', tone mapping ' + renderer.toneMapping + ', shadow map ' + renderer.shadowMap.enabled + ', sortObjects ' + renderer.sortObjects + ', local clipping ' + renderer.localClippingEnabled + ', global clipping planes ' + renderer.clippingPlanes.length)
+  } catch (e) { L('FAILED while collecting (' + (e && e.message) + ')') }
+}
+function rendererLogSetupSystem(again) {
+  const L = (txt) => appendRendererLogLine('[' + new Date().toLocaleTimeString() + '] SYSTEM setup -- ' + txt)
+  try {
+    if (hands.length) rlog.handsSetupDone = true
+    if (!again) {
+      L('device -- ' + (navigator.hardwareConcurrency || '?') + ' logical cores, deviceMemory ' + (navigator.deviceMemory || '?') + ' GB, devicePixelRatio ' + window.devicePixelRatio + ', screen ' + screen.width + 'x' + screen.height + ', viewport ' + window.innerWidth + 'x' + window.innerHeight +
+        ' | ' + navigator.userAgent.slice(0, 120))
     }
+    if (!hands.length) { L('the hand field is not built yet -- the scene and settings lines follow once the hands exist'); return }
     let lights = 0, shadowLights = 0, meshes = 0, skinned = 0, objs = 0
     scene.traverse((o) => { objs++; if (o.isLight) { lights++; if (o.castShadow) shadowLights++ } if (o.isMesh) meshes++; if (o.isSkinnedMesh) skinned++ })
     const h0 = hands[0]
     const bones = h0 && h0.skinnedMesh && h0.skinnedMesh.skeleton ? h0.skinnedMesh.skeleton.bones.length : '?'
     const mat0 = h0 && h0.skinnedMesh ? h0.skinnedMesh.material : null
-    L('scene -- ' + objs + ' objects, ' + meshes + ' meshes (' + skinned + ' skinned), ' + lights + ' lights (' + shadowLights + ' cast shadows), shadow map ' + renderer.shadowMap.enabled + ', tone mapping ' + renderer.toneMapping + ', sortObjects ' + renderer.sortObjects +
-      ', local clipping ' + renderer.localClippingEnabled + ', global clipping planes ' + renderer.clippingPlanes.length + ' | hand: ' + bones + ' bones, material ' + (mat0 && (Array.isArray(mat0) ? 'array' : mat0.type)) + ', geometry mix ' + rendererLogGeometryMix())
+    L('scene -- ' + objs + ' objects, ' + meshes + ' meshes (' + skinned + ' skinned), ' + lights + ' lights (' + shadowLights + ' cast shadows) | hand: ' + bones + ' bones, material ' + (mat0 && (Array.isArray(mat0) ? 'array' : mat0.type)) + ', geometry mix ' + rendererLogGeometryMix())
     L('field -- ' + hands.length + ' hands, hand scale ' + cfg.handScale + ', outline ' + (cfg.outlineEnabled ? cfg.outlineMechanic : 'off') + ', Small Scale Models ' + (cfg.smallScaleModelsEnabled === true ? 'on' : 'off') + ', Skip Off-Screen Curls ' + (cfg.skipOffScreenFingerCurls !== false ? 'on' : 'off') +
       ', Resolution Scale ' + cfg.resolutionScale + '%, Device Pixel Ratio ' + cfg.pixelRatio)
+    let ids = []
+    try { ids = JSON.parse(cfg.customClickFunctionIds || '[]') } catch (e) { ids = [] }
+    const enabled = ids.filter((id) => cfg[id + 'Enabled'] === true).length
+    L('click functions -- ' + ids.length + ' custom functions, ' + enabled + ' enabled')
+    const nd = rendererLogNonDefaults()
+    let chunk = [], len = 0, part = 1
+    const flushChunk = () => { if (chunk.length) { L('settings differing from their defaults (' + nd.length + ' total, part ' + part + ') -- ' + chunk.join(' | ')); part++; chunk = []; len = 0 } }
+    nd.forEach((x) => { if (len + x.length > 800) flushChunk(); chunk.push(x); len += x.length + 3 })
+    flushChunk()
   } catch (e) { L('FAILED while collecting (' + (e && e.message) + ')') }
 }
 function rendererLogFlush(elapsedMs) {
-  const t = '[' + new Date().toLocaleTimeString() + '] RENDERER '
+  const stamp = '[' + new Date().toLocaleTimeString() + '] '
+  const f1 = (x) => x.toFixed(1)
   try {
-    if (!rlog.handsSetupDone && hands.length) rendererLogSetup(true)
-    const f1 = (x) => x.toFixed(1)
-    const n = rlog.dts.length
-    let timing = 'timing -- '
-    if (n) {
-      const sorted = rlog.dts.slice().sort((a, b) => a - b)
-      const avg = sorted.reduce((a, b) => a + b, 0) / n
-      timing += 'frame interval avg ' + f1(avg) + ' ms (' + f1(1000 / avg) + ' fps), 95th percentile ' + f1(sorted[Math.min(n - 1, Math.floor(n * 0.95))]) + ', worst ' + f1(sorted[n - 1]) + ' | over 33 ms: ' + rlog.over33 + ', over 100 ms: ' + rlog.over100 + (rlog.gaps ? ', gaps over 1 s: ' + rlog.gaps : '')
-    } else timing += 'no frame intervals this second (paused / hidden / one frame)'
-    if (rlog.renderFrames) timing += ' | render() CPU avg ' + f1(rlog.renderMs / rlog.renderFrames) + ' ms, worst ' + f1(rlog.renderMaxMs)
-    if (rlog.gpuExt && !rlog.gpuBroken) timing += ' | GPU time avg ' + (rlog.gpuN ? f1(rlog.gpuNs / rlog.gpuN / 1e6) + ' ms, worst ' + f1(rlog.gpuMaxNs / 1e6) + ' (' + rlog.gpuN + ' samples)' : 'no samples yet')
-    else timing += ' | GPU time ' + (rlog.gpuBroken ? 'failed (disabled)' : 'unavailable')
-    timing += ' | main-thread long tasks (over 50 ms): ' + (rlog.ltObserver ? rlog.ltCount + (rlog.ltCount ? ' totalling ' + Math.round(rlog.ltMs) + ' ms, worst ' + Math.round(rlog.ltMax) : '') : 'not supported')
-    if (performance.memory) timing += ' | JS heap ' + Math.round(performance.memory.usedJSHeapSize / 1048576) + ' of ' + Math.round(performance.memory.totalJSHeapSize / 1048576) + ' MB'
-    appendRendererLogLine(t + timing)
-
-    const rf = Math.max(1, rlog.renderFrames), info = renderer.info
-    let total = 0, shown = 0, skipped = 0, posed = 0
-    const mats = new Set()
-    for (let i = 0; i < hands.length; i++) {
-      const h = hands[i]; total++
-      if (h.wrapper && h.wrapper.visible) shown++
-      if (h._curlSkip) skipped++
-      if (h._wasOverriddenLastFrame) posed++
-      if (h.skinnedMesh) mats.add(h.skinnedMesh.material)
-    }
-    appendRendererLogLine(t + 'work -- per rendered frame: draw calls avg ' + Math.round(rlog.calls / rf) + ' (max ' + rlog.callsMax + '), triangles avg ' + (rlog.tris / rf / 1e6).toFixed(2) + ' M (max ' + (rlog.trisMax / 1e6).toFixed(2) + ' M)' +
-      (rlog.lines || rlog.points ? ', lines ' + Math.round(rlog.lines / rf) + ', points ' + Math.round(rlog.points / rf) : '') + ', rendered frames ' + rlog.renderFrames +
-      ' | GPU objects: ' + info.memory.geometries + ' geometries, ' + info.memory.textures + ' textures, ' + (info.programs ? info.programs.length : '?') + ' programs' +
-      ' | hands: ' + total + ' total, ' + shown + ' shown, ' + skipped + ' outside every camera (finger curl skipped), ' + posed + ' driven by a click function, ' + mats.size + ' distinct materials' +
-      ' | Small Scale Models used by ' + (smallScaleActiveCount || 0) + ' hands | geometry mix ' + rendererLogGeometryMix())
-
-    const sz = renderer.getDrawingBufferSize(new THREE.Vector2())
-    const passes = composer.passes.map((p) => p.constructor.name + (p.enabled ? '' : ' (off)')).join(', ')
-    const sig = sz.x + 'x' + sz.y + '|' + renderer.getPixelRatio() + '|' + passes + '|' + cfg.resolutionScale + '|' + canvas.clientWidth + 'x' + canvas.clientHeight
-    if (sig !== rlog.lastTargetSig) {
-      rlog.lastTargetSig = sig
-      appendRendererLogLine(t + 'target -- drawing buffer ' + sz.x + 'x' + sz.y + ' (' + (sz.x * sz.y / 1e6).toFixed(2) + ' M pixels), canvas ' + canvas.clientWidth + 'x' + canvas.clientHeight + ' CSS px, renderer pixel ratio ' + renderer.getPixelRatio() + ', Resolution Scale ' + cfg.resolutionScale + '% | composer passes: ' + passes)
-    }
-  } catch (e) { appendRendererLogLine(t + 'FAILED while collecting (' + (e && e.message) + ')') }
+    if (rlog.r) rendererLogFlushRenderer(stamp + 'RENDERER ', f1)
+  } catch (e) { appendRendererLogLine(stamp + 'RENDERER FAILED while collecting (' + (e && e.message) + ')') }
+  try {
+    if (rlog.f) rendererLogFlushFrame(stamp + 'FRAME ', f1)
+  } catch (e) { appendRendererLogLine(stamp + 'FRAME FAILED while collecting (' + (e && e.message) + ')') }
+  try {
+    if (rlog.s) rendererLogFlushSystem(stamp + 'SYSTEM ', f1, elapsedMs)
+  } catch (e) { appendRendererLogLine(stamp + 'SYSTEM FAILED while collecting (' + (e && e.message) + ')') }
   rendererLogResetWindow()
+}
+function rendererLogFlushRenderer(t, f1) {
+  const rf = Math.max(1, rlog.renderFrames), info = renderer.info
+  let line = 'timing -- render() CPU ' + (rlog.renderFrames ? 'avg ' + f1(rlog.renderMs / rlog.renderFrames) + ' ms, worst ' + f1(rlog.renderMaxMs) : 'no rendered frames this second')
+  if (rlog.gpuExt && !rlog.gpuBroken) line += ' | GPU time ' + (rlog.gpuN ? 'avg ' + f1(rlog.gpuNs / rlog.gpuN / 1e6) + ' ms, worst ' + f1(rlog.gpuMaxNs / 1e6) + ' (' + rlog.gpuN + ' samples)' : 'no samples yet')
+  else line += ' | GPU time ' + (rlog.gpuBroken ? 'failed (disabled)' : 'unavailable')
+  appendRendererLogLine(t + line)
+  appendRendererLogLine(t + 'work -- per rendered frame: draw calls avg ' + Math.round(rlog.calls / rf) + ' (max ' + rlog.callsMax + '), triangles avg ' + (rlog.tris / rf / 1e6).toFixed(2) + ' M (max ' + (rlog.trisMax / 1e6).toFixed(2) + ' M)' +
+    (rlog.lines || rlog.points ? ', lines ' + Math.round(rlog.lines / rf) + ', points ' + Math.round(rlog.points / rf) : '') + ', rendered frames ' + rlog.renderFrames +
+    ' | GPU objects: ' + info.memory.geometries + ' geometries, ' + info.memory.textures + ' textures, ' + (info.programs ? info.programs.length : '?') + ' programs | geometry mix ' + rendererLogGeometryMix())
+  const sz = renderer.getDrawingBufferSize(new THREE.Vector2())
+  const passes = composer.passes.map((p) => p.constructor.name + (p.enabled ? '' : ' (off)')).join(', ')
+  const sig = sz.x + 'x' + sz.y + '|' + renderer.getPixelRatio() + '|' + passes + '|' + cfg.resolutionScale + '|' + canvas.clientWidth + 'x' + canvas.clientHeight
+  if (sig !== rlog.lastTargetSig) {
+    rlog.lastTargetSig = sig
+    appendRendererLogLine(t + 'target -- drawing buffer ' + sz.x + 'x' + sz.y + ' (' + (sz.x * sz.y / 1e6).toFixed(2) + ' M pixels), canvas ' + canvas.clientWidth + 'x' + canvas.clientHeight + ' CSS px, renderer pixel ratio ' + renderer.getPixelRatio() + ', Resolution Scale ' + cfg.resolutionScale + '% | composer passes: ' + passes)
+  }
+}
+function rendererLogFlushFrame(t, f1) {
+  const n = rlog.dts.length
+  let timing = 'timing -- '
+  if (n) {
+    const sorted = rlog.dts.slice().sort((a, b) => a - b)
+    const avg = sorted.reduce((a, b) => a + b, 0) / n
+    timing += 'frame interval avg ' + f1(avg) + ' ms (' + f1(1000 / avg) + ' fps), 95th percentile ' + f1(sorted[Math.min(n - 1, Math.floor(n * 0.95))]) + ', worst ' + f1(sorted[n - 1]) + ' | over 33 ms: ' + rlog.over33 + ', over 100 ms: ' + rlog.over100 + (rlog.gaps ? ', gaps over 1 s: ' + rlog.gaps : '')
+  } else timing += 'no frame intervals this second (paused / hidden / one frame)'
+  const fr = Math.max(1, rlog.secFrames), totalAvg = rlog.secTotalMs / fr
+  timing += ' | animate() work avg ' + f1(totalAvg) + ' ms over ' + rlog.secFrames + ' frames'
+  appendRendererLogLine(t + timing)
+  let total = 0, shown = 0, skipped = 0, posed = 0
+  const mats = new Set()
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]; total++
+    if (h.wrapper && h.wrapper.visible) shown++
+    if (h._curlSkip) skipped++
+    if (h._wasOverriddenLastFrame) posed++
+    if (h.skinnedMesh) mats.add(h.skinnedMesh.material)
+  }
+  appendRendererLogLine(t + 'hands -- ' + total + ' total, ' + shown + ' shown, ' + skipped + ' outside every camera (finger curl skipped), ' + posed + ' driven by a click function, ' + mats.size + ' distinct materials, Small Scale Models used by ' + (smallScaleActiveCount || 0) + ' hands')
+  const names = Object.keys(rlog.secs)
+  const fmt = (name, base) => {
+    const e = rlog.secs[name]
+    const per = e.n / fr
+    return name.replace(/^uro: /, '') + ' ' + f1(e.ms / fr) + ' ms' + (base > 0 ? ' (' + Math.round(100 * (e.ms / fr) / base) + '%)' : '') + (per > 1.5 ? ' x' + Math.round(per) + '/frame' : '')
+  }
+  const top = names.filter((k) => !k.startsWith('uro: ')).sort((a, b) => rlog.secs[b].ms - rlog.secs[a].ms)
+  const timed = top.reduce((a, k) => a + rlog.secs[k].ms / fr, 0)
+  appendRendererLogLine(t + 'sections (ms per frame, % of animate() work) -- ' + top.map((k) => fmt(k, totalAvg)).join(' | ') + ' | untimed rest of animate() ' + f1(Math.max(0, totalAvg - timed)) + ' ms')
+  const uroKey = 'update render order (total, incl. field bounds)'
+  const uroTotal = rlog.secs[uroKey] ? rlog.secs[uroKey].ms / fr : 0
+  const uro = names.filter((k) => k.startsWith('uro: ')).sort((a, b) => rlog.secs[b].ms - rlog.secs[a].ms)
+  if (uro.length) appendRendererLogLine(t + 'hand update breakdown (ms per frame, % of the hand update) -- ' + uro.slice(0, 12).map((k) => fmt(k, uroTotal)).join(' | '))
+  if (rlog.worstSecs) {
+    const w = Object.keys(rlog.worstSecs).sort((a, b) => rlog.worstSecs[b] - rlog.worstSecs[a]).slice(0, 6).map((k) => k.replace(/^uro: /, '') + ' ' + f1(rlog.worstSecs[k])).join(' | ')
+    appendRendererLogLine(t + 'slowest frame this second -- animate() ' + f1(rlog.worstMs) + ' ms (interval ' + f1(rlog.worstDt) + ') at ' + rlog.worstAt + ' | biggest sections: ' + w + ' | last action: ' + rlog.worstAction)
+  }
+}
+function rendererLogFlushSystem(t, f1, elapsedMs) {
+  const secs = Math.max(0.001, elapsedMs / 1000)
+  let line = 'browser -- main-thread long tasks (over 50 ms): ' + (rlog.ltObserver ? rlog.ltCount + (rlog.ltCount ? ' totalling ' + Math.round(rlog.ltMs) + ' ms, worst ' + Math.round(rlog.ltMax) : '') : 'not supported')
+  if (rlog.loafObserver) {
+    const top = Object.keys(rlog.loafScripts).sort((a, b) => rlog.loafScripts[b] - rlog.loafScripts[a]).slice(0, 3).map((k) => k + ' ' + Math.round(rlog.loafScripts[k]) + ' ms').join('; ')
+    line += ' | long animation frames: ' + rlog.loafN + (rlog.loafN ? ' totalling ' + Math.round(rlog.loafMs) + ' ms, worst ' + Math.round(rlog.loafMax) + ', style + layout ' + Math.round(rlog.loafStyleMs) + ' ms' + (top ? ', top scripts: ' + top : '') : '')
+  } else line += ' | long animation frames: not supported'
+  if (performance.memory) line += ' | JS heap ' + Math.round(performance.memory.usedJSHeapSize / 1048576) + ' of ' + Math.round(performance.memory.totalJSHeapSize / 1048576) + ' MB (approx), allocation ~' + f1(rlog.heapAllocBytes / 1048576 / secs) + ' MB/s, garbage-collection drops ' + rlog.gcEvents
+  line += ' | DOM nodes ' + document.getElementsByTagName('*').length + ', dev-panel value updates ' + rlog.panelUpdates + '/s | page ' + (document.hidden ? 'HIDDEN' : 'visible') + ', ' + (document.hasFocus() ? 'focused' : 'NOT focused') + (isPaused ? ', paused' : '')
+  appendRendererLogLine(t + line)
+  if (!rlog.handsSetupDone && hands.length) rendererLogSetupSystem(true)
 }
 function appendRendererLogLine(line) {
   if (logsPaused) return
@@ -6096,7 +6271,7 @@ function exportDebugLogs(btn) {
     ['mouseTracking', 'Mouse Tracking Log', true, mouseTrackingLogEntries],
     ['handBehaviour', 'Hand Behaviour Log', !!(cfg.logHandBehaviourEnabled || cfg.logHandBehaviourDetailedEnabled), handBehaviourLogEntries],
     ['frameRate', 'Frame Rate Log', !!(cfg.logFrameRateDropsEnabled || cfg.logFrameProfileEnabled), frameRateLogEntries],
-    ['renderer', 'Renderer Log', !!cfg.logRendererEnabled, rendererLogEntries],
+    ['renderer', 'Renderer Log', !!(cfg.logRendererEnabled || cfg.logFrameSectionsEnabled || cfg.logSystemEnabled), rendererLogEntries],
     ['loadingPreview', 'Loading Preview Log', true, loadingPreviewLogEntries],
     ['poseJumps', 'Pose Jump Log', !!cfg.logPoseJumpsEnabled, poseJumpLogEntries],
     ['renderReordering', 'Render Reordering Log', !!cfg.logRenderReorderEnabled, renderReorderLogEntries],
@@ -22282,7 +22457,7 @@ function animate(dt, now) {
     // the function, so it covers EVERYTHING this call does, not just the
     // 2 pieces already individually timed below.
     const __animateTotalStart = performance.now()
-    if (cfg.logRendererEnabled !== rlog.active) rendererLogSync()
+    if ((cfg.logRendererEnabled === true) !== rlog.r || (cfg.logFrameSectionsEnabled === true) !== rlog.f || (cfg.logSystemEnabled === true) !== rlog.s) rendererLogSync()
     if (rlog.active) rendererLogFrameStart(__animateTotalStart)
     // Frame Rate Drop Log (2026-09-29, see its DEV_GROUPS controls' own
     // comment for the full request). Measures REAL wall-clock time
@@ -22346,6 +22521,7 @@ function animate(dt, now) {
     // regardless of Global Pause, so the user can still look around while
     // paused.
     // Re-derive pan / zoom enabled from the Lock checkboxes and any active hold every frame, so a missed update (a restore that does not fire onChange, a reset during a hold) can never leave them stuck off.
+    const __s1 = rlsT()
     applyCameraLockState()
     controls.update()
     enforceCameraPanExtent()
@@ -22359,8 +22535,11 @@ function animate(dt, now) {
     cameraPreviews.forEach((pc) => pc.controls.update())
     syncCameraPreviewPanelFromLive()
     armLengthWidgetResyncs.forEach((fn) => fn())
+    let __s2 = rlsLap('camera / controls / panel sync', __s1)
     updateHandNumberLabels()
+    __s2 = rlsLap('hand number labels', __s2)
     updateSphereSequence()
+    rlsLap('sphere sequence', __s2)
     // Global Pause (Debug group, see setPaused()'s own declaration) --
     // skipping cursor-target tracking, the cursor-follow rotation step,
     // and updateRenderOrder() (which drives every Click Pose/Click-Hold-
@@ -22633,6 +22812,7 @@ function animate(dt, now) {
           hand.wrapper.quaternion.multiply(computeRollQuat(hand.currentPalmRollDeg, hand))
         })
         __frameProfiler.cursorTrackingMs += performance.now() - __cursorTrackingStart
+        if (rlog.secOn) rlsAdd('cursor tracking (arm / palm rotation)', performance.now() - __cursorTrackingStart)
       } else if (cfg.trackingEnabled) {
         // Static Pose On Startup, before the first click function: every hand stays at the default pose (wrapper rotation identity), and the damped tracking state is parked at neutral so that once tracking starts the
         // hands ease in from the default instead of snapping to the live target.
@@ -22659,6 +22839,7 @@ function animate(dt, now) {
       }
       checkStartupFloorHide()
       __frameProfiler.updateRenderOrderMs += performance.now() - __uroStart
+      if (rlog.secOn) rlsAdd('update render order (total, incl. field bounds)', performance.now() - __uroStart)
       if (cfg.logPoseJumpsEnabled) detectPoseJumps()
       else poseJumpLastCheckMs = 0
     }
@@ -22694,10 +22875,12 @@ function animate(dt, now) {
     if (__shouldRenderThisFrame) {
       if (isPaused) { lastPausedRenderMs = __nowForRender; sceneNeedsRedraw = false }
       const __renderStart = performance.now()
-      if (rlog.active) rendererLogBeforeRender()
+      if (rlog.r) rendererLogBeforeRender()
       composer.render()
-      if (rlog.active) rendererLogAfterRender(performance.now() - __renderStart)
+      if (rlog.r || rlog.secOn) { const __renderMs = performance.now() - __renderStart; if (rlog.r) rendererLogAfterRender(__renderMs); if (rlog.secOn) rlsAdd('render: composer.render()', __renderMs) }
+      const __prevT = rlsT()
       renderCameraPreviewViewports() // inside the same gate: while paused the canvas only changes when composer.render() runs, so previews must be drawn with it
+      rlsE('render: camera previews', __prevT)
       __frameProfiler.composerRenderMs += performance.now() - __renderStart
       window.__lastComposerMs = performance.now() - __renderStart
       fieldWarmLastRenderMs = window.__lastComposerMs
@@ -22714,6 +22897,7 @@ function animate(dt, now) {
     // (fps=4.2 with both of those reading normal) where the missing time
     // had to be somewhere this line now actually measures.
     __frameProfiler.animateTotalMs += performance.now() - __animateTotalStart
+    if (rlog.secOn) rlsFrameEnd(performance.now() - __animateTotalStart)
     updateFrameRateDisplay()
     if (DEBUG_TIMING && fieldStarted && (window.__postStartFrames = (window.__postStartFrames || 0) + 1) <= 8) logStartupTiming('post-start animate #' + window.__postStartFrames + ' total ' + Math.round(performance.now() - __animateTotalStart) + 'ms (composer ' + Math.round(window.__lastComposerMs || 0) + ')')
     {
@@ -22885,12 +23069,17 @@ window.addEventListener('focus', syncPauseWithVisibility)
 // compared to no smoothing at all, at fast/erratic cursor movement.
 const REORDER_SMOOTHING = 0.15
 function updateRenderOrder() {
+  let __u = rlsT()
   idleReposeFrameCounter++
   updateTrackingPoints(true) // before the on-screen flags: every hand-to-cursor measure below uses the tracking point
+  __u = rlsLap('uro: tracking points', __u)
   updateOnScreenFlags()
+  __u = rlsLap('uro: on-screen flags', __u)
   updateFingerCurlSkip()
+  __u = rlsLap('uro: finger-curl skip flags', __u)
   refreshTrackingDomains() // the tracking domains need this frame's on-screen flags
   updateScreenUnitsPerPx() // world units per screen pixel at the field plane, for the screen-space click-function distance
+  __u = rlsLap('uro: tracking domains / screen units', __u)
   // Everything an IDLE hand's finger curl depends on, as one string (2026-10-04): pose settings (finger,
   // wrist, model rotation) and the shared base orientation. The curl is independent of the wrapper's
   // rotation (the wrapper is excluded from the world->local axis conversion), so cursor tracking alone
@@ -22960,6 +23149,7 @@ function updateRenderOrder() {
   // the cursor this frame, so the curve's full 0-1 domain is always
   // spread across whatever hands are currently in the field, regardless
   // of how far the cursor wanders from it.
+  __u = rlsLap('uro: idle-repose signature / reorder flash fix', __u)
   let minLiveDist = Infinity, maxLiveDist = -Infinity
   const liveDistances = hands.map((hand) => {
     const d = handPoint(hand).distanceTo(cursorTarget)
@@ -22979,11 +23169,13 @@ function updateRenderOrder() {
   // once per frame, right alongside the values it mirrors.
   liveFieldMinDist = minLiveDist
   liveFieldDistRange = liveDistRange
+  __u = rlsLap('uro: live distances', __u)
   // Wrist Splay / Wrist Cropping each measure to the cursor at their own Cursor Target Depth (2026-10-11).
   updateTrackingTargets()
   updateTrackingPointMarkers()
   updateFieldCenterMarker()
   updateRenderOrderPointMarkers()
+  __u = rlsLap('uro: tracking targets / markers', __u)
   let spMin = Infinity, spMax = -Infinity, crMin = Infinity, crMax = -Infinity
   let spAMin = Infinity, spAMax = -Infinity, crAMin = Infinity, crAMax = -Infinity
   for (let ti = 0; ti < hands.length; ti++) {
@@ -23036,6 +23228,7 @@ function updateRenderOrder() {
   xyFieldMinDist = xyMin
   xyFieldDistRange = Math.max(xyMax - xyMin, 0.001)
   xyAllMinDist = xyAMin; xyAllDistRange = Math.max(xyAMax - xyAMin, 0.001)
+  __u = rlsLap('uro: field distance ranges', __u)
   const nowMs = nowVirtual() // virtual clock (see its own declaration) -- one shared timestamp for every hand's own Click-Hold-Pose/Click-Pose progress this frame, not a separate call per hand; only reached at all while !isPaused (animate()'s own gate), so this line simply never runs during a pause
   // effectiveRenderOrder (the 3D cursor distance with the optional overlap smoothing) feeds the XYZ cursor modes, so it is settled for every hand BEFORE the ranks are computed.
   for (let ri = 0; ri < hands.length; ri++) {
@@ -23043,8 +23236,9 @@ function updateRenderOrder() {
     rh.effectiveRenderOrder = (flashFixOn && rh.isOverlapping) ? rh.effectiveRenderOrder + (rlive - rh.effectiveRenderOrder) * REORDER_SMOOTHING : rlive
   }
   if (!loadingWarmMode) computeRenderOrderRanks()
+  __u = rlsLap('uro: render order ranks', __u)
   const warmReposeDeadline = loadingWarmMode ? performance.now() + 6 : 0 // 6 ms: the same slice the field build uses (a judgment call, not a measurement)
-  hands.forEach((hand, i) => {
+  const __perHand = (hand, i) => {
     if (loadingWarmMode && (hand.everReposed || performance.now() > warmReposeDeadline)) return
     const live = liveDistances[i]
     // Render order (2026-10-11): this hand's position in the per-frame sort (see computeRenderOrderRanks()).
@@ -23344,8 +23538,23 @@ function updateRenderOrder() {
       }
       hand._wasOverriddenLastFrame = overridden
     }
-  })
+  }
+  if (__u) {
+    // Log Frame Sections: time every hand's update separately so hands in view and hands outside every camera can be compared.
+    let tIn = 0, tOut = 0, nIn = 0, nOut = 0
+    for (let hi = 0; hi < hands.length; hi++) {
+      const h = hands[hi], t0 = performance.now()
+      __perHand(h, hi)
+      const d = performance.now() - t0
+      if (h._curlSkip) { tOut += d; nOut++ } else { tIn += d; nIn++ }
+    }
+    rlsAdd('uro: per-hand update, hands in view', tIn, nIn)
+    rlsAdd('uro: per-hand update, hands outside every camera', tOut, nOut)
+    __u = performance.now()
+  } else hands.forEach(__perHand)
   rvApplyDisplacement() // Responsive Velocity displacement, once every hand's pose is final
+  __u = rlsLap('uro: responsive velocity displacement', __u)
   updateSmallScaleModels()
+  rlsLap('uro: small scale models', __u)
 }
 animate()
