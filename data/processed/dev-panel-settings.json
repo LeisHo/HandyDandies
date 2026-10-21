@@ -36607,15 +36607,15 @@
           "group": "FLOWER"
         }
       ],
-      "cameraX": 4,
-      "cameraY": 2.87791997799628e-14,
-      "cameraZ": 469.9843574621996,
+      "cameraX": 3.7499999999999996,
+      "cameraY": 2.7523936810836762e-14,
+      "cameraZ": 449.48765636647585,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":-3.4222222222222225,\"cameraY\":1.7419533236278442e-13,\"cameraZ\":495.98765636647585,\"cameraFov\":20,\"cameraZoom\":496,\"cameraRoll\":0,\"targetX\":-3.4222222222222225,\"targetY\":1.4382409174393005e-13,\"targetZ\":-0.012343633524153574}",
-      "cameraZoom": 470,
+      "cameraDefaultPreset": "{\"cameraX\":3.7499999999999996,\"cameraY\":2.7523936810836762e-14,\"cameraZ\":449.48765636647585,\"cameraFov\":20,\"cameraZoom\":449.5,\"cameraRoll\":0,\"targetX\":3.7499999999999996,\"targetY\":0,\"targetZ\":-0.012343633524153574}",
+      "cameraZoom": 449.5,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -73278,7 +73278,18 @@
       "loadingPreviewTextColor": false,
       "loadingPreviewEasingCurveEnabled": true,
       "startupFnRetransitionDistCurve": false,
-      "startupFnRetransitionDistRange": false
+      "startupFnRetransitionDistRange": false,
+      "cameraPreviewEnabled": true,
+      "cameraPreviewX": true,
+      "cameraPreviewY": true,
+      "cameraPreviewZ": true,
+      "cameraPreviewFov": true,
+      "cameraPreviewZoom": true,
+      "lockCameraPreviewPan": true,
+      "lockCameraPreviewZoom": true,
+      "lockCameraPreviewRotate": true,
+      "cameraPreviewYaw": true,
+      "cameraPreviewPitch": true
     },
     "landscape": {}
   },
@@ -73305,7 +73316,7 @@
       "top": 105.89881134033203,
       "width": 365.13690185546875,
       "height": 534.0833129882812,
-      "collapsed": true
+      "collapsed": false
     }
   }
 }
