@@ -21692,7 +21692,7 @@
       "throttleOffScreenPose": false,
       "offScreenPoseEvery": 2,
       "fieldRows": 45,
-      "fieldCols": 35,
+      "fieldCols": 20,
       "rowSpacing": 7.5,
       "columnSpacing": 15,
       "handScale": 1,
@@ -21722,7 +21722,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-160}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-450,\"max\":-160}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -36614,14 +36614,14 @@
         }
       ],
       "cameraX": 3.7499999999999996,
-      "cameraY": 2.4309910872265077e-14,
-      "cameraZ": 396.9986294762832,
+      "cameraY": 8.662531901458323e-14,
+      "cameraZ": 1414.6864752405406,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":3.7499999999999996,\"cameraY\":3.490243377569957e-14,\"cameraZ\":569.9876563664759,\"cameraFov\":20,\"cameraZoom\":570,\"cameraRoll\":0,\"targetX\":3.7499999999999996,\"targetY\":0,\"targetZ\":-0.012343633524153574}",
-      "cameraZoom": 397.01097310980737,
+      "cameraZoom": 1414.6988188740647,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -65882,7 +65882,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -73347,7 +73347,7 @@
       "top": 206.94642639160156,
       "width": 253.8928680419922,
       "height": 440.8035888671875,
-      "collapsed": true
+      "collapsed": false
     }
   }
 }
