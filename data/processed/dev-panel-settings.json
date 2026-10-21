@@ -199,6 +199,7 @@
       ],
       "smallScaleModelsEnabled": true,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
+      "skipOffScreenFingerCurls": true,
       "skipOffScreenPoseWork": true,
       "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": true,
@@ -15126,7 +15127,7 @@
         }
       ],
       "cameraX": 1.9077061415860657,
-      "cameraY": 9.131840009205198e-13,
+      "cameraY": 9.3550318883498e-13,
       "cameraZ": 242.98502235780893,
       "cameraFov": 20,
       "cameraYaw": 0,
@@ -15542,7 +15543,6 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
@@ -15682,16 +15682,16 @@
       "cursorLogIntervalMs": 2000,
       "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
+      "logHandBehaviourEnabled": false,
       "logHandBehaviourDetailedEnabled": false,
-      "logFrameRateDropsEnabled": true,
+      "logFrameRateDropsEnabled": false,
       "frameRateDropThresholdFps": 10,
-      "logFrameProfileEnabled": true,
-      "logRendererEnabled": true,
-      "logFrameSectionsEnabled": true,
-      "logSystemEnabled": true,
-      "logHandBreakdownEnabled": true,
-      "logPoseJumpsEnabled": true,
+      "logFrameProfileEnabled": false,
+      "logRendererEnabled": false,
+      "logFrameSectionsEnabled": false,
+      "logSystemEnabled": false,
+      "logHandBreakdownEnabled": false,
+      "logPoseJumpsEnabled": false,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
@@ -21014,6 +21014,7 @@
       ],
       "smallScaleModelsEnabled": false,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
+      "skipOffScreenFingerCurls": true,
       "skipOffScreenPoseWork": true,
       "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": true,
@@ -36357,7 +36358,6 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
@@ -36497,16 +36497,16 @@
       "cursorLogIntervalMs": 2000,
       "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
+      "logHandBehaviourEnabled": false,
       "logHandBehaviourDetailedEnabled": false,
-      "logFrameRateDropsEnabled": true,
+      "logFrameRateDropsEnabled": false,
       "frameRateDropThresholdFps": 10,
-      "logFrameProfileEnabled": true,
-      "logRendererEnabled": true,
-      "logFrameSectionsEnabled": true,
-      "logSystemEnabled": true,
-      "logHandBreakdownEnabled": true,
-      "logPoseJumpsEnabled": true,
+      "logFrameProfileEnabled": false,
+      "logRendererEnabled": false,
+      "logFrameSectionsEnabled": false,
+      "logSystemEnabled": false,
+      "logHandBreakdownEnabled": false,
+      "logPoseJumpsEnabled": false,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
@@ -41829,6 +41829,7 @@
       ],
       "smallScaleModelsEnabled": false,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
+      "skipOffScreenFingerCurls": true,
       "skipOffScreenPoseWork": false,
       "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": false,
@@ -57172,7 +57173,6 @@
       "pixelRatio": 1.25,
       "resolutionScale": 100,
       "qualityPreset": "high",
-      "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
@@ -57312,16 +57312,16 @@
       "cursorLogIntervalMs": 2000,
       "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
-      "logHandBehaviourEnabled": true,
+      "logHandBehaviourEnabled": false,
       "logHandBehaviourDetailedEnabled": false,
-      "logFrameRateDropsEnabled": true,
+      "logFrameRateDropsEnabled": false,
       "frameRateDropThresholdFps": 10,
-      "logFrameProfileEnabled": true,
-      "logRendererEnabled": true,
-      "logFrameSectionsEnabled": true,
-      "logSystemEnabled": true,
-      "logHandBreakdownEnabled": true,
-      "logPoseJumpsEnabled": true,
+      "logFrameProfileEnabled": false,
+      "logRendererEnabled": false,
+      "logFrameSectionsEnabled": false,
+      "logSystemEnabled": false,
+      "logHandBreakdownEnabled": false,
+      "logPoseJumpsEnabled": false,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
@@ -62779,7 +62779,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -63986,40 +63986,66 @@
                 "key": "handModelId"
               },
               {
-                "type": "row",
-                "key": "skipOffScreenPoseWork"
-              },
-              {
-                "type": "row",
-                "key": "retainRotationArmWork"
-              },
-              {
-                "type": "row",
-                "key": "skipOffScreenSceneUpdate"
-              },
-              {
-                "type": "row",
-                "key": "skipOffScreenCursorTracking"
-              },
-              {
-                "type": "row",
-                "key": "renderOrderSkipOffScreen"
-              },
-              {
-                "type": "row",
-                "key": "throttleOffScreenPosition"
-              },
-              {
-                "type": "row",
-                "key": "offScreenPositionEvery"
-              },
-              {
-                "type": "row",
-                "key": "throttleOffScreenPose"
-              },
-              {
-                "type": "row",
-                "key": "offScreenPoseEvery"
+                "type": "group",
+                "group": {
+                  "key": "Off-Screen Hands",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "skipOffScreenFingerCurls"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skipOffScreenPoseWork"
+                    },
+                    {
+                      "type": "row",
+                      "key": "retainRotationArmWork"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skipOffScreenSceneUpdate"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skipOffScreenCursorTracking"
+                    },
+                    {
+                      "type": "row",
+                      "key": "renderOrderSkipOffScreen"
+                    },
+                    {
+                      "type": "row",
+                      "key": "throttleOffScreenPosition"
+                    },
+                    {
+                      "type": "row",
+                      "key": "offScreenPositionEvery"
+                    },
+                    {
+                      "type": "row",
+                      "key": "throttleOffScreenPose"
+                    },
+                    {
+                      "type": "row",
+                      "key": "offScreenPoseEvery"
+                    }
+                  ],
+                  "settings": [
+                    "skipOffScreenFingerCurls",
+                    "skipOffScreenPoseWork",
+                    "retainRotationArmWork",
+                    "skipOffScreenSceneUpdate",
+                    "skipOffScreenCursorTracking",
+                    "renderOrderSkipOffScreen",
+                    "throttleOffScreenPosition",
+                    "offScreenPositionEvery",
+                    "throttleOffScreenPose",
+                    "offScreenPoseEvery"
+                  ]
+                }
               }
             ],
             "settings": [
@@ -64044,16 +64070,7 @@
               "fieldBoundsYMax",
               "fieldBoundsZMin",
               "fieldBoundsZMax",
-              "handModelId",
-              "skipOffScreenPoseWork",
-              "retainRotationArmWork",
-              "skipOffScreenSceneUpdate",
-              "skipOffScreenCursorTracking",
-              "renderOrderSkipOffScreen",
-              "throttleOffScreenPosition",
-              "offScreenPositionEvery",
-              "throttleOffScreenPose",
-              "offScreenPoseEvery"
+              "handModelId"
             ]
           }
         },
@@ -65899,17 +65916,12 @@
               {
                 "type": "row",
                 "key": "qualityPreset"
-              },
-              {
-                "type": "row",
-                "key": "skipOffScreenFingerCurls"
               }
             ],
             "settings": [
               "pixelRatio",
               "resolutionScale",
-              "qualityPreset",
-              "skipOffScreenFingerCurls"
+              "qualityPreset"
             ]
           }
         },
@@ -71287,8 +71299,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 663.3500366210938,
-      "height": 576.1749877929688
+      "width": 666.5499877929688,
+      "height": 577.7750244140625
     },
     "mobile": {
       "left": 20,
