@@ -1392,14 +1392,14 @@ function advanceFieldWarmup() {
   }
   fieldWarmPrevRenderMs = fieldWarmLastRenderMs
   // The previous batch has been drawn once (its program, buffers and uniforms are on the GPU): hide it again so the next frames stay cheap. Everything is shown together at the end.
-  for (let i = fieldWarmPrevStart; i < fieldWarmRevealIndex; i++) hands[i]._warmHidden = true
+  for (let i = fieldWarmPrevStart; i < fieldWarmRevealIndex; i++) { hands[i]._warmHidden = true; if (hands[i].wrapper.parent) scene.remove(hands[i].wrapper) }
   fieldWarmPrevStart = fieldWarmRevealIndex
   const batch = capped ? hands.length : fieldWarmBatch // starts at 1: the first hand alone carries the one-time geometry upload
   let shown = 0
-  while (fieldWarmRevealIndex < hands.length && shown < batch) { hands[fieldWarmRevealIndex++]._warmHidden = false; shown++ }
+  while (fieldWarmRevealIndex < hands.length && shown < batch) { const wh = hands[fieldWarmRevealIndex++]; wh._warmHidden = false; if (!wh.wrapper.parent) scene.add(wh.wrapper); shown++ }
   updateHandsVisibility()
   if (fieldWarmRevealIndex >= hands.length) {
-    hands.forEach((h) => { h._warmHidden = false })
+    hands.forEach((h) => { h._warmHidden = false; if (!h.wrapper.parent) scene.add(h.wrapper) })
     fieldWarmStage = 3
     logStartupTiming('field warm-up finished (' + hands.length + ' hands shown over ' + Math.round(performance.now() - fieldWarmStartMs) + 'ms)' + (capped ? ' -- CAPPED' : ''))
     tryStartField()
@@ -2648,9 +2648,17 @@ const DEV_GROUPS = [
       { key: 'skipOffScreenCursorTracking', label: 'Skip Cursor Tracking For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
       // Render Order: Skip Hands Outside The Camera: the per-frame "new sequence" bookkeeping of the render order (flip locks) is not done for hands outside every camera. Off by default.
       { key: 'renderOrderSkipOffScreen', label: 'Render Order: Skip Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
-      // Throttle Click-Function Timelines For Hands Outside The Camera (2026-10-20, direct request): the ~1900 hands outside every camera on a big field still step every click function's timeline (phases, pose blending, offsets) every frame, ~13-15 us each (~28 ms of a 116 ms frame at 2475 hands). With this on, a hand outside the camera steps its timelines only every N-th frame (a different hand each frame, so the work is spread evenly). Measured 2026-10-21 (2475-hand field, five captures): N=2 is the setting to use. From N=3 a hand that comes into view is visibly out of step with its neighbours, because every phase boundary (the claim that starts a sequence, forward -> loop / pause, retransition start, ...) is stamped with the time of the step that noticed it, not the moment it happened, so each hand's timeline runs up to N-1 frames late, by a different amount per hand and a little more at every phase change. The extra saving beyond N=2 is small (the update call is ~8 us of an outside hand's ~16, so N=2 already takes ~4 of it). The timelines are time-based, so a hand steps further when it does run and ends up in the same place; a phase change (and a hand's position, which is only recomputed when it steps) can be up to N-1 frames late - a hand just about to enter the view can pop in up to N-1 frames late. Needs Skip Finger Curls For Off-Screen Hands on (it defines 'outside the camera'). Off by default.
-      { key: 'throttleOffScreenTimelines', label: 'Throttle Click-Function Timelines For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
-      { key: 'offScreenTimelineEvery', label: 'Outside Hands: Step Timelines Every N Frames (N)', type: 'slider', min: 2, max: 6, step: 1, def: 2, perDevice: true },
+      // Throttle Click-Function Positional Transposition / Pose Modification For Hands Outside The Camera (2026-10-21, direct request: split the earlier single 'throttle timelines' box in two). The click-function TIMELINES (phases, nominal clocks,
+      // accumulators, claims) now always step every frame, so a hand that comes into view is exactly in step with its neighbours (the earlier version stepped them every N-th frame and, from N=3, hands entering the view were visibly out of step:
+      // every phase boundary was stamped with the time of the step that noticed it). Only what a timeline WRITES to the hand is throttled, per hand outside every camera (a different hand each frame, so the work is spread evenly):
+      //  - Positional: the click function's Offset / Rotation / Offset To Camera and the pose-level Pose Offset. On a skipped frame the hand keeps last applied frame's position, and the click-function rotation (the change it made to the wrapper's
+      //    orientation, cached as a delta) is put back on top of the cursor-tracking orientation, so the hand does not flicker between rotated and unrotated.
+      //  - Pose: the base rotation, wrist bones and Pose Scale of the pose being applied. The pose values are still blended every frame (and kept as the hand's current pose, so an interruption continues from the right values).
+      // Both need Skip Finger Curls For Off-Screen Hands on (it defines 'outside the camera'). A hand in view is never throttled and gets a full apply the next frame. Off by default.
+      { key: 'throttleOffScreenPosition', label: 'Throttle Positional Transposition From Click Functions For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
+      { key: 'offScreenPositionEvery', label: 'Outside Hands: Apply Click-Function Position Every N Frames (N)', type: 'slider', min: 2, max: 6, step: 1, def: 2, perDevice: true },
+      { key: 'throttleOffScreenPose', label: 'Throttle Pose Modification From Click Functions For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
+      { key: 'offScreenPoseEvery', label: 'Outside Hands: Apply Click-Function Pose Every N Frames (N)', type: 'slider', min: 2, max: 6, step: 1, def: 2, perDevice: true },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => onFieldDimsChanged() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => onFieldDimsChanged() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -6406,19 +6414,20 @@ function rendererLogFlushFrame(t, f1) {
   const fr = Math.max(1, rlog.secFrames), totalAvg = rlog.secTotalMs / fr
   timing += ' | animate() work avg ' + f1(totalAvg) + ' ms over ' + rlog.secFrames + ' frames'
   appendRendererLogLine(t + timing)
-  let total = 0, shown = 0, skipped = 0, posed = 0, poseSkipped = 0, sceneOut = 0, tlSkipped = 0
+  let total = 0, shown = 0, skipped = 0, posed = 0, poseSkipped = 0, sceneOut = 0, posThrSkipped = 0, poseThrSkipped = 0
   const mats = new Set()
   for (let i = 0; i < hands.length; i++) {
     const h = hands[i]; total++
     if (h._poseSkip) poseSkipped++
     if (h._sceneOut) sceneOut++
-    if (h._tlSkip) tlSkipped++
+    if (h._posSkip) posThrSkipped++
+    if (h._poseThrSkip) poseThrSkipped++
     if (h.wrapper && h.wrapper.visible) shown++
     if (h._curlSkip) skipped++
     if (h._wasOverriddenLastFrame) posed++
     if (h.skinnedMesh) mats.add(h.skinnedMesh.material)
   }
-  appendRendererLogLine(t + 'hands -- ' + total + ' total, ' + shown + ' shown, ' + skipped + ' outside every camera (finger curl skipped), ' + poseSkipped + ' with pose work skipped, ' + sceneOut + ' removed from the scene, ' + tlSkipped + ' timeline steps skipped this frame, ' + posed + ' driven by a click function, ' + mats.size + ' distinct materials, Small Scale Models used by ' + (smallScaleActiveCount || 0) + ' hands')
+  appendRendererLogLine(t + 'hands -- ' + total + ' total, ' + shown + ' shown, ' + skipped + ' outside every camera (finger curl skipped), ' + poseSkipped + ' with pose work skipped, ' + sceneOut + ' removed from the scene, ' + posThrSkipped + ' with the click-function position held this frame, ' + poseThrSkipped + ' with the click-function pose held this frame, ' + posed + ' driven by a click function, ' + mats.size + ' distinct materials, Small Scale Models used by ' + (smallScaleActiveCount || 0) + ' hands')
   if (rlog.hb) {
     const part = (o, label) => {
       if (!o.n) return label + ': no hands'
@@ -13962,17 +13971,31 @@ function applyPoseOffsetToPosition(positionTarget, basePosition, cam, values, ha
     positionTarget.position.add(_poseLocalOffsetVec)
   }
 }
+// Throttle Positional Transposition (2026-10-21): true on a held frame of a hand outside the camera. Puts the cached click-function rotation back on the wrapper (once per frame) and tells the position code to leave the
+// wrapper's position exactly as the last full apply left it. Only inside the click-function update calls (hand._inTrigUpdate), only within N frames of that apply.
+function posThrottleHold(hand) {
+  if (hand._posSkip !== true || hand._inTrigUpdate !== true || !hand._posDeltaQ || idleReposeFrameCounter - hand._posDeltaFrame >= hand._posN) return false
+  if (hand._posReFrame !== idleReposeFrameCounter) {
+    hand._posReFrame = idleReposeFrameCounter
+    hand.wrapper.quaternion.multiply(hand._posDeltaQ)
+    if (hand._cfRot) hand._cfRotFrame = idleReposeFrameCounter // keeps clickRotatePointInto() following the (unchanged) click rotation
+  }
+  hand._posHeldFrame = idleReposeFrameCounter
+  return true
+}
 function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   if (!hand.skinnedMesh) return
   hand._idleCurlSig = null // fingers are about to be posed by something other than the idle path
   const poseSkipHere = hand._poseSkip === true // Skip Pose Work For Hands Outside The Camera (set per hand by updateRenderOrder())
-  if (!poseSkipHere || hand._poseRetain === true) {
+  const poseThr = hand._poseThrSkip === true && hand._inTrigUpdate === true && !!hand._lastPoseValues // Throttle Pose Modification From Click Functions: base rotation, wrist and scale are left as the last full apply set them
+  hand._poseThrApplied = poseThr
+  if (!poseThr && (!poseSkipHere || hand._poseRetain === true)) {
     hand.currentBaseQuat.copy(computeBaseQuatFromValues(poseValues))
     if (!hand.currentBaseRb) hand.currentBaseRb = new THREE.Quaternion()
     hand.currentBaseRb.copy(_poseBaseRb)
   }
   // Wrist BEFORE fingers -- see applyAllFingerPoses()'s own comment.
-  if (!poseSkipHere) applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, rvCurlValues(hand, poseValues), extraSplayDeg + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay (hand.currentSplayDeg below stays the plain value)
+  if (!poseSkipHere && !poseThr) applyWristPoseToSkeleton(hand.skinnedMesh.skeleton, rvCurlValues(hand, poseValues), extraSplayDeg + rvSplayOf(hand)) // + Responsive Velocity > Velocity Wrist Splay (hand.currentSplayDeg below stays the plain value)
   // CORRECTED 2026-09-27 -- direct report: releasing a Click-Hold, waiting
   // a moment, then clicking elsewhere made the wrist visibly SNAP instead
   // of transitioning smoothly. Root cause: `extraSplayDeg` (Responsive
@@ -14003,8 +14026,8 @@ function applyPoseValuesToHand(hand, poseValues, extraSplayDeg) {
   // is only absent before the very first relayoutField() call -- guarded
   // rather than assumed, since a pose could theoretically be applied a
   // single frame before the initial layout runs.
-  if (hand.basePosition) applyPoseOffsetToPosition(hand.wrapper, hand.basePosition, camera, poseValues)
-  hand.clone.scale.setScalar(computeBaseScale() * (poseValues.poseScale ?? 1))
+  if (hand.basePosition && !posThrottleHold(hand)) applyPoseOffsetToPosition(hand.wrapper, hand.basePosition, camera, poseValues)
+  if (!poseThr) hand.clone.scale.setScalar(computeBaseScale() * (poseValues.poseScale ?? 1))
   // The ONE place every trigger family (chp/rchp/dcHold/click/dblclick/rc)
   // funnels its own per-frame pose application through, regardless of
   // which phase/mode is driving it -- stashing the values here gives every
@@ -14434,6 +14457,11 @@ function normOffsetProgress(v) { return typeof v === 'number' ? { o: v, c: v, r:
 function applyOffsetRotationToHand(hand, p, progressIn) {
   const pr = normOffsetProgress(progressIn)
   const progress = pr.o // plain number for the startup-only curves below
+  if (posThrottleHold(hand)) { // Throttle Positional Transposition: a held frame -- only the progress record (bakeInFlightOffsetRotation() reads it) is kept current
+    if (!hand._lastOffsetRotationProgress) hand._lastOffsetRotationProgress = {}
+    hand._lastOffsetRotationProgress[p] = pr
+    return
+  }
   // Once per hand per frame (2026-10-15, direct report: "after i trigger it, the hands seem to jump to a new rotation then start their sequence"). Every active function applies its offset / rotation in the same pass,
   // and click rotations MULTIPLY onto the wrapper's orientation. On the frame a function commits, the function it interrupts can already have applied this frame (it comes earlier in the key order), and its in-flight
   // part has just been baked into the shared accumulators, so the committing function applied them a SECOND time on top: the hand showed its accumulated rotation twice for one frame (measured 84.6 deg, one frame, at the
@@ -14457,7 +14485,7 @@ function applyOffsetRotationToHand(hand, p, progressIn) {
   // own comment for the full account of the bug this closes).
   if (!hand._lastOffsetRotationProgress) hand._lastOffsetRotationProgress = {}
   hand._lastOffsetRotationProgress[p] = pr
-  if (p === STARTUP_FN && startupHandScaleActive(hand)) hand.clone.scale.multiplyScalar(startupHandScale(progress)) // Hand Scale Curve (applyPoseValuesToHand() has just set the plain scale this frame)
+  if (p === STARTUP_FN && startupHandScaleActive(hand) && !hand._poseThrApplied) hand.clone.scale.multiplyScalar(startupHandScale(progress)) // Hand Scale Curve (applyPoseValuesToHand() has just set the plain scale this frame)
   _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
   _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
   _offsetForwardVec.setFromMatrixColumn(camera.matrixWorld, 2)
@@ -14704,6 +14732,7 @@ function positionalProgressFor(p, poseProgress, st) {
   return cfg[`${q}RetransitionEasingCurveEnabled`] ? easingProfilePAt(getEasingProfile(q, CLICK_HOLD_KEYS.includes(q) && isSequenceOrChainMode(q), qTrig, true), st.posProg) : st.posProg
 }
 function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart, baseAccumStart, cursorAccumStart) {
+  if (posThrottleHold(hand)) return // Throttle Positional Transposition: a held frame (the decay is a function of progress, so the next full apply catches up exactly)
   const remaining = 1 - progress
   const decayedX = offsetAccumStart ? offsetAccumStart.x * remaining : 0
   const decayedY = offsetAccumStart ? offsetAccumStart.y * remaining : 0
@@ -22203,7 +22232,10 @@ async function rebuildFieldChunked() {
   hands.forEach((hand) => scene.remove(hand.wrapper))
   hands.length = 0
   // Behind the loading screen the hands are added HIDDEN and shown a few per frame (advanceFieldWarmup()) so the field's first draw is not one big frame.
-  pending.forEach((hand) => { if (!fieldStarted) hand._warmHidden = true; scene.add(hand.wrapper); hands.push(hand) })
+  // 2026-10-21 (direct report: the loading preview froze at ~50-65%): the warm-up hands used to be added to the scene here, just hidden -- but three.js still walks every child's matrices for them, so every
+  // preview frame paid a ~47 ms scene matrix update and a ~56-62 ms render for 2,475 invisible hands (measured, Renderer Log with Log Frame Sections). They now stay OUT of the scene until advanceFieldWarmup() attaches a batch.
+  const __warming = !fieldStarted && fieldWarmStage < 3
+  pending.forEach((hand) => { if (__warming) hand._warmHidden = true; else scene.add(hand.wrapper); hands.push(hand) })
   if (DEBUG_TIMING) logStartupTiming('field build tail: scene.add x' + pending.length + ' ' + Math.round(performance.now() - __ta) + 'ms')
   fieldBuildInProgress = false
   if (fieldStarted) finishRebuildField()
@@ -23858,14 +23890,20 @@ function updateRenderOrder() {
   const warmReposeDeadline = loadingWarmMode ? performance.now() + 6 : 0 // 6 ms: the same slice the field build uses (a judgment call, not a measurement)
   const __skipPose = cfg.skipOffScreenPoseWork === true && cfg.skipOffScreenFingerCurls !== false // hands outside every camera need Skip Finger Curls For Off-Screen Hands on (it defines "outside the camera")
   const __retainRot = cfg.retainRotationArmWork === true
-  const __thrN = cfg.throttleOffScreenTimelines === true && cfg.skipOffScreenFingerCurls !== false ? Math.max(2, Math.round(cfg.offScreenTimelineEvery || 3)) : 0 // Throttle Click-Function Timelines For Hands Outside The Camera
+  const __posN = cfg.throttleOffScreenPosition === true && cfg.skipOffScreenFingerCurls !== false ? Math.max(2, Math.round(cfg.offScreenPositionEvery || 2)) : 0 // Throttle Positional Transposition From Click Functions For Hands Outside The Camera
+  const __poseN = cfg.throttleOffScreenPose === true && cfg.skipOffScreenFingerCurls !== false ? Math.max(2, Math.round(cfg.offScreenPoseEvery || 2)) : 0 // Throttle Pose Modification From Click Functions For Hands Outside The Camera // Throttle Click-Function Timelines For Hands Outside The Camera
   const __hb = rlog.hb // Log Per-Hand Breakdown
   const __perHand = (hand, i) => {
     if (loadingWarmMode && (hand.everReposed || performance.now() > warmReposeDeadline)) return
     const live = liveDistances[i]
-    // a hand outside every camera steps its click-function timelines only every N-th frame, a different hand each frame (see the control's comment)
-    const timelineSkip = __thrN > 0 && hand._curlSkip === true && ((idleReposeFrameCounter + i) % __thrN) !== 0
-    hand._tlSkip = timelineSkip
+    // timelines always step; what they write to a hand outside every camera (position, pose) can be throttled to every N-th frame, a different hand each frame (see the controls' comment)
+    const __thr = hand._curlSkip === true
+    hand._posElig = __posN > 0 && __thr
+    hand._posN = __posN
+    hand._posSkip = hand._posElig && ((idleReposeFrameCounter + i) % __posN) !== 0
+    if (!hand._posElig) hand._posDeltaFrame = -1e9 // no cached click-function rotation to put back (see posThrottleHold())
+    hand._poseThrSkip = __poseN > 0 && __thr && ((idleReposeFrameCounter + i) % __poseN) !== 0
+    // (the timelines themselves always step)
     // Skip Pose Work For Hands Outside The Camera: hand._poseSkip / _poseRetain are read by applyPoseValuesToHand() (and below). The frame a skipped hand is no longer skipped (it came into view, or the box was
     // switched off) it gets a catch-up: a full idle repose with the splay snapping to its target (everReposed = false), the arm length snapping to its target, the finger curls recomputed.
     const poseSkip = __skipPose && hand._curlSkip === true
@@ -23932,9 +23970,10 @@ function updateRenderOrder() {
       const chpAll = getOrInitHandCHP(hand)
       let overridden = false
       const __hb1 = __hb ? performance.now() : 0
+      hand._inTrigUpdate = true; hand._poseThrApplied = false // the throttles below only apply inside the click-function update calls
       CLICK_HOLD_KEYS.forEach((p) => {
         if (clickHoldPoseTriggers[p].active || chpAll[p].phase !== 'idle' || chpAll[p].awaitClk) {
-          if (!timelineSkip) { updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs); if (__hb) rlog.hbCur.holdN++ }
+          { updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs); if (__hb) rlog.hbCur.holdN++ }
           overridden = true
         }
       })
@@ -23955,7 +23994,7 @@ function updateRenderOrder() {
         // be called every frame so that pending claim actually gets
         // checked/committed once its own delay elapses.
         if (cpAll[p].phase !== 'idle' || cpAll[p].pendingClaimAt || cpAll[p].awaitClk) {
-          if (!timelineSkip) { updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs); if (__hb) rlog.hbCur.poseN++ }
+          { updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs); if (__hb) rlog.hbCur.poseN++ }
           // Re-checked AFTER the call (not just the pre-call condition
           // above) -- a hand that was ONLY waiting on a pending claim,
           // still genuinely idle this exact frame, should still be
@@ -23966,6 +24005,13 @@ function updateRenderOrder() {
         }
       })
       if (__hb2) rlog.hbCur.pose = performance.now() - __hb2
+      hand._inTrigUpdate = false
+      if (hand._posElig && hand._orFrame === idleReposeFrameCounter && hand._posHeldFrame !== idleReposeFrameCounter) {
+        // a full positional apply happened this frame: remember the change it made to the wrapper's orientation (relative to the cursor-tracking orientation it started from) for the frames that are held
+        if (!hand._posDeltaQ) hand._posDeltaQ = new THREE.Quaternion()
+        hand._posDeltaQ.copy(hand._orQuat0).invert().multiply(hand.wrapper.quaternion)
+        hand._posDeltaFrame = idleReposeFrameCounter
+      }
       // PERFORMANCE (2026-09-15): this whole idle repose (wrist bone +
       // all 5 fingers, via rotateOnTrueWorldAxis()-style world-axis-
       // corrected bone math) is only actually necessary every frame when
