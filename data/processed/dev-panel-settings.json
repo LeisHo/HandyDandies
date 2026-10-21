@@ -207,7 +207,7 @@
       "throttleOffScreenPosition": false,
       "offScreenPositionEvery": 2,
       "throttleOffScreenPose": true,
-      "offScreenPoseEvery": 2,
+      "offScreenPoseEvery": 5,
       "fieldRows": 45,
       "fieldCols": 55,
       "rowSpacing": 8,
