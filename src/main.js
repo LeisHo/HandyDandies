@@ -480,7 +480,7 @@ let floorMesh = null // Floor group: one plane behind the hands
 // UI Buttons Tween (2026-10-20): the corner buttons (Pause, Reset, Color Presets) animate in when the loading screen is gone. Only the shared Animation Speed / Start Time / Easing / Retransition curve rows (prefix uiBtnFn)
 // are borrowed from the pose-kind click function factory; the runtime (startUiButtonsTween / updateUiButtonsTween) is its own and tiny.
 const UIBTN_FN = 'uiBtnFn'
-const uiBtn = { running: false, items: [] }
+const uiBtn = { running: false, items: [], waitStart: false } // waitStart: Run Starting State hid the buttons; they animate in once the starting sequences are done (see restartStartingState())
 const SPHERE_FN = 'sphereFn' // Field Grid Sphere Sequence: only the shared Speed / Easing / Start Time / Start Distance curve controls and their parsed caches are borrowed from the click functions
 let sphereStage = 2 // 0 = waiting for the first click (floor only, hands hidden), 1 = spheres running / shown, 2 = done or feature off
 let sphereMesh = null, sphereOn = null, sphereStart = null, sphereDur = null, sphereCap = null, sphereDone = null // sphereDone[i] = 1 once sphere i has reached its target scale and position (Wait For All Spheres)
@@ -4096,6 +4096,7 @@ const DEV_GROUPS = [
       // extra cost since these call sites are hand-picked already -- see
       // this control's own surrounding discussion) rather than a generic
       // description alone.
+      { key: 'logLoadingPreviewEnabled', label: 'Log Loading Preview', type: 'checkbox', def: true }, // off: no Loading Preview log lines and no per-frame fps bookkeeping for it (2026-10-21, direct request)
       { key: 'logHandBehaviourEnabled', label: 'Log Hand Behaviour', type: 'checkbox', def: false },
       // Added 2026-09-28, direct request: "on top of the regular Hand
       // Behaviour log, you will log every hand's pose details at the same
@@ -5126,6 +5127,12 @@ function uiBtnEnsureTrigger() {
 }
 // (Re)starts the animation: each button gets its place in the distance order (0 = closest to the cursor ... 1 = farthest of the buttons), its start time (Start Time Curve) and duration (Animation Speed Curve or the Duration
 // slider), and waits at the scale of progress 0 until its start time. Called when the loading screen goes away, by Run UI Buttons Tween, and by Run Starting State.
+// True when no starting sequence is left to play: the Field Grid Sphere Sequence is finished (or off) and Hand Offset On Startup has been fired and every visible hand has finished it (or the feature is off).
+function startingSequencesDone() {
+  if (sphereSeqActive()) return false
+  if (cfg.handOffsetOnStartupEnabled && (startupHandOffsetStage === 0 || startupHandPhaseUnfinished())) return false
+  return true
+}
 function startUiButtonsTween() {
   stopUiButtonsTween(true)
   if (!cfg.uiBtnTweenEnabled) return
@@ -5149,8 +5156,9 @@ function startUiButtonsTween() {
 }
 // Puts the buttons back to their normal scale. keepState = true when called from startUiButtonsTween() (it sets the state again right after).
 function stopUiButtonsTween(keepState) {
+  uiBtn.waitStart = false
   uiBtn.running = false
-  uiBtnElements().forEach((el) => { el.style.scale = '' })
+  uiBtnElements().forEach((el) => { el.style.scale = ''; el.style.visibility = '' })
   uiBtn.items = []
 }
 function onUiBtnTweenToggled() {
@@ -5306,7 +5314,12 @@ function restartStartingState() {
   startupStaticReleased = false
   onHandOffsetOnStartupToggled() // stage 0, startupFloorHidden off, per-hand startup flags cleared, offset displacement re-applied
   onSphereSeqToggled() // sphereStage back to 0 (or 2 when the sequence is off), spheres hidden, hands shown, offset re-applied
-  if (document.body.classList.contains('hd-revealed')) startUiButtonsTween() // plays the corner buttons' animation again
+  if (document.body.classList.contains('hd-revealed')) {
+    // 2026-10-21 (direct request): Run Starting State includes the buttons' tween. They become invisible, then animate in after the LAST starting sequence (sphere sequence, Hand Offset On Startup) has finished.
+    stopUiButtonsTween()
+    if (cfg.uiBtnTweenEnabled && !startingSequencesDone()) { uiBtn.waitStart = true; uiBtnElements().forEach((el) => { el.style.visibility = 'hidden' }) }
+    else startUiButtonsTween()
+  }
   updateFloor()
   sceneNeedsRedraw = true
 }
@@ -6583,7 +6596,7 @@ function exportDebugLogs(btn) {
     ['handBehaviour', 'Hand Behaviour Log', !!(cfg.logHandBehaviourEnabled || cfg.logHandBehaviourDetailedEnabled), handBehaviourLogEntries],
     ['frameRate', 'Frame Rate Log', !!(cfg.logFrameRateDropsEnabled || cfg.logFrameProfileEnabled), frameRateLogEntries],
     ['renderer', 'Renderer Log', !!(cfg.logRendererEnabled || cfg.logFrameSectionsEnabled || cfg.logSystemEnabled), rendererLogEntries],
-    ['loadingPreview', 'Loading Preview Log', true, loadingPreviewLogEntries],
+    ['loadingPreview', 'Loading Preview Log', cfg.logLoadingPreviewEnabled !== false, loadingPreviewLogEntries],
     ['poseJumps', 'Pose Jump Log', !!cfg.logPoseJumpsEnabled, poseJumpLogEntries],
     ['renderReordering', 'Render Reordering Log', !!cfg.logRenderReorderEnabled, renderReorderLogEntries],
     ['snapshot', 'Snapshot', !!snapshotText, snapshotText ? snapshotText.split('\n') : []]
@@ -6678,6 +6691,7 @@ function buildFrameRateLogWidget() {
 // most happen during startup, before a saved checkbox state would be restored.
 // Honors the shared Pause Logs toggle like the other 3 logs.
 function appendLoadingPreviewLogLine(line) {
+  if (cfg.logLoadingPreviewEnabled === false) return
   if (logsPaused) return
   loadingPreviewLogEntries.push(line)
   if (loadingPreviewLogEntries.length > LOADING_PREVIEW_LOG_MAX_ENTRIES) loadingPreviewLogEntries.shift()
@@ -6693,6 +6707,7 @@ function logLoadingPreview(text) {
 // Frame rate of the Loading Preview animation (2026-10-17, direct request): called after each rendered preview frame; once per `intervalMs` it logs the frames per second, the average frame time and the worst gap between two frames
 // in that window. The loading screen logs every second; the live preview (Show Loading Preview) every 5 s so it cannot push the startup lines out of the 300-line log. A window that spans a hidden tab shows a large worst gap.
 function lpNoteRenderedFrame(intervalMs) {
+  if (cfg.logLoadingPreviewEnabled === false) return
   const now = performance.now()
   if (lpFpsWindowStart === 0) { lpFpsWindowStart = now; lpFpsLastFrameAt = now; lpFpsFrames = 0; lpFpsWorstMs = 0; return }
   lpFpsFrames++
@@ -23198,6 +23213,7 @@ function animate(dt, now) {
     __s2 = rlsLap('hand number labels', __s2)
     updateSphereSequence()
     rlsLap('sphere sequence', __s2)
+    if (uiBtn.waitStart && startingSequencesDone()) { uiBtn.waitStart = false; startUiButtonsTween() } // Run Starting State: the starting sequences are over, the buttons animate in now
     updateUiButtonsTween()
     // Global Pause (Debug group, see setPaused()'s own declaration) --
     // skipping cursor-target tracking, the cursor-follow rotation step,

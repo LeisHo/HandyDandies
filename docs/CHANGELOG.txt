@@ -18436,3 +18436,10 @@ Direct request: On Click and On Release should only be available when the functi
   unchanged since the hand's last backfill (compared by length and last key; a function added or removed still triggers the full pass). NOT checked in a browser; node --check and tests/top-level-load-check.js pass.
   LEFT (measured, not done): the debug logs themselves cost ~8-10% while recording (Pose Jump Log alone 8.3%), so record without them for a true figure; a lookup table for evaluateArmLengthCurve (bezierSegmentY + cubicBezier1D ~0.7 s) and a cheaper cursorDistXY / refreshLiveDistanceState per hand (together ~2.2 s);
   applyCurlToSkeletonLocal 2,732 ms (7.7%) for hands in view.
+
+2026-10-21 -- Run Starting State includes the UI buttons' tween; Log Loading Preview checkbox (main.js?v=540)
+  RUN STARTING STATE (direct request): the corner buttons (Pause, Reset, Color Presets) become invisible (visibility:hidden), then run their UI Buttons Tween after the LAST starting sequence has finished. restartStartingState() used to start the tween at once, alongside the
+  sequences. Now, with UI Buttons Tween On/Off on, it stops the tween, hides the buttons and sets uiBtn.waitStart; animate() starts the tween (startUiButtonsTween() clears the hiding) as soon as startingSequencesDone() is true: the Field Grid Sphere Sequence is finished or off,
+  and Hand Offset On Startup is off, or has been fired and every visible hand has finished it. With no sequence on, the tween starts immediately (buttons at their tween's starting scale, as before). Static Pose On Startup is not counted as a sequence. The normal page load is unchanged:
+  the tween still starts at the reveal (finalizeReveal()). Turning UI Buttons Tween off, or pressing Run UI Buttons Tween, while waiting shows / starts them. Checked with node --check and tests/top-level-load-check.js; NOT checked in a browser.
+  LOG LOADING PREVIEW (Debug group, default on = unchanged): off, no Loading Preview log lines are written and the per-frame fps bookkeeping for it is skipped; the export lists the log as inactive.
