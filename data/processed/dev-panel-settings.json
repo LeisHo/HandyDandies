@@ -210,7 +210,7 @@
       "throttleOffScreenPose": true,
       "offScreenPoseEvery": 5,
       "fieldRows": 65,
-      "fieldCols": 100,
+      "fieldCols": 80,
       "rowSpacing": 8,
       "columnSpacing": 15,
       "handScale": 1,
@@ -65922,7 +65922,7 @@
                 "type": "group",
                 "group": {
                   "key": "Off-Screen Hands",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
