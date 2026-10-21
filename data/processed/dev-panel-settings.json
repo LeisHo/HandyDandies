@@ -14575,7 +14575,7 @@
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
-      "resolutionScale": 25,
+      "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
@@ -52097,7 +52097,7 @@
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
-      "resolutionScale": 25,
+      "resolutionScale": 100,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
@@ -56946,7 +56946,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
