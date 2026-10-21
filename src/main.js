@@ -15273,7 +15273,7 @@ function beginOnRelease(hand, chp, p, values, now) {
 // ---- Stage functions: On Click / On Release (2026-10-20) ----
 // Shadow pose-kind functions `${id}Clk` and `${id}Rel` of a custom click function. They have no Retransition, Start Time Curve or Start Distance Curve of their own: the main function's apply (Start Time / Start Distance
 // when they are armed, Retransition after On Release). Helpers are plain function declarations (hoisted) and use no module-level constants, so they are safe to call from anywhere.
-function stageParentOf(p) { const m = /^(custom\d+)(?:Clk|Rel)$/.exec(p); return m ? m[1] : null }
+function stageParentOf(p) { const m = /^(custom\d+(?:Trig\d+)?)(?:Clk|Rel)$/.exec(p); return m ? m[1] : null } // a custom function (customN) or one of its hold-kind Multi Triggers (customNTrigM)
 function isStagePrefix(p) { return stageParentOf(p) !== null }
 function triggerStateOf(p) { return clickHoldPoseTriggers[p] || clickPoseTriggers[p] }
 function onClickOn(p) { return cfg[`${p}ClkEnabled`] === true && !!clickPoseTriggers[`${p}Clk`] }
@@ -20123,6 +20123,9 @@ async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kin
   }
   const controls = buildMultiTriggerControlsForPrefix(prefix, title, kind)
   if (controlsHook) controlsHook(controls) // On Release (2026-10-17): lets its caller adjust this prefix's controls (labels, exclusion with the hold's own Retransition) before they are registered
+  // Hold-kind Multi Triggers carry On Click and On Release too (2026-10-20): Tween Stop and On Release switch each other off here as they do on the main function.
+  const stageCapable = kind === 'hold' && /^custom\d+Trig\d+$/.test(prefix)
+  if (stageCapable) { const tsCtrl = controls.find((c) => c.key === `${prefix}TweenStopEnabled`); if (tsCtrl) { const tsBase = tsCtrl.onChange; tsCtrl.onChange = (v) => { if (tsBase) tsBase(v); tweenStopReleaseExclusion(prefix, 'stop', v) } } }
   // seedFromId (2026-10-04, direct request "when i add a trigger in the multi
   // trigger group, the new trigger settings will be a duplicate of the
   // settings of the base click function"): only passed by a freshly ADDED
@@ -20132,7 +20135,11 @@ async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kin
   const seedFrom = seedFromId ? (c) => `${seedFromId}${c.key.slice(prefix.length)}` : undefined
   const g = renderDynamicGroup({ title, controls, seedFrom }) // seeds cfg regardless of DOM; returns null with no panel
   if (kind === 'hold') parseClickHoldConfig(prefix); else parseClickPoseConfig(prefix) // pure cfg read -- needed regardless of DOM for real dispatch to work
-  if (!g || !mtBody) return
+  if (!g || !mtBody) {
+    // no panel (a normal visitor): the trigger's On Click / On Release still have to exist as runtime functions
+    if (stageCapable) { const s = setupStageGroupsForTrigger(prefix, yielder, seedFromId); if (yielder) await s }
+    return
+  }
   if (yielder) await yielder()
   // CORRECTED before ever shipping (caught by re-reading createGroupElement()'s
   // own source, not live-caught): devPanel.js's createGroupElement() sets
@@ -20161,6 +20168,7 @@ async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kin
   updateSingleTimingGateVisibility(prefix)
   wrapClickFunctionGatedSubgroups(prefix)
   updateClickFunctionEnabledVisibility(prefix)
+  if (stageCapable) { const s = setupStageGroupsForTrigger(prefix, yielder, seedFromId); if (yielder) await s } // On Click + On Release groups inside this trigger (before the layout pass below places them)
   // Same reference row/group order every regular custom function gets
   // (item 4, 2026-09-28 direct request) -- applyCustomFunctionReferenceLayout()
   // silently skips any layout entry whose row/group doesn't exist for
@@ -20169,6 +20177,12 @@ async function registerMultiTriggerTrigger(prefix, title, mtBody, addBtnRow, kin
   // unconditionally with the matching 'hold'/'pose' layout every regular
   // custom function of that kind uses.
   applyCustomFunctionReferenceLayout(prefix, kind === 'hold' ? 'hold' : 'pose')
+}
+// On Click and On Release for a hold-kind Multi Trigger (2026-10-20, direct request): the same shadow functions the main function has, keyed by the trigger prefix (customNTrigM + Clk / Rel). A freshly added trigger copies the
+// base function's On Click / On Release settings like it copies everything else (seedBase = the base function id; a restored trigger passes none).
+async function setupStageGroupsForTrigger(prefix, yielder, seedBase) {
+  const a = setupOnReleaseGroupForFunction(prefix, yielder, seedBase ? `${seedBase}Rel` : undefined); if (yielder) await a
+  const b = setupOnClickGroupForFunction(prefix, yielder, seedBase ? `${seedBase}Clk` : undefined); if (yielder) await b
 }
 // Reads cfg[`${id}MultiTriggers`] (the persisted, ordered trigger list)
 // and rebuilds every trigger's own runtime state + (if a panel exists)
@@ -20217,13 +20231,13 @@ function gateGroupHeaderEl(g, enabledKey) {
   const t = header.querySelector(':scope > .dp-group-title-text')
   if (t) t.insertAdjacentElement('afterend', enabledRow)
 }
-async function setupOnReleaseGroupForFunction(id, yielder) {
+async function setupOnReleaseGroupForFunction(id, yielder, seedFromId) {
   const rel = `${id}Rel`
   const enabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
   const functionBody = enabledRow ? enabledRow.parentElement : null
   // A saved layout may already have made an empty ghost "On Release" group here (the same nested-dynamic-group risk the Multi Trigger wrapper clears).
   if (functionBody) functionBody.querySelectorAll(':scope > .dp-group[data-key="On Release"]').forEach((g) => g.remove())
-  const r = registerMultiTriggerTrigger(rel, 'On Release', functionBody, null, 'pose', undefined, yielder, onReleaseControlsHook(id))
+  const r = registerMultiTriggerTrigger(rel, 'On Release', functionBody, null, 'pose', seedFromId, yielder, onReleaseControlsHook(id))
   if (yielder) await r
   const g = functionBody ? functionBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${rel}"]`) : null
   if (g) {
@@ -20244,12 +20258,12 @@ function cleanupDeletedOnReleaseGroups(target) {
     try { syncValue(key, false) } catch (e) { /* no panel */ }
   })
 }
-async function setupOnClickGroupForFunction(id, yielder) {
+async function setupOnClickGroupForFunction(id, yielder, seedFromId) {
   const clk = `${id}Clk`
   const enabledRow = document.querySelector(`.dp-row[data-key="${id}Enabled"]`)
   const functionBody = enabledRow ? enabledRow.parentElement : null
   if (functionBody) functionBody.querySelectorAll(':scope > .dp-group[data-key="On Click"]').forEach((g) => g.remove()) // a saved layout may already have made an empty ghost one
-  const r = registerMultiTriggerTrigger(clk, 'On Click', functionBody, null, 'pose', undefined, yielder, stageControlsHook(id, 'Clk'))
+  const r = registerMultiTriggerTrigger(clk, 'On Click', functionBody, null, 'pose', seedFromId, yielder, stageControlsHook(id, 'Clk'))
   if (yielder) await r
   const g = functionBody ? functionBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${clk}"]`) : null
   if (g) {
@@ -20357,7 +20371,7 @@ function cleanupDeletedMultiTriggerGroups(target) {
     if (!Array.isArray(list)) list = []
     cfg[`${id}MultiTriggers`] = JSON.stringify(list.filter((t) => t && t.prefix && !gone.has(t.prefix)))
     try { syncValue(`${id}MultiTriggers`, cfg[`${id}MultiTriggers`]) } catch (e) { /* no panel */ }
-    gone.forEach(unregisterMultiTriggerRuntime)
+    gone.forEach((pf) => { unregisterMultiTriggerRuntime(pf); unregisterMultiTriggerRuntime(`${pf}Rel`); unregisterMultiTriggerRuntime(`${pf}Clk`) }) // and the trigger's On Release / On Click functions
     updateMultiTriggerGroupVisibility(id)
   })
   refreshCustomFunctionConflictWarnings()
@@ -20381,7 +20395,7 @@ async function reconcileMultiTriggers(id, wantJson) {
   cur.forEach((t) => {
     if (wantSet.has(t.prefix)) return
     if (mtBody) { const g = mtBody.querySelector(`:scope > .dp-group[data-multi-trigger-prefix="${t.prefix}"]`); if (g) g.remove() }
-    unregisterMultiTriggerRuntime(t.prefix)
+    unregisterMultiTriggerRuntime(t.prefix); unregisterMultiTriggerRuntime(`${t.prefix}Rel`); unregisterMultiTriggerRuntime(`${t.prefix}Clk`)
   })
   cfg[`${id}MultiTriggers`] = JSON.stringify(want)
   try { syncValue(`${id}MultiTriggers`, cfg[`${id}MultiTriggers`]) } catch (e) { /* no panel */ }
