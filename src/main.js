@@ -15900,6 +15900,13 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     }
   }
   if (chp.pendingClaimAt && p !== STARTUP_FN && handStartupLocked(hand)) chp.pendingClaimAt = 0 // never claims a hand that is still in its startup sequence
+  // 2026-10-21 (direct report: a 4th-click function froze the hands; the saved settings had a Click+Hold in Chain mode whose two chain slots were empty, with Retransition off). A hold with nothing to play used to claim every hand
+  // anyway: the phase went to 'forward', the 'nothing selected' guard below returned every frame without ever leaving it, and with Retransition off the release returned early too - so each hand stayed claimed for good,
+  // marked overridden every frame (no idle pose, no responsive splay) until another function took it. The click-kind functions already abandon such a hand; now the hold does not claim it in the first place.
+  if (chp.pendingClaimAt && now >= chp.pendingClaimAt && trig.playable === false) {
+    chp.pendingClaimAt = 0
+    if (!trig.playableWarned) { trig.playableWarned = true; console.warn('Click+Hold function ' + p + ' has nothing to play (empty Sequence / Chain, or a missing Target Pose) - it is ignored.') }
+  }
   if (chp.pendingClaimAt && now >= chp.pendingClaimAt) {
     // FIX 2026-10-04 (direct report: "when i interrupt a offset to camera
     // sequence, there are jumps. They jump back to their original position
@@ -16347,6 +16354,7 @@ function startClickHoldPose(p) {
   releaseStartupHold() // (startupBlocksClickFunctions() is true until every visible hand has finished its startup sequence, so this click is the one that starts cursor tracking)
   const trig = clickHoldPoseTriggers[p]
   trig.active = true
+  trig.playableWarned = false
   trig.holdStartTime = nowVirtual() // virtual clock (see its own declaration) so Global Pause doesn't shift this trigger's forward-phase elapsed time
   trig.forwardSnapshot = {}
   POSE_PRESET_KEYS.forEach((key) => { trig.forwardSnapshot[key] = cfg[key] })
@@ -16387,6 +16395,7 @@ function startClickHoldPose(p) {
     // of Loop's own discrete cycle stops), via resolveTweenSequencePoses()'s
     // own existing string-only mapping, unchanged.
     trig.loopPoses = namedPoses
+    trig.playable = namedPoses.length > 0 // a Sequence / Chain that resolves to no pose at all has nothing to play (see the commit gate in updateClickHoldPoseForHand())
     trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) * chainSequenceCount(p) / Math.max(namedPoses.length, 1), 1)
     // RAW entries (Hold objects intact, NOT run through
     // resolveTweenSequencePoses) -- feeds the one-time forward-pass
@@ -16412,6 +16421,7 @@ function startClickHoldPose(p) {
     trig.loopFwdW = tl.fwdW
     if (tl.ringW > 0) trig.loopSegmentMs = Math.max(safeTweenSpeedMs(cfg[`${p}TweenSpeedMs`]) * chainSequenceCount(p) / (tl.ringW - wrapK + 1), 1) // a normal transition's time: the closing segment is not counted as more than 1 here, so only it gets longer / shorter
   } else {
+    trig.playable = isNoPoseMode(p) || (cfg.savedPoses || []).some((sp) => sp.name === cfg[`${p}TargetPose`]) // Single Pose: the chosen pose must exist
     trig.loopPoses = null
     trig.rawChainEntries = null
     trig.loopRing = null
