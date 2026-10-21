@@ -33336,7 +33336,7 @@
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
-      "resolutionScale": 100,
+      "resolutionScale": 50,
       "qualityPreset": "high",
       "skipOffScreenFingerCurls": true,
       "staticPoseOnStartup": true,
@@ -56617,7 +56617,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -56850,7 +56850,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
