@@ -3049,7 +3049,7 @@ const DEV_GROUPS = [
       // (preserved-but-not-exposed) by applyLoadingPreviewOrbitFromSliders();
       // now a real, visible, directly-settable slider like the main
       // scene's own.
-      { key: 'loadingPreviewCameraFov', label: 'Loading Preview Camera FOV (Deg)', type: 'slider', min: 15, max: 90, step: 1, def: 35, onChange: (v) => { if (!loadingPreviewCamera) return; loadingPreviewCamera.fov = v; loadingPreviewCamera.updateProjectionMatrix() } },
+      { key: 'loadingPreviewCameraFov', label: 'Loading Preview Camera FOV (Deg)', type: 'slider', min: 15, max: 90, step: 1, def: 35, onChange: (v) => { if (!loadingPreviewCamera) return; if (lpRestoreSliderIgnored()) return; loadingPreviewCamera.fov = v; loadingPreviewCamera.updateProjectionMatrix() } },
       { key: 'loadingPreviewCameraZoom', label: 'Loading Preview Camera Zoom (Distance To Target) (x)', type: 'slider', min: 1, max: 300, step: 0.5, def: 55, onChange: (v) => applyLoadingPreviewOrbitFromSliders() },
       // 2026-10-17, direct request: a button that centres the preview hand(s) on screen by panning the Loading Preview camera in SCREEN space X / Y (see centerLoadingPreviewCameraOnHands()).
       // placeAfter puts it next to the Zoom slider, the last row of the saved "LOADING PREVIEW CAMERA" subgroup.
@@ -9970,7 +9970,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   resizeLoadingPreview()
   repositionLoadingPreview()
   setupLoadingPreviewOrbitControls()
-  logLoadingPreview(`build done in ${Math.round(performance.now() - lpBuildT0)}ms (hand scale x${loadingPreviewModelScale.toFixed(2)}; camera at ${loadingPreviewCamera.position.toArray().map((n) => n.toFixed(2)).join(', ')}; drawing buffer ${loadingPreviewCanvas.width}x${loadingPreviewCanvas.height}; background ${loadingPreviewScene.background ? '#' + loadingPreviewScene.background.getHexString() : 'transparent'})`)
+  logLoadingPreview(`build done in ${Math.round(performance.now() - lpBuildT0)}ms (hand scale x${loadingPreviewModelScale.toFixed(2)}; camera at ${loadingPreviewCamera.position.toArray().map((n) => n.toFixed(2)).join(', ')}, fov ${loadingPreviewCamera.fov}, aspect ${loadingPreviewCamera.aspect.toFixed(3)}, looking at ${loadingPreviewCameraTarget.toArray().map((n) => n.toFixed(2)).join(', ')}; device ${realDeviceClass()}; drawing buffer ${loadingPreviewCanvas.width}x${loadingPreviewCanvas.height}; background ${loadingPreviewScene.background ? '#' + loadingPreviewScene.background.getHexString() : 'transparent'})`)
 }
 // Applies one saved item from the Loading Preview's own local
 // `loadingPreviewSavedCameras` list directly to `loadingPreviewCamera` --
@@ -10137,8 +10137,19 @@ function syncLoadingPreviewOrbitControlsTarget() {
 // they stay usable with Edit Mode off, same click-to-type convention
 // every other slider in this panel has. FOV is separate (a direct
 // camera.fov set, no orbit math involved -- see its own onChange).
+// 2026-10-20 (direct report: "the loading preview camera is not showing right on Mobile ... the shown camera is not the same as the one used on startup"). The orbit / zoom / FOV sliders are READ-BACKS of the camera (see
+// deriveLoadingPreviewOrbitSliders) and are not per-device: syncValue() writes them into every device's slot, so the saved file carries whichever device's camera was derived last (Mobile's slots held Desktop's numbers
+// exactly). The boot-time settings restore fires each slider's onChange, which used to move a preview built earlier (from the startup cache) onto those numbers - over the camera preset chosen for THIS device - while a
+// rebuild (the Show Loading Preview checkbox) applied the preset only. The preset selector is the source of truth ("dropdown wins on every rebuild"), so during the boot restore the sliders are re-derived from the camera
+// instead of driving it. Undo / Use / Set Default (after startup) are unaffected.
+function lpRestoreSliderIgnored() {
+  if (startupSettingsReady || !isApplyingPanelState()) return false
+  deriveLoadingPreviewOrbitSliders()
+  return true
+}
 function applyLoadingPreviewOrbitFromSliders() {
   if (!loadingPreviewCamera) return
+  if (lpRestoreSliderIgnored()) return
   const origin = loadingPreviewOrbitOrigin()
   const target = origin.clone().add(new THREE.Vector3(cfg.loadingPreviewOffsetX || 0, cfg.loadingPreviewOffsetY || 0, cfg.loadingPreviewOffsetZ || 0))
   const distance = Math.max(cfg.loadingPreviewCameraZoom || 0, 1)
