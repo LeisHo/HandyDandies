@@ -15573,7 +15573,7 @@
       "startupFnOffsetProgressionCurveEnabled": false,
       "startupFnOffsetProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "FIST PALM + 60",
+      "startupFnTweenSelector": "FIST PALM + 30",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
@@ -21716,7 +21716,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-150}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-450,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -37049,7 +37049,7 @@
       "startupFnOffsetProgressionCurveEnabled": false,
       "startupFnOffsetProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "FIST PALM + 60",
+      "startupFnTweenSelector": "FIST PALM + 30",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
@@ -58525,7 +58525,7 @@
       "startupFnOffsetProgressionCurveEnabled": false,
       "startupFnOffsetProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnTargetPose": "",
-      "startupFnTweenSelector": "FIST PALM + 60",
+      "startupFnTweenSelector": "FIST PALM + 30",
       "startupFnReverseSequence": false,
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
@@ -67910,7 +67910,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -67929,7 +67929,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -67976,7 +67976,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -73302,9 +73302,9 @@
     },
     "mobile": {
       "left": 20,
-      "top": 82.82738494873047,
-      "width": 397.8571472167969,
-      "height": 479.2738037109375,
+      "top": 120.26786041259766,
+      "width": 415,
+      "height": 524.2261962890625,
       "collapsed": false
     }
   }
