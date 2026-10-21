@@ -14792,8 +14792,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":43,\"max\":96}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.32633568115444084,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27125923380862393,\"y\":0}}]",
+      "armLengthRange": "{\"min\":43,\"max\":86}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.6456318023351115,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27125923380862393,\"y\":0}}]",
       "armLengthDamping": 0.08,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -35607,8 +35607,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":43,\"max\":96}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.32633568115444084,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27125923380862393,\"y\":0}}]",
+      "armLengthRange": "{\"min\":43,\"max\":86}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.6456318023351115,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27125923380862393,\"y\":0}}]",
       "armLengthDamping": 0.24,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -56422,8 +56422,8 @@
       "cropWristEnabled": true,
       "hideWrist": 0,
       "reactiveArmLengthEnabled": true,
-      "armLengthRange": "{\"min\":43,\"max\":96}",
-      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.32633568115444084,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27125923380862393,\"y\":0}}]",
+      "armLengthRange": "{\"min\":43,\"max\":86}",
+      "armLengthCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.6456318023351115,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.27125923380862393,\"y\":0}}]",
       "armLengthDamping": 0.08,
       "armLengthUseDepth": false,
       "armLengthVisibleOnly": true,
@@ -64677,7 +64677,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -64878,7 +64878,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (4)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -71307,8 +71307,8 @@
     "mobile": {
       "left": 20,
       "top": 82.82738494873047,
-      "width": 391.5714416503906,
-      "height": 584.25
+      "width": 395,
+      "height": 35.52381134033203
     }
   }
 }
