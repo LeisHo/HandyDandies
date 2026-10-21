@@ -19763,9 +19763,9 @@
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
       "skipOffScreenPoseWork": true,
       "retainRotationArmWork": false,
-      "skipOffScreenSceneUpdate": false,
-      "skipOffScreenCursorTracking": false,
-      "renderOrderSkipOffScreen": false,
+      "skipOffScreenSceneUpdate": true,
+      "skipOffScreenCursorTracking": true,
+      "renderOrderSkipOffScreen": true,
       "fieldRows": 50,
       "fieldCols": 40,
       "rowSpacing": 8,
@@ -19797,7 +19797,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.25137871577513693,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-200}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-350,\"max\":-150}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -62161,7 +62161,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
