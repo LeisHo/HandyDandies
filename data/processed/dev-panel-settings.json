@@ -203,7 +203,7 @@
       "fieldCols": 35,
       "rowSpacing": 8,
       "columnSpacing": 13,
-      "handScale": 1,
+      "handScale": 0.6,
       "alternateRowOffset": 6.5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
