@@ -422,6 +422,7 @@ let lpHandoScaleCur = 0 // the selected two-hand sequence's HANDO world units pe
 // deliberately NOT included: they are not click-function settings, and the
 // frozen-at-trigger splay must stay on the same 3D value it blends against.
 let xyFieldMinDist = 0, xyFieldDistRange = 0.001
+let fbCacheB = null, fbCacheXn = null, fbCacheVals = null // applyFieldBounds(): per-hand limits (6 numbers each) and the distance fraction they were computed for
 let fieldBounds = null // { x:[min,max], y:[..], z:[..] } or null when no limit is active (Field Layout > Hand Position Min / Max)
 // Per cursor-tracking feature: the cursor target at THAT feature's own depth (2026-10-11), plus its field distance domain.
 const _trackTargetArm = new THREE.Vector3(), _trackTargetPalm = new THREE.Vector3(), _trackTargetSplay = new THREE.Vector3(), _trackTargetCrop = new THREE.Vector3()
@@ -13827,6 +13828,7 @@ function getOrInitHandCHP(hand) {
     hand._chp[p] = { phase: 'idle', forwardStartTime: 0, forwardSnapshot: null, tweenSegments: null, loopStartTime: 0, loopHoldEndTime: 0, loopDirection: 1, retransitionDelay: 0, retransitionStart: null, retransitionStartTime: 0, retransitionIsTween: false, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, armedForHoldStartTime: -1, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, releasePending: false, stoppingStartTime: 0, stoppingStartDelay: 0, stoppingDelayMs: 1, stoppingLastFrameTime: 0, stoppingBaseElapsedMs: 0, stoppingVirtualElapsedMs: 0, stoppingWasLooping: false, stoppingLoopBaseSegments: null, stoppingFreezeAtEnd: false, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1, fromSplayDeg: 0, pendingFromSplayDeg: 0, retransitionFromSplayDeg: 0 }
   })
   hand._chpKeyN = CLICK_HOLD_KEYS.length; hand._chpKeyLast = CLICK_HOLD_KEYS[CLICK_HOLD_KEYS.length - 1]
+  hand._chpArr = CLICK_HOLD_KEYS.map((p) => hand._chp[p]) // aligned with CLICK_HOLD_KEYS, for the per-frame loop in updateRenderOrder()
   return hand._chp
 }
 // Linearly interpolates every POSE_PRESET_KEYS value, INCLUDING
@@ -16817,6 +16819,7 @@ function getOrInitHandCP(hand) {
     hand._cp[p] = { phase: 'idle', triggerTime: 0, forwardSnapshot: null, tweenPoses: null, pauseStartTime: 0, retransitionStart: null, retransitionStartTime: 0, retransitionDelay: 0, retransitionSpeedMs: 0, lastAppliedValues: null, frozenSplayDeg: 0, pendingClaimAt: 0, pendingForwardSnapshot: null, pendingNamedPoses: null, pendingFrozenSplayDeg: 0, frozenSpeedMs: 0, pendingFrozenSpeedMs: 0, sequenceLapIndex: 1, sequenceLapStartTime: 0, sequenceHoldEndTime: 0, sequenceDirection: 1, offsetBaked: false, retransitionOffsetAccumStart: null, retransitionRotationAccumStart: null, pendingTweenFractionCap: 1, frozenTweenFractionCap: 1, fromSplayDeg: 0, pendingFromSplayDeg: 0, retransitionFromSplayDeg: 0 }
   })
   hand._cpKeyN = CLICK_POSE_KEYS.length; hand._cpKeyLast = CLICK_POSE_KEYS[CLICK_POSE_KEYS.length - 1]
+  hand._cpArr = CLICK_POSE_KEYS.map((p) => hand._cp[p]) // aligned with CLICK_POSE_KEYS, for the per-frame loop in updateRenderOrder()
   return hand._cp
 }
 // Right Click's own Sequence mode (cfg.rcMode === 'Sequence') shares this exact
@@ -21943,6 +21946,12 @@ function onFieldBoundsChanged() {
   relayoutField() // puts idle hands back on their grid position so widening a bound releases them
 }
 const _bndRight = new THREE.Vector3(), _bndUp = new THREE.Vector3(), _bndFwd = new THREE.Vector3(), _bndProj = new THREE.Vector3()
+function fbLim(curve, fallback, x) { return curve ? curve.lo + (curve.hi - curve.lo) * THREE.MathUtils.clamp(evaluateArmLengthCurve(curve.pts, x), 0, 1) : fallback }
+function fbAxisInto(o, xn, out, off) {
+  let lo = fbLim(o.minCurve, o.min, xn), hi = fbLim(o.maxCurve, o.max, xn)
+  if (lo > hi) { const t = lo; lo = hi; hi = t }
+  out[off] = lo; out[off + 1] = hi
+}
 function applyFieldBounds() {
   if (!fieldBounds) return
   const b = fieldBounds
@@ -21963,7 +21972,7 @@ function applyFieldBounds() {
     fbDistMin = mn === Infinity ? 0 : mn; fbDistRange = Math.max(mx - mn, 1e-6)
   }
   // The curve's Y (0..1) runs from the axis's Min number box value (0) to its Max number box value (1) (direct request 2026-10-13); with the curve off the limit is simply that box's own value.
-  const lim = (o, curve, fallback, x) => (curve ? curve.lo + (curve.hi - curve.lo) * THREE.MathUtils.clamp(evaluateArmLengthCurve(curve.pts, x), 0, 1) : fallback)
+  if (fbCacheB !== b || !fbCacheXn || fbCacheXn.length !== hands.length) { fbCacheB = b; fbCacheXn = new Float64Array(hands.length).fill(NaN); fbCacheVals = new Float64Array(hands.length * 6) }
   _bndRight.setFromMatrixColumn(camera.matrixWorld, 0)
   _bndUp.setFromMatrixColumn(camera.matrixWorld, 1)
   _bndFwd.setFromMatrixColumn(camera.matrixWorld, 2)
@@ -21971,11 +21980,14 @@ function applyFieldBounds() {
     const hand = hands[i]
     const p = hand.wrapper.position
     const xn = anyCurve ? (fbDist[i] - fbDistMin) / fbDistRange : 0
-    const bound = (o) => { let lo = lim(o, o.minCurve, o.min, xn), hi = lim(o, o.maxCurve, o.max, xn); if (lo > hi) { const t = lo; lo = hi; hi = t } return [lo, hi] }
-    const bx = bound(b.x), by = bound(b.y), bz = bound(b.z)
-    const cx = Math.min(Math.max(p.x, bx[0]), bx[1])
-    const cy = Math.min(Math.max(p.y, by[0]), by[1])
-    const cz = Math.min(Math.max(p.z, bz[0]), bz[1])
+    // 2026-10-21: the limits of a hand depend only on xn (its start distance from the camera as a fraction of the field's range, which only changes when the camera moves or the field is laid out again) and on the curves held in `b`
+    // (a new object on every parseFieldBounds()). They used to be recomputed for every hand every frame - up to six curve evaluations plus three small arrays and a closure per hand: 1,776 ms (5.1%) of a 34.7 s Chrome trace on 2,475 hands.
+    // Now a hand's six numbers are recomputed only when its xn changed.
+    const o6 = i * 6
+    if (fbCacheXn[i] !== xn) { fbCacheXn[i] = xn; fbAxisInto(b.x, xn, fbCacheVals, o6); fbAxisInto(b.y, xn, fbCacheVals, o6 + 2); fbAxisInto(b.z, xn, fbCacheVals, o6 + 4) }
+    const cx = Math.min(Math.max(p.x, fbCacheVals[o6]), fbCacheVals[o6 + 1])
+    const cy = Math.min(Math.max(p.y, fbCacheVals[o6 + 2]), fbCacheVals[o6 + 3])
+    const cz = Math.min(Math.max(p.z, fbCacheVals[o6 + 4]), fbCacheVals[o6 + 5])
     const ex = p.x - cx, ey = p.y - cy, ez = p.z - cz
     if (ex !== 0 || ey !== 0 || ez !== 0) {
       p.set(cx, cy, cz)
@@ -23938,6 +23950,7 @@ function updateRenderOrder() {
   const __retainRot = cfg.retainRotationArmWork === true
   const __posN = cfg.throttleOffScreenPosition === true && cfg.skipOffScreenFingerCurls !== false ? Math.max(2, Math.round(cfg.offScreenPositionEvery || 2)) : 0 // Throttle Positional Transposition From Click Functions For Hands Outside The Camera
   const __poseN = cfg.throttleOffScreenPose === true && cfg.skipOffScreenFingerCurls !== false ? Math.max(2, Math.round(cfg.offScreenPoseEvery || 2)) : 0 // Throttle Pose Modification From Click Functions For Hands Outside The Camera // Throttle Click-Function Timelines For Hands Outside The Camera
+  const __holdTrigs = CLICK_HOLD_KEYS.map((p) => clickHoldPoseTriggers[p]) // 2026-10-21: the two key loops below index arrays instead of looking the string key up in three big objects per hand per key (that closure was 2,193 ms self time, 6.3%, in a 34.7 s Chrome trace)
   const __hb = rlog.hb // Log Per-Hand Breakdown
   const __perHand = (hand, i) => {
     if (loadingWarmMode && (hand.everReposed || performance.now() > warmReposeDeadline)) return
@@ -24017,12 +24030,14 @@ function updateRenderOrder() {
       let overridden = false
       const __hb1 = __hb ? performance.now() : 0
       hand._inTrigUpdate = true; hand._poseThrApplied = false // the throttles below only apply inside the click-function update calls
-      CLICK_HOLD_KEYS.forEach((p) => {
-        if (clickHoldPoseTriggers[p].active || chpAll[p].phase !== 'idle' || chpAll[p].awaitClk) {
-          { updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs); if (__hb) rlog.hbCur.holdN++ }
+      const __chpArr = hand._chpArr
+      for (let k = 0, kn = CLICK_HOLD_KEYS.length; k < kn; k++) {
+        const st = __chpArr[k]
+        if (__holdTrigs[k].active || st.phase !== 'idle' || st.awaitClk) {
+          { updateClickHoldPoseForHand(hand, CLICK_HOLD_KEYS[k], live, minLiveDist, liveDistRange, nowMs); if (__hb) rlog.hbCur.holdN++ }
           overridden = true
         }
-      })
+      }
       if (__hb1) rlog.hbCur.hold = performance.now() - __hb1
       // Click Pose / Double-Click Pose -- same "only touch this hand
       // while it's genuinely mid-sequence" gating as Click Hold-Pose
@@ -24033,23 +24048,25 @@ function updateRenderOrder() {
       // write -- same disclosed simplification as the chp/rchp case.
       const cpAll = getOrInitHandCP(hand)
       const __hb2 = __hb ? performance.now() : 0
-      CLICK_POSE_KEYS.forEach((p) => {
+      const __cpArr = hand._cpArr
+      for (let k = 0, kn = CLICK_POSE_KEYS.length; k < kn; k++) {
+        const st = __cpArr[k]
         // `|| cpAll[p].pendingClaimAt` -- a hand can be 'idle' in phase
         // while still WAITING on a deferred claim (see
         // updateClickPoseForHand()'s own top comment); it still needs to
         // be called every frame so that pending claim actually gets
         // checked/committed once its own delay elapses.
-        if (cpAll[p].phase !== 'idle' || cpAll[p].pendingClaimAt || cpAll[p].awaitClk) {
-          { updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs); if (__hb) rlog.hbCur.poseN++ }
+        if (st.phase !== 'idle' || st.pendingClaimAt || st.awaitClk) {
+          { updateClickPoseForHand(hand, CLICK_POSE_KEYS[k], live, minLiveDist, liveDistRange, nowMs); if (__hb) rlog.hbCur.poseN++ }
           // Re-checked AFTER the call (not just the pre-call condition
           // above) -- a hand that was ONLY waiting on a pending claim,
           // still genuinely idle this exact frame, should still be
           // eligible for a normal idle repose below; only mark it
           // overridden once a claim actually commits (phase leaves
           // 'idle') or it was already active.
-          if (cpAll[p].phase !== 'idle') overridden = true
+          if (st.phase !== 'idle') overridden = true
         }
-      })
+      }
       if (__hb2) rlog.hbCur.pose = performance.now() - __hb2
       hand._inTrigUpdate = false
       if (hand._posElig && hand._orFrame === idleReposeFrameCounter && hand._posHeldFrame !== idleReposeFrameCounter) {
