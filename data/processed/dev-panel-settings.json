@@ -457,7 +457,7 @@
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
-      "loadingPreviewSpeedMs": 750,
+      "loadingPreviewSpeedMs": 1100,
       "loadingPreviewEasingCurveEnabled": false,
       "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4562103709998403,\"y\":0}}]",
       "loadingPreviewSpeedCurveEnabled": true,
@@ -14160,15 +14160,15 @@
           }
         }
       ],
-      "cameraX": 1.9077061415860712,
-      "cameraY": 3.3288511514455444e-13,
-      "cameraZ": 242.985022357809,
+      "cameraX": 1.9077061415860705,
+      "cameraY": 3.5520430305901453e-13,
+      "cameraZ": 242.98502235780893,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.041020698109996e-13,\"cameraZ\":245.9004898795015,\"cameraFov\":20,\"cameraZoom\":121.5,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 121.49999999999997,
+      "cameraZoom": 121.49999999999996,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -37979,7 +37979,7 @@
       "loadingPreviewAmbientIntensity": 0,
       "loadingPreviewAmbientSkyColor": "#ffffff",
       "loadingPreviewAmbientGroundColor": "#3a2f2a",
-      "loadingPreviewSpeedMs": 750,
+      "loadingPreviewSpeedMs": 1100,
       "loadingPreviewEasingCurveEnabled": false,
       "loadingPreviewEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4264163348796435,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4562103709998403,\"y\":0}}]",
       "loadingPreviewSpeedCurveEnabled": true,
@@ -56850,7 +56850,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -56946,7 +56946,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -56981,7 +56981,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -61551,7 +61551,7 @@
     "loadingPreviewSequenceMode": false,
     "loadingPreviewSequenceCountMode": true,
     "loadingPreviewSequenceCount": true,
-    "loadingPreviewSpeedMs": true,
+    "loadingPreviewSpeedMs": false,
     "loadingPreviewSize": true,
     "loadingPreviewSequenceHoldMs": false,
     "loadingPreviewSequenceLoopTransition": false,
@@ -62315,7 +62315,9 @@
     "loadingPreviewAmbientSkyColor": false,
     "loadingPreviewAmbientGroundColor": false,
     "loadingPreviewKeyLightType": false,
-    "loadingPreviewKeyDistance": false
+    "loadingPreviewKeyDistance": false,
+    "loadingPreviewSpeedCurveEnabled": false,
+    "loadingPreviewEndLoopWrapScale": false
   },
   "devIndependence": {
     "mobile": {
@@ -64682,8 +64684,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 580.1500244140625,
-      "height": 534.5750122070312
+      "width": 583.3500366210938,
+      "height": 536.1749877929688
     }
   }
 }
