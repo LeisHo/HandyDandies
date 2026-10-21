@@ -2646,8 +2646,8 @@ const DEV_GROUPS = [
       { key: 'skipOffScreenCursorTracking', label: 'Skip Cursor Tracking For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
       // Render Order: Skip Hands Outside The Camera: the per-frame "new sequence" bookkeeping of the render order (flip locks) is not done for hands outside every camera. Off by default.
       { key: 'renderOrderSkipOffScreen', label: 'Render Order: Skip Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
-      { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
-      { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
+      { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => onFieldDimsChanged() },
+      { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => onFieldDimsChanged() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
       { key: 'columnSpacing', label: 'Column Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 14, perDevice: true, onChange: () => relayoutField() },
       { key: 'handScale', label: 'Hand Scale (x)', type: 'slider', min: 0.1, max: 3, step: 0.05, def: 1.55, perDevice: true, onChange: () => relayoutField() },
@@ -21893,6 +21893,15 @@ function buildFieldBoundsWidgets() {
       wrapGatedSubgroup('fieldBounds' + A + M + 'CurveEnabled', ['fieldBounds' + A + M + 'Curve', 'fieldBounds' + A + M + 'CurveRange'], 'Hand Position ' + M + ' ' + A + ' Curve')
     })
   })
+}
+// Rows / Columns changed (2026-10-20, direct report: the dev panel's Reset button is very slow even when no setting changed). Reset re-applies every control, so Rows and then Columns each ran rebuildField() - destroying
+// and recreating EVERY hand (1,225 on Desktop) twice - even though the field was already exactly what the saved values describe. Now (1) while a whole state is being applied it runs once, after the last control (the same
+// deferral the click-function refreshes use), and (2) when the hand count already equals Rows x Columns nothing needs rebuilding: only the grid shape can have changed, and relayoutField() places the existing hands.
+// A real size change still rebuilds, exactly as before. The startup restore is unaffected (fieldBuildAllowed is still false then, so both paths return at once).
+function onFieldDimsChanged() {
+  if (deferWhileApplying('fieldDims', onFieldDimsChanged)) return
+  if (modelLoaded && fieldBuildAllowed && !fieldBuildInProgress && hands.length > 0 && hands.length === cfg.fieldRows * cfg.fieldCols) { relayoutField(); return }
+  rebuildField()
 }
 function relayoutField() {
   // 2026-10-04: nothing to lay out until the field exists (see rebuildField()).
