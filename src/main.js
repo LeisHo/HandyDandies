@@ -585,7 +585,8 @@ const rlog = {
   ltObserver: null, ltCount: 0, ltMs: 0, ltMax: 0,
   loafObserver: null, loafN: 0, loafMs: 0, loafMax: 0, loafStyleMs: 0, loafScripts: {},
   heapLast: 0, heapAllocBytes: 0, gcEvents: 0, panelUpdates: 0,
-  glOrig: null, glCalls: {}
+  glOrig: null, glCalls: {},
+  sceneManual: false, alloc: {}, lerpCalls: 0, heapPrev: 0
 }
 const RLOG_RING_MAX = 900 // frames kept by the Frame Sections recording (about 15 s at 60 fps; a judgment call)
 // Loading Preview Log (2026-10-04, direct request: "provide a loading preview
@@ -1699,8 +1700,10 @@ function roKnnPairs(n) {
 // trigger or retransition sequence" has a concrete meaning.
 function roUpdateSequences() {
   const hk = CLICK_HOLD_KEYS, pk = CLICK_POSE_KEYS
+  const skipOff = cfg.renderOrderSkipOffScreen === true // Render Order: Skip Hands Outside The Camera (their sequence number is refreshed the frame they are back in)
   for (let i = 0; i < hands.length; i++) {
     const h = hands[i]
+    if (skipOff && h._curlSkip === true) continue
     let sig = 0
     const cp = h._cp, chp = h._chp
     if (cp) for (let k = 0; k < pk.length; k++) {
@@ -2634,6 +2637,15 @@ const DEV_GROUPS = [
       // Rotation, scale), the click-function timelines keep running, and cursor tracking is untouched. The frame a hand comes back into view it gets a full catch-up (a full repose, the arm length snaps to its target). Off by default.
       { key: 'skipOffScreenPoseWork', label: 'Skip Pose Work For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
       { key: 'retainRotationArmWork', label: 'Retain Rotation And Arm Work', type: 'checkbox', def: false, perDevice: true },
+      // Remove Hands Outside The Camera From The Scene (2026-10-20, direct request): a hand outside every camera (the same test as Skip Finger Curls For Off-Screen Hands, which has to stay on) is taken out of the three.js scene after
+      // two frames outside, and put back the frame it is back inside, so the renderer neither updates the matrices of its ~26 bones nor walks them while drawing. Its position, pose and click-function timeline are still worked out in
+      // JS. Measure it with Log Frame Sections ("render: scene matrix update" and "render: composer.render()"). Off by default.
+      { key: 'skipOffScreenSceneUpdate', label: 'Remove Hands Outside The Camera From The Scene', type: 'checkbox', def: false, perDevice: true },
+      // Skip Cursor Tracking For Hands Outside The Camera: the arm / palm rotation toward the cursor is not worked out for a hand outside every camera (its wrapper rotation is reset to neutral so click-function rotation cannot pile up);
+      // the frame it comes back in, its damped arm / palm values snap to their targets instead of sliding from stale values. Needs Skip Finger Curls For Off-Screen Hands on. Off by default.
+      { key: 'skipOffScreenCursorTracking', label: 'Skip Cursor Tracking For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
+      // Render Order: Skip Hands Outside The Camera: the per-frame "new sequence" bookkeeping of the render order (flip locks) is not done for hands outside every camera. Off by default.
+      { key: 'renderOrderSkipOffScreen', label: 'Render Order: Skip Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => rebuildField() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => rebuildField() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -6072,6 +6084,7 @@ function rendererLogHookGl(on) {
 }
 function rendererLogResetWindow() {
   rlog.glCalls = {}
+  rlog.alloc = {}; rlog.lerpCalls = 0
   rlog.dts = []; rlog.over33 = 0; rlog.over100 = 0; rlog.gaps = 0
   rlog.renderFrames = 0; rlog.renderMs = 0; rlog.renderMaxMs = 0
   rlog.calls = 0; rlog.callsMax = 0; rlog.tris = 0; rlog.trisMax = 0; rlog.lines = 0; rlog.points = 0
@@ -6110,7 +6123,50 @@ function rendererLogStopObservers() {
   if (rlog.loafObserver) { try { rlog.loafObserver.disconnect() } catch (e) { /* ignore */ } rlog.loafObserver = null }
 }
 // ---- the section timer (Log Frame Sections). rlsT() is 0 while it is off, so every rlsE / rlsLap on that value is a no-op. ----
-function rlsT() { return rlog.secOn ? performance.now() : 0 }
+function rlsT() {
+  if (!rlog.secOn) return 0
+  if (performance.memory) rlog.heapPrev = performance.memory.usedJSHeapSize
+  return performance.now()
+}
+// Heap growth attribution (coarse: Chrome rounds performance.memory and a garbage collection can hide growth): rlsHeap() before a part, rlsAllocAdd(name, thatValue) after it; rlsLap() attributes the growth since the last lap.
+function rlsHeap() { return rlog.secOn && performance.memory ? performance.memory.usedJSHeapSize : 0 }
+function rlsAllocAdd(name, h0) {
+  if (!h0 || !performance.memory) return
+  const d = performance.memory.usedJSHeapSize - h0
+  if (d > 0) rlog.alloc[name] = (rlog.alloc[name] || 0) + d
+}
+// The scene-graph step of the frame (once, right before composer.render()). With Log Frame Sections on, three.js's own scene.updateMatrixWorld() is replaced by an identical call made here so it can be timed. With "Remove Hands Outside
+// The Camera From The Scene" on, a hand outside every camera for two frames in a row is taken out of the scene (three.js neither updates nor walks its bones) and put back as soon as it is inside again; its position and pose are JS values
+// and keep being worked out. (A matrixWorldAutoUpdate flag cannot do this: three.js still recurses into the children.) Only after the reveal, and only hands this function removed are ever put back.
+function updateSceneGraphForRender() {
+  const detach = cfg.skipOffScreenSceneUpdate === true && fieldRevealed
+  if (!detach) {
+    if (rlog.sceneDetached) {
+      rlog.sceneDetached = false
+      for (let i = 0; i < hands.length; i++) { const h = hands[i]; if (h._sceneOut) { h._sceneOut = false; if (!h.wrapper.parent) scene.add(h.wrapper) } }
+      sceneNeedsRedraw = true
+    }
+  } else {
+    rlog.sceneDetached = true
+    for (let i = 0; i < hands.length; i++) {
+      const h = hands[i]
+      h._offFrames = h._curlSkip === true ? (h._offFrames || 0) + 1 : 0
+      if (h._offFrames >= 2) {
+        if (!h._sceneOut && h.wrapper.parent === scene) { scene.remove(h.wrapper); h._sceneOut = true }
+      } else if (h._sceneOut) {
+        h._sceneOut = false
+        if (!h.wrapper.parent) scene.add(h.wrapper)
+      }
+    }
+  }
+  if (rlog.secOn) {
+    rlog.sceneManual = true
+    scene.matrixWorldAutoUpdate = false
+    const t0 = rlsT()
+    scene.updateMatrixWorld()
+    rlsE('render: scene matrix update', t0)
+  } else if (rlog.sceneManual) { rlog.sceneManual = false; scene.matrixWorldAutoUpdate = true }
+}
 function rlsAdd(name, ms, n) {
   let e = rlog.secs[name]
   if (!e) e = rlog.secs[name] = { ms: 0, n: 0, max: 0 }
@@ -6123,6 +6179,11 @@ function rlsLap(name, t0) {
   if (!t0) return 0
   const t = performance.now()
   rlsAdd(name, t - t0)
+  if (performance.memory) {
+    const h = performance.memory.usedJSHeapSize
+    if (rlog.heapPrev && h > rlog.heapPrev) rlog.alloc[name] = (rlog.alloc[name] || 0) + (h - rlog.heapPrev)
+    rlog.heapPrev = h
+  }
   return t
 }
 function rlsFrameEnd(totalMs) {
@@ -6334,17 +6395,18 @@ function rendererLogFlushFrame(t, f1) {
   const fr = Math.max(1, rlog.secFrames), totalAvg = rlog.secTotalMs / fr
   timing += ' | animate() work avg ' + f1(totalAvg) + ' ms over ' + rlog.secFrames + ' frames'
   appendRendererLogLine(t + timing)
-  let total = 0, shown = 0, skipped = 0, posed = 0, poseSkipped = 0
+  let total = 0, shown = 0, skipped = 0, posed = 0, poseSkipped = 0, sceneOut = 0
   const mats = new Set()
   for (let i = 0; i < hands.length; i++) {
     const h = hands[i]; total++
     if (h._poseSkip) poseSkipped++
+    if (h._sceneOut) sceneOut++
     if (h.wrapper && h.wrapper.visible) shown++
     if (h._curlSkip) skipped++
     if (h._wasOverriddenLastFrame) posed++
     if (h.skinnedMesh) mats.add(h.skinnedMesh.material)
   }
-  appendRendererLogLine(t + 'hands -- ' + total + ' total, ' + shown + ' shown, ' + skipped + ' outside every camera (finger curl skipped), ' + poseSkipped + ' with pose work skipped, ' + posed + ' driven by a click function, ' + mats.size + ' distinct materials, Small Scale Models used by ' + (smallScaleActiveCount || 0) + ' hands')
+  appendRendererLogLine(t + 'hands -- ' + total + ' total, ' + shown + ' shown, ' + skipped + ' outside every camera (finger curl skipped), ' + poseSkipped + ' with pose work skipped, ' + sceneOut + ' removed from the scene, ' + posed + ' driven by a click function, ' + mats.size + ' distinct materials, Small Scale Models used by ' + (smallScaleActiveCount || 0) + ' hands')
   const names = Object.keys(rlog.secs)
   const fmt = (name, base) => {
     const e = rlog.secs[name]
@@ -6358,6 +6420,12 @@ function rendererLogFlushFrame(t, f1) {
   const uroTotal = rlog.secs[uroKey] ? rlog.secs[uroKey].ms / fr : 0
   const uro = names.filter((k) => k.startsWith('uro: ')).sort((a, b) => rlog.secs[b].ms - rlog.secs[a].ms)
   if (uro.length) appendRendererLogLine(t + 'hand update breakdown (ms per frame, % of the hand update) -- ' + uro.slice(0, 12).map((k) => fmt(k, uroTotal)).join(' | '))
+  {
+    const al = Object.keys(rlog.alloc).filter((k) => rlog.alloc[k] > 0).sort((a, b) => rlog.alloc[b] - rlog.alloc[a])
+    const lf = rlog.lerpCalls / fr, nk = (typeof POSE_PRESET_KEYS !== 'undefined' ? POSE_PRESET_KEYS.length : 0)
+    appendRendererLogLine(t + 'allocation (heap growth around each part, MB per frame; coarse, a garbage collection hides some) -- ' + (al.length ? al.slice(0, 10).map((k) => k.replace(/^uro: /, '') + ' ' + (rlog.alloc[k] / fr / 1048576).toFixed(2)).join(' | ') : 'none measured') +
+      ' | pose-value blends ' + Math.round(lf) + '/frame, about ' + (lf * (nk * 8 + 64) / 1048576).toFixed(2) + ' MB/frame if each result holds ' + nk + ' numbers')
+  }
   if (rlog.worstSecs) {
     const w = Object.keys(rlog.worstSecs).sort((a, b) => rlog.worstSecs[b] - rlog.worstSecs[a]).slice(0, 6).map((k) => k.replace(/^uro: /, '') + ' ' + f1(rlog.worstSecs[k])).join(' | ')
     appendRendererLogLine(t + 'slowest frame this second -- animate() ' + f1(rlog.worstMs) + ' ms (interval ' + f1(rlog.worstDt) + ') at ' + rlog.worstAt + ' | biggest sections: ' + w + ' | last action: ' + rlog.worstAction)
@@ -13733,6 +13801,7 @@ function buildLerpPoseValuesFast() {
   }
 }
 function lerpPoseValues(a, b, t) {
+  if (rlog.secOn) rlog.lerpCalls++
   if (_lerpPoseValuesFast === null) _lerpPoseValuesFast = buildLerpPoseValuesFast()
   if (_lerpPoseValuesFast) return _lerpPoseValuesFast(a, b, t)
   const result = {}
@@ -23046,7 +23115,11 @@ function animate(dt, now) {
           ;[palmDistMinD, palmDistMaxD] = cfg.palmRotationVisibleOnly !== false ? onScreenMinMax(__palmDists) : [Math.min(...__palmDists), Math.max(...__palmDists)]
         }
         const __cursorTrackingStart = performance.now()
+        const __hT = rlsHeap()
+        const __skipTrack = cfg.skipOffScreenCursorTracking === true // Skip Cursor Tracking For Hands Outside The Camera
         hands.forEach((hand) => {
+          if (__skipTrack && hand._curlSkip === true) { hand._trackSkipped = true; hand.wrapper.quaternion.identity(); return } // neutral, not left over from last frame: a click function's rotation is multiplied onto it
+          if (hand._trackSkipped) { hand._trackSkipped = false; hand.currentArmRotationQuat = undefined; hand.currentPalmRollDeg = undefined; hand._handoffSettleFrames = 0 } // back in: the damped values snap to their targets
           _swingPivot.copy(hand._trk) // aim from the tracking point (the swing itself pivots on the cut point, see applyHandArmLength())
           if (armRotUseDepth) {
             _swingDir.subVectors(_trackTargetArm, _swingPivot)
@@ -23268,6 +23341,7 @@ function animate(dt, now) {
         })
         __frameProfiler.cursorTrackingMs += performance.now() - __cursorTrackingStart
         if (rlog.secOn) rlsAdd('cursor tracking (arm / palm rotation)', performance.now() - __cursorTrackingStart)
+        rlsAllocAdd('cursor tracking (arm / palm rotation)', __hT)
       } else if (cfg.trackingEnabled) {
         // Static Pose On Startup, before the first click function: every hand stays at the default pose (wrapper rotation identity), and the damped tracking state is parked at neutral so that once tracking starts the
         // hands ease in from the default instead of snapping to the live target.
@@ -23330,8 +23404,11 @@ function animate(dt, now) {
     if (__shouldRenderThisFrame) {
       if (isPaused) { lastPausedRenderMs = __nowForRender; sceneNeedsRedraw = false }
       const __renderStart = performance.now()
+      updateSceneGraphForRender()
+      const __hR = rlsHeap()
       if (rlog.r) rendererLogBeforeRender()
       composer.render()
+      rlsAllocAdd('render: composer.render()', __hR)
       if (rlog.r || rlog.secOn) { const __renderMs = performance.now() - __renderStart; if (rlog.r) rendererLogAfterRender(__renderMs); if (rlog.secOn) rlsAdd('render: composer.render()', __renderMs) }
       const __prevT = rlsT()
       renderCameraPreviewViewports() // inside the same gate: while paused the canvas only changes when composer.render() runs, so previews must be drawn with it
@@ -24016,6 +24093,7 @@ function updateRenderOrder() {
   if (__u) {
     // Log Frame Sections: time every hand's update separately so hands in view and hands outside every camera can be compared.
     let tIn = 0, tOut = 0, nIn = 0, nOut = 0
+    const __hP = rlsHeap()
     for (let hi = 0; hi < hands.length; hi++) {
       const h = hands[hi], t0 = performance.now()
       __perHand(h, hi)
@@ -24024,6 +24102,7 @@ function updateRenderOrder() {
     }
     rlsAdd('uro: per-hand update, hands in view', tIn, nIn)
     rlsAdd('uro: per-hand update, hands outside every camera', tOut, nOut)
+    rlsAllocAdd('uro: per-hand update (all hands)', __hP)
     __u = performance.now()
   } else hands.forEach(__perHand)
   rvApplyDisplacement() // Responsive Velocity displacement, once every hand's pose is final
