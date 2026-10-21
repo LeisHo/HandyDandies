@@ -36433,7 +36433,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveXOrigin": "Global Setting",
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3567004088400583,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":0}",
+      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":100}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
@@ -66101,7 +66101,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": true,
                         "items": [
                           {
@@ -71307,8 +71307,8 @@
     "mobile": {
       "left": 20,
       "top": 82.82738494873047,
-      "width": 393.8214416503906,
-      "height": 575.1190795898438
+      "width": 374.4285888671875,
+      "height": 576.6369018554688
     }
   }
 }
