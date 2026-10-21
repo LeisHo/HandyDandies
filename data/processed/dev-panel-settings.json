@@ -209,8 +209,8 @@
       "offScreenPositionEvery": 2,
       "throttleOffScreenPose": true,
       "offScreenPoseEvery": 5,
-      "fieldRows": 35,
-      "fieldCols": 45,
+      "fieldRows": 29,
+      "fieldCols": 35,
       "rowSpacing": 8,
       "columnSpacing": 15,
       "handScale": 1,
@@ -15132,14 +15132,14 @@
         }
       ],
       "cameraX": 3.6923076923076925,
-      "cameraY": 1.2923893488664274e-14,
-      "cameraZ": 335.46368781808087,
+      "cameraY": 2.5847786977328528e-14,
+      "cameraZ": 335.46368781808053,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":3.6923076923076925,\"cameraY\":1.2923893488664274e-14,\"cameraZ\":335.46368781808087,\"cameraFov\":20,\"cameraZoom\":211.06319793857938,\"cameraRoll\":0,\"targetX\":3.6923076923076925,\"targetY\":0,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 211.06319793857938,
+      "cameraZoom": 211.06319793857904,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -65690,7 +65690,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -65701,7 +65701,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -67519,7 +67519,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -67630,7 +67630,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -73323,8 +73323,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 765.75,
-      "height": 596.1749877929688,
+      "width": 768.9500122070312,
+      "height": 597.7750244140625,
       "collapsed": false
     },
     "mobile": {
