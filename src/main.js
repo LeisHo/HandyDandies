@@ -425,6 +425,7 @@ let xyFieldMinDist = 0, xyFieldDistRange = 0.001
 // Declared up here (not next to evaluateArmLengthCurve()): that function runs during the first build, before the later part of the file has executed (temporal dead zone).
 const curveLutCache = new WeakMap()
 const CURVE_LUT_SAMPLES = 4096, CURVE_LUT_AFTER = 24 // both judgment calls (not measured): 4096 samples keep the interpolation error ~3e-5 (p99, smooth curves; measured in a Node harness against the exact evaluator); 24 calls before building keeps a one-off evaluation of a fresh array cheap
+const cameraFrame = { svg: null, poly: null, cam: null, last: '', rowDone: false } // Show Frame: the red outline of the default camera's view, an SVG overlay (see updateCameraFrame())
 const trackFreezeEpoch = { arm: 0, palm: 0, crop: 0, splay: 0 } // Continually Recomputes (cursor-tracking curves): bumped when a box is changed, so hands capture their frozen curve value afresh
 let fbCacheB = null, fbCacheXn = null, fbCacheVals = null // applyFieldBounds(): per-hand limits (6 numbers each) and the distance fraction they were computed for
 let fieldBounds = null // { x:[min,max], y:[..], z:[..] } or null when no limit is active (Field Layout > Hand Position Min / Max)
@@ -3791,6 +3792,9 @@ const DEV_GROUPS = [
         captureCurrent: () => captureCameraPreset(),
         onUse: (item) => applyCameraPreset(item)
       },
+      // Show Frame (2026-10-21, direct request): a red outline of the rectangle the DEFAULT camera sees (on the field plane), drawn over whatever the live camera shows; the thickness slider is shown only while it is on.
+      { key: 'cameraShowFrame', label: 'Show Frame', type: 'checkbox', def: false, perDevice: true, placeAfter: 'savedCameras', onChange: () => updateCameraFrame() },
+      { key: 'cameraFrameThickness', label: 'Frame Line Thickness (Px)', type: 'slider', min: 1, max: 20, step: 0.5, def: 3, perDevice: true, placeAfter: 'cameraShowFrame', onChange: () => updateCameraFrame() },
       // 3 more direct requests, same message: lock pan/zoom independently,
       // and an optional bounded-camera mode built on top of the "Default"
       // button above (mirroring setSelectedPoseAsDefault()'s own pattern,
@@ -4381,6 +4385,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('placeSmallScaleModelRows', placeSmallScaleModelRows)
     prof('loadCameraDefaultFromCfg', loadCameraDefaultFromCfg)
     prof('reconcileCameraAfterRestore', reconcileCameraAfterRestore)
+    prof('updateCameraFrame', updateCameraFrame)
     try { const dr = document.querySelector('.dp-row[data-key="cameraDefaultPreset"]'); if (dr) dr.style.display = 'none' } catch (e) { /* no panel */ }
     prof('refreshItemSelectorMarks', refreshAllItemSelectorMarks)
     prof('syncHandModelWithSettings', syncHandModelWithSettings)
@@ -9460,6 +9465,75 @@ function applyCameraPreset(rawItem) {
   syncValue('cameraFov', camera.fov)
   syncValue('cameraZoom', camera.position.distanceTo(controls.target))
   syncCameraPanelFromLive() // yaw / pitch / roll follow the new view
+}
+// ---- Show Frame (2026-10-21, direct request) ----
+// The corners of the image the Default camera (cameraDefaultValues: position, target or Yaw / Pitch, Field Of View, Roll) would show, at the live aspect ratio, where its four corner rays meet the field plane (z = Field Offset Z, where the hands stand). If a ray does not reach that
+// plane (a camera looking along it or away from it) the rectangle is taken on the plane through the default target instead, so there is always a frame. Drawn as an SVG polygon over the canvas, projected through the LIVE camera every frame, so the line has an exact pixel
+// thickness and sits on top of the hands; it follows the live camera when you pan or zoom and coincides with the screen edge while the live camera IS the default one. A corner behind the live camera hides it for that frame.
+const _cfT = new THREE.Vector3(), _cfV = new THREE.Vector3(), _cfD = new THREE.Vector3(), _cfFwd = new THREE.Vector3(), _cfQ = new THREE.Quaternion(), _cfAxisZ = new THREE.Vector3(0, 0, 1)
+const _cfCorners = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()]
+const CF_SX = [-1, 1, 1, -1], CF_SY = [1, 1, -1, -1]
+function cameraFrameCorners() {
+  const v = cameraDefaultValues
+  const dc = cameraFrame.cam || (cameraFrame.cam = new THREE.PerspectiveCamera())
+  dc.fov = v.cameraFov; dc.aspect = camera.aspect; dc.near = 0.1; dc.far = 2000; dc.updateProjectionMatrix()
+  dc.position.set(v.cameraX, v.cameraY, v.cameraZ)
+  if (cameraDefaultTargetKnown) _cfT.set(v.targetX, v.targetY, v.targetZ)
+  else _cfT.copy(dc.position).addScaledVector(cameraDefaultDir || _cfFwd.set(0, 0, -1), Math.max(v.cameraZoom || 1, 1e-3))
+  dc.up.set(0, 1, 0); dc.lookAt(_cfT)
+  dc.quaternion.multiply(_cfQ.setFromAxisAngle(_cfAxisZ, THREE.MathUtils.degToRad(v.cameraRoll || 0)))
+  dc.updateMatrixWorld(true)
+  const planeZ = cfg.fieldOffsetZ || 0
+  let ok = true
+  for (let k = 0; k < 4 && ok; k++) {
+    _cfV.set(CF_SX[k], CF_SY[k], 0.5).unproject(dc)
+    _cfD.copy(_cfV).sub(dc.position)
+    const t = Math.abs(_cfD.z) > 1e-9 ? (planeZ - dc.position.z) / _cfD.z : -1
+    if (!(t > 0) || !isFinite(t)) ok = false
+    else _cfCorners[k].copy(dc.position).addScaledVector(_cfD, t)
+  }
+  if (!ok) {
+    dc.getWorldDirection(_cfFwd)
+    const dist = Math.max(v.cameraZoom || 1, 1e-3)
+    for (let k = 0; k < 4; k++) {
+      _cfV.set(CF_SX[k], CF_SY[k], 0.5).unproject(dc)
+      _cfD.copy(_cfV).sub(dc.position).normalize()
+      _cfCorners[k].copy(dc.position).addScaledVector(_cfD, dist / Math.max(_cfD.dot(_cfFwd), 1e-6))
+    }
+  }
+  return _cfCorners
+}
+function updateCameraFrame() {
+  const on = cfg.cameraShowFrame === true
+  if (!cameraFrame.rowDone || cameraFrame.rowOn !== on) { // the thickness slider only exists while the frame is on (looked up again only when the box changes or the row was not built yet)
+    const row = document.querySelector('.dp-row[data-key="cameraFrameThickness"]')
+    if (row) { row.style.display = on ? '' : 'none'; cameraFrame.rowDone = true; cameraFrame.rowOn = on }
+  }
+  if (!on) { if (cameraFrame.svg) cameraFrame.svg.style.display = 'none'; return }
+  if (!cameraFrame.svg) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    svg.id = 'cameraFrameOverlay'
+    svg.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:8000;overflow:hidden'
+    const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
+    poly.setAttribute('fill', 'none'); poly.setAttribute('stroke', '#ff0000'); poly.setAttribute('stroke-linejoin', 'miter')
+    svg.appendChild(poly)
+    document.body.appendChild(svg)
+    cameraFrame.svg = svg; cameraFrame.poly = poly
+  }
+  camera.updateMatrixWorld()
+  const corners = cameraFrameCorners()
+  const w = window.innerWidth, h = window.innerHeight
+  let pts = ''
+  for (let k = 0; k < 4; k++) {
+    _cfV.copy(corners[k]).applyMatrix4(camera.matrixWorldInverse)
+    if (_cfV.z >= -camera.near) { cameraFrame.svg.style.display = 'none'; return } // a corner is behind the live camera
+    _cfV.copy(corners[k]).project(camera)
+    pts += ((_cfV.x * 0.5 + 0.5) * w).toFixed(1) + ',' + ((-_cfV.y * 0.5 + 0.5) * h).toFixed(1) + ' '
+  }
+  const th = Math.max(cfg.cameraFrameThickness || 3, 0.5)
+  const key = pts + th
+  cameraFrame.svg.style.display = ''
+  if (key !== cameraFrame.last) { cameraFrame.last = key; cameraFrame.poly.setAttribute('points', pts); cameraFrame.poly.setAttribute('stroke-width', String(th)) }
 }
 function getSelectedSavedCameraItem() {
   const selectedRow = document.querySelector('.dp-row[data-key="savedCameras"] .dp-list-picker-row-selected')
@@ -23391,6 +23465,7 @@ function animate(dt, now) {
     applyCameraLockState()
     controls.update()
     enforceCameraPanExtent()
+    updateCameraFrame()
     syncCameraPanelFromLive()
     // Camera Preview panels: each one's own OrbitControls needs update() every frame too (keeps a damped glide alive, makes a locked
     // pan/zoom/rotate take effect), and the shared controls mirror the active panel -- all of it, like the main camera's, regardless of Global Pause.
