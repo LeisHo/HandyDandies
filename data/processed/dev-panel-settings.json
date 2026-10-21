@@ -202,7 +202,7 @@
       "skipOffScreenPoseWork": true,
       "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": true,
-      "skipOffScreenCursorTracking": true,
+      "skipOffScreenCursorTracking": false,
       "renderOrderSkipOffScreen": false,
       "fieldRows": 45,
       "fieldCols": 55,
