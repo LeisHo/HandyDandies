@@ -211,7 +211,7 @@
       "offScreenPositionEvery": 2,
       "throttleOffScreenPose": false,
       "offScreenPoseEvery": 2,
-      "fieldRows": 30,
+      "fieldRows": 28,
       "fieldCols": 27,
       "rowSpacing": 8,
       "columnSpacing": 15,
@@ -241,8 +241,8 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5312260086631311,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.20225734860456546,\"y\":-0.40604159037272136}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-160}",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5312260086631311,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.14555210124165918,\"y\":-0.8024897257486979}}]",
+      "fieldBoundsZMinCurveRange": "{\"min\":-450,\"max\":-250}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -43201,8 +43201,8 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5312260086631311,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.20225734860456546,\"y\":-0.40604159037272136}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-160}",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5312260086631311,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.14555210124165918,\"y\":-0.8024897257486979}}]",
+      "fieldBoundsZMinCurveRange": "{\"min\":-450,\"max\":-250}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -65037,7 +65037,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -65696,7 +65696,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -73343,10 +73343,10 @@
       "height": 533.7750244140625
     },
     "mobile": {
-      "left": 61.63095474243164,
-      "top": 195.89881896972656,
-      "width": 309.1309509277344,
-      "height": 465.1726379394531,
+      "left": 64.25595092773438,
+      "top": 168.08929443359375,
+      "width": 326.6488037109375,
+      "height": 471.2559509277344,
       "collapsed": false
     }
   }
