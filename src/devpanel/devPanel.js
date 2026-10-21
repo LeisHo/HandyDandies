@@ -3502,9 +3502,14 @@ async function fetchRemoteSettingsUntilSuccess(remoteSave, onSuccess) {
   }
 }
 
+// 2026-10-21 (direct report: collapse the Dev Panel, Save, refresh -> the panel came back expanded but cramped and empty-looking; collapsing and expanding it once fixed it). Cause: the collapsed state was never saved, and the saved
+// geometry was the COLLAPSED box (header height only), which the restore then applied to an expanded panel (clamped up to the 140 px floor). Now the geometry holds the EXPANDED height while collapsed (kept in
+// panel.dataset.expandedHeight by setPanelCollapsed) plus a `collapsed` flag, and applyPanelGeometry puts the panel back in that state.
 function getPanelGeometry(panel) {
   const r = panel.getBoundingClientRect()
-  return { left: r.left, top: r.top, width: r.width, height: r.height }
+  const collapsed = panel.classList.contains('dp-collapsed')
+  const eh = collapsed ? parseFloat(panel.dataset.expandedHeight) : NaN
+  return { left: r.left, top: r.top, width: r.width, height: eh > 0 ? eh : r.height, collapsed }
 }
 
 // Defensive clamp (2026-09-21, real production incident: "the dev panel
@@ -3525,7 +3530,7 @@ function getPanelGeometry(panel) {
 // left/top so at least a real, grabbable strip of the panel's own title
 // bar always stays on screen, regardless of what viewport the value was
 // originally saved from.
-function applyPanelGeometry(panel, geom) {
+function applyPanelGeometry(panel, geom, applyCollapse = false) { // applyCollapse: only the settings restore (resetSettings) puts the collapsed state back; Undo / Use leave it as the user has it
   if (!geom) return
   const vw = window.innerWidth || document.documentElement.clientWidth || 1024
   const vh = window.innerHeight || document.documentElement.clientHeight || 768
@@ -3534,12 +3539,15 @@ function applyPanelGeometry(panel, geom) {
   const height = Math.min(Math.max(geom.height || minH, minH), Math.max(vh - 20, minH))
   const left = Math.min(Math.max(geom.left ?? 0, visibleStripPx - width), vw - visibleStripPx)
   const top = Math.min(Math.max(geom.top ?? 0, 0), Math.max(vh - visibleStripPx, 0))
+  // A panel that is collapsed right now is expanded first, so the size below is set on the expanded panel and the collapse (below) remembers the right height. Geometry saved before the flag existed has no `collapsed`: left as is.
+  if (applyCollapse && geom.collapsed !== undefined && panel._setCollapsed) panel._setCollapsed(false)
   panel.style.right = 'auto'
   panel.style.left = left + 'px'
   panel.style.top = top + 'px'
   panel.style.width = width + 'px'
   panel.style.maxHeight = 'none' // see initResizeHandles' pointerdown for why
   panel.style.height = height + 'px'
+  if (applyCollapse && geom.collapsed && panel._setCollapsed) panel._setCollapsed(true)
 }
 
 export function initDevPanel(groups, opts = {}) {
@@ -4118,13 +4126,13 @@ export function initDevPanel(groups, opts = {}) {
         // Saved panel size/position for this device class (2026-10-04).
         const savedGeom = settings.panelGeometry && settings.panelGeometry[realDeviceClass()]
         if (savedGeom) {
-          applyPanelGeometry(panel, savedGeom)
+          applyPanelGeometry(panel, savedGeom, true)
           try { localStorage.setItem(currentGeomKey(), JSON.stringify(savedGeom)) } catch (err) { /* ignore */ }
         }
       })
       let remoteGeom = null
       try { remoteGeom = JSON.parse(localStorage.getItem(currentGeomKey())) } catch (err) { remoteGeom = null }
-      applyPanelGeometry(panel, remoteGeom)
+      applyPanelGeometry(panel, remoteGeom, true)
       return
     }
     let saved = null
@@ -4157,7 +4165,7 @@ export function initDevPanel(groups, opts = {}) {
     }
     let geom = null
     try { geom = JSON.parse(localStorage.getItem(currentGeomKey())) } catch (err) { geom = null }
-    applyPanelGeometry(panel, geom)
+    applyPanelGeometry(panel, geom, true)
   }
   // Shared by Copy Settings (clipboard export) and Named Setting States
   // below ([JS-13b]-equivalent port) -- both need the exact same "entire
@@ -4618,22 +4626,29 @@ export function initDevPanel(groups, opts = {}) {
   // values on expand.
   let heightBeforeCollapse = null
   let minHeightBeforeCollapse = null
-  collapseBtn.addEventListener('click', () => {
-    const collapsing = !panel.classList.contains('dp-collapsed')
-    panel.classList.toggle('dp-collapsed')
-    collapseBtn.textContent = panel.classList.contains('dp-collapsed') ? '+' : '–'
-    if (collapsing) {
+  // Collapse / expand in one place (2026-10-21): the button and the geometry restore (applyPanelGeometry, via panel._setCollapsed) both use it. The expanded height is remembered in panel.dataset.expandedHeight so a Save while
+  // collapsed stores the real panel size, not the header-high box.
+  function setPanelCollapsed(collapse) {
+    if (collapse === panel.classList.contains('dp-collapsed')) return
+    panel.classList.toggle('dp-collapsed', collapse)
+    collapseBtn.textContent = collapse ? '+' : '–'
+    if (collapse) {
       heightBeforeCollapse = panel.style.height
       minHeightBeforeCollapse = panel.style.minHeight
-      panel.style.height = header.offsetHeight + 'px'
-      panel.style.minHeight = header.offsetHeight + 'px'
+      panel.dataset.expandedHeight = String(panel.getBoundingClientRect().height) // measured before the box shrinks
+      const hh = header.offsetHeight || 44
+      panel.style.height = hh + 'px'
+      panel.style.minHeight = hh + 'px'
     } else {
       panel.style.height = heightBeforeCollapse
       panel.style.minHeight = minHeightBeforeCollapse
       heightBeforeCollapse = null
       minHeightBeforeCollapse = null
+      delete panel.dataset.expandedHeight
     }
-  })
+  }
+  panel._setCollapsed = setPanelCollapsed
+  collapseBtn.addEventListener('click', () => setPanelCollapsed(!panel.classList.contains('dp-collapsed')))
   window.addEventListener('keydown', (e) => {
     const tag = document.activeElement && document.activeElement.tagName
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
