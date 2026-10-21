@@ -19029,7 +19029,7 @@
       "loadingPreviewRealTimeLoading": true,
       "loadingPreviewModelId": "local:mvc1a66c",
       "loadingPreviewShowLive": true,
-      "loadingMinTimeMs": 0,
+      "loadingMinTimeMs": 3000,
       "loadingPreviewTweenSelector": "2 TWIDS",
       "loadingPreviewTwoHandTweens": [
         {
@@ -61536,7 +61536,7 @@
     "loadingPreviewShowLive": true,
     "loadingPreviewEnabled": false,
     "loadingPreviewCameraEditMode": true,
-    "loadingMinTimeMs": false,
+    "loadingMinTimeMs": true,
     "loadingPreviewRotationX": true,
     "loadingPreviewRotationY": true,
     "loadingPreviewRotationZ": true,
@@ -62317,7 +62317,8 @@
     "loadingPreviewKeyLightType": false,
     "loadingPreviewKeyDistance": false,
     "loadingPreviewSpeedCurveEnabled": false,
-    "loadingPreviewEndLoopWrapScale": false
+    "loadingPreviewEndLoopWrapScale": false,
+    "loadingPreviewSequenceLoopWrapScale": false
   },
   "devIndependence": {
     "mobile": {
