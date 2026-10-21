@@ -14606,7 +14606,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 3800,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.36208318074544266}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.611041768391927}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09088674713900793,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.33988114294774197,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":348}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -14623,7 +14623,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":756,\"max\":960}",
+      "startupFnSpeedCurveRange": "{\"min\":893,\"max\":1025}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -34140,7 +34140,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.36208318074544266}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.611041768391927}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09088674713900793,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.33988114294774197,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":348}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -34157,7 +34157,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":756,\"max\":960}",
+      "startupFnSpeedCurveRange": "{\"min\":893,\"max\":1025}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -53674,7 +53674,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 3800,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.36208318074544266}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.611041768391927}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.09088674713900793,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.33988114294774197,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":348}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -53691,7 +53691,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3975100633428528,\"y\":0.0054166158040364065}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.2893590448759581,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":756,\"max\":960}",
+      "startupFnSpeedCurveRange": "{\"min\":893,\"max\":1025}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveXOrigin": "Global Setting",
@@ -59189,7 +59189,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
@@ -59285,7 +59285,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": false,
             "items": [
               {
@@ -59320,7 +59320,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -59434,7 +59434,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (5)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -62373,7 +62373,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Distance Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -62487,7 +62487,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": false,
+            "collapsed": true,
             "locked": false,
             "items": [
               {
@@ -62627,7 +62627,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Sphere Radius Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
