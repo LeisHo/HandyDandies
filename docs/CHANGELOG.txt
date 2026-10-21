@@ -18443,3 +18443,8 @@ Direct request: On Click and On Release should only be available when the functi
   and Hand Offset On Startup is off, or has been fired and every visible hand has finished it. With no sequence on, the tween starts immediately (buttons at their tween's starting scale, as before). Static Pose On Startup is not counted as a sequence. The normal page load is unchanged:
   the tween still starts at the reveal (finalizeReveal()). Turning UI Buttons Tween off, or pressing Run UI Buttons Tween, while waiting shows / starts them. Checked with node --check and tests/top-level-load-check.js; NOT checked in a browser.
   LOG LOADING PREVIEW (Debug group, default on = unchanged): off, no Loading Preview log lines are written and the per-frame fps bookkeeping for it is skipped; the export lists the log as inactive.
+
+2026-10-21 -- Empty duplicate "Easing" subgroups removed (main.js?v=541)
+  Direct report: many empty Easing subgroups in the Loading Preview group. Cause: the saved layout (data/processed/dev-panel-settings.json) records three EMPTY "Easing" groups next to the real one under UI > Loading Preview; applyOrder() rebuilds each as a placeholder and the gated Easing subgroup only fills one.
+  New pruneDuplicateEmptyGroups() (run on restore, after renestRenderOrderRows()) removes any group with no row inside it when a sibling with the same key does hold rows. Empty groups with no filled twin are untouched. The next Save writes the cleaned layout (the saved file still lists the three copies until then,
+  and the prune runs again on every load meanwhile). Checked with node --check and tests/top-level-load-check.js; NOT checked in a browser.

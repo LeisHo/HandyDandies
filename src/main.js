@@ -2153,6 +2153,17 @@ function renestSubgroupRows(parentTitle, spec) {
   flat.forEach((row) => gb.appendChild(row))
   return gb
 }
+// 2026-10-21 (direct report: lots of empty "Easing" subgroups in the Loading Preview group). A saved order lists every subgroup it ever recorded, including empty ones; applyOrder() rebuilds each as a placeholder, but a gated subgroup
+// (wrapGatedSubgroup()) fills only one group of its title, so the copies stay empty (the saved layout had three empty "Easing" groups next to the real one under Loading Preview). Any group with no row anywhere inside it is removed when a
+// SIBLING with the same key does hold rows, i.e. it is a pure leftover copy. Empty groups with no filled twin (a group the user just created, a plain empty shell) are left alone. The next Save records the cleaned layout.
+function pruneDuplicateEmptyGroups() {
+  document.querySelectorAll('.dp-group-body').forEach((body) => {
+    const kids = Array.from(body.querySelectorAll(':scope > .dp-group'))
+    if (kids.length < 2) return
+    const filled = new Set(kids.filter((g) => g.querySelector('.dp-row')).map((g) => g.dataset.key))
+    kids.forEach((g) => { if (!g.querySelector('.dp-row') && filled.has(g.dataset.key)) g.remove() })
+  })
+}
 function renestRenderOrderRows() {
   // 2026-10-21: Skip Finger Curls For Off-Screen Hands used to live in Quality / Performance; a saved order still lists it there (the user's copy: the group saved as 'New Group (11)'). It is pulled into Field Layout
   // from exactly those two old homes (a row the user placed anywhere else is left alone), then every off-screen row is gathered into the 'Off-Screen Hands' subgroup.
@@ -4308,6 +4319,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     logStartupTiming('onRestore fired -> startupSettingsReady = true')
     // A saved panel order that predates the Render Order group puts its rows straight back into Field Layout when it is applied; re-nest them (idempotent, only moves the listed keys).
     try { renestRenderOrderRows() } catch (e) { /* panel not built */ }
+    try { pruneDuplicateEmptyGroups() } catch (e) { /* panel not built */ }
     try { migrateLegacyFieldBounds(); ;['X', 'Y', 'Z'].forEach((A) => { const r = document.querySelector('.dp-row[data-key="fieldBounds' + A + '"]'); if (r) r.style.display = 'none' }) } catch (e) { /* panel not built */ }
     try {
       // Default Floor Color = the Background Color (direct request): while Floor Color still holds its code default (white) and the restored Background Color is something else, start from the Background Color. Once a
