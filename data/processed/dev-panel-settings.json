@@ -14609,7 +14609,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 50,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.15032345019725493,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35331963958443846,\"y\":-0.6322917938232422}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":100}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":400}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -34145,7 +34145,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 5000,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.15032345019725493,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35331963958443846,\"y\":-0.6322917938232422}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":100}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":400}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -53681,7 +53681,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 50,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.15032345019725493,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35331963958443846,\"y\":-0.6322917938232422}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":100}",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":400}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -67106,7 +67106,7 @@
       "left": 41.75,
       "top": 82.82738494873047,
       "width": 352.6726379394531,
-      "height": 35.52381134033203
+      "height": 519.02978515625
     }
   }
 }
