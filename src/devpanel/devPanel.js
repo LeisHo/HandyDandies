@@ -2678,6 +2678,29 @@ function buildDevPanel(groupsEl) {
     if (seqRow && !document.getElementById('dpHotkeysListContainer')) {
       const listContainer = el('div', null, { id: 'dpHotkeysListContainer' })
       seqRow.insertAdjacentElement('afterend', listContainer)
+      // The panel's own built-in hotkeys (2026-10-20, direct request: "also show all the dev panel's own hotkeys"), a fixed read-only list under the hotkeys the user set. Static text that mirrors the key handlers in
+      // initDevPanel() (D / R, Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y, the search box's Enter, Esc, slider hotkey mode); when one of those handlers changes, change this list too.
+      const builtinBox = el('div', null, { id: 'dpBuiltinHotkeysContainer' })
+      builtinBox.style.cssText = 'margin-top:6px; padding-top:4px; border-top:1px solid rgba(255,255,255,0.12);'
+      const builtinTitle = el('div', null, { textContent: 'Built-in Hotkeys' })
+      builtinTitle.style.cssText = 'font-size:10px; color:#aaa; padding:0 0 2px 0;'
+      builtinBox.appendChild(builtinTitle)
+      ;[
+        ['D', 'Hide / show the dev panel'],
+        ['R', 'Reset to the last saved settings (off while a hotkey you set uses that letter)'],
+        ['Ctrl + Z', 'Undo'],
+        ['Ctrl + Shift + Z, Ctrl + Y', 'Redo'],
+        ['Enter / Shift + Enter', 'Next / previous match, in the search box'],
+        ['Esc', 'Cancel an edit in progress; leave slider hotkey mode'],
+        ['Up / Down', 'Slider hotkey mode: step the value up / down'],
+        ['+ / -', 'Slider hotkey mode: step size x10 / divided by 10']
+      ].forEach(([keys, what]) => {
+        const line = el('div', null, {})
+        line.style.cssText = 'display:flex; align-items:center; gap:6px;'
+        line.append(el('span', 'dp-hotkey-badge', { textContent: keys }), el('span', null, { textContent: what }))
+        builtinBox.appendChild(line)
+      })
+      listContainer.insertAdjacentElement('afterend', builtinBox)
     }
   }
   // Groups reorder among top-level siblings by default (target: groupsEl
