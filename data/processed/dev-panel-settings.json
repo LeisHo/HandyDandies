@@ -14604,7 +14604,7 @@
       "startupFnTweenSelector": "PALM FAN - FAST OPEN",
       "startupFnReverseSequence": true,
       "startupFnGlideToFirstPose": true,
-      "startupFnFirstGlideTimeScale": 1.35,
+      "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 3800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.13713482556494505,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":370}",
@@ -52126,7 +52126,7 @@
       "startupFnTweenSelector": "PALM FAN - FAST OPEN",
       "startupFnReverseSequence": true,
       "startupFnGlideToFirstPose": true,
-      "startupFnFirstGlideTimeScale": 1.35,
+      "startupFnFirstGlideTimeScale": 1,
       "startupFnTweenSpeedMs": 3800,
       "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.29914436960931434,\"y\":0.006354141235351607}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.13713482556494505,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":370}",
@@ -59720,7 +59720,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
