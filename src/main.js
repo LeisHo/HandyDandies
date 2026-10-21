@@ -586,7 +586,9 @@ const rlog = {
   loafObserver: null, loafN: 0, loafMs: 0, loafMax: 0, loafStyleMs: 0, loafScripts: {},
   heapLast: 0, heapAllocBytes: 0, gcEvents: 0, panelUpdates: 0,
   glOrig: null, glCalls: {},
-  sceneManual: false, alloc: {}, lerpCalls: 0, heapPrev: 0
+  sceneManual: false, alloc: {}, lerpCalls: 0, heapPrev: 0,
+  hb: false, hbWanted: false, hbCur: { arm: 0, hold: 0, holdN: 0, pose: 0, poseN: 0, idle: 0, idleN: 0 },
+  hbIn: { n: 0, total: 0, arm: 0, hold: 0, holdN: 0, pose: 0, poseN: 0, idle: 0, idleN: 0 }, hbOut: { n: 0, total: 0, arm: 0, hold: 0, holdN: 0, pose: 0, poseN: 0, idle: 0, idleN: 0 }
 }
 const RLOG_RING_MAX = 900 // frames kept by the Frame Sections recording (about 15 s at 60 fps; a judgment call)
 // Loading Preview Log (2026-10-04, direct request: "provide a loading preview
@@ -2646,6 +2648,9 @@ const DEV_GROUPS = [
       { key: 'skipOffScreenCursorTracking', label: 'Skip Cursor Tracking For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
       // Render Order: Skip Hands Outside The Camera: the per-frame "new sequence" bookkeeping of the render order (flip locks) is not done for hands outside every camera. Off by default.
       { key: 'renderOrderSkipOffScreen', label: 'Render Order: Skip Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
+      // Throttle Click-Function Timelines For Hands Outside The Camera (2026-10-20, direct request): the ~1900 hands outside every camera on a big field still step every click function's timeline (phases, pose blending, offsets) every frame, ~13-15 us each (~28 ms of a 116 ms frame at 2475 hands). With this on, a hand outside the camera steps its timelines only every N-th frame (a different hand each frame, so the work is spread evenly). The timelines are time-based, so a hand steps further when it does run and ends up in the same place; the cost is that a phase change (and a hand's position, which is only recomputed when it steps) can be up to N-1 frames late - a hand just about to enter the view can pop in up to N-1 frames late. Needs Skip Finger Curls For Off-Screen Hands on (it defines 'outside the camera'). Off by default.
+      { key: 'throttleOffScreenTimelines', label: 'Throttle Click-Function Timelines For Hands Outside The Camera', type: 'checkbox', def: false, perDevice: true },
+      { key: 'offScreenTimelineEvery', label: 'Outside Hands: Step Timelines Every N Frames (N)', type: 'slider', min: 2, max: 12, step: 1, def: 3, perDevice: true },
       { key: 'fieldRows', label: 'Rows (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 15, perDevice: true, onChange: () => onFieldDimsChanged() },
       { key: 'fieldCols', label: 'Columns (Count)', type: 'slider', min: 1, max: 40, step: 1, def: 17, perDevice: true, onChange: () => onFieldDimsChanged() },
       { key: 'rowSpacing', label: 'Row Spacing (World Units)', type: 'slider', min: 2, max: 40, step: 0.5, def: 9.5, perDevice: true, onChange: () => relayoutField() },
@@ -4117,6 +4122,8 @@ const DEV_GROUPS = [
       { key: 'logFrameSectionsEnabled', label: 'Log Frame Sections', type: 'checkbox', def: false },
       { key: 'logSystemEnabled', label: 'Log System', type: 'checkbox', def: false },
       { key: 'saveFrameRecordingBtn', label: 'Save Frame Recording', type: 'button', onClick: () => saveFrameRecording() },
+      // Log Per-Hand Breakdown (2026-10-20, direct request): with Log Frame Sections on as well, a FRAME line splits the per-hand update into its parts (arm length, click-function hold updates, click-function pose updates, idle repose, the rest), in microseconds per hand and calls per hand, for hands in view and hands outside every camera. Each hand's parts are timed separately, so the box adds a little cost of its own (about 8 clock reads per hand).
+      { key: 'logHandBreakdownEnabled', label: 'Log Per-Hand Breakdown (Needs Log Frame Sections)', type: 'checkbox', def: false },
       { key: 'clearFrameRateLogBtn', label: 'Clear Frame Rate Log', type: 'button', onClick: () => clearFrameRateLog() },
       // Pose Jump Log (2026-10-04): logs any frame where a hand's bone rotation or position
       // changes more than the thresholds below between two consecutive frames -- i.e. a pop, not
@@ -6031,12 +6038,14 @@ function appendFrameRateLogLine(line) {
 // Three checkboxes, one Renderer Log box (each line starts with RENDERER, FRAME or SYSTEM). RENDERER = the GPU and draw side; FRAME = the CPU time of each part of the frame, the frame intervals, the hands, the slowest
 // frame and a raw per-frame recording; SYSTEM = the browser and machine around the page. Everything costs nothing while its checkbox is off (one flag test per timed section).
 function rendererLogSync() {
-  const r = cfg.logRendererEnabled === true, f = cfg.logFrameSectionsEnabled === true, s = cfg.logSystemEnabled === true
-  if (r === rlog.r && f === rlog.f && s === rlog.s) return
+  const r = cfg.logRendererEnabled === true, f = cfg.logFrameSectionsEnabled === true, s = cfg.logSystemEnabled === true, hbW = cfg.logHandBreakdownEnabled === true
+  if (r === rlog.r && f === rlog.f && s === rlog.s && hbW === rlog.hbWanted) return
   const was = { r: rlog.r, f: rlog.f, s: rlog.s }
   rlog.r = r; rlog.f = f; rlog.s = s
   rlog.active = r || f || s
   rlog.secOn = f
+  rlog.hbWanted = hbW
+  rlog.hb = hbW && f // the per-hand breakdown rides on the section timer's timed per-hand loop
   rlog.lastAt = 0
   rendererLogResetWindow()
   if (r && !was.r) {
@@ -6082,7 +6091,9 @@ function rendererLogHookGl(on) {
     rlog.glOrig = null
   }
 }
+function hbBlank() { return { n: 0, total: 0, arm: 0, hold: 0, holdN: 0, pose: 0, poseN: 0, idle: 0, idleN: 0 } }
 function rendererLogResetWindow() {
+  rlog.hbIn = hbBlank(); rlog.hbOut = hbBlank()
   rlog.glCalls = {}
   rlog.alloc = {}; rlog.lerpCalls = 0
   rlog.dts = []; rlog.over33 = 0; rlog.over100 = 0; rlog.gaps = 0
@@ -6395,18 +6406,28 @@ function rendererLogFlushFrame(t, f1) {
   const fr = Math.max(1, rlog.secFrames), totalAvg = rlog.secTotalMs / fr
   timing += ' | animate() work avg ' + f1(totalAvg) + ' ms over ' + rlog.secFrames + ' frames'
   appendRendererLogLine(t + timing)
-  let total = 0, shown = 0, skipped = 0, posed = 0, poseSkipped = 0, sceneOut = 0
+  let total = 0, shown = 0, skipped = 0, posed = 0, poseSkipped = 0, sceneOut = 0, tlSkipped = 0
   const mats = new Set()
   for (let i = 0; i < hands.length; i++) {
     const h = hands[i]; total++
     if (h._poseSkip) poseSkipped++
     if (h._sceneOut) sceneOut++
+    if (h._tlSkip) tlSkipped++
     if (h.wrapper && h.wrapper.visible) shown++
     if (h._curlSkip) skipped++
     if (h._wasOverriddenLastFrame) posed++
     if (h.skinnedMesh) mats.add(h.skinnedMesh.material)
   }
-  appendRendererLogLine(t + 'hands -- ' + total + ' total, ' + shown + ' shown, ' + skipped + ' outside every camera (finger curl skipped), ' + poseSkipped + ' with pose work skipped, ' + sceneOut + ' removed from the scene, ' + posed + ' driven by a click function, ' + mats.size + ' distinct materials, Small Scale Models used by ' + (smallScaleActiveCount || 0) + ' hands')
+  appendRendererLogLine(t + 'hands -- ' + total + ' total, ' + shown + ' shown, ' + skipped + ' outside every camera (finger curl skipped), ' + poseSkipped + ' with pose work skipped, ' + sceneOut + ' removed from the scene, ' + tlSkipped + ' timeline steps skipped this frame, ' + posed + ' driven by a click function, ' + mats.size + ' distinct materials, Small Scale Models used by ' + (smallScaleActiveCount || 0) + ' hands')
+  if (rlog.hb) {
+    const part = (o, label) => {
+      if (!o.n) return label + ': no hands'
+      const per = (x) => (x / o.n).toFixed(1)
+      const rest = Math.max(0, o.total - o.arm - o.hold - o.pose - o.idle)
+      return label + ' (' + Math.round(o.n / fr) + ' hands per frame): ' + per(o.total) + ' us per hand = arm length ' + per(o.arm) + ' + click-function hold updates ' + per(o.hold) + ' [' + (o.holdN / o.n).toFixed(2) + ' calls per hand] + click-function pose updates ' + per(o.pose) + ' [' + (o.poseN / o.n).toFixed(2) + '] + idle repose ' + per(o.idle) + ' [' + (o.idleN / o.n).toFixed(2) + '] + the rest ' + per(rest)
+    }
+    appendRendererLogLine(t + 'per-hand breakdown (microseconds per hand) -- ' + part(rlog.hbIn, 'hands in view') + ' | ' + part(rlog.hbOut, 'hands outside every camera'))
+  }
   const names = Object.keys(rlog.secs)
   const fmt = (name, base) => {
     const e = rlog.secs[name]
@@ -23044,7 +23065,7 @@ function animate(dt, now) {
     // the function, so it covers EVERYTHING this call does, not just the
     // 2 pieces already individually timed below.
     const __animateTotalStart = performance.now()
-    if ((cfg.logRendererEnabled === true) !== rlog.r || (cfg.logFrameSectionsEnabled === true) !== rlog.f || (cfg.logSystemEnabled === true) !== rlog.s) rendererLogSync()
+    if ((cfg.logRendererEnabled === true) !== rlog.r || (cfg.logFrameSectionsEnabled === true) !== rlog.f || (cfg.logSystemEnabled === true) !== rlog.s || (cfg.logHandBreakdownEnabled === true) !== rlog.hbWanted) rendererLogSync()
     if (rlog.active) rendererLogFrameStart(__animateTotalStart)
     // Frame Rate Drop Log (2026-09-29, see its DEV_GROUPS controls' own
     // comment for the full request). Measures REAL wall-clock time
@@ -23837,9 +23858,14 @@ function updateRenderOrder() {
   const warmReposeDeadline = loadingWarmMode ? performance.now() + 6 : 0 // 6 ms: the same slice the field build uses (a judgment call, not a measurement)
   const __skipPose = cfg.skipOffScreenPoseWork === true && cfg.skipOffScreenFingerCurls !== false // hands outside every camera need Skip Finger Curls For Off-Screen Hands on (it defines "outside the camera")
   const __retainRot = cfg.retainRotationArmWork === true
+  const __thrN = cfg.throttleOffScreenTimelines === true && cfg.skipOffScreenFingerCurls !== false ? Math.max(2, Math.round(cfg.offScreenTimelineEvery || 3)) : 0 // Throttle Click-Function Timelines For Hands Outside The Camera
+  const __hb = rlog.hb // Log Per-Hand Breakdown
   const __perHand = (hand, i) => {
     if (loadingWarmMode && (hand.everReposed || performance.now() > warmReposeDeadline)) return
     const live = liveDistances[i]
+    // a hand outside every camera steps its click-function timelines only every N-th frame, a different hand each frame (see the control's comment)
+    const timelineSkip = __thrN > 0 && hand._curlSkip === true && ((idleReposeFrameCounter + i) % __thrN) !== 0
+    hand._tlSkip = timelineSkip
     // Skip Pose Work For Hands Outside The Camera: hand._poseSkip / _poseRetain are read by applyPoseValuesToHand() (and below). The frame a skipped hand is no longer skipped (it came into view, or the box was
     // switched off) it gets a catch-up: a full idle repose with the splay snapping to its target (everReposed = false), the arm length snapping to its target, the finger curls recomputed.
     const poseSkip = __skipPose && hand._curlSkip === true
@@ -23876,6 +23902,7 @@ function updateRenderOrder() {
     // mirrors applyHandArmLength()'s own existing "no prior value yet"
     // fallback, so a hand's very first frame still applies its target
     // instantly rather than lerping from nothing.
+    const __hb0 = __hb ? performance.now() : 0
     if (!poseSkip || __retainRot) {
     const targetArmLengthT0 = cfg.armLengthUseDepth === false
       ? computeArmLengthT(hand, hand._trkXY ?? handXYDist(hand), cfg.armLengthVisibleOnly !== false ? trkXYFieldMin : trkXYAllMin, cfg.armLengthVisibleOnly !== false ? trkXYFieldRange : trkXYAllRange) // Wrist Cropping Use Cursor Target Depth off: screen-space XY only
@@ -23888,6 +23915,7 @@ function updateRenderOrder() {
       : targetArmLengthT
     if (hand.skinnedMesh) applyHandArmLength(hand, hand.currentArmLengthT)
     }
+    if (__hb0) rlog.hbCur.arm = performance.now() - __hb0
     // Click-Hold Pose takes over BOTH finger curls and wrist pose for
     // this hand whenever either trigger is globally active OR this hand
     // is still finishing its own retransition after release (checking
@@ -23903,12 +23931,14 @@ function updateRenderOrder() {
     if (hand.skinnedMesh) {
       const chpAll = getOrInitHandCHP(hand)
       let overridden = false
+      const __hb1 = __hb ? performance.now() : 0
       CLICK_HOLD_KEYS.forEach((p) => {
         if (clickHoldPoseTriggers[p].active || chpAll[p].phase !== 'idle' || chpAll[p].awaitClk) {
-          updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs)
+          if (!timelineSkip) { updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs); if (__hb) rlog.hbCur.holdN++ }
           overridden = true
         }
       })
+      if (__hb1) rlog.hbCur.hold = performance.now() - __hb1
       // Click Pose / Double-Click Pose -- same "only touch this hand
       // while it's genuinely mid-sequence" gating as Click Hold-Pose
       // above, checked separately since these 2 features track separate
@@ -23917,6 +23947,7 @@ function updateRenderOrder() {
       // families at once, whichever runs last here wins that frame's
       // write -- same disclosed simplification as the chp/rchp case.
       const cpAll = getOrInitHandCP(hand)
+      const __hb2 = __hb ? performance.now() : 0
       CLICK_POSE_KEYS.forEach((p) => {
         // `|| cpAll[p].pendingClaimAt` -- a hand can be 'idle' in phase
         // while still WAITING on a deferred claim (see
@@ -23924,7 +23955,7 @@ function updateRenderOrder() {
         // be called every frame so that pending claim actually gets
         // checked/committed once its own delay elapses.
         if (cpAll[p].phase !== 'idle' || cpAll[p].pendingClaimAt || cpAll[p].awaitClk) {
-          updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs)
+          if (!timelineSkip) { updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, nowMs); if (__hb) rlog.hbCur.poseN++ }
           // Re-checked AFTER the call (not just the pre-call condition
           // above) -- a hand that was ONLY waiting on a pending claim,
           // still genuinely idle this exact frame, should still be
@@ -23934,6 +23965,7 @@ function updateRenderOrder() {
           if (cpAll[p].phase !== 'idle') overridden = true
         }
       })
+      if (__hb2) rlog.hbCur.pose = performance.now() - __hb2
       // PERFORMANCE (2026-09-15): this whole idle repose (wrist bone +
       // all 5 fingers, via rotateOnTrueWorldAxis()-style world-axis-
       // corrected bone math) is only actually necessary every frame when
@@ -24008,6 +24040,8 @@ function updateRenderOrder() {
       // first frame -- so with Responsive Wrist Splay off the rotation sliders, a pose's rotation applied by Default, and Rotation at Base never reached idle hands.
       const baseChanged = !overridden && hand._cloneBaseVersion !== cloneBaseVersion
       const needsIdleRepose = !overridden && ((cfg.wristSplayResponsiveEnabled && isThisHandsStaggerTurn) || hand._wasOverriddenLastFrame || !hand.everReposed || baseChanged || hand._rvRepose)
+      const __hb3 = needsIdleRepose && __hb ? performance.now() : 0
+      if (__hb3) rlog.hbCur.idleN++
       if (needsIdleRepose) {
         hand._rvRepose = false
         hand._cloneBaseVersion = cloneBaseVersion
@@ -24082,6 +24116,7 @@ function updateRenderOrder() {
           const blendedSplay = THREE.MathUtils.lerp(hand._idleSettleFromSplay, extraSplay, settleProgress)
           applyPoseValuesToHand(hand, blendedValues, blendedSplay)
           hand._wasOverriddenLastFrame = overridden
+          if (__hb3) rlog.hbCur.idle = performance.now() - __hb3
           return
         }
         hand._idleSettleFrom = null
@@ -24150,6 +24185,7 @@ function updateRenderOrder() {
           hand._idleCurlSig = rvSig
           hand._idleCurlSplay = rvSplayNow
         }
+        if (__hb3) rlog.hbCur.idle = performance.now() - __hb3
       }
       hand._wasOverriddenLastFrame = overridden
     }
@@ -24160,9 +24196,15 @@ function updateRenderOrder() {
     const __hP = rlsHeap()
     for (let hi = 0; hi < hands.length; hi++) {
       const h = hands[hi], t0 = performance.now()
+      const c = rlog.hbCur
+      c.arm = c.hold = c.holdN = c.pose = c.poseN = c.idle = c.idleN = 0
       __perHand(h, hi)
       const d = performance.now() - t0
       if (h._curlSkip) { tOut += d; nOut++ } else { tIn += d; nIn++ }
+      if (__hb) {
+        const o = h._curlSkip ? rlog.hbOut : rlog.hbIn
+        o.n++; o.total += d * 1000; o.arm += c.arm * 1000; o.hold += c.hold * 1000; o.holdN += c.holdN; o.pose += c.pose * 1000; o.poseN += c.poseN; o.idle += c.idle * 1000; o.idleN += c.idleN
+      }
     }
     rlsAdd('uro: per-hand update, hands in view', tIn, nIn)
     rlsAdd('uro: per-hand update, hands outside every camera', tOut, nOut)
