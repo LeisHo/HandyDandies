@@ -22240,12 +22240,21 @@ gltfLoader.setDRACOLoader(dracoLoader)
 // sibling of the Armature - is borrowed: its geometry and transform are read once and a copy is added to the loaded root, where every clone picks it up like a native block. Models that have their own keep it.
 let borrowedClipBlockPromise = null
 function findClipBlockNode(root) { return root.getObjectByName('Clipping_Block') || root.getObjectByName('Clipping Block') || null }
+// The block comes from data/processed/HAND3D/Clipping Block.glb (exported on its own by the user, 2026-10-20: the same box geometry, already positioned in the hand's frame, a few millimetres different in X / Z from the
+// copy inside HandipantsOL_Clip); if that file cannot be read, the block inside HandipantsOL_Clip.glb is used. It is for the "hide up to the wrist" crop only - Hide Model (a Loading Preview pose value) is unrelated.
+const CLIP_BLOCK_URL = '../data/processed/HAND3D/Clipping%20Block.glb'
+function readClipBlockFrom(url) {
+  return gltfLoader.loadAsync(url).then((g) => {
+    const b = findClipBlockNode(g.scene)
+    return b && b.geometry ? { geometry: b.geometry, position: b.position.clone(), quaternion: b.quaternion.clone(), scale: b.scale.clone() } : null
+  }).catch((err) => { console.warn('Clipping Block source ' + url + ' unavailable:', err); return null })
+}
 function loadBorrowedClipBlock() {
   if (!borrowedClipBlockPromise) {
-    borrowedClipBlockPromise = gltfLoader.loadAsync(MODEL_URL).then((g) => {
-      const b = findClipBlockNode(g.scene)
-      return b && b.geometry ? { geometry: b.geometry, position: b.position.clone(), quaternion: b.quaternion.clone(), scale: b.scale.clone() } : null
-    }).catch((err) => { console.warn('Borrowed Clipping Block unavailable - the wrist crop falls back to a plane:', err); return null })
+    borrowedClipBlockPromise = readClipBlockFrom(CLIP_BLOCK_URL).then((b) => b || readClipBlockFrom(MODEL_URL)).then((b) => {
+      if (!b) console.warn('No Clipping Block source could be read - the wrist crop falls back to a plane')
+      return b
+    })
   }
   return borrowedClipBlockPromise
 }
