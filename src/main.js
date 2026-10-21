@@ -565,7 +565,7 @@ const frameRateLogEntries = []
 let frameRateLogEl = null
 // Log Renderer (2026-10-20, direct request: "log all info that is relevant to render speed"). All state in ONE object, declared here with the other Frame Rate Log state (module top-level / animate() both touch it).
 // r / f / s mirror cfg.logRendererEnabled / logFrameSectionsEnabled / logSystemEnabled and are re-synced lazily from animate() (rendererLogSync()), so no onChange is needed (a restored onChange fires before the renderer exists); active = any of the three.
-const RENDERER_LOG_MAX_ENTRIES = 300
+const RENDERER_LOG_MAX_ENTRIES = 800
 const rendererLogEntries = []
 let rendererLogEl = null
 const _rendererLogFlushFlag = { scheduled: false }
@@ -580,7 +580,8 @@ const rlog = {
   ring: [], ringPos: 0,
   ltObserver: null, ltCount: 0, ltMs: 0, ltMax: 0,
   loafObserver: null, loafN: 0, loafMs: 0, loafMax: 0, loafStyleMs: 0, loafScripts: {},
-  heapLast: 0, heapAllocBytes: 0, gcEvents: 0, panelUpdates: 0
+  heapLast: 0, heapAllocBytes: 0, gcEvents: 0, panelUpdates: 0,
+  glOrig: null, glCalls: {}
 }
 const RLOG_RING_MAX = 900 // frames kept by the Frame Sections recording (about 15 s at 60 fps; a judgment call)
 // Loading Preview Log (2026-10-04, direct request: "provide a loading preview
@@ -5862,10 +5863,12 @@ function rendererLogSync() {
     // composer.render() runs several renderer.render() calls per frame (one per pass); three.js resets renderer.info before EACH of them (autoReset), which would leave only the last pass in the numbers.
     // With autoReset off we reset once per frame ourselves (rendererLogBeforeRender()) and read the whole frame's totals afterwards.
     renderer.info.autoReset = false
+    rendererLogHookGl(true)
     rlog.lastTargetSig = ''
     rendererLogSetupRenderer()
   } else if (!r && was.r) {
     renderer.info.autoReset = true
+    rendererLogHookGl(false)
     if (rlog.gl) { rlog.gpuPending.forEach((q) => { try { rlog.gl.deleteQuery(q) } catch (e) { /* ignore */ } }); if (rlog.gpuCur) { try { rlog.gl.endQuery(rlog.gpuExt.TIME_ELAPSED_EXT); rlog.gl.deleteQuery(rlog.gpuCur) } catch (e) { /* ignore */ } } }
     rlog.gpuPending = []; rlog.gpuCur = null
   }
@@ -5876,7 +5879,31 @@ function rendererLogSync() {
     rendererLogSetupSystem(false)
   } else if (!s && was.s) rendererLogStopObservers()
 }
+// Counts and times the WebGL texture / buffer upload calls (skinned meshes upload a bone texture every frame they are drawn). Only while Log Renderer is on.
+function rendererLogHookGl(on) {
+  const gl = renderer.getContext()
+  const names = ['texImage2D', 'texSubImage2D', 'bufferSubData', 'bufferData']
+  if (on && !rlog.glOrig) {
+    rlog.glOrig = {}
+    names.forEach((n) => {
+      const orig = gl[n]
+      if (typeof orig !== 'function') return
+      rlog.glOrig[n] = true
+      gl[n] = function () {
+        const t0 = performance.now()
+        const r = orig.apply(gl, arguments)
+        const e = rlog.glCalls[n] || (rlog.glCalls[n] = { n: 0, ms: 0 })
+        e.n++; e.ms += performance.now() - t0
+        return r
+      }
+    })
+  } else if (!on && rlog.glOrig) {
+    names.forEach((n) => { if (rlog.glOrig[n]) delete gl[n] }) // removes the instance override: the browser's own method shows through again
+    rlog.glOrig = null
+  }
+}
 function rendererLogResetWindow() {
+  rlog.glCalls = {}
   rlog.dts = []; rlog.over33 = 0; rlog.over100 = 0; rlog.gaps = 0
   rlog.renderFrames = 0; rlog.renderMs = 0; rlog.renderMaxMs = 0
   rlog.calls = 0; rlog.callsMax = 0; rlog.tris = 0; rlog.trisMax = 0; rlog.lines = 0; rlog.points = 0
@@ -6034,10 +6061,11 @@ function rendererLogGeometryMix() {
   return Array.from(m.values()).sort((a, b) => b.tris - a.tris).map((e) => e.n + 'x' + k(e.tris) + ' tris (' + k(e.verts) + ' verts)').join(', ')
 }
 // Every setting that differs from its default (DEV_GROUPS' own def), so a capture says what it was run with.
-function rendererLogNonDefaults() {
+function rendererLogNonDefaults(skipDynamic) {
   const out = []
   DEV_GROUPS.forEach((g) => g.controls.forEach((c) => {
     if (c.def === undefined || c.type === 'button') return
+    if (skipDynamic && /^(custom\d+|startupFn|sphereFn)/.test(c.key)) return // the click functions' own settings: in Save Frame Recording, summarised per function in the log
     const v = cfg[c.key]
     if (v === undefined) return
     let same = true
@@ -6083,9 +6111,11 @@ function rendererLogSetupSystem(again) {
     try { ids = JSON.parse(cfg.customClickFunctionIds || '[]') } catch (e) { ids = [] }
     const enabled = ids.filter((id) => cfg[id + 'Enabled'] === true).length
     L('click functions -- ' + ids.length + ' custom functions, ' + enabled + ' enabled')
-    const nd = rendererLogNonDefaults()
+    const on = ids.filter((id) => cfg[id + 'Enabled'] === true).slice(0, 30).map((id) => id + ' ' + (cfg[id + 'Type'] || '?') + (cfg[id + 'Mode'] ? '/' + cfg[id + 'Mode'] : ''))
+    if (on.length) L('enabled click functions -- ' + on.join(' | '))
+    const nd = rendererLogNonDefaults(true)
     let chunk = [], len = 0, part = 1
-    const flushChunk = () => { if (chunk.length) { L('settings differing from their defaults (' + nd.length + ' total, part ' + part + ') -- ' + chunk.join(' | ')); part++; chunk = []; len = 0 } }
+    const flushChunk = () => { if (chunk.length) { L('settings differing from their defaults, not counting the click functions\' own (' + nd.length + ' total, part ' + part + ') -- ' + chunk.join(' | ')); part++; chunk = []; len = 0 } }
     nd.forEach((x) => { if (len + x.length > 800) flushChunk(); chunk.push(x); len += x.length + 3 })
     flushChunk()
   } catch (e) { L('FAILED while collecting (' + (e && e.message) + ')') }
@@ -6113,6 +6143,10 @@ function rendererLogFlushRenderer(t, f1) {
   appendRendererLogLine(t + 'work -- per rendered frame: draw calls avg ' + Math.round(rlog.calls / rf) + ' (max ' + rlog.callsMax + '), triangles avg ' + (rlog.tris / rf / 1e6).toFixed(2) + ' M (max ' + (rlog.trisMax / 1e6).toFixed(2) + ' M)' +
     (rlog.lines || rlog.points ? ', lines ' + Math.round(rlog.lines / rf) + ', points ' + Math.round(rlog.points / rf) : '') + ', rendered frames ' + rlog.renderFrames +
     ' | GPU objects: ' + info.memory.geometries + ' geometries, ' + info.memory.textures + ' textures, ' + (info.programs ? info.programs.length : '?') + ' programs | geometry mix ' + rendererLogGeometryMix())
+  {
+    const parts = Object.keys(rlog.glCalls).map((k) => { const e = rlog.glCalls[k]; return k + ' ' + (e.n / rf).toFixed(1) + '/frame, ' + f1(e.ms / rf) + ' ms/frame' })
+    appendRendererLogLine(t + 'uploads (CPU time inside the WebGL call, per rendered frame) -- ' + (parts.length ? parts.join(' | ') : 'none this second'))
+  }
   const sz = renderer.getDrawingBufferSize(new THREE.Vector2())
   const passes = composer.passes.map((p) => p.constructor.name + (p.enabled ? '' : ' (off)')).join(', ')
   const sig = sz.x + 'x' + sz.y + '|' + renderer.getPixelRatio() + '|' + passes + '|' + cfg.resolutionScale + '|' + canvas.clientWidth + 'x' + canvas.clientHeight
