@@ -15556,7 +15556,7 @@
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
       "startupHandMaxClicks": 2,
-      "startupHandOffsetZ": 0,
+      "startupHandOffsetZ": -2,
       "startupHandWaitForAll": true,
       "startupTrackArm": false,
       "startupTrackPalm": false,
@@ -58516,7 +58516,7 @@
       "hideFloorAfterHandOffset": true,
       "handOffsetOnStartupEnabled": true,
       "startupHandMaxClicks": 2,
-      "startupHandOffsetZ": 0,
+      "startupHandOffsetZ": -2,
       "startupHandWaitForAll": true,
       "startupTrackArm": false,
       "startupTrackPalm": false,
@@ -65037,7 +65037,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -65133,7 +65133,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -65696,7 +65696,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -67942,7 +67942,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -67961,7 +67961,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -73345,8 +73345,8 @@
     "mobile": {
       "left": 61.63095474243164,
       "top": 195.89881896972656,
-      "width": 305.702392578125,
-      "height": 463.6488037109375,
+      "width": 309.1309509277344,
+      "height": 465.1726379394531,
       "collapsed": false
     }
   }
