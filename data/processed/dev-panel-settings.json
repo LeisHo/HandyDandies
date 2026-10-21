@@ -20589,8 +20589,8 @@
       "custom54GlideToFirstPose": true,
       "custom54FirstGlideTimeScale": 2.7,
       "custom54TweenChain": [
-        "2 TWIDS",
-        "2 TWIDS"
+        "",
+        ""
       ],
       "custom54TweenSpeedMs": 800,
       "custom54TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -20678,11 +20678,11 @@
       "custom54Trig1CursorOffsetContinual": true,
       "custom54Trig1CursorOffsetXOrigin": "Global Setting",
       "custom54Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2882400706091056,\"y\":0}},{\"x\":1,\"y\":0}]",
-      "custom54Trig1CursorOffsetDistanceCurveRange": "{\"min\":-3,\"max\":-1}",
+      "custom54Trig1CursorOffsetDistanceCurveRange": "{\"min\":1,\"max\":5}",
       "custom54Trig1CursorOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.35857983055634596,\"y\":0}},{\"x\":1,\"y\":0}]",
-      "custom54Trig1CursorOffsetXRange": "{\"min\":-3,\"max\":-1}",
+      "custom54Trig1CursorOffsetXRange": "{\"min\":1,\"max\":5}",
       "custom54Trig1CursorOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2928274633768638,\"y\":0}},{\"x\":1,\"y\":0}]",
-      "custom54Trig1CursorOffsetYRange": "{\"min\":-3,\"max\":-1}",
+      "custom54Trig1CursorOffsetYRange": "{\"min\":-5,\"max\":5}",
       "custom54Trig1CursorOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.27141971795789843,\"y\":0}},{\"x\":1,\"y\":0}]",
       "custom54Trig1CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom54Trig1CursorClampEnabled": true,
@@ -41757,8 +41757,8 @@
       "custom54GlideToFirstPose": true,
       "custom54FirstGlideTimeScale": 2.7,
       "custom54TweenChain": [
-        "2 TWIDS",
-        "2 TWIDS"
+        "",
+        ""
       ],
       "custom54TweenSpeedMs": 800,
       "custom54TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -41846,11 +41846,11 @@
       "custom54Trig1CursorOffsetContinual": true,
       "custom54Trig1CursorOffsetXOrigin": "Global Setting",
       "custom54Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2882400706091056,\"y\":0}},{\"x\":1,\"y\":0}]",
-      "custom54Trig1CursorOffsetDistanceCurveRange": "{\"min\":-3,\"max\":-1}",
+      "custom54Trig1CursorOffsetDistanceCurveRange": "{\"min\":1,\"max\":5}",
       "custom54Trig1CursorOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.35857983055634596,\"y\":0}},{\"x\":1,\"y\":0}]",
-      "custom54Trig1CursorOffsetXRange": "{\"min\":-3,\"max\":-1}",
+      "custom54Trig1CursorOffsetXRange": "{\"min\":1,\"max\":5}",
       "custom54Trig1CursorOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2928274633768638,\"y\":0}},{\"x\":1,\"y\":0}]",
-      "custom54Trig1CursorOffsetYRange": "{\"min\":-3,\"max\":-1}",
+      "custom54Trig1CursorOffsetYRange": "{\"min\":-5,\"max\":5}",
       "custom54Trig1CursorOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.27141971795789843,\"y\":0}},{\"x\":1,\"y\":0}]",
       "custom54Trig1CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom54Trig1CursorClampEnabled": true,
@@ -62925,8 +62925,8 @@
       "custom54GlideToFirstPose": true,
       "custom54FirstGlideTimeScale": 2.7,
       "custom54TweenChain": [
-        "2 TWIDS",
-        "2 TWIDS"
+        "",
+        ""
       ],
       "custom54TweenSpeedMs": 800,
       "custom54TweenStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -63014,11 +63014,11 @@
       "custom54Trig1CursorOffsetContinual": true,
       "custom54Trig1CursorOffsetXOrigin": "Global Setting",
       "custom54Trig1CursorOffsetDistanceCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2882400706091056,\"y\":0}},{\"x\":1,\"y\":0}]",
-      "custom54Trig1CursorOffsetDistanceCurveRange": "{\"min\":-3,\"max\":-1}",
+      "custom54Trig1CursorOffsetDistanceCurveRange": "{\"min\":1,\"max\":5}",
       "custom54Trig1CursorOffsetXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.35857983055634596,\"y\":0}},{\"x\":1,\"y\":0}]",
-      "custom54Trig1CursorOffsetXRange": "{\"min\":-3,\"max\":-1}",
+      "custom54Trig1CursorOffsetXRange": "{\"min\":1,\"max\":5}",
       "custom54Trig1CursorOffsetYCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2928274633768638,\"y\":0}},{\"x\":1,\"y\":0}]",
-      "custom54Trig1CursorOffsetYRange": "{\"min\":-3,\"max\":-1}",
+      "custom54Trig1CursorOffsetYRange": "{\"min\":-5,\"max\":5}",
       "custom54Trig1CursorOffsetZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.27141971795789843,\"y\":0}},{\"x\":1,\"y\":0}]",
       "custom54Trig1CursorOffsetZRange": "{\"min\":0,\"max\":0}",
       "custom54Trig1CursorClampEnabled": true,
