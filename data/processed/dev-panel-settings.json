@@ -199,8 +199,8 @@
       ],
       "smallScaleModelsEnabled": true,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"}]",
-      "fieldRows": 40,
-      "fieldCols": 40,
+      "fieldRows": 35,
+      "fieldCols": 35,
       "rowSpacing": 4.5,
       "columnSpacing": 8.5,
       "handScale": 0.6,
@@ -14160,15 +14160,15 @@
           }
         }
       ],
-      "cameraX": 1.9077061415860708,
-      "cameraY": 3.1056592723009385e-13,
+      "cameraX": 1.9077061415860712,
+      "cameraY": 3.3288511514455444e-13,
       "cameraZ": 242.985022357809,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":1.9534883720930232,\"cameraY\":2.041020698109996e-13,\"cameraZ\":245.9004898795015,\"cameraFov\":20,\"cameraZoom\":121.5,\"cameraRoll\":0,\"targetX\":1.9534883720930232,\"targetY\":1.9666234050617943e-13,\"targetZ\":124.40048987950149}",
-      "cameraZoom": 121.49999999999999,
+      "cameraZoom": 121.49999999999997,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -57504,7 +57504,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -57515,7 +57515,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -64682,8 +64682,8 @@
     "desktop": {
       "left": 4.762500286102295,
       "top": 69,
-      "width": 576.9500122070312,
-      "height": 532.9750366210938
+      "width": 580.1500244140625,
+      "height": 534.5750122070312
     }
   }
 }
