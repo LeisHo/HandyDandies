@@ -15677,7 +15677,7 @@
       "logRendererEnabled": true,
       "logFrameSectionsEnabled": true,
       "logSystemEnabled": true,
-      "logHandBreakdownEnabled": false,
+      "logHandBreakdownEnabled": true,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
@@ -37063,7 +37063,7 @@
       "logRendererEnabled": true,
       "logFrameSectionsEnabled": true,
       "logSystemEnabled": true,
-      "logHandBreakdownEnabled": false,
+      "logHandBreakdownEnabled": true,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
@@ -58449,7 +58449,7 @@
       "logRendererEnabled": true,
       "logFrameSectionsEnabled": true,
       "logSystemEnabled": true,
-      "logHandBreakdownEnabled": false,
+      "logHandBreakdownEnabled": true,
       "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
@@ -64492,7 +64492,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
