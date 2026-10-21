@@ -15571,7 +15571,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.12626117393401745,\"y\":0.4177270253499349}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.08480085625549938,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3997058907405725,\"y\":0.2488405863444011}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.33553990570962466,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":200}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -36386,7 +36386,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.12626117393401745,\"y\":0.4177270253499349}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.08480085625549938,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3997058907405725,\"y\":0.2488405863444011}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.33553990570962466,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":280}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -57201,7 +57201,7 @@
       "startupFnGlideToFirstPose": true,
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.12626117393401745,\"y\":0.4177270253499349}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.08480085625549938,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3997058907405725,\"y\":0.2488405863444011}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.33553990570962466,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":200}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -71305,8 +71305,8 @@
     "mobile": {
       "left": 20,
       "top": 82.82738494873047,
-      "width": 380.1071472167969,
-      "height": 562.7142944335938
+      "width": 383.5357360839844,
+      "height": 564.232177734375
     }
   }
 }
