@@ -1530,7 +1530,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, get rigLocalAxisPosing() { return RIG_LOCAL_AXIS_POSING }, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness }
+  window.__debug = { refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, get rigLocalAxisPosing() { return RIG_LOCAL_AXIS_POSING }, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness, savedPoseByName, selectedSequenceEntries, resolveTweenSequencePoses }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -10060,7 +10060,7 @@ async function importTwoHandTween(btn) {
   if (handoScale && ma && typeof ma.x === 'number') handoAnchorRaw = { x: ma.x / handoScale, y: ma.y / handoScale, z: ma.z / handoScale }
   const incomingSeqs = (Array.isArray(data.tweenSequences) && data.tweenSequences.length ? data.tweenSequences : [{ name: data.name || 'Two-Hand Tween', tweenPoses: data.tweenPoses, tweenPosesHand2: data.tweenPosesHand2 }])
     .filter((q) => q && typeof q.name === 'string')
-    .map((q) => ({ name: q.name, tweenPoses: Array.isArray(q.tweenPoses) ? q.tweenPoses : (data.tweenPoses || []), tweenPosesHand2: renameHand2Entries(Array.isArray(q.tweenPosesHand2) ? q.tweenPosesHand2 : (data.tweenPosesHand2 || [])), twoHand: h2.show2ndHand !== false, hand2: placement, ...(handoScale ? { handoScale } : {}), ...(handoAnchorRaw ? { handoAnchorRaw } : {}) }))
+    .map((q) => ({ name: q.name, tweenPoses: Array.isArray(q.tweenPoses) ? q.tweenPoses : (data.tweenPoses || []), tweenPosesHand2: renameHand2Entries(Array.isArray(q.tweenPosesHand2) ? q.tweenPosesHand2 : (data.tweenPosesHand2 || [])), twoHand: h2.show2ndHand !== false, hand2: placement, ...(handoScale ? { handoScale } : {}), ...(handoAnchorRaw ? { handoAnchorRaw } : {}), ...((q.baseModifiers || data.baseModifiers) ? { baseModifiers: q.baseModifiers || data.baseModifiers } : {}) })) // baseModifiers: HANDO's BASE MODIFIERS of this tween (see lpApplyBaseMod())
   if (!incomingSeqs.length) { flash('No sequence found'); return }
   const sequences = mergeByName(cfg.savedTweenSequences || [], incomingSeqs)
   cfg.savedTweenSequences = sequences
@@ -10173,8 +10173,8 @@ const _lp2Q = new THREE.Quaternion(), _lp2Base = new THREE.Quaternion(), _lp2V =
 function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride, ringMode = 0) {
   const hand2 = loadingPreviewHand2
   if (!hand2 || !hand2.skinnedMesh || !loadingPreviewHand || !seq) return
-  const cfg2 = seq.hand2 || {}
-  let values = valuesOverride || null // the End Sequence supplies the pose itself
+  const cfg2 = lpHand2WithBaseMods(seq.hand2 || {}, seq) // + the 2nd hand's Base Modifiers (placement level)
+  let values = valuesOverride || null // the End Sequence supplies the pose itself (already carrying its modifiers)
   if (!values) {
   // the second hand's own pose list (or the main list when it is told to mirror the main hand's pose)
   const entries2 = (cfg2.mirrorMainHandPose || !(seq.tweenPosesHand2 && seq.tweenPosesHand2.length)) ? (seq.tweenPoses || []) : seq.tweenPosesHand2
@@ -10196,6 +10196,7 @@ function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride, ringMode = 
     else if (ringMode === 2) pos2 = Math.min(pos2, (loadingPreviewLapIndex - 1) * totalW + baseW2) // finishing: stop at this hand's last pose
     values = lerpLoopSegments(ring, pos2)
   }
+  values = lpApplyBaseMod(values, seq, 2) // the sequence's own 2nd-hand frame + its Base Modifiers (bone keys, Hide Model)
   }
   lpHand2LastValues = values
   const V = {}
@@ -11149,6 +11150,47 @@ function repositionLoadingPreview() {
 // codebase's own existing precedent of a bespoke apply-to-isolated-hand
 // function per independent preview instance instead of a new abstraction
 // both would route through.
+// BASE MODIFIERS (HANDO 2026-10-19, tween groups "1ST / 2ND HAND TWEENING" > BASE MODIFIERS): a rotation / offset / scale / wrist / arm value baked into EVERY frame of a tween instead of into each saved pose. HANDO exports them as
+// seq.baseModifiers = { main: {enabled, sections: {BaseRot|Offset|Rot|Wrist|Arm: {enabled, values: {poseKey: n}}}}, hand2: {...} } (a Two-Hand Tween export carries it on the bundle and on its sequence), and this project
+// stores the sequence whole, so it just has to play it. A hand is only modified when its group AND the section are on. Added to the frame's value: angles, offsets, arm; multiplied: Pose Scale; added and kept 0-100: Hide Wrist
+// / Hide Model. The 2nd hand has no Pose Local Offset in HANDO (no such sliders), and its pose-level keys here are the bone ones; its placement-level ones (rotation, offset, scale, hide wrist) go through
+// lpHand2WithBaseMods(). The 2nd hand's Whole-Hand Rotation at Base is not applied: this project has no 2nd-hand base rotation at all (HANDO's hand2BaseRot* is not imported either).
+const LP_BASE_MOD_HAND2_PLACEMENT_KEYS = ['modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ', 'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseLocalOffsetX', 'poseLocalOffsetY', 'poseLocalOffsetZ', 'poseScale', 'hideWrist']
+function lpBaseModSections(seq, hand) { // the enabled sections' values of one hand, or null
+  const bm = seq && seq.baseModifiers && seq.baseModifiers[hand === 1 ? 'main' : 'hand2']
+  if (!bm || !bm.enabled || !bm.sections) return null
+  if (hand === 2 && seq.hand2 && seq.hand2.mirrorMainHandPose) return null // a mirroring 2nd hand plays the main hand's poses, the 2nd hand's own modifiers are not in play
+  const secs = Object.keys(bm.sections).map((id) => bm.sections[id]).filter((sec) => sec && sec.enabled && sec.values)
+  return secs.length ? secs : null
+}
+function lpApplyBaseMod(item, seq, hand) { // a copy of the frame's pose values with the modifiers added (or `item` itself when there are none)
+  const secs = lpBaseModSections(seq, hand)
+  if (!secs) return item
+  const out = { ...item }
+  secs.forEach((sec) => Object.keys(sec.values).forEach((k) => {
+    const v = sec.values[k]
+    if (typeof v !== 'number') return
+    if (hand === 2 && LP_BASE_MOD_HAND2_PLACEMENT_KEYS.includes(k) && k !== 'hideModel') return // placement keys of the 2nd hand: lpHand2WithBaseMods()
+    if (k === 'poseScale') { if (v > 0) out.poseScale = (out.poseScale !== undefined ? out.poseScale : POSE_KEY_DEFAULTS.poseScale) * v; return }
+    if (k === 'hideWrist' || k === 'hideModel') { const base = out[k] !== undefined ? out[k] : (k === 'hideWrist' ? 100 : 0); out[k] = Math.min(100, Math.max(0, base + v)); return }
+    out[k] = (out[k] !== undefined ? out[k] : (POSE_KEY_DEFAULTS[k] !== undefined ? POSE_KEY_DEFAULTS[k] : 0)) + v
+  }))
+  return out
+}
+function lpHand2WithBaseMods(cfg2, seq) { // the 2nd hand's placement with its Base Modifiers on top
+  const secs = lpBaseModSections(seq, 2)
+  if (!secs) return cfg2
+  const out = { ...cfg2 }
+  const map = { poseOffsetX: 'hand2OffsetX', poseOffsetY: 'hand2OffsetY', poseOffsetZ: 'hand2OffsetZ', modelRotX: 'hand2RotX', modelRotY: 'hand2RotY', modelRotZ: 'hand2RotZ' }
+  secs.forEach((sec) => Object.keys(sec.values).forEach((k) => {
+    const v = sec.values[k]
+    if (typeof v !== 'number') return
+    if (map[k]) out[map[k]] = (out[map[k]] || 0) + v
+    else if (k === 'poseScale') { if (v > 0) out.hand2Scale = (typeof out.hand2Scale === 'number' && out.hand2Scale > 0 ? out.hand2Scale : 1) * v }
+    else if (k === 'hideWrist') out.hand2HideWrist = Math.min(100, Math.max(0, (typeof out.hand2HideWrist === 'number' ? out.hand2HideWrist : 100) + v))
+  }))
+  return out
+}
 function applyLoadingPreviewPose(item) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh) return
   lpLastValues = item // the End Sequence glides from whatever pose is showing
@@ -11524,7 +11566,7 @@ function updateLoadingPreviewAnimation() {
     }
     values = lerpLoopSegments(ringSegments, tCyclic)
   }
-  applyLoadingPreviewPose(values)
+  applyLoadingPreviewPose(lpApplyBaseMod(values, seq, 1))
   updateLoadingPreviewHand2(seq, lapStyle, typeof easedT !== 'undefined' ? easedT : lapT, undefined, ringMode) // same timeline position, second hand's own poses
   if (lapT >= 1 || ringDoneEarly) {
     lpLastLapOnLast = segments.length === 0 || (lapStyle === 'Oscillate' ? loadingPreviewDirection === 1 : (cfg.loadingPreviewSequenceLoopTransition === false || ringMode === 1 || ringDoneEarly))
@@ -11698,8 +11740,8 @@ function endSeqPlayFrame(now) {
   const lapDur = Math.max(endSeq.lapIndex === 1 ? unit * tr1.W1 : (tr1.Wlap > 0 ? unit * tr1.Wlap : endSeq.speedMs), 1)
   const lapT = THREE.MathUtils.clamp((now - endSeq.lapStartMs) / lapDur, 0, 1)
   const eased = cfg.loadingPreviewEndEasingEnabled ? easingProfilePAt(getEasingProfile('loadingPreviewEnd', true, loadingPreviewEndEasingTrig), lapT) : lapT
-  applyLoadingPreviewPose(lpEndValues(tr1, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir))
-  if (endSeq.tr2 && loadingPreviewHand2) updateLoadingPreviewHand2(endSeq.seq, endSeq.lapStyle, eased, lpEndValues(endSeq.tr2, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir))
+  applyLoadingPreviewPose(lpApplyBaseMod(lpEndValues(tr1, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir), endSeq.seq, 1))
+  if (endSeq.tr2 && loadingPreviewHand2) updateLoadingPreviewHand2(endSeq.seq, endSeq.lapStyle, eased, lpApplyBaseMod(lpEndValues(endSeq.tr2, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir), endSeq.seq, 2))
   if (lapT >= 1) {
     logLoadingPreview('End Sequence: pass ' + endSeq.lapIndex + ' of ' + endSeq.total + ' complete')
     endSeq.lapIndex++
@@ -15195,8 +15237,37 @@ function useTweenSequencePreset(item) {
 // first. Every place that reads `${p}TweenSelector` to START a trigger goes through this.
 function selectedSequenceEntries(p) {
   const seq = (cfg.savedTweenSequences || []).find((s) => s.name === cfg[`${p}TweenSelector`])
-  const raw = seq ? (seq.tweenPoses || []) : []
+  const raw = seq ? sequencePoseEntries(seq) : []
   return cfg[`${p}ReverseSequence`] ? raw.slice().reverse() : raw
+}
+// BASE MODIFIERS on the field's click / hold functions (2026-10-22, direct report: "I imported a tween TWO FINGER WALK -90 and the click hold function didn't recognize the wrist splay I added as a base modifier"). A sequence
+// imported from HANDO carries seq.baseModifiers (see lpApplyBaseMod()); the field plays a sequence as a list of pose NAMES that every consumer looks up in Saved Poses, so the modifiers are baked in at that lookup: a sequence
+// with modifiers on hands its entries out as BM_ENTRY_PREFIX + sequence name + BM_SEP + pose name, and savedPoseByName() turns such a name into the saved pose with the modifiers added (cached while the pose and the sequence's
+// modifiers are the same objects). A sequence without active modifiers hands out its plain names, exactly as before.
+const BM_SEP = '\u0001' // a separator no pose or sequence name contains
+const BM_ENTRY_PREFIX = BM_SEP + 'bm' + BM_SEP
+const bmPoseCache = new Map()
+function sequencePoseEntries(seq) {
+  const raw = seq.tweenPoses || []
+  if (!lpBaseModSections(seq, 1)) return raw
+  return raw.map((e) => (typeof e === 'string' && e ? BM_ENTRY_PREFIX + seq.name + BM_SEP + e : e))
+}
+function savedPoseByName(name) { // the last saved pose of that name (or its modified copy for a baked entry)
+  if (typeof name === 'string' && name.startsWith(BM_ENTRY_PREFIX)) {
+    const rest = name.slice(BM_ENTRY_PREFIX.length)
+    const i = rest.indexOf(BM_SEP)
+    const base = savedPoseByName(rest.slice(i + 1))
+    if (!base) return base
+    const seq = (cfg.savedTweenSequences || []).find((s) => s.name === rest.slice(0, i))
+    if (!seq || !lpBaseModSections(seq, 1)) return base
+    const c = bmPoseCache.get(name)
+    if (c && c.base === base && c.bm === seq.baseModifiers) return c.out
+    const out = lpApplyBaseMod(base, seq, 1)
+    bmPoseCache.set(name, { base, bm: seq.baseModifiers, out })
+    return out
+  }
+  const matches = (cfg.savedPoses || []).filter((p) => p.name === name)
+  return matches[matches.length - 1]
 }
 // ---- Glide To Pose 1 / First Transition Time Scale (2026-10-04) ----
 // Sequence mode only. `glide` OFF: the hand's current pose is used as Pose 1, so the first
@@ -15269,8 +15340,7 @@ function stackOnDefault(item) {
 function resolveTweenSequencePoses(names, stack = false) {
   return (names || [])
     .map((name) => {
-      const matches = (cfg.savedPoses || []).filter((p) => p.name === name)
-      const pose = matches[matches.length - 1]
+      const pose = savedPoseByName(name)
       return stack ? stackOnDefault(pose) : pose
     })
     .filter(Boolean)
@@ -15330,8 +15400,7 @@ function resolveTweenSegmentsWithAnchor(anchorPose, rawEntries, stack = false) {
       return
     }
     if (typeof entry !== 'string' || !entry) return
-    const matches = (cfg.savedPoses || []).filter((p) => p.name === entry)
-    const found = matches[matches.length - 1]
+    const found = savedPoseByName(entry)
     const pose = stack ? stackOnDefault(found) : found
     if (!pose || !lastPose) return
     segments.push({ poseA: lastPose, poseB: pose, weight: 1 })
@@ -15403,8 +15472,7 @@ function buildLoopTimelines(entries, wrapScale = 1) {
   for (let i = 0; i < list.length; i++) {
     const e = list[i]
     if (typeof e !== 'string' || !e) continue
-    const matches = (cfg.savedPoses || []).filter((sp) => sp.name === e)
-    const found = matches[matches.length - 1]
+    const found = savedPoseByName(e)
     if (found) { firstIdx = i; firstPose = stackOnDefault(found); break }
   }
   if (!firstPose) return { ring: null, ringW: 0, fwd: null, fwdW: 0 }
@@ -16619,7 +16687,7 @@ function startClickHoldPose(p) {
     const namedPoses = cfg[`${p}Mode`] === 'Chain'
       ? (cfg[`${p}TweenChain`] || []).flatMap((seqName) => {
           const seq = (cfg.savedTweenSequences || []).find((s) => s.name === seqName)
-          return seq ? resolveTweenSequencePoses(seq.tweenPoses, true) : []
+          return seq ? resolveTweenSequencePoses(sequencePoseEntries(seq), true) : []
         })
       : resolveTweenSequencePoses(selectedSequenceEntries(p), true)
     // Loop/Oscillate's own cyclic sequence -- named poses ONLY, excluding
@@ -16648,7 +16716,7 @@ function startClickHoldPose(p) {
     trig.rawChainEntries = cfg[`${p}Mode`] === 'Chain'
       ? (cfg[`${p}TweenChain`] || []).flatMap((seqName) => {
           const seq = (cfg.savedTweenSequences || []).find((s) => s.name === seqName)
-          return seq ? (seq.tweenPoses || []) : []
+          return seq ? sequencePoseEntries(seq) : []
         })
       : selectedSequenceEntries(p)
     // Hold-aware Loop / Oscillate timelines (see buildLoopTimelines()). Each weight unit lasts what one pose-to-pose segment used to, so lap length = total weight x loopSegmentMs.
