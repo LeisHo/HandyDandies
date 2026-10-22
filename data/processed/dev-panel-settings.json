@@ -465,11 +465,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.00000000000002,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -498,14 +498,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -26742,11 +26742,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 3",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.00000000000002,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -26775,14 +26775,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -53019,11 +53019,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.00000000000002,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -53052,14 +53052,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -79428,7 +79428,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -82195,7 +82195,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -83091,14 +83091,14 @@
           "type": "group",
           "group": {
             "key": "UI Buttons Tween",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -83142,7 +83142,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Scale Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -83299,7 +83299,7 @@
           "group": {
             "key": "35 FT - 1 - C Copy",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83309,7 +83309,7 @@
           "group": {
             "key": "35 FT - 1 - CH Copy",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83319,7 +83319,7 @@
           "group": {
             "key": "20 FT - R - CH Copy",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83329,7 +83329,7 @@
           "group": {
             "key": "20 FT - 1 - C Copy",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83339,7 +83339,7 @@
           "group": {
             "key": "35 FT - Copy",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83349,7 +83349,7 @@
           "group": {
             "key": "35 FT - 2 - CH Copy",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83359,7 +83359,7 @@
           "group": {
             "key": "35 FT - 3 - C Copy",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83369,7 +83369,7 @@
           "group": {
             "key": "35 FT - 3 - CH Copy",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83379,7 +83379,7 @@
           "group": {
             "key": "Custom Click Function 29",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83389,7 +83389,7 @@
           "group": {
             "key": "Custom Click Function 28",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83399,7 +83399,7 @@
           "group": {
             "key": "Custom Click Function 19",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83409,7 +83409,7 @@
           "group": {
             "key": "20 FT - 3 - C Copy",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -83419,7 +83419,7 @@
           "group": {
             "key": "20 FT - 3 - CH Copy",
             "collapsed": true,
-            "locked": true,
+            "locked": false,
             "items": [],
             "settings": []
           }
@@ -88489,8 +88489,8 @@
     "desktop": {
       "left": 4.75,
       "top": 66.5,
-      "width": 604.5,
-      "height": 552.4125366210938,
+      "width": 607.7000122070312,
+      "height": 554.0125122070312,
       "collapsed": false
     },
     "mobile": {
