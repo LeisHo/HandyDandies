@@ -16037,6 +16037,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
   const trig = clickHoldPoseTriggers[p]
   const chp = getOrInitHandCHP(hand)[p]
   refreshLiveDistanceState(chp, hand, p, trig, now, 'hold')
+  if (chp.lateStop) { // released while this hand's claim was still pending (see endClickHoldPose): a new press, a cancelled claim or an ended stop window drops it
+    if (trig.active || !chp.pendingClaimAt || now - chp.lateStop.releaseTime >= chp.lateStop.startDelay + chp.lateStop.delayMs) { chp.pendingClaimAt = 0; chp.lateStop = null }
+  }
   if (chp.awaitClk) resolveAwaitClk(hand, chp, p, now, true)
   // CORRECTED 2026-09-30, direct request: "for all click functions, even
   // if i set start time to 0 ms, make sure that that is after any hold or
@@ -16188,6 +16191,17 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     chp.pendingClaimAt = 0
     chp.releasePending = false // a NEW hold-claim always starts fresh, regardless of a stale flag from a previous release
     chp.offsetBaked = false // a fresh ramp starts a fresh (not-yet-locked-in) increment (item 2/5/6, 2026-09-27)
+    if (chp.lateStop) {
+      // Claimed after the button was released (Tween Stop applies to triggering, 2026-10-22): start straight in the 'stopping' phase, with its clock anchored to the RELEASE, so the speed is whatever the stop has
+      // slowed to by now (full speed inside the Start Time window, then decaying to a halt) and the sequence only travels as far as the rest of the window allows. Same numbers as a hand that was playing.
+      const ls = chp.lateStop; chp.lateStop = null
+      chp.stoppingStartTime = ls.releaseTime; chp.stoppingStartDelay = ls.startDelay; chp.stoppingDelayMs = ls.delayMs
+      chp.retransitionDelayForStop = ls.retDelay; chp.retransitionSpeedMsForStop = ls.retSpeed
+      chp.stoppingLastFrameTime = now; chp.stoppingWasLooping = false; chp.stoppingBaseElapsedMs = 0; chp.stoppingLoopBaseSegments = null; chp.stoppingVirtualElapsedMs = 0
+      chp.stoppingFreezeAtEnd = ls.freezeAtEnd
+      chp.lateSplayFrom = chp.fromSplayDeg // the splay keeps easing in over the sequence progress instead of jumping to its frozen value
+      chp.phase = 'stopping'
+    }
     releaseHandFromOtherFunctions(hand, p)
     logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), isSequenceOrChainMode(p)
       ? `triggered -> tween "${cfg[`${p}Mode`] === 'Chain' ? (cfg[`${p}TweenChain`] || []).join(' + ') : cfg[`${p}TweenSelector`]}"`
@@ -16414,6 +16428,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // function as well, not just the pose"). It used to be frozen at release (the in-flight part is baked into the accumulator there, and this phase applied progress 0), so only the pose obeyed the Start Time
     // (keeps running at normal speed) and the Delay (slows to a halt). stopRamp is the progress made SINCE the release, taken from the same virtual-elapsed accumulator that drives the pose; it is baked when the stop ends.
     let stopRamp = 0
+    let stopSplay = chp.frozenSplayDeg
     if (chp.stoppingWasLooping) {
       // CORRECTED 2026-10-04 (was: hold the release-moment pose for the whole
       // delay, so Tween Stop appeared to work only on the first playthrough).
@@ -16447,6 +16462,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       chp.stoppingVirtualElapsedMs += dt * decayFactor * (chp.liveTempo || 1)
       const progressRaw = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
       const progress = stopEasing ? easingProfilePAt(stopEasing, progressRaw) : progressRaw
+      if (chp.lateSplayFrom != null) stopSplay = THREE.MathUtils.lerp(chp.lateSplayFrom, chp.frozenSplayDeg, progress)
       const progressAtRelease = THREE.MathUtils.clamp(chp.stoppingBaseElapsedMs / speedMs, 0, 1)
       stopRamp = Math.max(progress - (stopEasing ? easingProfilePAt(stopEasing, progressAtRelease) : progressAtRelease), 0) // the (eased) forward ramp minus the part already baked at release
       // `* frozenTweenFractionCap` (CORRECTED 2026-09-28) -- the forward
@@ -16457,7 +16473,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       values = (chp.tweenSegments && chp.tweenSegments.length > 0) ? lerpTweenSegments(chp.tweenSegments, progress * (chp.frozenTweenFractionCap ?? 1)) : chp.lastAppliedValues
     }
     chp.lastAppliedValues = values
-    applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
+    applyPoseValuesToHand(hand, values, stopSplay)
     applyOffsetRotationToHand(hand, p, stopRamp) // continues the ramp the release interrupted (see stopRamp above); 0 when nothing was left to add
     if (tDecay >= 1) {
       bakeInFlightOffsetRotation(hand, p) // the stop is over: lock in the part of the ramp added while stopping, so a retransition (or a freeze) starts from the real total
@@ -16670,6 +16686,14 @@ function startClickHoldPose(p) {
 // computed once right here (mirrors updateRenderOrder()'s own per-frame
 // pass) rather than waiting for the next animation frame -- release
 // should feel immediate, not delayed by up to one frame.
+// Tween Stop applied to triggering (2026-10-22): the per-hand stop numbers that endClickHoldPose() computes inline for a hand that is already playing, for a hand that has not been claimed yet. Mirrors that block - keep them in step.
+function holdStopParams(p, trig, dist, retransitionOff) {
+  const startDelay = cfg[`${p}TweenStopStartTimeCurveEnabled`] ? curveByDomain(p, 'TweenStopStartTimeCurveVisibleOnly', dist, trig.tweenStopStartCurveParsed, trig.tweenStopStartRangeParsed) : 0
+  const delayMs = Math.max(cfg[`${p}TweenStopDelayCurveEnabled`] ? curveByDomain(p, 'TweenStopDelayCurveVisibleOnly', dist, trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed) : (cfg[`${p}TweenStopDelayMs`] || 0), 1)
+  const retDelay = retransitionOff ? 0 : curveByDomain(p, 'RetransitionStartTimeCurveVisibleOnly', dist, trig.tweenRetransitionCurveParsed, trig.tweenRetransitionRangeParsed)
+  const retSpeed = cfg[`${p}RetransitionSpeedCurveEnabled`] ? curveByDomain(p, 'RetransitionSpeedCurveVisibleOnly', dist, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed) : 0
+  return { startDelay, delayMs, retDelay, retSpeed }
+}
 function endClickHoldPose(p) {
   const trig = clickHoldPoseTriggers[p]
   if (!trig.active) return // guard against a stray release with no matching press
@@ -16718,6 +16742,16 @@ function endClickHoldPose(p) {
         const kcp = hand._cp && hand._cp[`${p}Clk`]
         if (kcp && kcp.phase !== 'idle') chp.clkReleased = true
         else { chp.awaitClk = false; if (kcp) kcp.pendingClaimAt = 0 }
+      }
+      // 2026-10-22 (direct request): Tween Stop applies to TRIGGERING too. A hand that has not been claimed yet when the button is released (its Start Time delay has not elapsed) used to be dropped, leaving a gap between the
+      // hands that were already playing (winding down by Tween Stop) and the rest (doing nothing). With Tween Stop and Tween Stop Delay on, it keeps its pending claim and is still triggered during the stop window
+      // (Tween Stop Start Time + Tween Stop Delay, from the release): it starts already inside the stop, so its speed - and therefore how far through the sequence it gets - follows the same slow-down; a hand whose claim
+      // would land after the window is dropped as before.
+      chp.lateStop = null
+      if (!chp.awaitClk && chp.pendingClaimAt && isSequenceOrChainMode(p) && cfg[`${p}TweenStopEnabled`] && cfg[`${p}TweenStopDelayEnabled`]) {
+        const rOff = cfg[`${p}RetransitionEnabled`] === false && !onReleaseOn(p)
+        const sp = holdStopParams(p, trig, dists[i], rOff)
+        if (chp.pendingClaimAt - now < sp.startDelay + sp.delayMs) { chp.lateStop = { releaseTime: now, freezeAtEnd: rOff, ...sp }; return }
       }
       chp.pendingClaimAt = 0; return
     }
@@ -16873,6 +16907,7 @@ function endClickHoldPose(p) {
       }
       chp.stoppingVirtualElapsedMs = 0
       chp.stoppingFreezeAtEnd = retransitionOff
+      chp.lateSplayFrom = null
       // CORRECTED 2026-09-27 -- see bakeInFlightOffsetRotation()'s own
       // comment. Release can land mid-ramp (forward not yet complete) or
       // mid-lap (looping) -- either way, whatever fraction of this
@@ -24491,7 +24526,7 @@ function updateRenderOrder() {
       const __chpArr = hand._chpArr
       for (let k = 0, kn = CLICK_HOLD_KEYS.length; k < kn; k++) {
         const st = __chpArr[k]
-        if (__holdTrigs[k].active || st.phase !== 'idle' || st.awaitClk) {
+        if (__holdTrigs[k].active || st.phase !== 'idle' || st.awaitClk || st.lateStop) {
           { updateClickHoldPoseForHand(hand, CLICK_HOLD_KEYS[k], live, minLiveDist, liveDistRange, nowMs); if (__hb) rlog.hbCur.holdN++ }
           overridden = true
         }
