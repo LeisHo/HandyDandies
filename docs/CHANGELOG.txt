@@ -18569,3 +18569,10 @@ Change: remoteSaveSnapshot() (devpanel/devPanel.js) now merges `values` per devi
 Also: if the saved file cannot be read when Save starts (offline, HTTP error), the Save now stops with "could not read the current saved settings ... nothing was saved". It used to carry on from an empty base and write from the page alone. A file that does not exist yet (404) still saves normally.
 Not changed: `order` (layout), textOverrides, devVisibility and devIndependence are still replaced by the page's copy; they are not keyed per setting, so a merge could bring back things that were removed on purpose.
 Checked with a Node test of the real function using a stubbed fetch (kept newer keys, dropped a deleted function and a removed trigger, new values won for shared keys, a failed read refused to save). Not tried against the live page.
+
+
+2026-10-22 - Tween Stop applies to triggering (main.js?v=557)
+Direct request: releasing a Click+Hold when only part of the field had been triggered left the not-yet-triggered hands doing nothing, while the triggered ones wound down by Tween Stop, so a big gap opened between them.
+Now, with Tween Stop and Tween Stop Delay on (Sequence / Chain mode), a hand that is still waiting on its Start Time delay at release keeps its pending claim and is still triggered during the stop window (Tween Stop Start Time + Tween Stop Delay, counted from the release). It starts straight in the stopping phase with its clock anchored to the release, so its speed follows the same slow-down (full speed inside the Start Time window, then decaying to a halt) and the sequence only travels as far as the rest of the window allows. Splay eases in over that progress instead of jumping. A hand whose claim would land after the window is dropped, as before. A new press, or another function claiming the hand, cancels it. Tween Stop off, Tween Stop Delay off, Single Pose mode and On Click behave as before.
+Files: src/main.js (holdStopParams(), endClickHoldPose() idle branch, updateClickHoldPoseForHand() cleanup + commit, stopping phase splay, per-frame hold gate).
+Checked: node --check, tests/top-level-load-check.js. Not run in a browser.
