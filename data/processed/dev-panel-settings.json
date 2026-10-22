@@ -75617,7 +75617,7 @@
           "type": "group",
           "group": {
             "key": "Tween",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -77867,7 +77867,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
