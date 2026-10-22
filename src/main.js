@@ -21787,23 +21787,24 @@ function updateOffsetRotationVisibility(p) {
 }
 // Wrist group rows (2026-10-21): the whole group follows its own On/Off, each axis subgroup its own, the plain Amount and the curve subgroup follow the axis, the curve rows follow the curve On/Off, the Progression Curve row follows its box.
 function updateWristVisibility(p) {
-  const show = (key, on) => {
+  const show = (key, on, gate) => {
     const row = document.querySelector(`.dp-row[data-key="${key}"]`)
     if (!row) return
     const g = row.classList.contains('dp-group-gate-row') ? row.closest('.dp-group') : null // wrapped into its own group yet?
+    if (gate) { row.style.display = ''; if (g) g.style.display = on ? '' : 'none'; return } // a gate row is the On/Off checkbox in its group's header: it is never hidden itself (a row hidden before it was wrapped stayed hidden inside the header), only the GROUP is shown / hidden
     ;(g || row).style.display = on ? '' : 'none'
   }
   const wOn = !!cfg[`${p}WristEnabled`]
   ;['WristLoopRetransition', 'WristCurveVisibleOnly', 'WristCurveContinual'].forEach((k) => show(`${p}${k}`, wOn))
   WRIST_KINDS.forEach((k) => {
     const kOn = wOn && !!cfg[`${p}Wrist${k}Enabled`], cOn = kOn && !!cfg[`${p}Wrist${k}CurveEnabled`]
-    show(`${p}Wrist${k}Enabled`, wOn)
+    show(`${p}Wrist${k}Enabled`, wOn, true)
     show(`${p}Wrist${k}Amount`, kOn)
-    show(`${p}Wrist${k}CurveEnabled`, kOn)
+    show(`${p}Wrist${k}CurveEnabled`, kOn, true)
     show(`${p}Wrist${k}CurveRange`, cOn)
     show(`${p}Wrist${k}Curve`, cOn)
   })
-  show(`${p}WristProgressionCurveEnabled`, wOn)
+  show(`${p}WristProgressionCurveEnabled`, wOn, true)
   show(`${p}WristProgressionCurve`, wOn && !!cfg[`${p}WristProgressionCurveEnabled`])
 }
 cfg.startupFnEnabled = true
@@ -21908,6 +21909,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   const wristProgGroup = wrapGatedSubgroup(`${p}WristProgressionCurveEnabled`, [`${p}WristProgressionCurve`], 'Progression Curve')
   if (wristGroup && wristProgGroup) wristGroup.querySelector(':scope > .dp-group-body').appendChild(wristProgGroup)
   if (wristGroup && rotationGroup && rotationGroup.parentElement) rotationGroup.parentElement.insertBefore(wristGroup, rotationGroup.nextSibling)
+  updateWristVisibility(p) // the first visibility pass ran before the rows were wrapped into groups: apply it to the groups now
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurveVisibleOnly`, `${p}SpeedCurveXOrigin`, `${p}SpeedCurveContinual`, `${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
   // start-time curve (no enable toggle of its own -- see
