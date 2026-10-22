@@ -212,7 +212,7 @@
       "renderOrderSkipOffScreen": true,
       "throttleOffScreenPosition": false,
       "offScreenPositionEvery": 2,
-      "throttleOffScreenPose": true,
+      "throttleOffScreenPose": false,
       "offScreenPoseEvery": 5,
       "fieldRows": 32,
       "fieldCols": 31,
