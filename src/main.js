@@ -11163,11 +11163,29 @@ function lpBaseModSections(seq, hand) { // the enabled sections' values of one h
   const secs = Object.keys(bm.sections).map((id) => bm.sections[id]).filter((sec) => sec && sec.enabled && sec.values)
   return secs.length ? secs : null
 }
+// FLIP VALUE of the Base Modifiers (HANDO 2026-10-22, BASE MODIFIERS > FLIP VALUE): seq.baseModifiers.<main|hand2>.flip = { enabled, keys: [plain pose keys] }. While the hand's Base Modifiers group AND its Flip Value group are on, every
+// listed setting of every frame is multiplied by -1 (0 stays 0) BEFORE the other modifiers are added. A key the frame does not carry flips its default. The 2nd hand's placement-level keys are left alone here (this project does not
+// import its pose-level terms); Hide Wrist / Hide Model stay within 0-100.
+function lpFlipKeys(seq, hand) { // the picked keys, or null when the flip is off
+  const bm = seq && seq.baseModifiers && seq.baseModifiers[hand === 1 ? 'main' : 'hand2']
+  if (!bm || !bm.enabled || !bm.flip || !bm.flip.enabled || !Array.isArray(bm.flip.keys) || !bm.flip.keys.length) return null
+  if (hand === 2 && seq.hand2 && seq.hand2.mirrorMainHandPose) return null
+  const keys = bm.flip.keys.filter((k) => typeof k === 'string' && !(hand === 2 && LP_BASE_MOD_HAND2_PLACEMENT_KEYS.includes(k) && k !== 'hideModel'))
+  return keys.length ? keys : null
+}
+function lpBaseModActive(seq, hand) { return !!(lpBaseModSections(seq, hand) || lpFlipKeys(seq, hand)) }
 function lpApplyBaseMod(item, seq, hand) { // a copy of the frame's pose values with the modifiers added (or `item` itself when there are none)
   const secs = lpBaseModSections(seq, hand)
-  if (!secs) return item
+  const flips = lpFlipKeys(seq, hand)
+  if (!secs && !flips) return item
   const out = { ...item }
-  secs.forEach((sec) => Object.keys(sec.values).forEach((k) => {
+  if (flips) flips.forEach((k) => {
+    const cur = out[k] !== undefined ? out[k] : (POSE_KEY_DEFAULTS[k] !== undefined ? POSE_KEY_DEFAULTS[k] : 0)
+    if (typeof cur !== 'number') return
+    const nv = cur === 0 ? 0 : -cur
+    out[k] = (k === 'hideWrist' || k === 'hideModel') ? Math.min(100, Math.max(0, nv)) : nv
+  })
+  if (secs) secs.forEach((sec) => Object.keys(sec.values).forEach((k) => {
     const v = sec.values[k]
     if (typeof v !== 'number') return
     if (hand === 2 && LP_BASE_MOD_HAND2_PLACEMENT_KEYS.includes(k) && k !== 'hideModel') return // placement keys of the 2nd hand: lpHand2WithBaseMods()
@@ -15249,7 +15267,7 @@ const BM_ENTRY_PREFIX = BM_SEP + 'bm' + BM_SEP
 const bmPoseCache = new Map()
 function sequencePoseEntries(seq) {
   const raw = seq.tweenPoses || []
-  if (!lpBaseModSections(seq, 1)) return raw
+  if (!lpBaseModActive(seq, 1)) return raw
   return raw.map((e) => (typeof e === 'string' && e ? BM_ENTRY_PREFIX + seq.name + BM_SEP + e : e))
 }
 function savedPoseByName(name) { // the last saved pose of that name (or its modified copy for a baked entry)
@@ -15259,7 +15277,7 @@ function savedPoseByName(name) { // the last saved pose of that name (or its mod
     const base = savedPoseByName(rest.slice(i + 1))
     if (!base) return base
     const seq = (cfg.savedTweenSequences || []).find((s) => s.name === rest.slice(0, i))
-    if (!seq || !lpBaseModSections(seq, 1)) return base
+    if (!seq || !lpBaseModActive(seq, 1)) return base
     const c = bmPoseCache.get(name)
     if (c && c.base === base && c.bm === seq.baseModifiers) return c.out
     const out = lpApplyBaseMod(base, seq, 1)
