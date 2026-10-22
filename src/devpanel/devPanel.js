@@ -3426,7 +3426,8 @@ async function remoteSaveSnapshot(remoteSave, snapshot) {
     if (getResp.ok && getBody.ok === true && getBody.settings && typeof getBody.settings === 'object') {
       base = getBody.settings
     }
-  } catch (err) { /* fall through -- POST below still proceeds from an empty base */ }
+    else if (!(getResp.ok && getBody.ok === true && getBody.settings === null)) return { ok: false, error: 'could not read the current saved settings (HTTP ' + getResp.status + '); nothing was saved' }
+  } catch (err) { return { ok: false, error: 'could not read the current saved settings (connection); nothing was saved' } }
   // CORRECTED 2026-10-01, REAL BUG confirmed live via direct testing
   // against the deployed app (direct report: "when i enable click
   // funcitons in mobile tab through cehckbox, i hit save, it doesnt get
@@ -3445,6 +3446,20 @@ async function remoteSaveSnapshot(remoteSave, snapshot) {
   // field like HANDO's own `defaultCamera`, per this function's own
   // top comment).
   const merged = { ...base, ...snapshot }
+  // 2026-10-21 (direct request after the 19:23 Save dropped 1,940 settings): `values` is MERGED per device, not replaced. A page that is running older code (a tab left open, a phone that kept a cached copy) holds only the settings that existed when it
+  // loaded; replacing the file's values with that smaller set silently deleted every newer setting. Now a key the saved file has and this page does not is kept (unless the host says it belongs to something deleted: remoteSave.keepStaleKey).
+  if (base.values && snapshot.values) {
+    merged.values = {}
+    for (const d of Object.keys({ ...base.values, ...snapshot.values })) {
+      const mine = snapshot.values[d] || {}, theirs = base.values[d] || {}, out = { ...mine }
+      for (const k of Object.keys(theirs)) {
+        if (k in mine) continue
+        if (remoteSave.keepStaleKey) { let keep = true; try { keep = remoteSave.keepStaleKey(k, mine) !== false } catch (err) { /* keep it */ } if (!keep) continue }
+        out[k] = theirs[k]
+      }
+      merged.values[d] = out
+    }
+  }
   // Vercel rejects a request body over 4.5 MB (the function never runs, the client only sees a failure); say so instead of a vague error.
   const approxBytes = JSON.stringify(merged).length
   if (approxBytes > 4.4 * 1024 * 1024) return { ok: false, error: 'settings are ' + (approxBytes / 1048576).toFixed(1) + ' MB, over the 4.5 MB request limit' }

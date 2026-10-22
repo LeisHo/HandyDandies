@@ -11,7 +11,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { nestImportedGroups, DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible, mergeImportedItem } from './devpanel/devPanel.js?v=106'
+import { nestImportedGroups, DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible, mergeImportedItem } from './devpanel/devPanel.js?v=107'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -4321,7 +4321,8 @@ const SAVE_SETTINGS_ENDPOINT = '/api/save-settings'
 const cfg = initDevPanel(DEV_GROUPS, {
   storageKeyPrefix: 'handyDandies',
   organizeSubgroups: (groupsEl) => { organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Debug', SNAPSHOT_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Camera', CAMERA_SUBGROUP_SPECS) },
-  remoteSave: { endpoint: SAVE_SETTINGS_ENDPOINT, secret: DEV_PANEL_SAVE_SECRET },
+  // keepStaleKey: Save keeps saved settings this page does not hold (older code), but not the settings of a custom click function / Multi Trigger that was deleted (its id is no longer in this page's list).
+  remoteSave: { endpoint: SAVE_SETTINGS_ENDPOINT, secret: DEV_PANEL_SAVE_SECRET, keepStaleKey: saveShouldKeepStaleKey },
   // ROOT CAUSE of the middle/ring finger "outstretched" bug's REAL
   // return, 2026-09-16 (direct user report, correctly suspecting "the
   // default position") -- `poseDefaultValues` (declared below) used to
@@ -18737,6 +18738,18 @@ function buildClickPoseWidgets(p) {
 // over `p` and already proven correct on the existing IDs, so a new ID
 // needs ZERO changes there.
 // -----------------------------------------------------------------------
+function saveShouldKeepStaleKey(k, mine) {
+  const m = /^(custom\d+)(Trig\d+)?(?=[A-Z]|$)/.exec(k)
+  if (!m) return true
+  let ids; try { ids = JSON.parse(mine.customClickFunctionIds || '[]') } catch (e) { return true }
+  if (!Array.isArray(ids) || !ids.length) return true
+  if (!ids.some((e) => e && e.id === m[1])) return false // the function was deleted
+  if (m[2]) { // a Multi Trigger block: kept only while the function's own trigger list (when this page has one) still names it
+    const raw = mine[`${m[1]}MultiTriggers`]
+    if (typeof raw === 'string') { try { const l = JSON.parse(raw); if (Array.isArray(l) && !l.some((t) => t && t.prefix === m[1] + m[2])) return false } catch (e) { /* keep */ } }
+  }
+  return true
+}
 let customClickFunctionIds = [] // [{id, title, kind, family}] -- kind: 'pose'|'hold'; family: 'desktop'|'mobile'. Mirrors cfg.customClickFunctionIds (JSON), kept in sync by persistCustomClickFunctionIds()
 let nextCustomFunctionN = 1
 // Multi Trigger (added 2026-09-27, direct spec: "for custom click
