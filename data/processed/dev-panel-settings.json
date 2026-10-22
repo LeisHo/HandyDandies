@@ -244,7 +244,7 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8236886200483564,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.14644391749988517,\"y\":-0.08687502543131509}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8179901001153433,\"y\":0.1064584096272786}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.12332654900637385,\"y\":-0.19354159037272134}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-152}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
@@ -48980,7 +48980,7 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8236886200483564,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.14644391749988517,\"y\":-0.08687502543131509}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8179901001153433,\"y\":0.1064584096272786}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.12332654900637385,\"y\":-0.19354159037272134}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-152}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
@@ -73701,7 +73701,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -74360,7 +74360,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -74371,7 +74371,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -74546,7 +74546,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -77371,7 +77371,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
