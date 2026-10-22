@@ -212,7 +212,7 @@
       "throttleOffScreenPose": false,
       "offScreenPoseEvery": 2,
       "fieldRows": 30,
-      "fieldCols": 26,
+      "fieldCols": 29,
       "rowSpacing": 8,
       "columnSpacing": 15,
       "handScale": 1,
@@ -242,7 +242,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7723014639266264,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.11251825718339037,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-163}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-140}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -43202,7 +43202,7 @@
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
       "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7723014639266264,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.11251825718339037,\"y\":0}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-163}",
+      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-140}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -65882,7 +65882,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
