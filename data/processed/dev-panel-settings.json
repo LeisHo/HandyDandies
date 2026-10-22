@@ -17485,15 +17485,15 @@
       "uiBtnTweenEnabled": true,
       "uiBtnDurationMs": 600,
       "uiBtnFnEasingCurveEnabled": true,
-      "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.49523197809091923,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4915642581676357,\"y\":0}}]",
+      "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.594993624215724,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4915642581676357,\"y\":0}}]",
       "uiBtnFnRetransitionEasingCurveEnabled": false,
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnSpeedCurveEnabled": true,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "uiBtnFnSpeedCurveRange": "{\"min\":838,\"max\":937}",
+      "uiBtnFnSpeedCurveRange": "{\"min\":600,\"max\":754}",
       "uiBtnFnStartTimeCurveEnabled": true,
       "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3323858570917693,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
+      "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":172}",
       "uiBtnFnRetransitionEnabled": false,
       "uiBtnFnRetransitionSpeedMs": 400,
       "uiBtnFnRetransitionSpeedCurveEnabled": false,
@@ -17503,8 +17503,8 @@
       "uiBtnFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "uiBtnScaleCurveEnabled": true,
-      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.48936368217841675,\"y\":0}},{\"x\":0.6037960960668532,\"y\":1,\"h1\":{\"x\":0.12616906167819264,\"y\":0},\"h2\":{\"x\":-0.2171282079694925,\"y\":0}},{\"x\":1,\"y\":0.6666666666666666,\"h2\":{\"x\":-0.17760860799434086,\"y\":-0.0390626271565756}}]",
-      "uiBtnScaleRange": "{\"min\":0,\"max\":1.5}",
+      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.552448213017513,\"y\":0.013124974568684888}},{\"x\":0.6037960960668532,\"y\":1,\"h1\":{\"x\":0.12616906167819264,\"y\":0},\"h2\":{\"x\":-0.15844488507358523,\"y\":0}},{\"x\":1,\"y\":0.7692307692307692,\"h2\":{\"x\":-0.16293778426595795,\"y\":-0.21610602354392028}}]",
+      "uiBtnScaleRange": "{\"min\":0,\"max\":1.3}",
       "showTrackingPoints": false,
       "showFieldCenterPoint": false,
       "showRenderOrderPoints": false,
@@ -41853,15 +41853,15 @@
       "uiBtnTweenEnabled": true,
       "uiBtnDurationMs": 600,
       "uiBtnFnEasingCurveEnabled": true,
-      "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.49523197809091923,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4915642581676357,\"y\":0}}]",
+      "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.594993624215724,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4915642581676357,\"y\":0}}]",
       "uiBtnFnRetransitionEasingCurveEnabled": false,
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnSpeedCurveEnabled": true,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "uiBtnFnSpeedCurveRange": "{\"min\":838,\"max\":937}",
+      "uiBtnFnSpeedCurveRange": "{\"min\":600,\"max\":754}",
       "uiBtnFnStartTimeCurveEnabled": true,
       "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3323858570917693,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
+      "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":172}",
       "uiBtnFnRetransitionEnabled": false,
       "uiBtnFnRetransitionSpeedMs": 400,
       "uiBtnFnRetransitionSpeedCurveEnabled": false,
@@ -41871,8 +41871,8 @@
       "uiBtnFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "uiBtnScaleCurveEnabled": true,
-      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.48936368217841675,\"y\":0}},{\"x\":0.6037960960668532,\"y\":1,\"h1\":{\"x\":0.12616906167819264,\"y\":0},\"h2\":{\"x\":-0.2171282079694925,\"y\":0}},{\"x\":1,\"y\":0.6666666666666666,\"h2\":{\"x\":-0.17760860799434086,\"y\":-0.0390626271565756}}]",
-      "uiBtnScaleRange": "{\"min\":0,\"max\":1.5}",
+      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.552448213017513,\"y\":0.013124974568684888}},{\"x\":0.6037960960668532,\"y\":1,\"h1\":{\"x\":0.12616906167819264,\"y\":0},\"h2\":{\"x\":-0.15844488507358523,\"y\":0}},{\"x\":1,\"y\":0.7692307692307692,\"h2\":{\"x\":-0.16293778426595795,\"y\":-0.21610602354392028}}]",
+      "uiBtnScaleRange": "{\"min\":0,\"max\":1.3}",
       "showTrackingPoints": false,
       "showFieldCenterPoint": false,
       "showRenderOrderPoints": false,
@@ -66221,15 +66221,15 @@
       "uiBtnTweenEnabled": true,
       "uiBtnDurationMs": 600,
       "uiBtnFnEasingCurveEnabled": true,
-      "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.49523197809091923,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4915642581676357,\"y\":0}}]",
+      "uiBtnFnEasingCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.594993624215724,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4915642581676357,\"y\":0}}]",
       "uiBtnFnRetransitionEasingCurveEnabled": false,
       "uiBtnFnRetransitionEasingCurve": "[{\"x\":0,\"y\":0.5},{\"x\":1,\"y\":0.5}]",
       "uiBtnFnSpeedCurveEnabled": true,
       "uiBtnFnSpeedCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "uiBtnFnSpeedCurveRange": "{\"min\":838,\"max\":937}",
+      "uiBtnFnSpeedCurveRange": "{\"min\":600,\"max\":754}",
       "uiBtnFnStartTimeCurveEnabled": true,
       "uiBtnFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3323858570917693,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":300}",
+      "uiBtnFnStartTimeRange": "{\"min\":0,\"max\":172}",
       "uiBtnFnRetransitionEnabled": false,
       "uiBtnFnRetransitionSpeedMs": 400,
       "uiBtnFnRetransitionSpeedCurveEnabled": false,
@@ -66239,8 +66239,8 @@
       "uiBtnFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "uiBtnFnRetransitionStartTimeRange": "{\"min\":0,\"max\":300}",
       "uiBtnScaleCurveEnabled": true,
-      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.48936368217841675,\"y\":0}},{\"x\":0.6037960960668532,\"y\":1,\"h1\":{\"x\":0.12616906167819264,\"y\":0},\"h2\":{\"x\":-0.2171282079694925,\"y\":0}},{\"x\":1,\"y\":0.6666666666666666,\"h2\":{\"x\":-0.17760860799434086,\"y\":-0.0390626271565756}}]",
-      "uiBtnScaleRange": "{\"min\":0,\"max\":1.5}",
+      "uiBtnScaleCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.552448213017513,\"y\":0.013124974568684888}},{\"x\":0.6037960960668532,\"y\":1,\"h1\":{\"x\":0.12616906167819264,\"y\":0},\"h2\":{\"x\":-0.15844488507358523,\"y\":0}},{\"x\":1,\"y\":0.7692307692307692,\"h2\":{\"x\":-0.16293778426595795,\"y\":-0.21610602354392028}}]",
+      "uiBtnScaleRange": "{\"min\":0,\"max\":1.3}",
       "showTrackingPoints": false,
       "showFieldCenterPoint": false,
       "showRenderOrderPoints": false,
@@ -74360,7 +74360,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -74371,7 +74371,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -74546,7 +74546,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -74598,7 +74598,7 @@
                 "type": "group",
                 "group": {
                   "key": "Off-Screen Hands",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -74670,7 +74670,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Splay",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -74687,7 +74687,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Bend",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -74704,7 +74704,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -74748,7 +74748,7 @@
           "type": "group",
           "group": {
             "key": "Render Order",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -77371,7 +77371,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -77437,7 +77437,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Easing",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -77552,7 +77552,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": true,
+      "collapsed": false,
       "locked": false,
       "items": [
         {
