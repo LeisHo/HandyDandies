@@ -18562,7 +18562,7 @@ Cause found in the git history of data/processed/dev-panel-settings.json: the Sa
   Reload any tab that was open before this commit before pressing Save, or it will write the damaged state again.
 
 --------------------------------------------------------------------------------
-2026-10-21  -  10:58 PM EDT  -  Save merges into the saved file instead of replacing it (main.js?v=556, devPanel.js?v=107)
+2026-10-21  -  10:53 PM EDT  -  Save merges into the saved file instead of replacing it (main.js?v=556, devPanel.js?v=107)
 --------------------------------------------------------------------------------
 Why: the Save at 19:23 (e441a4ba) came from a page running code from before about 21:28 on Oct 20. Save used to replace the file's `values` with whatever the page held, so that page deleted 1,940 settings it did not know (the Continually Recomputes checkboxes, Off-Screen skip / throttle settings, UI Button Tween, log checkboxes, the newer per-function Click and Progression Curve settings). The settings it did know were written back unchanged (4,330 of 4,333 shared keys identical), so the load itself had worked.
 Change: remoteSaveSnapshot() (devpanel/devPanel.js) now merges `values` per device: every key this page holds wins, and every key the saved file has but this page does not is kept. main.js passes remoteSave.keepStaleKey (saveShouldKeepStaleKey) so the settings of a custom click function that was deleted, or of a Multi Trigger that was removed from its function's list, are not carried forward (deleted functions still disappear from the file).
