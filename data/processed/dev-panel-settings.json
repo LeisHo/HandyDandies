@@ -241,7 +241,7 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7723014639266264,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.11251825718339037,\"y\":0}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7723014639266264,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.09984886360792855,\"y\":-0.24687499999999996}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-140}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
@@ -15134,14 +15134,14 @@
         }
       ],
       "cameraX": 3.6923076923076925,
-      "cameraY": 1.04554353627336e-13,
-      "cameraZ": 354.370595411201,
+      "cameraY": 1.1084596782191232e-13,
+      "cameraZ": 457.1204527407885,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":3.6923076923076925,\"cameraY\":1.04554353627336e-13,\"cameraZ\":354.370595411201,\"cameraFov\":20,\"cameraZoom\":230,\"cameraRoll\":0,\"targetX\":3.6923076923076925,\"targetY\":9.047091543714144e-14,\"targetZ\":124.37059541120101}",
-      "cameraZoom": 230,
+      "cameraZoom": 332.7498573295875,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -43201,7 +43201,7 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7723014639266264,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.11251825718339037,\"y\":0}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7723014639266264,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.09984886360792855,\"y\":-0.24687499999999996}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-140}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
@@ -73338,9 +73338,9 @@
   "panelGeometry": {
     "desktop": {
       "left": 4.75,
-      "top": 63.29999923706055,
-      "width": 582.1000366210938,
-      "height": 544.4249877929688,
+      "top": 66.5,
+      "width": 585.2999877929688,
+      "height": 542.8125,
       "collapsed": false
     },
     "mobile": {
