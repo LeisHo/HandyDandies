@@ -200,8 +200,8 @@
       "smallScaleModelsEnabled": true,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"},{\"z\":-300,\"model\":\"repo:HD_IK_100\"}]",
       "skipOffScreenFingerCurls": true,
-      "offScreenBufferEnabled": false,
-      "offScreenBufferDistance": 30,
+      "offScreenBufferEnabled": true,
+      "offScreenBufferDistance": 15,
       "skipOffScreenPoseWork": false,
       "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": false,
@@ -65934,7 +65934,7 @@
                 "type": "group",
                 "group": {
                   "key": "Off-Screen Hands",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -73338,9 +73338,9 @@
   "panelGeometry": {
     "desktop": {
       "left": 4.75,
-      "top": 176.19444274902344,
-      "width": 578.9027709960938,
-      "height": 429.9444580078125,
+      "top": 63.30555725097656,
+      "width": 582.4583129882812,
+      "height": 544.6111450195312,
       "collapsed": false
     },
     "mobile": {
