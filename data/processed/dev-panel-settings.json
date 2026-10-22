@@ -212,11 +212,11 @@
       "throttleOffScreenPose": false,
       "offScreenPoseEvery": 2,
       "fieldRows": 32,
-      "fieldCols": 30,
+      "fieldCols": 31,
       "rowSpacing": 8,
-      "columnSpacing": 15,
+      "columnSpacing": 14,
       "handScale": 1,
-      "alternateRowOffset": 7.5,
+      "alternateRowOffset": 7,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
       "hideHands": false,
@@ -241,8 +241,8 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.885727695232266,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.04816899545875508,\"y\":-0.5335418701171875}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-140}",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8236886200483564,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.14644391749988517,\"y\":-0.08687502543131509}}]",
+      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-152}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -16323,14 +16323,14 @@
         }
       ],
       "cameraX": 3.6923076923076925,
-      "cameraY": 1.04554353627336e-13,
-      "cameraZ": 354.370595411201,
+      "cameraY": 1.214939755500029e-13,
+      "cameraZ": 401.0156155829095,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":3.6923076923076925,\"cameraY\":1.04554353627336e-13,\"cameraZ\":354.370595411201,\"cameraFov\":20,\"cameraZoom\":230,\"cameraRoll\":0,\"targetX\":3.6923076923076925,\"targetY\":9.047091543714144e-14,\"targetZ\":124.37059541120101}",
-      "cameraZoom": 230,
+      "cameraZoom": 276.6450201717085,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -16370,7 +16370,7 @@
           "targetZ": -0.012343633524153574
         }
       ],
-      "cameraShowFrame": false,
+      "cameraShowFrame": true,
       "cameraFrameThickness": 3,
       "lockCameraPan": true,
       "lockCameraZoom": false,
@@ -45579,8 +45579,8 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.885727695232266,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.04816899545875508,\"y\":-0.5335418701171875}}]",
-      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-140}",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.8236886200483564,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.14644391749988517,\"y\":-0.08687502543131509}}]",
+      "fieldBoundsZMinCurveRange": "{\"min\":-400,\"max\":-152}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
       "fieldBoundsZMaxCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7710241189949432,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":0,\"y\":1}}]",
@@ -69274,7 +69274,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -69449,7 +69449,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -69679,7 +69679,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -70913,7 +70913,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -71102,7 +71102,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -71213,7 +71213,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -76906,8 +76906,8 @@
     "desktop": {
       "left": 4.75,
       "top": 66.5,
-      "width": 585.2999877929688,
-      "height": 542.8125,
+      "width": 588.5,
+      "height": 544.4125366210938,
       "collapsed": false
     },
     "mobile": {
