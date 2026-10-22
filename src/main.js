@@ -2759,8 +2759,7 @@ const DEV_GROUPS = [
       { key: 'fieldBoundsY', label: 'Hand Position Min / Max Y (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
       { key: 'fieldBoundsZ', label: 'Hand Position Min / Max Z (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
       // Crop Cap (2026-10-22): a cropped hand's cut end shows a flat colour instead of the hollow inside of the mesh (see cropCapSideFor()). setupCropCapGroup() wraps these two into a toggleable "Crop Cap" subgroup (the on/off checkbox is in its label).
-      { key: 'cropCapEnabled', label: 'Crop Cap On/Off', type: 'checkbox', def: false, onChange: (v) => { setToonUniform('cropCapOn', v ? 1 : 0); hands.forEach((h) => { if (h.clipRig && h.clipRig.fillMat) h.clipRig.fillMat.side = cropCapSideFor(true) }); sceneNeedsRedraw = true } },
-      { key: 'cropCapColor', label: 'Crop Cap Color', type: 'color', def: '#c8967a', onChange: (v) => { setToonUniform('cropCapColor', new THREE.Color(v)); sceneNeedsRedraw = true } }
+      { key: 'cropCapEnabled', label: 'Crop Cap On/Off', type: 'checkbox', def: false, onChange: (v) => { setToonUniform('cropCapOn', v ? 1 : 0); hands.forEach((h) => { if (h.clipRig && h.clipRig.fillMat) h.clipRig.fillMat.side = cropCapSideFor(true) }); sceneNeedsRedraw = true } }
     ]
   },
   {
@@ -5515,7 +5514,7 @@ function placeStartupRetransitionGroup() {
 }
 // Crop Cap subgroup in the Field Layout group (2026-10-22, direct request: a toggleable group, the on/off checkbox in its label): the Color row moves into it and the On/Off row's checkbox into its header.
 function setupCropCapGroup() {
-  wrapGatedSubgroup('cropCapEnabled', ['cropCapColor'], 'Crop Cap')
+  wrapGatedSubgroup('cropCapEnabled', [], 'Crop Cap')
 }
 function setupSphereSequenceGroup() {
   clickPoseTriggers[SPHERE_FN] = clickPoseTriggers[SPHERE_FN] || {
@@ -7536,15 +7535,18 @@ function createToonMaterial(map) {
     shader.uniforms.rimPower = { value: cfg.rimPower }
     shader.uniforms.textureInfluence = { value: cfg.textureInfluence / 100 }
     shader.uniforms.toonTint = { value: new THREE.Color(cfg.toonTint) }
-    shader.uniforms.cropCapColor = { value: new THREE.Color(cfg.cropCapColor) }
     shader.uniforms.cropCapOn = { value: cfg.cropCapEnabled ? 1 : 0 }
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `varying vec3 vRimNormal;\nvarying vec3 vRimViewDir;\n#include <common>`)
       .replace('#include <project_vertex>', `#include <project_vertex>\nvRimNormal = normalize( normalMatrix * objectNormal );\nvRimViewDir = normalize( -mvPosition.xyz );`)
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `varying vec3 vRimNormal;\nvarying vec3 vRimViewDir;\nuniform vec3 rimColor;\nuniform float rimIntensity;\nuniform float rimPower;\nuniform float textureInfluence;\nuniform vec3 toonTint;\nuniform vec3 cropCapColor;\nuniform float cropCapOn;\n#include <common>`)
+      .replace('#include <common>', `varying vec3 vRimNormal;\nvarying vec3 vRimViewDir;\nuniform vec3 rimColor;\nuniform float rimIntensity;\nuniform float rimPower;\nuniform float textureInfluence;\nuniform vec3 toonTint;\nuniform float cropCapOn;\n#include <common>`)
+      // Crop Cap: a back face seen through the crop (the inside of the far wall) is lit as a flat face whose normal is the crop plane's, pointing at the removed side (the clipping planes are in view space here; the Clipping Block's
+      // top plane is index 2 of 6, the single-plane fallback is index 0). Its colour is the hand's own base colour (Toon Texture Tint), and it goes through the same toon gradient as the rest of the hand, so it takes the
+      // light's shade steps: facing the light = the ceiling, facing away = the floor, and every step in between.
+      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>\n#if NUM_CLIPPING_PLANES > 0\nif ( cropCapOn > 0.5 && ! gl_FrontFacing ) {\n#if NUM_CLIPPING_PLANES > 1\nnormal = - normalize( clippingPlanes[ 2 ].xyz );\n#else\nnormal = - normalize( clippingPlanes[ 0 ].xyz );\n#endif\ndiffuseColor.rgb = toonTint;\n}\n#endif`)
       .replace('#include <map_fragment>', `#include <map_fragment>\nfloat toonLuma = dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) );\nvec3 toonDuotone = mix( vec3( 0.0 ), toonTint, toonLuma );\ndiffuseColor.rgb = mix( toonTint, toonDuotone, textureInfluence );`)
-      .replace('#include <dithering_fragment>', `#include <dithering_fragment>\nfloat rimFactor = pow( 1.0 - max( dot( normalize( vRimNormal ), normalize( vRimViewDir ) ), 0.0 ), rimPower );\ngl_FragColor.rgb += rimColor * rimFactor * rimIntensity;\nif ( cropCapOn > 0.5 && ! gl_FrontFacing ) gl_FragColor = vec4( cropCapColor, 1.0 );`)
+      .replace('#include <dithering_fragment>', `#include <dithering_fragment>\nfloat rimFactor = pow( 1.0 - max( dot( normalize( vRimNormal ), normalize( vRimViewDir ) ), 0.0 ), rimPower );\nif ( cropCapOn > 0.5 && ! gl_FrontFacing ) rimFactor = 0.0;\ngl_FragColor.rgb += rimColor * rimFactor * rimIntensity;`)
     toonShaderUniformsList.push(shader.uniforms)
   }
   return material
@@ -22444,7 +22446,7 @@ function applyClipRigToMaterial(mat, rig, singlePlane, isFill = false) {
   if (rig && isFill) rig.fillMat = mat // the hand's toon fill material: setClipRigT() switches it to double-sided for the Crop Cap
 }
 // Crop Cap (2026-10-22, direct request: render the cropped model with the cut end capped instead of a hollow shell): computing the real cut surface per hand per frame is too heavy, so the cap is faked. While a hand is cropped its fill
-// material is drawn double-sided, and the toon shader paints every BACK face (what is seen through the cut: the inside of the far wall) in one flat colour (cropCapColor), which reads as a flat cut face. Only a cropped hand pays for the
+// material is drawn double-sided, and the toon shader lights every BACK face (what is seen through the cut: the inside of the far wall) as a flat face with the crop plane's normal and the hand's base colour, through the same toon gradient as the hand (so it takes the toon steps by the light direction). Only a cropped hand pays for the
 // extra faces; the side is switched without recompiling (the shader always has the gl_FrontFacing test, which is a no-op while culling hides back faces).
 function cropCapSideFor(cropped) { return cfg.cropCapEnabled && cropped ? THREE.DoubleSide : THREE.FrontSide }
 const _clipFarPos = new THREE.Vector3()
