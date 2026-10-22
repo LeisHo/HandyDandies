@@ -19437,7 +19437,7 @@
       "qualityPreset": "high",
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
-      "handOffsetOnStartupEnabled": true,
+      "handOffsetOnStartupEnabled": false,
       "startupHandMaxClicks": 2,
       "startupHandOffsetZ": -10,
       "startupHandWaitForAll": true,
@@ -19539,7 +19539,7 @@
       "startupFnRetransitionStartTimeCurveXOrigin": "Global Setting",
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.08610345933884565,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":0}",
-      "sphereSeqEnabled": true,
+      "sphereSeqEnabled": false,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
@@ -72347,7 +72347,7 @@
       "qualityPreset": "high",
       "staticPoseOnStartup": true,
       "hideFloorAfterHandOffset": true,
-      "handOffsetOnStartupEnabled": true,
+      "handOffsetOnStartupEnabled": false,
       "startupHandMaxClicks": 2,
       "startupHandOffsetZ": -10,
       "startupHandWaitForAll": true,
@@ -72449,7 +72449,7 @@
       "startupFnRetransitionStartTimeCurveXOrigin": "Global Setting",
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.08610345933884565,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":0}",
-      "sphereSeqEnabled": true,
+      "sphereSeqEnabled": false,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
@@ -80621,7 +80621,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -80632,7 +80632,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -80982,7 +80982,7 @@
                 "type": "group",
                 "group": {
                   "key": "Crop Cap",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -82344,14 +82344,14 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "New Group (10)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -82455,7 +82455,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -82751,7 +82751,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
