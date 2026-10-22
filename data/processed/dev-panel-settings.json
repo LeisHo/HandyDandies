@@ -468,11 +468,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.00000000000002,
+      "loadingPreviewKeyAzimuth": 314,
+      "loadingPreviewKeyElevation": 47,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 311,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -501,14 +501,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65,
-      "loadingPreviewRotationY": 179.99999999999997,
+      "loadingPreviewRotationX": -67.76155881846029,
+      "loadingPreviewRotationY": 179.78594228722,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.025964204363,
+      "loadingPreviewCameraZoom": 1279.5949475713576,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -556,22 +556,22 @@
           "fnId": "custom29"
         },
         {
-          "name": "20 FT - 3 - CH Copy",
+          "name": "20 FT - 4 - CH",
           "fnId": "custom54",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 3 - C Copy",
+          "name": "20 FT - 4 - C",
           "fnId": "custom53",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - R - CH Copy",
+          "name": "20 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 1 - C Copy",
+          "name": "20 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
@@ -19124,7 +19124,7 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 2,
+      "toonSteps": 4,
       "toonStepThreshold": 2.5,
       "toonShadowFloor": 0,
       "toonLightCeiling": 99,
@@ -26923,11 +26923,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 3",
-      "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.00000000000002,
+      "loadingPreviewKeyAzimuth": 314,
+      "loadingPreviewKeyElevation": 47,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 311,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -26956,14 +26956,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65,
-      "loadingPreviewRotationY": 179.99999999999997,
+      "loadingPreviewRotationX": -67.76155881846029,
+      "loadingPreviewRotationY": 179.78594228722,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.025964204363,
+      "loadingPreviewCameraZoom": 1279.5949475713576,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -27011,22 +27011,22 @@
           "fnId": "custom29"
         },
         {
-          "name": "20 FT - 3 - CH Copy",
+          "name": "20 FT - 4 - CH",
           "fnId": "custom54",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 3 - C Copy",
+          "name": "20 FT - 4 - C",
           "fnId": "custom53",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - R - CH Copy",
+          "name": "20 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 1 - C Copy",
+          "name": "20 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
@@ -45472,8 +45472,8 @@
         }
       ],
       "cameraX": 3.7499999999999996,
-      "cameraY": 6.337548854377772e-13,
-      "cameraZ": 539.9862936958529,
+      "cameraY": 1.3777276392759843e-13,
+      "cameraZ": 539.9876643400305,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -45579,7 +45579,7 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 2,
+      "toonSteps": 4,
       "toonStepThreshold": 2.5,
       "toonShadowFloor": 0,
       "toonLightCeiling": 99,
@@ -53378,11 +53378,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.00000000000002,
+      "loadingPreviewKeyAzimuth": 314,
+      "loadingPreviewKeyElevation": 47,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 311,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -53411,14 +53411,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -65,
-      "loadingPreviewRotationY": 179.99999999999997,
+      "loadingPreviewRotationX": -67.76155881846029,
+      "loadingPreviewRotationY": 179.78594228722,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 554.025964204363,
+      "loadingPreviewCameraZoom": 1279.5949475713576,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -53466,22 +53466,22 @@
           "fnId": "custom29"
         },
         {
-          "name": "20 FT - 3 - CH Copy",
+          "name": "20 FT - 4 - CH",
           "fnId": "custom54",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 3 - C Copy",
+          "name": "20 FT - 4 - C",
           "fnId": "custom53",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - R - CH Copy",
+          "name": "20 FT - R - C",
           "fnId": "custom52",
           "group": "20 FOV TEST"
         },
         {
-          "name": "20 FT - 1 - C Copy",
+          "name": "20 FT - R - CH",
           "fnId": "custom51",
           "group": "20 FOV TEST"
         },
@@ -72034,7 +72034,7 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 2,
+      "toonSteps": 4,
       "toonStepThreshold": 2.5,
       "toonShadowFloor": 0,
       "toonLightCeiling": 99,
@@ -80599,26 +80599,6 @@
               {
                 "type": "row",
                 "key": "loadingWarmBudgetMs"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewTextEnabled"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewProgressCropEnabled"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewEndEnabled"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewEndEasingEnabled"
-              },
-              {
-                "type": "row",
-                "key": "loadingPreviewEndRetransitionEnabled"
               }
             ],
             "settings": [
@@ -80632,12 +80612,7 @@
               "loadingPreviewPosX",
               "loadingPreviewPosY",
               "loadingPreviewLayout",
-              "loadingWarmBudgetMs",
-              "loadingPreviewTextEnabled",
-              "loadingPreviewProgressCropEnabled",
-              "loadingPreviewEndEnabled",
-              "loadingPreviewEndEasingEnabled",
-              "loadingPreviewEndRetransitionEnabled"
+              "loadingWarmBudgetMs"
             ]
           }
         }
@@ -81940,8 +81915,400 @@
                   "key": "Responsive Velocity",
                   "collapsed": true,
                   "locked": false,
-                  "items": [],
-                  "settings": []
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "rvHoldOnly"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rvVelocityRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rvVelocitySmoothing"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rvTriggerDistanceRange"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rvTriggerDistanceCurve"
+                    },
+                    {
+                      "type": "row",
+                      "key": "rvDistanceFrom"
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Displacement Start Time Curve",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "rvStartTimeRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvStartTimeCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvStartTimeCurveXOrigin"
+                          }
+                        ],
+                        "settings": [
+                          "rvStartTimeRange",
+                          "rvStartTimeCurve",
+                          "rvStartTimeCurveXOrigin"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Displacement Speed Curve",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "rvSpeedRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSpeedCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSpeedCurveXOrigin"
+                          }
+                        ],
+                        "settings": [
+                          "rvSpeedRange",
+                          "rvSpeedCurve",
+                          "rvSpeedCurveXOrigin"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Retransition",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "rvRetransitionSpeedMs"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Speed Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionSpeedRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionSpeedCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionSpeedCurveXOrigin"
+                                }
+                              ],
+                              "settings": [
+                                "rvRetransitionSpeedRange",
+                                "rvRetransitionSpeedCurve",
+                                "rvRetransitionSpeedCurveXOrigin"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Start Time Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionStartTimeRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionStartTimeCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionStartTimeCurveXOrigin"
+                                }
+                              ],
+                              "settings": [
+                                "rvRetransitionStartTimeRange",
+                                "rvRetransitionStartTimeCurve",
+                                "rvRetransitionStartTimeCurveXOrigin"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Retransition Easing Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvRetransitionEasingCurve"
+                                }
+                              ],
+                              "settings": [
+                                "rvRetransitionEasingCurve"
+                              ]
+                            }
+                          }
+                        ],
+                        "settings": [
+                          "rvRetransitionSpeedMs"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Easing",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "rvEasingCurve"
+                          }
+                        ],
+                        "settings": [
+                          "rvEasingCurve"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "row",
+                      "key": "rvSets"
+                    },
+                    {
+                      "type": "group",
+                      "group": {
+                        "key": "Displacement Angle to Velocity 1",
+                        "collapsed": true,
+                        "locked": false,
+                        "items": [
+                          {
+                            "type": "row",
+                            "key": "rvSet1Angle"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSet1DisplacementRange"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSet1DisplacementCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSet1DisplacementDistCurve"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSet1DisplacementDistCurveXOrigin"
+                          },
+                          {
+                            "type": "row",
+                            "key": "rvSet1TriggerAngleRange"
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Displacement Angle Curve",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1AngleCurveRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1AngleCurve"
+                                }
+                              ],
+                              "settings": [
+                                "rvSet1AngleCurveRange",
+                                "rvSet1AngleCurve"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Velocity Arm Rotation",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1ArmRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1ArmCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1ArmDistCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1ArmDistCurveXOrigin"
+                                }
+                              ],
+                              "settings": [
+                                "rvSet1ArmRange",
+                                "rvSet1ArmCurve",
+                                "rvSet1ArmDistCurve",
+                                "rvSet1ArmDistCurveXOrigin"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Velocity Wrist Splay",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1SplayRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1SplayCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1SplayDistCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1SplayDistCurveXOrigin"
+                                }
+                              ],
+                              "settings": [
+                                "rvSet1SplayRange",
+                                "rvSet1SplayCurve",
+                                "rvSet1SplayDistCurve",
+                                "rvSet1SplayDistCurveXOrigin"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Velocity Wrist Crop",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CropRange"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CropCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CropDistCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CropDistCurveXOrigin"
+                                }
+                              ],
+                              "settings": [
+                                "rvSet1CropRange",
+                                "rvSet1CropCurve",
+                                "rvSet1CropDistCurve",
+                                "rvSet1CropDistCurveXOrigin"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "group",
+                            "group": {
+                              "key": "Velocity Finger Curl",
+                              "collapsed": true,
+                              "locked": false,
+                              "items": [
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CurlTargetPose"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CurlCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CurlDistCurve"
+                                },
+                                {
+                                  "type": "row",
+                                  "key": "rvSet1CurlDistCurveXOrigin"
+                                }
+                              ],
+                              "settings": [
+                                "rvSet1CurlTargetPose",
+                                "rvSet1CurlCurve",
+                                "rvSet1CurlDistCurve",
+                                "rvSet1CurlDistCurveXOrigin"
+                              ]
+                            }
+                          }
+                        ],
+                        "settings": [
+                          "rvSet1Angle",
+                          "rvSet1DisplacementRange",
+                          "rvSet1DisplacementCurve",
+                          "rvSet1DisplacementDistCurve",
+                          "rvSet1DisplacementDistCurveXOrigin",
+                          "rvSet1TriggerAngleRange"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "row"
+                    }
+                  ],
+                  "settings": [
+                    "rvHoldOnly",
+                    "rvVelocityRange",
+                    "rvVelocitySmoothing",
+                    "rvTriggerDistanceRange",
+                    "rvTriggerDistanceCurve",
+                    "rvDistanceFrom",
+                    "rvSets",
+                    null
+                  ]
                 }
               }
             ],
@@ -81977,14 +82344,14 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "New Group (10)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -81995,7 +82362,7 @@
                 "type": "group",
                 "group": {
                   "key": "Toon Shading",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -83472,106 +83839,6 @@
       "locked": true,
       "items": [
         {
-          "type": "group",
-          "group": {
-            "key": "20 FT - 1 - C Copy",
-            "collapsed": false,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "35 FT - 2 - CH Copy",
-            "collapsed": false,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "35 FT - 1 - C Copy",
-            "collapsed": false,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "35 FT - 3 - CH Copy",
-            "collapsed": false,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "35 FT - 3 - C Copy",
-            "collapsed": false,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "35 FT - Copy",
-            "collapsed": false,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "35 FT - 1 - CH Copy",
-            "collapsed": false,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 29",
-            "collapsed": false,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 28",
-            "collapsed": false,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
-          "type": "group",
-          "group": {
-            "key": "Custom Click Function 19",
-            "collapsed": false,
-            "locked": false,
-            "items": [],
-            "settings": []
-          }
-        },
-        {
           "type": "row",
           "key": "holdConfirmMs"
         },
@@ -83582,6 +83849,136 @@
         {
           "type": "row",
           "key": "customFunctionSelector"
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "35 FT - 1 - C Copy",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "35 FT - 1 - CH Copy",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "20 FT - R - CH Copy",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "20 FT - 1 - C Copy",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "35 FT - Copy",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "35 FT - 2 - CH Copy",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "35 FT - 3 - C Copy",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "35 FT - 3 - CH Copy",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Custom Click Function 29",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Custom Click Function 28",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "Custom Click Function 19",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "20 FT - 3 - C Copy",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
+        },
+        {
+          "type": "group",
+          "group": {
+            "key": "20 FT - 3 - CH Copy",
+            "collapsed": true,
+            "locked": false,
+            "items": [],
+            "settings": []
+          }
         },
         {
           "type": "row",
@@ -87050,7 +87447,7 @@
       "custom13Trig2RetransitionSpeedMs": true,
       "custom13Trig2RetransitionSpeedCurveEnabled": true,
       "custom13Trig2RetransitionStartTimeCurveEnabled": true,
-      "toonSteps": true,
+      "toonSteps": false,
       "toonStepThreshold": true,
       "toonShadowFloor": true,
       "toonLightCeiling": true,
@@ -88646,8 +89043,8 @@
     "mobile": {
       "left": 20,
       "top": 170.52381896972656,
-      "width": 381.2857360839844,
-      "height": 497.27978515625,
+      "width": 388.1428527832031,
+      "height": 574.8035888671875,
       "collapsed": false
     }
   }
