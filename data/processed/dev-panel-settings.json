@@ -79961,7 +79961,7 @@
           "type": "group",
           "group": {
             "key": "Tween",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
