@@ -273,7 +273,7 @@
       "armRotationRangePct": "{\"min\":0,\"max\":60}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
-      "armRotationDamping": 0.46,
+      "armRotationDamping": 0.69,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
       "palmRotationContinual": true,
@@ -468,11 +468,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.00000000000002,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -501,14 +501,14 @@
       "loadingPreviewScaleRefPx": 820,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 28,
@@ -19016,15 +19016,15 @@
           ]
         }
       ],
-      "cameraX": 3.7500000000008322,
-      "cameraY": -6.47009657557219e-14,
-      "cameraZ": 279.9883496538655,
+      "cameraX": 3.692307692307692,
+      "cameraY": 2.367377203395856e-13,
+      "cameraZ": 334.979025524292,
       "cameraFov": 20,
-      "cameraYaw": 180,
+      "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":3.7500000000008322,\"cameraY\":-6.47009657557219e-14,\"cameraZ\":279.9883496538655,\"cameraFov\":20,\"cameraZoom\":800,\"cameraRoll\":0,\"targetX\":3.75,\"targetY\":0,\"targetZ\":1079.9883496538564}",
-      "cameraZoom": 799.9999999999909,
+      "cameraDefaultPreset": "{\"cameraX\":3.692307692307692,\"cameraY\":2.367377203395856e-13,\"cameraZ\":334.979025524292,\"cameraFov\":20,\"cameraZoom\":334.99999999999994,\"cameraRoll\":0,\"targetX\":3.692307692307692,\"targetY\":2.162248864538674e-13,\"targetZ\":-0.02097447570793065}",
+      "cameraZoom": 334.99999999999994,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -19053,20 +19053,20 @@
         },
         {
           "name": "HD - Mobile - 20 FOV",
-          "cameraX": 3.7500000000008322,
-          "cameraY": -6.47009657557219e-14,
-          "cameraZ": 279.9883496538655,
+          "cameraX": 3.7499999999999996,
+          "cameraY": 1.3777276392759843e-13,
+          "cameraZ": 539.9876643400305,
           "cameraFov": 20,
-          "cameraZoom": 800,
+          "cameraZoom": 540,
           "cameraRoll": 0,
-          "targetX": 3.75,
-          "targetY": 0,
-          "targetZ": 1079.9883496538564
+          "targetX": 3.7499999999999996,
+          "targetY": 1.0470730035061989e-13,
+          "targetZ": -0.012335659969494372
         }
       ],
       "cameraShowFrame": true,
       "cameraFrameThickness": 3,
-      "lockCameraPan": false,
+      "lockCameraPan": true,
       "lockCameraZoom": false,
       "cameraMaxExtentsEnabled": false,
       "cameraPreviewEnabled": false,
@@ -19124,7 +19124,7 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 4,
+      "toonSteps": 2,
       "toonStepThreshold": 2.5,
       "toonShadowFloor": 0,
       "toonLightCeiling": 99,
@@ -26923,11 +26923,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 3",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.00000000000002,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -26956,14 +26956,14 @@
       "loadingPreviewScaleRefPx": 350,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 18,
@@ -45471,15 +45471,15 @@
           ]
         }
       ],
-      "cameraX": 3.7500000000008322,
-      "cameraY": -6.47009657557219e-14,
-      "cameraZ": 279.9883496538655,
+      "cameraX": 3.7499999999999996,
+      "cameraY": 6.337548854377772e-13,
+      "cameraZ": 539.9862936958529,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":3.7500000000001643,\"cameraY\":-1.4935750790271225e-13,\"cameraZ\":279.9883496538564,\"cameraFov\":20,\"cameraZoom\":800,\"cameraRoll\":0,\"targetX\":3.750000000000066,\"targetY\":-2.070769592858131e-14,\"targetZ\":1079.9883496538564}",
-      "cameraZoom": 800,
+      "cameraDefaultPreset": "{\"cameraX\":3.7499999999999996,\"cameraY\":1.3777276392759843e-13,\"cameraZ\":539.9876643400305,\"cameraFov\":20,\"cameraZoom\":540,\"cameraRoll\":0,\"targetX\":3.7499999999999996,\"targetY\":1.0470730035061989e-13,\"targetZ\":-0.012335659969494372}",
+      "cameraZoom": 540,
       "cameraZoomSpeed": 1,
       "savedCameras": [
         {
@@ -45508,15 +45508,15 @@
         },
         {
           "name": "HD - Mobile - 20 FOV",
-          "cameraX": 3.7500000000008322,
-          "cameraY": -6.47009657557219e-14,
-          "cameraZ": 279.9883496538655,
+          "cameraX": 3.7499999999999996,
+          "cameraY": 1.3777276392759843e-13,
+          "cameraZ": 539.9876643400305,
           "cameraFov": 20,
-          "cameraZoom": 800,
+          "cameraZoom": 540,
           "cameraRoll": 0,
-          "targetX": 3.75,
-          "targetY": 0,
-          "targetZ": 1079.9883496538564
+          "targetX": 3.7499999999999996,
+          "targetY": 1.0470730035061989e-13,
+          "targetZ": -0.012335659969494372
         }
       ],
       "cameraShowFrame": true,
@@ -45579,7 +45579,7 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 4,
+      "toonSteps": 2,
       "toonStepThreshold": 2.5,
       "toonShadowFloor": 0,
       "toonLightCeiling": 99,
@@ -53183,7 +53183,7 @@
       "armRotationRangePct": "{\"min\":0,\"max\":60}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
-      "armRotationDamping": 0.46,
+      "armRotationDamping": 0.69,
       "palmFacesCursor": true,
       "palmRotationVisibleOnly": true,
       "palmRotationContinual": true,
@@ -53378,11 +53378,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 314,
-      "loadingPreviewKeyElevation": 47,
+      "loadingPreviewKeyAzimuth": 299,
+      "loadingPreviewKeyElevation": 51.00000000000002,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 311,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -53411,14 +53411,14 @@
       "loadingPreviewScaleRefPx": 1080,
       "loadingPreviewPosX": 0,
       "loadingPreviewPosY": 0,
-      "loadingPreviewRotationX": -67.76155881846029,
-      "loadingPreviewRotationY": 179.78594228722,
+      "loadingPreviewRotationX": -65,
+      "loadingPreviewRotationY": 179.99999999999997,
       "loadingPreviewRotationZ": 0,
       "loadingPreviewOffsetX": 0,
       "loadingPreviewOffsetY": 0,
       "loadingPreviewOffsetZ": 0,
       "loadingPreviewCameraFov": 15,
-      "loadingPreviewCameraZoom": 1279.5949475713576,
+      "loadingPreviewCameraZoom": 554.025964204363,
       "loadingPreviewTextEnabled": false,
       "loadingPreviewTextContent": "loading",
       "loadingPreviewTextFontSize": 32,
@@ -71963,15 +71963,15 @@
         },
         {
           "name": "HD - Mobile - 20 FOV",
-          "cameraX": 3.7500000000008322,
-          "cameraY": -6.47009657557219e-14,
-          "cameraZ": 279.9883496538655,
+          "cameraX": 3.7499999999999996,
+          "cameraY": 1.3777276392759843e-13,
+          "cameraZ": 539.9876643400305,
           "cameraFov": 20,
-          "cameraZoom": 800,
+          "cameraZoom": 540,
           "cameraRoll": 0,
-          "targetX": 3.75,
-          "targetY": 0,
-          "targetZ": 1079.9883496538564
+          "targetX": 3.7499999999999996,
+          "targetY": 1.0470730035061989e-13,
+          "targetZ": -0.012335659969494372
         }
       ],
       "cameraShowFrame": false,
@@ -72034,7 +72034,7 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 4,
+      "toonSteps": 2,
       "toonStepThreshold": 2.5,
       "toonShadowFloor": 0,
       "toonLightCeiling": 99,
@@ -80965,7 +80965,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -80982,7 +80982,7 @@
                 "type": "group",
                 "group": {
                   "key": "Crop Cap",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -81236,7 +81236,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (6)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -81536,7 +81536,7 @@
                 "type": "group",
                 "group": {
                   "key": "Whole-Hand Rotation at Base",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -81607,7 +81607,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -81630,7 +81630,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -82344,14 +82344,14 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "New Group (10)",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -82455,7 +82455,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -82751,7 +82751,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -87447,7 +87447,7 @@
       "custom13Trig2RetransitionSpeedMs": true,
       "custom13Trig2RetransitionSpeedCurveEnabled": true,
       "custom13Trig2RetransitionStartTimeCurveEnabled": true,
-      "toonSteps": false,
+      "toonSteps": true,
       "toonStepThreshold": true,
       "toonShadowFloor": true,
       "toonLightCeiling": true,
@@ -89031,7 +89031,16 @@
     },
     "landscape": {}
   },
-  "devHotkeys": {},
+  "devHotkeys": {
+    "pp": {
+      "key": "pauseAnimations",
+      "type": "button"
+    },
+    "rs": {
+      "key": "runStartingStateBtn",
+      "type": "button"
+    }
+  },
   "panelGeometry": {
     "desktop": {
       "left": 4.75,
