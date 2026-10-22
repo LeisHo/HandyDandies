@@ -19365,7 +19365,7 @@
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
-      "sphereWaitForAll": true,
+      "sphereWaitForAll": false,
       "sphereMaxClicks": 2,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
@@ -45116,8 +45116,8 @@
         }
       ],
       "cameraX": 3.7499999999999996,
-      "cameraY": 2.369692385852724e-13,
-      "cameraZ": 539.9869790262047,
+      "cameraY": 3.3616571324294644e-13,
+      "cameraZ": 539.9862937123789,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -71919,7 +71919,7 @@
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
       "sphereSeqDurationMs": 1850,
-      "sphereWaitForAll": true,
+      "sphereWaitForAll": false,
       "sphereMaxClicks": 2,
       "sphereColor": "#ffffff",
       "sphereFnEasingCurveEnabled": true,
@@ -80087,7 +80087,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -81788,7 +81788,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -81899,7 +81899,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -82195,7 +82195,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -82892,7 +82892,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -88494,10 +88494,10 @@
       "collapsed": false
     },
     "mobile": {
-      "left": 47.2023811340332,
+      "left": 30.059524536132812,
       "top": 168.08929443359375,
-      "width": 354.077392578125,
-      "height": 483.4464416503906,
+      "width": 364.36309814453125,
+      "height": 488.01190185546875,
       "collapsed": false
     }
   }
