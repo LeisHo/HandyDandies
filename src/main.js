@@ -10060,7 +10060,7 @@ async function importTwoHandTween(btn) {
   if (handoScale && ma && typeof ma.x === 'number') handoAnchorRaw = { x: ma.x / handoScale, y: ma.y / handoScale, z: ma.z / handoScale }
   const incomingSeqs = (Array.isArray(data.tweenSequences) && data.tweenSequences.length ? data.tweenSequences : [{ name: data.name || 'Two-Hand Tween', tweenPoses: data.tweenPoses, tweenPosesHand2: data.tweenPosesHand2 }])
     .filter((q) => q && typeof q.name === 'string')
-    .map((q) => ({ name: q.name, tweenPoses: Array.isArray(q.tweenPoses) ? q.tweenPoses : (data.tweenPoses || []), tweenPosesHand2: renameHand2Entries(Array.isArray(q.tweenPosesHand2) ? q.tweenPosesHand2 : (data.tweenPosesHand2 || [])), twoHand: h2.show2ndHand !== false, hand2: placement, ...(handoScale ? { handoScale } : {}), ...(handoAnchorRaw ? { handoAnchorRaw } : {}) }))
+    .map((q) => ({ name: q.name, tweenPoses: Array.isArray(q.tweenPoses) ? q.tweenPoses : (data.tweenPoses || []), tweenPosesHand2: renameHand2Entries(Array.isArray(q.tweenPosesHand2) ? q.tweenPosesHand2 : (data.tweenPosesHand2 || [])), twoHand: h2.show2ndHand !== false, hand2: placement, ...(handoScale ? { handoScale } : {}), ...(handoAnchorRaw ? { handoAnchorRaw } : {}), ...((q.baseModifiers || data.baseModifiers) ? { baseModifiers: q.baseModifiers || data.baseModifiers } : {}) })) // baseModifiers: HANDO's BASE MODIFIERS of this tween (see lpApplyBaseMod())
   if (!incomingSeqs.length) { flash('No sequence found'); return }
   const sequences = mergeByName(cfg.savedTweenSequences || [], incomingSeqs)
   cfg.savedTweenSequences = sequences
@@ -10173,8 +10173,8 @@ const _lp2Q = new THREE.Quaternion(), _lp2Base = new THREE.Quaternion(), _lp2V =
 function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride, ringMode = 0) {
   const hand2 = loadingPreviewHand2
   if (!hand2 || !hand2.skinnedMesh || !loadingPreviewHand || !seq) return
-  const cfg2 = seq.hand2 || {}
-  let values = valuesOverride || null // the End Sequence supplies the pose itself
+  const cfg2 = lpHand2WithBaseMods(seq.hand2 || {}, seq) // + the 2nd hand's Base Modifiers (placement level)
+  let values = valuesOverride || null // the End Sequence supplies the pose itself (already carrying its modifiers)
   if (!values) {
   // the second hand's own pose list (or the main list when it is told to mirror the main hand's pose)
   const entries2 = (cfg2.mirrorMainHandPose || !(seq.tweenPosesHand2 && seq.tweenPosesHand2.length)) ? (seq.tweenPoses || []) : seq.tweenPosesHand2
@@ -10196,6 +10196,7 @@ function updateLoadingPreviewHand2(seq, lapStyle, t, valuesOverride, ringMode = 
     else if (ringMode === 2) pos2 = Math.min(pos2, (loadingPreviewLapIndex - 1) * totalW + baseW2) // finishing: stop at this hand's last pose
     values = lerpLoopSegments(ring, pos2)
   }
+  values = lpApplyBaseMod(values, seq, 2) // the sequence's own 2nd-hand frame + its Base Modifiers (bone keys, Hide Model)
   }
   lpHand2LastValues = values
   const V = {}
@@ -11149,6 +11150,47 @@ function repositionLoadingPreview() {
 // codebase's own existing precedent of a bespoke apply-to-isolated-hand
 // function per independent preview instance instead of a new abstraction
 // both would route through.
+// BASE MODIFIERS (HANDO 2026-10-19, tween groups "1ST / 2ND HAND TWEENING" > BASE MODIFIERS): a rotation / offset / scale / wrist / arm value baked into EVERY frame of a tween instead of into each saved pose. HANDO exports them as
+// seq.baseModifiers = { main: {enabled, sections: {BaseRot|Offset|Rot|Wrist|Arm: {enabled, values: {poseKey: n}}}}, hand2: {...} } (a Two-Hand Tween export carries it on the bundle and on its sequence), and this project
+// stores the sequence whole, so it just has to play it. A hand is only modified when its group AND the section are on. Added to the frame's value: angles, offsets, arm; multiplied: Pose Scale; added and kept 0-100: Hide Wrist
+// / Hide Model. The 2nd hand has no Pose Local Offset in HANDO (no such sliders), and its pose-level keys here are the bone ones; its placement-level ones (rotation, offset, scale, hide wrist) go through
+// lpHand2WithBaseMods(). The 2nd hand's Whole-Hand Rotation at Base is not applied: this project has no 2nd-hand base rotation at all (HANDO's hand2BaseRot* is not imported either).
+const LP_BASE_MOD_HAND2_PLACEMENT_KEYS = ['modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ', 'poseOffsetX', 'poseOffsetY', 'poseOffsetZ', 'poseLocalOffsetX', 'poseLocalOffsetY', 'poseLocalOffsetZ', 'poseScale', 'hideWrist']
+function lpBaseModSections(seq, hand) { // the enabled sections' values of one hand, or null
+  const bm = seq && seq.baseModifiers && seq.baseModifiers[hand === 1 ? 'main' : 'hand2']
+  if (!bm || !bm.enabled || !bm.sections) return null
+  if (hand === 2 && seq.hand2 && seq.hand2.mirrorMainHandPose) return null // a mirroring 2nd hand plays the main hand's poses, the 2nd hand's own modifiers are not in play
+  const secs = Object.keys(bm.sections).map((id) => bm.sections[id]).filter((sec) => sec && sec.enabled && sec.values)
+  return secs.length ? secs : null
+}
+function lpApplyBaseMod(item, seq, hand) { // a copy of the frame's pose values with the modifiers added (or `item` itself when there are none)
+  const secs = lpBaseModSections(seq, hand)
+  if (!secs) return item
+  const out = { ...item }
+  secs.forEach((sec) => Object.keys(sec.values).forEach((k) => {
+    const v = sec.values[k]
+    if (typeof v !== 'number') return
+    if (hand === 2 && LP_BASE_MOD_HAND2_PLACEMENT_KEYS.includes(k) && k !== 'hideModel') return // placement keys of the 2nd hand: lpHand2WithBaseMods()
+    if (k === 'poseScale') { if (v > 0) out.poseScale = (out.poseScale !== undefined ? out.poseScale : POSE_KEY_DEFAULTS.poseScale) * v; return }
+    if (k === 'hideWrist' || k === 'hideModel') { const base = out[k] !== undefined ? out[k] : (k === 'hideWrist' ? 100 : 0); out[k] = Math.min(100, Math.max(0, base + v)); return }
+    out[k] = (out[k] !== undefined ? out[k] : (POSE_KEY_DEFAULTS[k] !== undefined ? POSE_KEY_DEFAULTS[k] : 0)) + v
+  }))
+  return out
+}
+function lpHand2WithBaseMods(cfg2, seq) { // the 2nd hand's placement with its Base Modifiers on top
+  const secs = lpBaseModSections(seq, 2)
+  if (!secs) return cfg2
+  const out = { ...cfg2 }
+  const map = { poseOffsetX: 'hand2OffsetX', poseOffsetY: 'hand2OffsetY', poseOffsetZ: 'hand2OffsetZ', modelRotX: 'hand2RotX', modelRotY: 'hand2RotY', modelRotZ: 'hand2RotZ' }
+  secs.forEach((sec) => Object.keys(sec.values).forEach((k) => {
+    const v = sec.values[k]
+    if (typeof v !== 'number') return
+    if (map[k]) out[map[k]] = (out[map[k]] || 0) + v
+    else if (k === 'poseScale') { if (v > 0) out.hand2Scale = (typeof out.hand2Scale === 'number' && out.hand2Scale > 0 ? out.hand2Scale : 1) * v }
+    else if (k === 'hideWrist') out.hand2HideWrist = Math.min(100, Math.max(0, (typeof out.hand2HideWrist === 'number' ? out.hand2HideWrist : 100) + v))
+  }))
+  return out
+}
 function applyLoadingPreviewPose(item) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh) return
   lpLastValues = item // the End Sequence glides from whatever pose is showing
@@ -11524,7 +11566,7 @@ function updateLoadingPreviewAnimation() {
     }
     values = lerpLoopSegments(ringSegments, tCyclic)
   }
-  applyLoadingPreviewPose(values)
+  applyLoadingPreviewPose(lpApplyBaseMod(values, seq, 1))
   updateLoadingPreviewHand2(seq, lapStyle, typeof easedT !== 'undefined' ? easedT : lapT, undefined, ringMode) // same timeline position, second hand's own poses
   if (lapT >= 1 || ringDoneEarly) {
     lpLastLapOnLast = segments.length === 0 || (lapStyle === 'Oscillate' ? loadingPreviewDirection === 1 : (cfg.loadingPreviewSequenceLoopTransition === false || ringMode === 1 || ringDoneEarly))
@@ -11698,8 +11740,8 @@ function endSeqPlayFrame(now) {
   const lapDur = Math.max(endSeq.lapIndex === 1 ? unit * tr1.W1 : (tr1.Wlap > 0 ? unit * tr1.Wlap : endSeq.speedMs), 1)
   const lapT = THREE.MathUtils.clamp((now - endSeq.lapStartMs) / lapDur, 0, 1)
   const eased = cfg.loadingPreviewEndEasingEnabled ? easingProfilePAt(getEasingProfile('loadingPreviewEnd', true, loadingPreviewEndEasingTrig), lapT) : lapT
-  applyLoadingPreviewPose(lpEndValues(tr1, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir))
-  if (endSeq.tr2 && loadingPreviewHand2) updateLoadingPreviewHand2(endSeq.seq, endSeq.lapStyle, eased, lpEndValues(endSeq.tr2, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir))
+  applyLoadingPreviewPose(lpApplyBaseMod(lpEndValues(tr1, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir), endSeq.seq, 1))
+  if (endSeq.tr2 && loadingPreviewHand2) updateLoadingPreviewHand2(endSeq.seq, endSeq.lapStyle, eased, lpApplyBaseMod(lpEndValues(endSeq.tr2, endSeq.lapIndex, eased, endSeq.lapStyle, endSeq.dir), endSeq.seq, 2))
   if (lapT >= 1) {
     logLoadingPreview('End Sequence: pass ' + endSeq.lapIndex + ' of ' + endSeq.total + ' complete')
     endSeq.lapIndex++
