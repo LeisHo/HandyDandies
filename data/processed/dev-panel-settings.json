@@ -26477,16 +26477,16 @@
       "smallScaleModelsEnabled": false,
       "smallScaleModelLevels": "[{\"z\":-100,\"model\":\"repo:HD_IK_300\"},{\"z\":-200,\"model\":\"repo:HD_IK_200\"},{\"z\":-300,\"model\":\"repo:HD_IK_100\"}]",
       "skipOffScreenFingerCurls": true,
-      "offScreenBufferEnabled": false,
+      "offScreenBufferEnabled": true,
       "offScreenBufferDistance": 30,
       "handWristSplayRange": "{\"min\":-90,\"max\":90}",
       "handWristBendRange": "{\"min\":-180,\"max\":180}",
       "handWristRotationRange": "{\"min\":-360,\"max\":360}",
-      "skipOffScreenPoseWork": false,
+      "skipOffScreenPoseWork": true,
       "retainRotationArmWork": false,
-      "skipOffScreenSceneUpdate": false,
-      "skipOffScreenCursorTracking": false,
-      "renderOrderSkipOffScreen": false,
+      "skipOffScreenSceneUpdate": true,
+      "skipOffScreenCursorTracking": true,
+      "renderOrderSkipOffScreen": true,
       "throttleOffScreenPosition": false,
       "offScreenPositionEvery": 2,
       "throttleOffScreenPose": false,
@@ -45116,8 +45116,8 @@
         }
       ],
       "cameraX": 3.7499999999999996,
-      "cameraY": 1.3777276392759843e-13,
-      "cameraZ": 539.9876643400305,
+      "cameraY": 2.369692385852724e-13,
+      "cameraZ": 539.9869790262047,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -80087,7 +80087,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -81788,7 +81788,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -88496,8 +88496,8 @@
     "mobile": {
       "left": 47.2023811340332,
       "top": 168.08929443359375,
-      "width": 350.6488037109375,
-      "height": 481.9226379394531,
+      "width": 354.077392578125,
+      "height": 483.4464416503906,
       "collapsed": false
     }
   }
