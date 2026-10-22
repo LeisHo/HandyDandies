@@ -17323,7 +17323,7 @@
           "shoulderRotation": 0,
           "elbowBend": 3,
           "elbowSideBend": 0,
-          "forearmTwist": 15,
+          "forearmTwist": 25,
           "group": "FISH/FISH - TWIST"
         },
         {
@@ -17381,7 +17381,7 @@
           "baseTwistPinky": 0,
           "wristBend": -15,
           "wristSplay": -25,
-          "wristRotation": 15,
+          "wristRotation": 20,
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
@@ -17560,7 +17560,7 @@
           "shoulderRotation": 0,
           "elbowBend": 3,
           "elbowSideBend": 0,
-          "forearmTwist": -5,
+          "forearmTwist": 10,
           "group": "FISH/FISH - TWIST"
         },
         {
@@ -43244,7 +43244,7 @@
           "shoulderRotation": 0,
           "elbowBend": 3,
           "elbowSideBend": 0,
-          "forearmTwist": 15,
+          "forearmTwist": 25,
           "group": "FISH/FISH - TWIST"
         },
         {
@@ -43302,7 +43302,7 @@
           "baseTwistPinky": 0,
           "wristBend": -15,
           "wristSplay": -25,
-          "wristRotation": 15,
+          "wristRotation": 20,
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
@@ -43481,7 +43481,7 @@
           "shoulderRotation": 0,
           "elbowBend": 3,
           "elbowSideBend": 0,
-          "forearmTwist": -5,
+          "forearmTwist": 10,
           "group": "FISH/FISH - TWIST"
         },
         {
@@ -69165,7 +69165,7 @@
           "shoulderRotation": 0,
           "elbowBend": 3,
           "elbowSideBend": 0,
-          "forearmTwist": 15,
+          "forearmTwist": 25,
           "group": "FISH/FISH - TWIST"
         },
         {
@@ -69223,7 +69223,7 @@
           "baseTwistPinky": 0,
           "wristBend": -15,
           "wristSplay": -25,
-          "wristRotation": 15,
+          "wristRotation": 20,
           "modelRotX": 0,
           "modelRotY": 0,
           "modelRotZ": 0,
@@ -69402,7 +69402,7 @@
           "shoulderRotation": 0,
           "elbowBend": 3,
           "elbowSideBend": 0,
-          "forearmTwist": -5,
+          "forearmTwist": 10,
           "group": "FISH/FISH - TWIST"
         },
         {
