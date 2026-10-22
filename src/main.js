@@ -2757,7 +2757,10 @@ const DEV_GROUPS = [
       { key: 'fieldBoundsZMaxCurveRange', label: 'Hand Position Max Z Curve Min / Max (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
       { key: 'fieldBoundsX', label: 'Hand Position Min / Max X (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
       { key: 'fieldBoundsY', label: 'Hand Position Min / Max Y (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
-      { key: 'fieldBoundsZ', label: 'Hand Position Min / Max Z (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() }
+      { key: 'fieldBoundsZ', label: 'Hand Position Min / Max Z (World Units)', type: 'text', def: '{"min":-300,"max":300}', onChange: () => onFieldBoundsChanged() },
+      // Crop Cap (2026-10-22): a cropped hand's cut end shows a flat colour instead of the hollow inside of the mesh (see cropCapSideFor()). setupCropCapGroup() wraps these two into a toggleable "Crop Cap" subgroup (the on/off checkbox is in its label).
+      { key: 'cropCapEnabled', label: 'Crop Cap On/Off', type: 'checkbox', def: false, onChange: (v) => { setToonUniform('cropCapOn', v ? 1 : 0); hands.forEach((h) => { if (h.clipRig && h.clipRig.fillMat) h.clipRig.fillMat.side = cropCapSideFor(true) }); sceneNeedsRedraw = true } },
+      { key: 'cropCapColor', label: 'Crop Cap Color', type: 'color', def: '#c8967a', onChange: (v) => { setToonUniform('cropCapColor', new THREE.Color(v)); sceneNeedsRedraw = true } }
     ]
   },
   {
@@ -5510,6 +5513,10 @@ function placeStartupRetransitionGroup() {
   const tw = body.querySelector(':scope > .dp-group[data-key="Startup > Animation Tween"], :scope > .dp-group[data-key="Animation Tween"]')
   if (tw && tw.nextSibling) body.insertBefore(retr, tw.nextSibling); else body.appendChild(retr)
 }
+// Crop Cap subgroup in the Field Layout group (2026-10-22, direct request: a toggleable group, the on/off checkbox in its label): the Color row moves into it and the On/Off row's checkbox into its header.
+function setupCropCapGroup() {
+  wrapGatedSubgroup('cropCapEnabled', ['cropCapColor'], 'Crop Cap')
+}
 function setupSphereSequenceGroup() {
   clickPoseTriggers[SPHERE_FN] = clickPoseTriggers[SPHERE_FN] || {
     startCurveParsed: [{ x: 0, y: 0 }, { x: 1, y: 1 }], startRangeParsed: { min: 0, max: 300 },
@@ -7529,13 +7536,15 @@ function createToonMaterial(map) {
     shader.uniforms.rimPower = { value: cfg.rimPower }
     shader.uniforms.textureInfluence = { value: cfg.textureInfluence / 100 }
     shader.uniforms.toonTint = { value: new THREE.Color(cfg.toonTint) }
+    shader.uniforms.cropCapColor = { value: new THREE.Color(cfg.cropCapColor) }
+    shader.uniforms.cropCapOn = { value: cfg.cropCapEnabled ? 1 : 0 }
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `varying vec3 vRimNormal;\nvarying vec3 vRimViewDir;\n#include <common>`)
       .replace('#include <project_vertex>', `#include <project_vertex>\nvRimNormal = normalize( normalMatrix * objectNormal );\nvRimViewDir = normalize( -mvPosition.xyz );`)
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `varying vec3 vRimNormal;\nvarying vec3 vRimViewDir;\nuniform vec3 rimColor;\nuniform float rimIntensity;\nuniform float rimPower;\nuniform float textureInfluence;\nuniform vec3 toonTint;\n#include <common>`)
+      .replace('#include <common>', `varying vec3 vRimNormal;\nvarying vec3 vRimViewDir;\nuniform vec3 rimColor;\nuniform float rimIntensity;\nuniform float rimPower;\nuniform float textureInfluence;\nuniform vec3 toonTint;\nuniform vec3 cropCapColor;\nuniform float cropCapOn;\n#include <common>`)
       .replace('#include <map_fragment>', `#include <map_fragment>\nfloat toonLuma = dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) );\nvec3 toonDuotone = mix( vec3( 0.0 ), toonTint, toonLuma );\ndiffuseColor.rgb = mix( toonTint, toonDuotone, textureInfluence );`)
-      .replace('#include <dithering_fragment>', `#include <dithering_fragment>\nfloat rimFactor = pow( 1.0 - max( dot( normalize( vRimNormal ), normalize( vRimViewDir ) ), 0.0 ), rimPower );\ngl_FragColor.rgb += rimColor * rimFactor * rimIntensity;`)
+      .replace('#include <dithering_fragment>', `#include <dithering_fragment>\nfloat rimFactor = pow( 1.0 - max( dot( normalize( vRimNormal ), normalize( vRimViewDir ) ), 0.0 ), rimPower );\ngl_FragColor.rgb += rimColor * rimFactor * rimIntensity;\nif ( cropCapOn > 0.5 && ! gl_FrontFacing ) gl_FragColor = vec4( cropCapColor, 1.0 );`)
     toonShaderUniformsList.push(shader.uniforms)
   }
   return material
@@ -10159,7 +10168,7 @@ function ensureLoadingPreviewHand2(seq) {
   const rig = makeClipRig(clone)
   if (skinnedMesh && toonMaterial) {
     skinnedMesh.material = toonMaterial.clone()
-    applyClipRigToMaterial(skinnedMesh.material, rig, plane)
+    applyClipRigToMaterial(skinnedMesh.material, rig, plane, true)
     skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
   }
   clone.matrixAutoUpdate = false // its matrix is composed by hand each frame (it can be a reflection)
@@ -10416,7 +10425,7 @@ function buildLoadingPreview(bypassEnabledGate) {
   const loadingPreviewClipRig = makeClipRig(clone)
   if (skinnedMesh && toonMaterial) {
     skinnedMesh.material = toonMaterial.clone()
-    applyClipRigToMaterial(skinnedMesh.material, loadingPreviewClipRig, loadingPreviewWristClipPlane)
+    applyClipRigToMaterial(skinnedMesh.material, loadingPreviewClipRig, loadingPreviewWristClipPlane, true)
     // Material.clone() doesn't carry over onBeforeCompile -- see
     // rebuildField()'s own matching comment for the real bug this once
     // caused (toon rim-light/tint shading silently reverting to default).
@@ -22396,6 +22405,7 @@ function setClipRigT(rig, t, modelT = 0) {
   const topWrist = tt <= 0 ? 0 : tt * rig.topY0
   const topModel = modelT > 0 ? clipRigModelEndY(rig) * Math.min(modelT, 1) : 0
   const top = Math.max(topWrist, topModel)
+  if (rig.fillMat) rig.fillMat.side = cropCapSideFor(top > 0) // Crop Cap
   // The box's own origin is NOT its bottom (on the shipped models its local top is below the origin: maxY < 0), so stretch it about its authored BOTTOM at the full-wrist state, B: height scales so the top lands on `top`,
   // and the position follows so the bottom stays at B. (A first version scaled about the origin and, with maxY < 0, never grew past the wrist: Hide Model 100% hid the same as Hide Wrist 100%.)
   const bottom = rig.baseY + rig.scaleY0 * rig.minY
@@ -22427,11 +22437,16 @@ function updateClipRigPlanes(rig) {
     rig.planes[i].applyMatrix4(rig.block.matrixWorld, _clipNormalMatrix)
   }
 }
-function applyClipRigToMaterial(mat, rig, singlePlane) {
+function applyClipRigToMaterial(mat, rig, singlePlane, isFill = false) {
   if (!mat) return
   mat.clippingPlanes = rig ? rig.planes : [singlePlane]
   mat.clipIntersection = !!rig
+  if (rig && isFill) rig.fillMat = mat // the hand's toon fill material: setClipRigT() switches it to double-sided for the Crop Cap
 }
+// Crop Cap (2026-10-22, direct request: render the cropped model with the cut end capped instead of a hollow shell): computing the real cut surface per hand per frame is too heavy, so the cap is faked. While a hand is cropped its fill
+// material is drawn double-sided, and the toon shader paints every BACK face (what is seen through the cut: the inside of the far wall) in one flat colour (cropCapColor), which reads as a flat cut face. Only a cropped hand pays for the
+// extra faces; the side is switched without recompiling (the shader always has the gl_FrontFacing test, which is a no-op while culling hides back faces).
+function cropCapSideFor(cropped) { return cfg.cropCapEnabled && cropped ? THREE.DoubleSide : THREE.FrontSide }
 const _clipFarPos = new THREE.Vector3()
 const _clipNearPos = new THREE.Vector3()
 const _clipDir = new THREE.Vector3()
@@ -22454,6 +22469,7 @@ function updateWristClipPlaneForHand(hand) {
   const t = hand.currentArmLengthT !== undefined ? hand.currentArmLengthT : cfg.hideWrist / 100
   _clipPoint.copy(_clipFarPos).addScaledVector(_clipDir, armToWristDist * t)
   hand.wristClipPlane.setFromNormalAndCoplanarPoint(_clipDir, _clipPoint)
+  if (hand.skinnedMesh.material) hand.skinnedMesh.material.side = cropCapSideFor(t > 0) // Crop Cap (single-plane fallback)
 }
 
 // -----------------------------------------------------------------------
@@ -22660,7 +22676,7 @@ function createFieldHand() {
   const clipRig = makeClipRig(clone)
   if (skinnedMesh && toonMaterial) {
     skinnedMesh.material = toonMaterial.clone()
-    applyClipRigToMaterial(skinnedMesh.material, clipRig, handWristClipPlane)
+    applyClipRigToMaterial(skinnedMesh.material, clipRig, handWristClipPlane, true)
     // `Material.clone()`/`.copy()` does NOT carry over a custom
     // `onBeforeCompile` override -- it isn't part of the property list
     // three.js's own `copy()` handles, so a clone silently reverts to
@@ -24284,6 +24300,7 @@ updateFloorRowVisibility()
 updateFloor()
 setupHandOffsetStartupGroup()
 setupSphereSequenceGroup()
+setupCropCapGroup()
 setupUiButtonsTweenGroup()
 setupLoadingPreviewEasingGroup()
 setupLoadingPreviewSpeedCurveGroup()
