@@ -207,9 +207,9 @@
       "handWristRotationRange": "{\"min\":-360,\"max\":360}",
       "skipOffScreenPoseWork": false,
       "retainRotationArmWork": false,
-      "skipOffScreenSceneUpdate": false,
-      "skipOffScreenCursorTracking": false,
-      "renderOrderSkipOffScreen": false,
+      "skipOffScreenSceneUpdate": true,
+      "skipOffScreenCursorTracking": true,
+      "renderOrderSkipOffScreen": true,
       "throttleOffScreenPosition": false,
       "offScreenPositionEvery": 2,
       "throttleOffScreenPose": false,
@@ -16930,14 +16930,14 @@
         }
       ],
       "cameraX": 3.6923076923076925,
-      "cameraY": 1.04554353627336e-13,
-      "cameraZ": 354.370595411201,
+      "cameraY": 1.0741053735980834e-13,
+      "cameraZ": 401.01561558290973,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":3.6923076923076925,\"cameraY\":1.04554353627336e-13,\"cameraZ\":354.370595411201,\"cameraFov\":20,\"cameraZoom\":230,\"cameraRoll\":0,\"targetX\":3.6923076923076925,\"targetY\":9.047091543714144e-14,\"targetZ\":124.37059541120101}",
-      "cameraZoom": 230,
+      "cameraZoom": 276.6450201717087,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -74598,7 +74598,7 @@
                 "type": "group",
                 "group": {
                   "key": "Off-Screen Hands",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -74670,7 +74670,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Splay",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -74748,7 +74748,7 @@
           "type": "group",
           "group": {
             "key": "Render Order",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
