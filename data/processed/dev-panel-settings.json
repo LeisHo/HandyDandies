@@ -22650,12 +22650,12 @@
       "rvSet1ArmEnabled": true,
       "rvSet1ArmRange": "{\"min\":0,\"max\":35.7}",
       "rvSet1ArmCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.06329561145098525,\"y\":0}},{\"x\":0.052645817347512405,\"y\":0,\"h1\":{\"x\":0.3958537237366516,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.19370764615113367,\"y\":0}}]",
-      "rvSet1ArmDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.26249141925110764,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.288378762917763,\"y\":0}}]",
+      "rvSet1ArmDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.26249141925110764,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5034849936825954,\"y\":0}}]",
       "rvSet1ArmDistCurveXOrigin": "Global Setting",
       "rvSet1SplayEnabled": true,
       "rvSet1SplayRange": "{\"min\":-32,\"max\":0}",
-      "rvSet1SplayCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2657308883149995,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.20254507962820756,\"y\":0}}]",
-      "rvSet1SplayDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.7056328547404378,\"y\":-0.028958384195963527}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.19855279935153713,\"y\":0}}]",
+      "rvSet1SplayCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2657308883149995,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3300096672479088,\"y\":0}}]",
+      "rvSet1SplayDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.49186835792150063,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4895449894095436,\"y\":0.020312372843424464}}]",
       "rvSet1SplayDistCurveXOrigin": "Global Setting",
       "rvSet1CropEnabled": false,
       "rvSet1CropRange": "{\"min\":0,\"max\":0.48}",
@@ -22664,8 +22664,8 @@
       "rvSet1CropDistCurveXOrigin": "Global Setting",
       "rvSet1CurlEnabled": true,
       "rvSet1CurlTargetPose": "Max Palm -30",
-      "rvSet1CurlCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1831059220706147,\"y\":0.5346875508626302}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.36873183568934154,\"y\":0}}]",
-      "rvSet1CurlDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.29043726696818106,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.3736173539183115,\"y\":0.0625}}]",
+      "rvSet1CurlCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3803485009931064,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.36873183568934154,\"y\":0}}]",
+      "rvSet1CurlDistCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.29043726696818106,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.5855759789613648,\"y\":0}}]",
       "rvSet1CurlDistCurveXOrigin": "Global Setting",
       "rvSets": "[{\"prefix\":\"rvSet1\",\"title\":\"Displacement Angle to Velocity 1\"}]"
     },
@@ -70761,7 +70761,7 @@
                             "type": "group",
                             "group": {
                               "key": "Velocity Wrist Splay",
-                              "collapsed": true,
+                              "collapsed": false,
                               "locked": false,
                               "items": [
                                 {
