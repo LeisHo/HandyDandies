@@ -16637,18 +16637,6 @@
           "group": "2 TWIDS - 2 HANDS"
         },
         {
-          "name": "WAVE",
-          "tweenPoses": [
-            "Wave 1",
-            "WAVE 2",
-            "WAVE 3",
-            "WAVE 4",
-            "WAVE 5",
-            "WAVE 6",
-            "WAVE 7"
-          ]
-        },
-        {
           "name": "FIST PALM + 0",
           "tweenPoses": [
             "Fist",
@@ -16927,11 +16915,128 @@
             "FIRE_5",
             "FIRE_6"
           ]
+        },
+        {
+          "name": "WAVE -45",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "Wave -30",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE -25",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE -15",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE -0",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +15",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +30",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +45",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +60",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
         }
       ],
-      "cameraX": 3.6923076923076925,
-      "cameraY": 1.0741053735980834e-13,
-      "cameraZ": 401.01561558290973,
+      "cameraX": 3.692307692307692,
+      "cameraY": 1.7346248992810606e-13,
+      "cameraZ": 276.6280222710836,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -19589,7 +19694,7 @@
       "custom42RotationMode": "Rotation Around Cursor",
       "custom42TargetPose": "MiddleFinger",
       "custom42SkipIfSamePose": true,
-      "custom42TweenSelector": "WAVE",
+      "custom42TweenSelector": "2 TWIDS",
       "custom42ReverseSequence": false,
       "custom42GlideToFirstPose": true,
       "custom42FirstGlideTimeScale": 1.8,
@@ -22339,7 +22444,7 @@
       "custom51Trig2RotationMode": "Rotation Around Cursor",
       "custom51Trig2TargetPose": "",
       "custom51Trig2SkipIfSamePose": false,
-      "custom51Trig2TweenSelector": "WAVE",
+      "custom51Trig2TweenSelector": "2 TWIDS",
       "custom51Trig2ReverseSequence": false,
       "custom51Trig2GlideToFirstPose": true,
       "custom51Trig2FirstGlideTimeScale": 2.45,
@@ -23209,7 +23314,7 @@
       "custom52Trig2RotationMode": "Rotation Around Cursor",
       "custom52Trig2TargetPose": "",
       "custom52Trig2SkipIfSamePose": false,
-      "custom52Trig2TweenSelector": "WAVE",
+      "custom52Trig2TweenSelector": "2 TWIDS",
       "custom52Trig2ReverseSequence": false,
       "custom52Trig2GlideToFirstPose": true,
       "custom52Trig2FirstGlideTimeScale": 2.45,
@@ -41005,18 +41110,6 @@
           "group": "2 TWIDS - 2 HANDS"
         },
         {
-          "name": "WAVE",
-          "tweenPoses": [
-            "Wave 1",
-            "WAVE 2",
-            "WAVE 3",
-            "WAVE 4",
-            "WAVE 5",
-            "WAVE 6",
-            "WAVE 7"
-          ]
-        },
-        {
           "name": "FIST PALM + 0",
           "tweenPoses": [
             "Fist",
@@ -41295,6 +41388,123 @@
             "FIRE_5",
             "FIRE_6"
           ]
+        },
+        {
+          "name": "WAVE -45",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "Wave -30",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE -25",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE -15",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE -0",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +15",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +30",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +45",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +60",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
         }
       ],
       "cameraX": 3.7499999999999996,
@@ -43957,7 +44167,7 @@
       "custom42RotationMode": "Rotation Around Cursor",
       "custom42TargetPose": "MiddleFinger",
       "custom42SkipIfSamePose": true,
-      "custom42TweenSelector": "WAVE",
+      "custom42TweenSelector": "2 TWIDS",
       "custom42ReverseSequence": false,
       "custom42GlideToFirstPose": true,
       "custom42FirstGlideTimeScale": 1.8,
@@ -46707,7 +46917,7 @@
       "custom51Trig2RotationMode": "Rotation Around Cursor",
       "custom51Trig2TargetPose": "",
       "custom51Trig2SkipIfSamePose": false,
-      "custom51Trig2TweenSelector": "WAVE",
+      "custom51Trig2TweenSelector": "2 TWIDS",
       "custom51Trig2ReverseSequence": false,
       "custom51Trig2GlideToFirstPose": true,
       "custom51Trig2FirstGlideTimeScale": 2.45,
@@ -47577,7 +47787,7 @@
       "custom52Trig2RotationMode": "Rotation Around Cursor",
       "custom52Trig2TargetPose": "",
       "custom52Trig2SkipIfSamePose": false,
-      "custom52Trig2TweenSelector": "WAVE",
+      "custom52Trig2TweenSelector": "2 TWIDS",
       "custom52Trig2ReverseSequence": false,
       "custom52Trig2GlideToFirstPose": true,
       "custom52Trig2FirstGlideTimeScale": 2.45,
@@ -65373,18 +65583,6 @@
           "group": "2 TWIDS - 2 HANDS"
         },
         {
-          "name": "WAVE",
-          "tweenPoses": [
-            "Wave 1",
-            "WAVE 2",
-            "WAVE 3",
-            "WAVE 4",
-            "WAVE 5",
-            "WAVE 6",
-            "WAVE 7"
-          ]
-        },
-        {
           "name": "FIST PALM + 0",
           "tweenPoses": [
             "Fist",
@@ -65663,6 +65861,123 @@
             "FIRE_5",
             "FIRE_6"
           ]
+        },
+        {
+          "name": "WAVE -45",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "Wave -30",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE -25",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE -15",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE -0",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +15",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +30",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +45",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
+        },
+        {
+          "name": "WAVE +60",
+          "tweenPoses": [
+            "Wave 1",
+            "WAVE 2",
+            "WAVE 3",
+            "WAVE 4",
+            "WAVE 5",
+            "WAVE 6",
+            "WAVE 7"
+          ],
+          "group": "WAVE"
         }
       ],
       "cameraX": 6.6385295949156875,
@@ -68325,7 +68640,7 @@
       "custom42RotationMode": "Rotation Around Cursor",
       "custom42TargetPose": "MiddleFinger",
       "custom42SkipIfSamePose": true,
-      "custom42TweenSelector": "WAVE",
+      "custom42TweenSelector": "2 TWIDS",
       "custom42ReverseSequence": false,
       "custom42GlideToFirstPose": true,
       "custom42FirstGlideTimeScale": 1.8,
@@ -71075,7 +71390,7 @@
       "custom51Trig2RotationMode": "Rotation Around Cursor",
       "custom51Trig2TargetPose": "",
       "custom51Trig2SkipIfSamePose": false,
-      "custom51Trig2TweenSelector": "WAVE",
+      "custom51Trig2TweenSelector": "2 TWIDS",
       "custom51Trig2ReverseSequence": false,
       "custom51Trig2GlideToFirstPose": true,
       "custom51Trig2FirstGlideTimeScale": 2.45,
@@ -71945,7 +72260,7 @@
       "custom52Trig2RotationMode": "Rotation Around Cursor",
       "custom52Trig2TargetPose": "",
       "custom52Trig2SkipIfSamePose": false,
-      "custom52Trig2TweenSelector": "WAVE",
+      "custom52Trig2TweenSelector": "2 TWIDS",
       "custom52Trig2ReverseSequence": false,
       "custom52Trig2GlideToFirstPose": true,
       "custom52Trig2FirstGlideTimeScale": 2.45,
@@ -74360,7 +74675,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -75302,7 +75617,7 @@
           "type": "group",
           "group": {
             "key": "Tween",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -76468,7 +76783,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -77364,14 +77679,14 @@
           "type": "group",
           "group": {
             "key": "UI Buttons Tween",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -77415,7 +77730,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Scale Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -77437,7 +77752,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Easing",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -77552,7 +77867,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -82762,8 +83077,8 @@
     "desktop": {
       "left": 4.75,
       "top": 66.5,
-      "width": 598.1000366210938,
-      "height": 549.2125244140625,
+      "width": 601.2999877929688,
+      "height": 550.8125,
       "collapsed": false
     },
     "mobile": {
