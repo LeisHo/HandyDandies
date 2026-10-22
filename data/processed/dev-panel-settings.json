@@ -212,7 +212,7 @@
       "throttleOffScreenPose": false,
       "offScreenPoseEvery": 2,
       "fieldRows": 30,
-      "fieldCols": 28,
+      "fieldCols": 26,
       "rowSpacing": 8,
       "columnSpacing": 15,
       "handScale": 1,
