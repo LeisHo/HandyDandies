@@ -26489,8 +26489,8 @@
       "renderOrderSkipOffScreen": true,
       "throttleOffScreenPosition": false,
       "offScreenPositionEvery": 2,
-      "throttleOffScreenPose": false,
-      "offScreenPoseEvery": 2,
+      "throttleOffScreenPose": true,
+      "offScreenPoseEvery": 5,
       "fieldRows": 44,
       "fieldCols": 13,
       "rowSpacing": 7.5,
@@ -80087,7 +80087,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -80098,7 +80098,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -80325,7 +80325,7 @@
                 "type": "group",
                 "group": {
                   "key": "Off-Screen Hands",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
