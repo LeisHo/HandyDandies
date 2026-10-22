@@ -9637,6 +9637,9 @@ function cameraDirFromCfg() {
 // After the restore the view is now set directly from the saved numbers: position X / Y / Z, Field Of View, Yaw / Pitch / Roll, and the target = position + view direction x Zoom. Nothing saved for the camera = left as it is.
 function reconcileCameraAfterRestore() {
   if (fieldRevealed) return // the visitor may already be panning
+  // 2026-10-21 (direct request, desktop and mobile): the page starts on the DEFAULT camera of this device's settings, not on the camera that was live when the settings were last saved. The Default camera is the full stored view
+  // (position, target, field of view, roll; loadCameraDefaultFromCfg() has just read it from this device's own cameraDefaultPreset). Only a setting that never stored a Default falls back to the saved camera sliders below.
+  if (cameraDefaultTargetKnown) { applyCameraPreset({ ...cameraDefaultValues }); sceneNeedsRedraw = true; return }
   const num = (k) => { const v = peekRestoredValue(k); return typeof v === 'number' && isFinite(v) ? v : undefined }
   const x = num('cameraX'), y = num('cameraY'), z = num('cameraZ'), zoom = num('cameraZoom')
   if (x === undefined || y === undefined || z === undefined || zoom === undefined) return
