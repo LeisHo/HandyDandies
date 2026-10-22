@@ -19254,6 +19254,13 @@ function customFunctionActiveForDeviceFamily(family, id, deviceFamily) {
   if (family === 'desktop' && deviceFamily === 'mobile') return isDevRowVisible(`${id}Enabled`)
   return false
 }
+// Whether a custom function FIRES on the real device (2026-10-22, direct correction: "Show in Mobile/Landscape" means the control can have its OWN Mobile / Landscape settings; unticked, Mobile just uses Desktop's).
+// It is not an on/off switch for the function, so the runtime no longer reads it: a Desktop-family function fires on every device (with Desktop's settings unless made independent), a Mobile-family one only on a
+// phone. This used to read the Enabled row's checkbox, which only dev mode loads (devVisibility is restored by resetSettings()), so with ?dev=1 on a phone every function unticked there stopped firing while a
+// normal visitor still ran them all. The dev-panel UI keeps using customFunctionActiveForDeviceFamily() above to show / hide the groups.
+function customFunctionRunsOnDevice(family, deviceFamily) {
+  return family === 'desktop' || family === deviceFamily
+}
 // Shows/hides ONE custom function's group based on customFunctionActiveForDeviceFamily()
 // above vs. whichever dev-panel tab is currently active -- devPanel.js's
 // own generic refreshEmptyGroupVisibility() only auto-hides an empty group
@@ -21089,7 +21096,7 @@ function triggerCustomPoseFunctions(type, clickCount = 1) {
     // previously nothing here checked family at all, so a mobile-created
     // function fired on ANY device, including Desktop. See
     // customFunctionActiveForDeviceFamily()'s own comment.
-    if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
+    if (!customFunctionRunsOnDevice(family, deviceFamily)) return
     if ((type === 'Click' || type === 'Right Click') && customFunctionClickCountOrdinal(id) !== clickCount) return
     if (type === 'Click' && customFunctionWantsMultiTouch(id)) return
     // Multi Trigger -- resolved ONCE per real click, here (not inside
@@ -21137,7 +21144,7 @@ function startCustomHoldFunctions(type, ordinal = 1) {
   customClickFunctionIds.forEach(({ id, kind, family }) => {
     if (kind !== 'hold' || cfg[`${id}Type`] !== type) return
     if (!cfg[`${id}Enabled`]) return // a switched-off function fires nothing, not even an enabled Multi Trigger trigger (see triggerCustomPoseFunctions())
-    if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
+    if (!customFunctionRunsOnDevice(family, deviceFamily)) return
     if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
     if (type === 'Click+Hold' && customFunctionWantsMultiTouch(id)) return
     const prefix = resolveMultiTriggerPrefix(id)
@@ -21157,7 +21164,7 @@ function endCustomHoldFunctions(type, ordinal = 1) {
   const deviceFamily = currentDeviceFamily()
   customClickFunctionIds.forEach(({ id, kind, family }) => {
     if (kind !== 'hold' || cfg[`${id}Type`] !== type) return
-    if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
+    if (!customFunctionRunsOnDevice(family, deviceFamily)) return
     if (type === 'Click+Hold' && customFunctionClickCountOrdinal(id) !== ordinal) return
     if (type === 'Click+Hold' && customFunctionWantsMultiTouch(id)) return
     // Release whichever prefix THIS press actually armed -- falls back
@@ -21249,7 +21256,7 @@ function multiPointEligibleFunctions() {
   return customClickFunctionIds
     .filter(({ id, family }) => {
       const type = cfg[`${id}Type`]
-      return cfg[`${id}Enabled`] && (type === 'Click' || type === 'Click+Hold') && customFunctionWantsMultiTouch(id) && customFunctionActiveForDeviceFamily(family, id, deviceFamily)
+      return cfg[`${id}Enabled`] && (type === 'Click' || type === 'Click+Hold') && customFunctionWantsMultiTouch(id) && customFunctionRunsOnDevice(family, deviceFamily)
     })
     .map(({ id, kind }) => ({ id, kind, need: cfg[`${id}TouchPointCount`] }))
     .sort((a, b) => a.need - b.need)
@@ -21280,7 +21287,7 @@ function multiPointHandleTouchEnd(e) {
   const deviceFamily = currentDeviceFamily()
   customClickFunctionIds.forEach(({ id, kind, family }) => {
     if (kind !== 'hold' || cfg[`${id}Type`] !== 'Click+Hold' || !customFunctionWantsMultiTouch(id)) return
-    if (!customFunctionActiveForDeviceFamily(family, id, deviceFamily)) return
+    if (!customFunctionRunsOnDevice(family, deviceFamily)) return
     const need = cfg[`${id}TouchPointCount`]
     const trig = clickHoldPoseTriggers[id]
     if (trig && trig.active && multiPointActiveTouchCount < need) endClickHoldPose(id)
