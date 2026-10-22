@@ -17520,7 +17520,7 @@
       "showFrameRate": true,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": true,
+      "exportLogsUiButton": false,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -37472,7 +37472,7 @@
       "showFrameRate": true,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": true,
+      "exportLogsUiButton": false,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -57424,7 +57424,7 @@
       "showFrameRate": true,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": true,
+      "exportLogsUiButton": false,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -60190,7 +60190,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -69389,10 +69389,10 @@
       "collapsed": false
     },
     "mobile": {
-      "left": 50.63095474243164,
+      "left": 47.2023811340332,
       "top": 168.08929443359375,
-      "width": 340.36309814453125,
-      "height": 477.3511962890625,
+      "width": 347.2202453613281,
+      "height": 480.3988037109375,
       "collapsed": false
     }
   }
