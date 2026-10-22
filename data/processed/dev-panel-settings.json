@@ -45116,8 +45116,8 @@
         }
       ],
       "cameraX": 3.7499999999999996,
-      "cameraY": 3.3616571324294644e-13,
-      "cameraZ": 539.9862937123789,
+      "cameraY": 4.3536202005321485e-13,
+      "cameraZ": 539.9869789766306,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
@@ -45163,7 +45163,7 @@
           "targetZ": -0.012335659969494372
         }
       ],
-      "cameraShowFrame": false,
+      "cameraShowFrame": true,
       "cameraFrameThickness": 3,
       "lockCameraPan": true,
       "lockCameraZoom": false,
@@ -80098,7 +80098,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -80325,7 +80325,7 @@
                 "type": "group",
                 "group": {
                   "key": "Off-Screen Hands",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -81899,7 +81899,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -82195,7 +82195,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -82892,7 +82892,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -83279,7 +83279,7 @@
     },
     {
       "key": "Custom Click Functions",
-      "collapsed": false,
+      "collapsed": true,
       "locked": false,
       "items": [
         {
@@ -88494,10 +88494,10 @@
       "collapsed": false
     },
     "mobile": {
-      "left": 30.059524536132812,
+      "left": 20,
       "top": 168.08929443359375,
-      "width": 364.36309814453125,
-      "height": 488.01190185546875,
+      "width": 374.6488037109375,
+      "height": 477.6071472167969,
       "collapsed": false
     }
   }
