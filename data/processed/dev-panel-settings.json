@@ -77371,7 +77371,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -77393,7 +77393,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -77415,7 +77415,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Scale Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -77437,7 +77437,7 @@
                 "type": "group",
                 "group": {
                   "key": "UiBtn > UI Button Easing",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
