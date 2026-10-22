@@ -22217,7 +22217,7 @@ function applyFieldBounds() {
     for (let i = 0; i < hands.length; i++) {
       const bp = hands[i].basePosition
       let d = 0
-      if (bp) d = Math.hypot(bp.x - camera.position.x, bp.y - camera.position.y) // world XY only (no Z): the starting point's XY distance from the camera's XY position
+      if (bp) d = Math.hypot(bp.x - cameraDefaultValues.cameraX, bp.y - cameraDefaultValues.cameraY) // world XY only (no Z): the starting point's XY distance from the DEFAULT camera's XY position (2026-10-21, direct request: not the live camera, so panning / zooming does not move the limits)
       fbDist[i] = d
       if (d < mn) mn = d
       if (d > mx) mx = d
@@ -22262,7 +22262,7 @@ function buildFieldBoundsWidgets() {
     if (legacy) legacy.style.display = 'none' // old range-bar storage, replaced by the Min / Max number inputs
     ;['Min', 'Max'].forEach((M) => {
       const row = document.querySelector('.dp-row[data-key="fieldBounds' + A + M + 'Curve"]')
-      if (row) buildGenericCurveWidget(row, { caption: 'X: XY Distance Of The Starting Field Point From The Camera (%, Nearest→Farthest Point, All Points, No Z)  ·  Y: ' + M + ' ' + A + ' Limit (0 = Slider Min, 1 = Slider Max)', defaultPoints: M === 'Min' ? [{ x: 0, y: 0 }, { x: 1, y: 0 }] : [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+      if (row) buildGenericCurveWidget(row, { caption: 'X: XY Distance Of The Starting Field Point From The Default Camera (%, Nearest→Farthest Point, All Points, No Z)  ·  Y: ' + M + ' ' + A + ' Limit (0 = Slider Min, 1 = Slider Max)', defaultPoints: M === 'Min' ? [{ x: 0, y: 0 }, { x: 1, y: 0 }] : [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
       const rr = document.querySelector('.dp-row[data-key="fieldBounds' + A + M + 'CurveRange"]')
       if (rr) buildGenericRangeBarWidget(rr, { trackMin: -300, trackMax: 300, unit: 'wu', defaultValue: { min: -300, max: 300 } })
       wrapGatedSubgroup('fieldBounds' + A + M + 'CurveEnabled', ['fieldBounds' + A + M + 'Curve', 'fieldBounds' + A + M + 'CurveRange'], 'Hand Position ' + M + ' ' + A + ' Curve')
