@@ -19053,15 +19053,15 @@
         },
         {
           "name": "HD - Mobile - 20 FOV",
-          "cameraX": 3.750000000000198,
-          "cameraY": 7.564967614185461e-14,
-          "cameraZ": 539.9876643400305,
+          "cameraX": 3.7500000000001323,
+          "cameraY": -1.0754631901111969e-13,
+          "cameraZ": 539.9883496538564,
           "cameraFov": 20,
           "cameraZoom": 540,
           "cameraRoll": 0,
-          "targetX": 3.750000000000132,
-          "targetY": 1.62488299224393e-13,
-          "targetZ": 1079.9876643400305
+          "targetX": 3.750000000000066,
+          "targetY": -2.070769592858131e-14,
+          "targetZ": 1079.9883496538564
         }
       ],
       "cameraShowFrame": true,
@@ -45471,14 +45471,14 @@
           ]
         }
       ],
-      "cameraX": 3.750000000000198,
-      "cameraY": 7.564967614185461e-14,
-      "cameraZ": 539.9876643400305,
+      "cameraX": 3.7500000000001323,
+      "cameraY": -1.0754631901111969e-13,
+      "cameraZ": 539.9883496538564,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 180,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":3.750000000000198,\"cameraY\":7.564967614185461e-14,\"cameraZ\":539.9876643400305,\"cameraFov\":20,\"cameraZoom\":540,\"cameraRoll\":0,\"targetX\":3.750000000000132,\"targetY\":1.62488299224393e-13,\"targetZ\":1079.9876643400305}",
+      "cameraDefaultPreset": "{\"cameraX\":3.7500000000001323,\"cameraY\":-1.0754631901111969e-13,\"cameraZ\":539.9883496538564,\"cameraFov\":20,\"cameraZoom\":540,\"cameraRoll\":0,\"targetX\":3.750000000000066,\"targetY\":-2.070769592858131e-14,\"targetZ\":1079.9883496538564}",
       "cameraZoom": 540,
       "cameraZoomSpeed": 1,
       "savedCameras": [
@@ -45508,15 +45508,15 @@
         },
         {
           "name": "HD - Mobile - 20 FOV",
-          "cameraX": 3.750000000000198,
-          "cameraY": 7.564967614185461e-14,
-          "cameraZ": 539.9876643400305,
+          "cameraX": 3.7500000000001323,
+          "cameraY": -1.0754631901111969e-13,
+          "cameraZ": 539.9883496538564,
           "cameraFov": 20,
           "cameraZoom": 540,
           "cameraRoll": 0,
-          "targetX": 3.750000000000132,
-          "targetY": 1.62488299224393e-13,
-          "targetZ": 1079.9876643400305
+          "targetX": 3.750000000000066,
+          "targetY": -2.070769592858131e-14,
+          "targetZ": 1079.9883496538564
         }
       ],
       "cameraShowFrame": true,
@@ -71963,15 +71963,15 @@
         },
         {
           "name": "HD - Mobile - 20 FOV",
-          "cameraX": 3.750000000000198,
-          "cameraY": 7.564967614185461e-14,
-          "cameraZ": 539.9876643400305,
+          "cameraX": 3.7500000000001323,
+          "cameraY": -1.0754631901111969e-13,
+          "cameraZ": 539.9883496538564,
           "cameraFov": 20,
           "cameraZoom": 540,
           "cameraRoll": 0,
-          "targetX": 3.750000000000132,
-          "targetY": 1.62488299224393e-13,
-          "targetZ": 1079.9876643400305
+          "targetX": 3.750000000000066,
+          "targetY": -2.070769592858131e-14,
+          "targetZ": 1079.9883496538564
         }
       ],
       "cameraShowFrame": false,
@@ -82344,7 +82344,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -82455,7 +82455,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -89043,8 +89043,8 @@
     "mobile": {
       "left": 20,
       "top": 170.52381896972656,
-      "width": 408.71429443359375,
-      "height": 583.9404907226562,
+      "width": 394.4285888671875,
+      "height": 585.4642944335938,
       "collapsed": false
     }
   }
