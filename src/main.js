@@ -2164,6 +2164,15 @@ function renestSubgroupRows(parentTitle, spec) {
 // 2026-10-21 (direct report: lots of empty "Easing" subgroups in the Loading Preview group). A saved order lists every subgroup it ever recorded, including empty ones; applyOrder() rebuilds each as a placeholder, but a gated subgroup
 // (wrapGatedSubgroup()) fills only one group of its title, so the copies stay empty (the saved layout had three empty "Easing" groups next to the real one under Loading Preview). Any group with no row anywhere inside it is removed when a
 // SIBLING with the same key does hold rows, i.e. it is a pure leftover copy. Empty groups with no filled twin (a group the user just created, a plain empty shell) are left alone. The next Save records the cleaned layout.
+// 2026-10-21 (second part): the saved layout also listed each custom click function's group as an EMPTY top-level group (a placeholder left by an earlier save), which showed as a duplicate, empty copy of every function above the real
+// Custom Click Functions group. An empty top-level group whose key matches a group that holds rows anywhere in the panel is removed too. Run again after the custom functions are rebuilt (they are built inside onRestore).
+function pruneTopLevelGhostGroups() {
+  const filled = new Set()
+  document.querySelectorAll('.dp-group').forEach((g) => { if (g.querySelector('.dp-row')) filled.add(g.dataset.key) })
+  document.querySelectorAll('.dp-group').forEach((g) => {
+    if (g.parentElement && !g.parentElement.closest('.dp-group-body') && !g.querySelector('.dp-row') && filled.has(g.dataset.key)) g.remove()
+  })
+}
 function pruneDuplicateEmptyGroups() {
   document.querySelectorAll('.dp-group-body').forEach((body) => {
     const kids = Array.from(body.querySelectorAll(':scope > .dp-group'))
@@ -4403,6 +4412,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     try { const dr = document.querySelector('.dp-row[data-key="cameraDefaultPreset"]'); if (dr) dr.style.display = 'none' } catch (e) { /* no panel */ }
     prof('refreshItemSelectorMarks', refreshAllItemSelectorMarks)
     prof('syncHandModelWithSettings', syncHandModelWithSettings)
+    try { pruneTopLevelGhostGroups() } catch (e) { /* panel not built */ } // the custom click function groups exist now: drop the empty top-level placeholders of the saved layout
     startupSettingsReady = true
     prof('refreshStartupPreviewAfterRestore', refreshStartupPreviewAfterRestore)
     prof('writeStartupCache', writeStartupCache)
@@ -9576,6 +9586,7 @@ function updateCameraFrame() {
     _cfV.copy(corners[k]).project(camera)
     pts += ((_cfV.x * 0.5 + 0.5) * w).toFixed(1) + ',' + ((-_cfV.y * 0.5 + 0.5) * h).toFixed(1) + ' '
   }
+  if (pts.indexOf('NaN') >= 0) { cameraFrame.svg.style.display = 'none'; return } // no usable size / projection yet
   const th = Math.max(cfg.cameraFrameThickness || 3, 0.5)
   const key = pts + th
   cameraFrame.svg.style.display = ''
@@ -19750,7 +19761,7 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   // Distance Curve, Retransition, Multi Trigger. The 2 groups that were
   // missing from this list ('Offset To Camera', 'Easing') are new since
   // this layout was captured; the flat rows above already matched.
-  { type: 'group', title: 'On Click' }, { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Easing' },
+  { type: 'group', title: 'On Click' }, { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Wrist' }, { type: 'group', title: 'Easing' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' }, { type: 'group', title: 'Retransition' },
   { type: 'group', title: 'Multi Trigger' }
 ]
@@ -19779,7 +19790,7 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' }, { type: 'row', suffix: 'LoopWrapScale' },
   // 2026-10-04 -- same group order as CUSTOM_FUNCTION_POSE_LAYOUT (taken
   // from Click Offset Test); Tween Stop stays last, hold-kind only.
-  { type: 'group', title: 'On Click' }, { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Easing' },
+  { type: 'group', title: 'On Click' }, { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Wrist' }, { type: 'group', title: 'Easing' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' },
   // Multi Trigger last, as in Click Offset Test (2026-10-04, direct request "fix my
   // group setting order"): it was missing from this list, so hold-kind
