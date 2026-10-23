@@ -222,6 +222,20 @@
       "cropCapEnabled": true,
       "cropCapTone": "Reactive",
       "cropCapColor": "#ffffff",
+      "renderSkeletonFront": false,
+      "skelFrontModel": "repo:SKELETON HAND",
+      "skelToonSteps": 2,
+      "skelToonStepThreshold": 2.7,
+      "skelToonShadowFloor": 7,
+      "skelToonLightCeiling": 100,
+      "skelToonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]",
+      "skelToonBaseTint": "#ffffff",
+      "skelTextureInfluence": 0,
+      "skelToonTint": "#ffffff",
+      "skelRimIntensity": 0,
+      "skelRimPower": 0.5,
+      "skelRimColor": "#ffffff",
+      "skelSavedToon": [],
       "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 0.89,
@@ -434,11 +448,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.00000000000002,
+      "loadingPreviewKeyAzimuth": 314,
+      "loadingPreviewKeyElevation": 47.00000000000001,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 311,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -26615,10 +26629,10 @@
       "offScreenPoseEvery": 5,
       "fieldRows": 30,
       "fieldCols": 11,
-      "rowSpacing": 16,
-      "columnSpacing": 30,
-      "handScale": 2.5,
-      "alternateRowOffset": 15,
+      "rowSpacing": 14,
+      "columnSpacing": 28,
+      "handScale": 2,
+      "alternateRowOffset": 14,
       "progressiveRowOffset": -10,
       "useProgressiveOffset": false,
       "hideHands": false,
@@ -26655,6 +26669,20 @@
       "cropCapEnabled": true,
       "cropCapTone": "Reactive",
       "cropCapColor": "#ffffff",
+      "renderSkeletonFront": false,
+      "skelFrontModel": "repo:SKELETON HAND",
+      "skelToonSteps": 2,
+      "skelToonStepThreshold": 2.7,
+      "skelToonShadowFloor": 7,
+      "skelToonLightCeiling": 100,
+      "skelToonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]",
+      "skelToonBaseTint": "#ffffff",
+      "skelTextureInfluence": 0,
+      "skelToonTint": "#ffffff",
+      "skelRimIntensity": 0,
+      "skelRimPower": 0.5,
+      "skelRimColor": "#ffffff",
+      "skelSavedToon": [],
       "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 0.08,
@@ -26867,11 +26895,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 3",
-      "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.00000000000002,
+      "loadingPreviewKeyAzimuth": 314,
+      "loadingPreviewKeyElevation": 47.00000000000001,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 311,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -53088,6 +53116,20 @@
       "cropCapEnabled": true,
       "cropCapTone": "Reactive",
       "cropCapColor": "#ffffff",
+      "renderSkeletonFront": false,
+      "skelFrontModel": "repo:SKELETON HAND",
+      "skelToonSteps": 2,
+      "skelToonStepThreshold": 2.7,
+      "skelToonShadowFloor": 7,
+      "skelToonLightCeiling": 100,
+      "skelToonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]",
+      "skelToonBaseTint": "#ffffff",
+      "skelTextureInfluence": 0,
+      "skelToonTint": "#ffffff",
+      "skelRimIntensity": 0,
+      "skelRimPower": 0.5,
+      "skelRimColor": "#ffffff",
+      "skelSavedToon": [],
       "trackingPoint": "armEnd",
       "trackingEnabled": true,
       "trackingDamping": 1,
@@ -53300,11 +53342,11 @@
         }
       ],
       "loadingPreviewLightingSelector": "LOADING 7",
-      "loadingPreviewKeyAzimuth": 299,
-      "loadingPreviewKeyElevation": 51.00000000000002,
+      "loadingPreviewKeyAzimuth": 314,
+      "loadingPreviewKeyElevation": 47.00000000000001,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 311,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -80938,6 +80980,98 @@
                     "cropCapTone"
                   ]
                 }
+              },
+              {
+                "type": "group",
+                "group": {
+                  "key": "Render Skeleton In Front",
+                  "collapsed": false,
+                  "locked": false,
+                  "items": [
+                    {
+                      "type": "row",
+                      "key": "skelFrontModel"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelToonSteps"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelToonStepThreshold"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelToonStepThresholdPick"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelToonShadowFloor"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelToonShadowFloorPick"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelToonLightCeiling"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelToonLightCeilingPick"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelToonGradient"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelToonBaseTint"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelTextureInfluence"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelToonTint"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelRimIntensity"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelRimPower"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelRimColor"
+                    },
+                    {
+                      "type": "row",
+                      "key": "skelSavedToon"
+                    }
+                  ],
+                  "settings": [
+                    "skelFrontModel",
+                    "skelToonSteps",
+                    "skelToonStepThreshold",
+                    "skelToonStepThresholdPick",
+                    "skelToonShadowFloor",
+                    "skelToonShadowFloorPick",
+                    "skelToonLightCeiling",
+                    "skelToonLightCeilingPick",
+                    "skelToonGradient",
+                    "skelToonBaseTint",
+                    "skelTextureInfluence",
+                    "skelToonTint",
+                    "skelRimIntensity",
+                    "skelRimPower",
+                    "skelRimColor",
+                    "skelSavedToon"
+                  ]
+                }
               }
             ],
             "settings": [
@@ -89270,8 +89404,8 @@
     "mobile": {
       "left": 20,
       "top": 292.2738037109375,
-      "width": 404.71429443359375,
-      "height": 475.8988037109375,
+      "width": 401.2857360839844,
+      "height": 480.4702453613281,
       "collapsed": false
     }
   }
