@@ -71,17 +71,24 @@ const HAND_MODEL_BUILTINS = [
   // 2026-10-16: the 13 HD IK exports - same 23-joint rig names and Hand + OUTLINE primitives as the HD files above, a different bind pose (so poses will not match exactly). Triangle counts read from each file's Hand index accessor.
   { id: 'repo:HD_IK_100', name: 'HD IK 100 (110 tris)', url: '../data/processed/HAND3D/HD_IK_100.glb', source: 'repo' },
   { id: 'repo:HD_IK_200', name: 'HD IK 200 (194 tris)', url: '../data/processed/HAND3D/HD_IK_200.glb', source: 'repo' },
-  { id: 'repo:HD_IK_300', name: 'HD IK 300 (304 tris)', url: '../data/processed/HAND3D/HD_IK_300.glb', source: 'repo' },
+  { id: 'repo:HD_IK_300', name: 'HD IK 300 (292 tris)', url: '../data/processed/HAND3D/HD_IK_300.glb', source: 'repo' },
   { id: 'repo:HD_IK_400', name: 'HD IK 400 (402 tris)', url: '../data/processed/HAND3D/HD_IK_400.glb', source: 'repo' },
-  { id: 'repo:HD_IK_500', name: 'HD IK 500 (544 tris)', url: '../data/processed/HAND3D/HD_IK_500.glb', source: 'repo' },
+  { id: 'repo:HD_IK_500', name: 'HD IK 500 (510 tris)', url: '../data/processed/HAND3D/HD_IK_500.glb', source: 'repo' },
   { id: 'repo:HD_IK_800', name: 'HD IK 800 (810 tris)', url: '../data/processed/HAND3D/HD_IK_800.glb', source: 'repo' },
-  { id: 'repo:HD_IK_1k', name: 'HD IK 1k (1,090 tris)', url: '../data/processed/HAND3D/HD_IK_1k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_1k', name: 'HD IK 1k (960 tris)', url: '../data/processed/HAND3D/HD_IK_1k.glb', source: 'repo' },
   { id: 'repo:HD_IK_2k', name: 'HD IK 2k (2,062 tris)', url: '../data/processed/HAND3D/HD_IK_2k.glb', source: 'repo' },
   { id: 'repo:HD_IK_4k', name: 'HD IK 4k (4,008 tris)', url: '../data/processed/HAND3D/HD_IK_4k.glb', source: 'repo' },
   { id: 'repo:HD_IK_6k', name: 'HD IK 6k (6,034 tris)', url: '../data/processed/HAND3D/HD_IK_6k.glb', source: 'repo' },
   { id: 'repo:HD_IK_8k', name: 'HD IK 8k (8,018 tris)', url: '../data/processed/HAND3D/HD_IK_8k.glb', source: 'repo' },
-  { id: 'repo:HD_IK_10k', name: 'HD IK 10k (10,004 tris)', url: '../data/processed/HAND3D/HD_IK_10k.glb', source: 'repo' },
-  { id: 'repo:HD_IK_12k', name: 'HD IK 12k (12,224 tris)', url: '../data/processed/HAND3D/HD_IK_12k.glb', source: 'repo' }
+  { id: 'repo:HD_IK_10k', name: 'HD IK 10k (9,794 tris)', url: '../data/processed/HAND3D/HD_IK_10k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_12k', name: 'HD IK 12k (12,224 tris)', url: '../data/processed/HAND3D/HD_IK_12k.glb', source: 'repo' },
+  // 2026-10-23, imported from HANDO: the newest IK exports (HAND-021, 2026-10-22; HD IK 1k / 300 / 500 / 10k replace the 2026-10-16 files of the same name, HD IK 5k and 10k T are new) and two non-IK hands with the same rig names:
+  // SKELETON HAND (two material slots, merged into one fill mesh by mergeHandParts()) and FEMALE HAND_8k (a Hand-style mesh plus an OUTLINE primitive). Triangle counts are the skinned fill mesh, read from the files.
+  { id: 'repo:HD_IK_5k', name: 'HD IK 5k (4,828 tris)', url: '../data/processed/HAND3D/HD_IK_5k.glb', source: 'repo' },
+  { id: 'repo:HD_IK_10k_T', name: 'HD IK 10k T (9,794 tris)', url: '../data/processed/HAND3D/HD_IK_10k_T.glb', source: 'repo' },
+  { id: 'repo:SKELETON HAND', name: 'SKELETON HAND (4,987 tris)', url: '../data/processed/HAND3D/SKELETON%20HAND.glb', source: 'repo' },
+  { id: 'repo:SKELETON HAND_W', name: 'SKELETON HAND W (4,987 tris)', url: '../data/processed/HAND3D/SKELETON%20HAND_W.glb', source: 'repo' },
+  { id: 'repo:FEMALE HAND_8k', name: 'FEMALE HAND 8k (8,142 tris)', url: '../data/processed/HAND3D/FEMALE%20HAND_8k.glb', source: 'repo' }
 ]
 const lpLoadedRoots = new Map() // model id -> the loaded, prepared scene root (only for ids that loaded fine)
 const lpModelLoads = new Map() // model id -> the load promise (a model is fetched once)
@@ -20320,13 +20327,32 @@ function importHandModelFile(btn) {
       if (!skinned) { flashModelButton(btn, 'No skinned mesh'); alert('"' + file.name + '" has no skinned mesh, so it cannot be posed.'); return }
       const missing = HAND_MODEL_BONES.filter((n) => !skinned.skeleton.getBoneByName(n))
       if (missing.length) { flashModelButton(btn, 'Rig mismatch'); alert('"' + file.name + '" does not have the hand rig this app uses (missing bones: ' + missing.join(', ') + ').'); return }
-      const id = 'local:' + Date.now().toString(36)
-      await handModelIdbPut(id, { name: file.name, title: file.name.replace(/\.(glb|gltf)$/i, ''), blob: new Blob([buf], { type: 'model/gltf-binary' }) })
+      // Same name as a model already in the list (2026-10-23, direct request: "if it shares the same name as an existing model, ask me if I want to overwrite, then overwrite, don't duplicate"): an imported model of that name is
+      // asked about and, on yes, REPLACED in place (same list entry and id, so nothing is duplicated and the saved choice keeps pointing at it). A built-in (repo) model of that file name cannot be replaced from the browser (it
+      // is a file in the project), so the import is stopped instead of adding a second copy.
+      const title = file.name.replace(/\.(glb|gltf)$/i, '')
+      const sameName = (s) => String(s || '').toLowerCase() === title.toLowerCase()
+      const list = Array.isArray(cfg.handModels) ? cfg.handModels : []
+      const builtinSame = HAND_MODEL_BUILTINS.find((b) => sameName(decodeURIComponent(b.url.split('/').pop()).replace(/\.(glb|gltf)$/i, '')) || sameName(b.name))
+      if (builtinSame) { flashModelButton(btn, 'Built-in name'); alert('"' + title + '" is a built-in model (' + builtinSame.name + '). Built-in models are files in the project and cannot be overwritten from here, so nothing was imported - rename the file to import it as its own model.'); return }
+      const existing = list.find((it) => it && it.source === 'local' && sameName(it.name))
+      let id
+      if (existing) {
+        if (!confirm('A model called "' + title + '" is already in the Hand Models list. Overwrite it with this file?')) { flashModelButton(btn, 'Cancelled'); return }
+        id = existing.id
+        lpLoadedRoots.delete(id); lpModelLoads.delete(id) // the Loading Preview must not keep the old file's scene
+      } else {
+        id = 'local:' + Date.now().toString(36)
+      }
+      await handModelIdbPut(id, { name: file.name, title, blob: new Blob([buf], { type: 'model/gltf-binary' }) })
       localHandModelPresent[id] = true
-      const items = (Array.isArray(cfg.handModels) ? cfg.handModels : []).concat([{ name: file.name.replace(/\.(glb|gltf)$/i, ''), id, source: 'local' }])
-      cfg.handModels = items
-      syncValue('handModels', items)
-      flashModelButton(btn, 'Imported')
+      if (!existing) {
+        const items = list.concat([{ name: title, id, source: 'local' }])
+        cfg.handModels = items
+        syncValue('handModels', items)
+      }
+      flashModelButton(btn, existing ? 'Overwritten' : 'Imported')
+      if (existing && id === activeHandModelId) { alert('"' + title + '" is the model in use. The page reloads now to measure the new file.'); location.reload() } // (the model is measured once at load)
     } catch (e) {
       console.error('Hand model import failed', e)
       flashModelButton(btn, 'Failed')
@@ -23001,12 +23027,14 @@ function findSkinnedMesh(root) {
   mergeHandParts(root)
   let byHandMaterial = null
   let anyFound = null
+  let nonOutline = null // 2026-10-23: a hand whose fill material is not called 'Hand' (FEMALE HAND_8k: 'default' + an 'OUTLINE' primitive) must not end up with its OUTLINE primitive as the fill mesh just because that was visited last
   root.traverse((obj) => {
     if (!obj.isSkinnedMesh) return
     anyFound = obj
     if (obj.material && obj.material.name === 'Hand') byHandMaterial = obj
+    if (!(obj.material && obj.material.name === 'OUTLINE')) nonOutline = obj
   })
-  return byHandMaterial || anyFound
+  return byHandMaterial || nonOutline || anyFound
 }
 // New mesh finder (2026-09-24, Emission Material outline mechanic) --
 // locates HandyOL.glb's own 2nd skinned primitive (GLTF material name
