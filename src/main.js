@@ -1538,7 +1538,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { mergeHandParts, findSkinnedMesh, clipBlockRigInfo, pickBorrowedClipBlock, loadBorrowedClipBlock, addBorrowedClipBlock, refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, get rigLocalAxisPosing() { return RIG_LOCAL_AXIS_POSING }, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness, savedPoseByName, selectedSequenceEntries, resolveTweenSequencePoses }
+  window.__debug = { mergeHandParts, findSkinnedMesh, clipBlockRigInfo, pickBorrowedClipBlock, loadBorrowedClipBlock, addBorrowedClipBlock, refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, get skelFront() { return skelFront }, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, get rigLocalAxisPosing() { return RIG_LOCAL_AXIS_POSING }, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness, savedPoseByName, selectedSequenceEntries, resolveTweenSequencePoses }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -2212,8 +2212,8 @@ function renestRenderOrderRows() {
 // Toon Shade Color Gradient editor (2026-10-12): a gradient bar with a handle per colour stop. Click the bar to ADD a stop (it takes the
 // colour already there), click a handle to pick its colour, double-click a handle to DELETE it (at least 2 stay), drag a handle to move it.
 // The leftmost stop colours the Shadow Floor shade, the rightmost the Light Ceiling shade (see makeGradientTexture()).
-function buildToonGradientWidget() {
-  const row = document.querySelector('.dp-row[data-key="toonGradient"]')
+function buildToonGradientWidget(key) {
+  const row = document.querySelector('.dp-row[data-key="' + (key || 'toonGradient') + '"]')
   const input = row && row.querySelector('.dp-text-input')
   if (!input || row.dataset.tgWidget) return
   row.dataset.tgWidget = '1'
@@ -4338,6 +4338,34 @@ const POSE_SUBGROUP_SPECS = [
 // workspace-wide shared secret, not a per-project one.
 const DEV_PANEL_SAVE_SECRET = 'PkrbMti03M6xm3FEThYXa8gGW_08BOGj'
 const SAVE_SETTINGS_ENDPOINT = '/api/save-settings'
+// Render Skeleton In Front (2026-10-23, direct request, ported from HANDO: "place it in the Field Layout group"): the on/off row, the model selector and the skeleton's own copy of every Toon Shading control, all pushed into the Field
+// Layout group; setupRenderSkeletonGroup() wraps them into a toggleable "Render Skeleton In Front" subgroup (the on/off checkbox in its label). The default model is SKELETON HAND (a literal here: the constants below this point are
+// not declared yet while the control list is built).
+{
+  const fieldControls = DEV_GROUPS.find((g) => g.title === 'Field Layout').controls
+  const toonControls = DEV_GROUPS.find((g) => g.title === 'Toon Shading').controls
+  const SK = (k) => 'skel' + k.charAt(0).toUpperCase() + k.slice(1)
+  fieldControls.push({ key: 'renderSkeletonFront', label: 'Render Skeleton In Front On/Off', type: 'checkbox', def: false, onChange: () => { try { skelFrontEnsure() } catch (err) { /* early boot: the first frame picks it up */ } } })
+  fieldControls.push({ key: 'skelFrontModel', label: 'Skeleton Model', type: 'select', def: 'repo:SKELETON HAND', options: () => skelFrontModelOptions(), onChange: () => { try { skelFrontReload() } catch (err) { /* early boot */ } } })
+  const effect = {
+    toonSteps: () => rebuildSkelGradientMap(), toonStepThreshold: () => rebuildSkelGradientMap(), toonShadowFloor: () => rebuildSkelGradientMap(), toonLightCeiling: () => rebuildSkelGradientMap(), toonGradient: () => rebuildSkelGradientMap(),
+    toonBaseTint: (v) => forEachSkelToonMaterial((m) => m.color.set(v)),
+    textureInfluence: (v) => setSkelToonUniform('textureInfluence', v / 100),
+    toonTint: (v) => setSkelToonUniform('toonTint', new THREE.Color(v)), rimColor: (v) => setSkelToonUniform('rimColor', new THREE.Color(v)),
+    rimIntensity: (v) => setSkelToonUniform('rimIntensity', v), rimPower: (v) => setSkelToonUniform('rimPower', v)
+  }
+  const picks = { toonStepThresholdPick: 'threshold', toonShadowFloorPick: 'floor', toonLightCeilingPick: 'ceiling' }
+  ;['toonSteps', 'toonStepThreshold', 'toonStepThresholdPick', 'toonShadowFloor', 'toonShadowFloorPick', 'toonLightCeiling', 'toonLightCeilingPick', 'toonGradient', 'toonBaseTint', 'textureInfluence', 'toonTint', 'rimIntensity', 'rimPower', 'rimColor'].forEach((k) => {
+    const src = toonControls.find((c) => c.key === k)
+    if (!src) return
+    const c = { ...src, key: SK(k) }
+    if (src.placeAfter) c.placeAfter = SK(src.placeAfter)
+    if (picks[k]) c.onClick = (btn) => pickToonValueFromScreen(picks[k], btn, true)
+    else c.onChange = (v) => { try { effect[k](v) } catch (err) { /* early boot */ } }
+    fieldControls.push(c)
+  })
+  fieldControls.push({ key: 'skelSavedToon', label: 'Saved Toon Shading', type: 'list-picker', def: [], itemLabel: 'Toon', exportable: true, importable: true, isInUse: (item) => skelToonItemMatchesLive(item), captureCurrent: () => captureSkelToonPreset(), onUse: (item) => useSkelToonPreset(item) })
+}
 // Camera group (direct request 2026-10-14): its sliders are perDevice, which has no Show in Mobile/Landscape checkbox of its own; opt them into the visibility-only one so the group has it like every other group.
 ;(DEV_GROUPS.find((g) => g.title === 'Camera') || { controls: [] }).controls.forEach((c) => { if (c.perDevice && c.type === 'slider') c.visibilityToggle = true })
 const cfg = initDevPanel(DEV_GROUPS, {
@@ -7342,8 +7370,10 @@ function updateTrackingTargets() {
 // -----------------------------------------------------------------------
 let toonMaterial = null
 const toonShaderUniformsList = []
+const skelToonShaderUniformsList = [] // the Render Skeleton In Front overlay's materials (see createToonMaterial(map, true))
 function setToonUniform(name, value) {
   toonShaderUniformsList.forEach((u) => { if (u[name]) u[name].value = value })
+  if (name.startsWith('cropCap')) skelToonShaderUniformsList.forEach((u) => { if (u[name]) u[name].value = value }) // the Crop Cap settings are shared with the overlay
 }
 // Every field hand now gets its OWN cloned toon/outline material (see
 // rebuildField()'s own comment on wristClipPlane for why) -- these two
@@ -7395,10 +7425,10 @@ function toonGradientHexAt(stops, t) {
   const mix = (o) => Math.round(ch(a.c, o) + (ch(b.c, o) - ch(a.c, o)) * u).toString(16).padStart(2, '0')
   return '#' + mix(1) + mix(3) + mix(5)
 }
-function makeGradientTexture(steps, shadowFloor, lightCeiling, threshold) {
+function makeGradientTexture(steps, shadowFloor, lightCeiling, threshold, gradientStr) { // gradientStr: the colour gradient JSON (default: the Toon Shading one; the skeleton overlay passes its own)
   const size = Math.max(1, Math.round(steps)) // 1 = one flat band (the colour preset slider goes down to 1)
   const data = new Uint8Array(size * 4)
-  const grad = parseToonGradient(cfg.toonGradient || '')
+  const grad = parseToonGradient((gradientStr === undefined ? cfg.toonGradient : gradientStr) || '')
   const tc = new THREE.Color()
   for (let i = 0; i < size; i++) {
     const t = size <= 1 ? 1 : i / (size - 1)
@@ -7458,7 +7488,8 @@ function toonThresholdForMidBrightness(B, floor, ceiling) {
   const frac = THREE.MathUtils.clamp((B - floor) / span, 0.005, 0.995)
   return THREE.MathUtils.clamp(Math.round(Math.log(frac) / Math.log(0.5) / 0.05) * 0.05, 0.2, 5)
 }
-function pickToonValueFromScreen(which, btn) {
+function pickToonValueFromScreen(which, btn, skel) { // skel: the Render Skeleton In Front copy of the group (its own settings)
+  const K = (k) => (skel ? skelToonKey(k) : k)
   const label = btn.textContent
   btn.textContent = 'Click a color...'
   pickScreenColor().then((hex) => {
@@ -7466,19 +7497,19 @@ function pickToonValueFromScreen(which, btn) {
     const B = hexBrightnessPct(hex)
     let msg
     if (which === 'threshold') {
-      const v = Math.round(toonThresholdForMidBrightness(B, cfg.toonShadowFloor, cfg.toonLightCeiling) * 100) / 100
-      syncValue('toonStepThreshold', v)
+      const v = Math.round(toonThresholdForMidBrightness(B, cfg[K('toonShadowFloor')], cfg[K('toonLightCeiling')]) * 100) / 100
+      syncValue(K('toonStepThreshold'), v)
       msg = 'Threshold ' + v + ' (' + Math.round(B) + '% mid)'
     } else if (which === 'floor') {
       const v = THREE.MathUtils.clamp(Math.round(B), 0, 90)
-      syncValue('toonShadowFloor', v)
+      syncValue(K('toonShadowFloor'), v)
       msg = 'Floor ' + v + '%'
     } else {
       const v = THREE.MathUtils.clamp(Math.round(B), 10, 100)
-      syncValue('toonLightCeiling', v)
+      syncValue(K('toonLightCeiling'), v)
       msg = 'Ceiling ' + v + '%'
     }
-    rebuildGradientMap()
+    (skel ? rebuildSkelGradientMap : rebuildGradientMap)()
     btn.textContent = msg
     setTimeout(() => { btn.textContent = label }, 2500)
   })
@@ -7536,6 +7567,44 @@ function useToonPreset(item) {
   setToonUniform('rimColor', new THREE.Color(cfg.rimColor))
   rebuildGradientMap()
 }
+// Render Skeleton In Front's own copy of the Toon Shading settings (2026-10-23, ported from HANDO: "These settings apply only to the skeleton model"). The controls are built from the Toon Shading group's own definitions (same
+// labels, ranges, defaults, eyedroppers and colour gradient) under keys skelToonSteps ... skelRimColor / skelToonGradient; they drive the overlay's materials only. A saved preset stores the MAIN key names (toonSteps ...), so a
+// preset saved from either group can be used in the other.
+function skelToonKey(k) { return 'skel' + k.charAt(0).toUpperCase() + k.slice(1) }
+function forEachSkelToonMaterial(fn) { hands.forEach((h) => { if (h._skel && h._skel.material) fn(h._skel.material) }); if (skelFront.tmpl) fn(skelFront.tmpl) }
+function setSkelToonUniform(name, value) { skelToonShaderUniformsList.forEach((u) => { if (u[name]) u[name].value = value }) }
+function rebuildSkelGradientMap() {
+  const tex = makeGradientTexture(cfg.skelToonSteps, cfg.skelToonShadowFloor, cfg.skelToonLightCeiling, cfg.skelToonStepThreshold, cfg.skelToonGradient)
+  forEachSkelToonMaterial((m) => { m.gradientMap = tex; m.needsUpdate = true })
+  sceneNeedsRedraw = true
+}
+function captureSkelToonPreset() {
+  const item = {}
+  TOON_PRESET_KEYS.forEach((key) => { item[key] = cfg[skelToonKey(key)] })
+  return item
+}
+function skelToonItemMatchesLive(item) {
+  return TOON_PRESET_KEYS.every((k) => {
+    if (item[k] === undefined) return true
+    const a = item[k], b = cfg[skelToonKey(k)]
+    return typeof a === 'string' && typeof b === 'string' ? a.toLowerCase() === b.toLowerCase() : nearNum(a, b, 1e-3)
+  })
+}
+function useSkelToonPreset(item) {
+  TOON_PRESET_KEYS.forEach((key) => {
+    if (item[key] === undefined) return
+    const sk = skelToonKey(key)
+    cfg[sk] = item[key]
+    syncValue(sk, item[key])
+  })
+  forEachSkelToonMaterial((m) => m.color.set(cfg.skelToonBaseTint))
+  setSkelToonUniform('textureInfluence', cfg.skelTextureInfluence / 100)
+  setSkelToonUniform('toonTint', new THREE.Color(cfg.skelToonTint))
+  setSkelToonUniform('rimIntensity', cfg.skelRimIntensity)
+  setSkelToonUniform('rimPower', cfg.skelRimPower)
+  setSkelToonUniform('rimColor', new THREE.Color(cfg.skelRimColor))
+  rebuildSkelGradientMap()
+}
 // Ported from HANDO's own createToonMaterial() -- a MeshToonMaterial with
 // an onBeforeCompile injecting rim lighting + a duotone texture-tint blend
 // (see HANDO's own code for why duotone rather than a flat color swap).
@@ -7566,11 +7635,14 @@ function useToonPreset(item) {
 // -- correctness over the speculative compile-time saving; three.js now
 // compiles up to 289 separate (but small, cheap) programs once at
 // `rebuildField()` time, same as before this cache-key attempt existed.
-function createToonMaterial(map) {
+// `skel` (2026-10-23): the Render Skeleton In Front overlay's own material - it reads the skeleton's copy of every Toon Shading setting (skelToonSteps ... skelToonGradient, see skelToonKey()) and registers its shader
+// uniforms in skelToonShaderUniformsList instead, so the main Toon Shading sliders never touch it and its own sliders never touch the hands.
+function createToonMaterial(map, skel) {
+  const K = (k) => (skel ? skelToonKey(k) : k)
   const material = new THREE.MeshToonMaterial({
     map,
-    color: new THREE.Color(cfg.toonBaseTint),
-    gradientMap: makeGradientTexture(cfg.toonSteps, cfg.toonShadowFloor, cfg.toonLightCeiling, cfg.toonStepThreshold),
+    color: new THREE.Color(cfg[K('toonBaseTint')]),
+    gradientMap: makeGradientTexture(cfg[K('toonSteps')], cfg[K('toonShadowFloor')], cfg[K('toonLightCeiling')], cfg[K('toonStepThreshold')], cfg[K('toonGradient')]),
     wireframe: cfg.showWireframe,
     clippingPlanes: []
     // depthTest stays ON (the default) -- a single hand's own self-
@@ -7585,11 +7657,11 @@ function createToonMaterial(map) {
     // earlier `depthTest:false` approach here).
   })
   material.onBeforeCompile = (shader) => {
-    shader.uniforms.rimColor = { value: new THREE.Color(cfg.rimColor) }
-    shader.uniforms.rimIntensity = { value: cfg.rimIntensity }
-    shader.uniforms.rimPower = { value: cfg.rimPower }
-    shader.uniforms.textureInfluence = { value: cfg.textureInfluence / 100 }
-    shader.uniforms.toonTint = { value: new THREE.Color(cfg.toonTint) }
+    shader.uniforms.rimColor = { value: new THREE.Color(cfg[K('rimColor')]) }
+    shader.uniforms.rimIntensity = { value: cfg[K('rimIntensity')] }
+    shader.uniforms.rimPower = { value: cfg[K('rimPower')] }
+    shader.uniforms.textureInfluence = { value: cfg[K('textureInfluence')] / 100 }
+    shader.uniforms.toonTint = { value: new THREE.Color(cfg[K('toonTint')]) }
     shader.uniforms.cropCapOn = { value: cfg.cropCapEnabled ? 1 : 0 }
     shader.uniforms.cropCapMode = { value: cropCapModeValue(cfg.cropCapTone) }
     shader.uniforms.cropCapColor = { value: new THREE.Color(cfg.cropCapColor) }
@@ -7607,7 +7679,7 @@ function createToonMaterial(map) {
       .replace('#include <opaque_fragment>', `if ( cropCapOn > 0.5 && cropCapMode > 2.5 && ! gl_FrontFacing ) outgoingLight = cropCapColor;\n#include <opaque_fragment>`)
       .replace('#include <map_fragment>', `#include <map_fragment>\nfloat toonLuma = dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) );\nvec3 toonDuotone = mix( vec3( 0.0 ), toonTint, toonLuma );\ndiffuseColor.rgb = mix( toonTint, toonDuotone, textureInfluence );`)
       .replace('#include <dithering_fragment>', `#include <dithering_fragment>\nfloat rimFactor = pow( 1.0 - max( dot( normalize( vRimNormal ), normalize( vRimViewDir ) ), 0.0 ), rimPower );\nif ( cropCapOn > 0.5 && ! gl_FrontFacing ) rimFactor = 0.0;\ngl_FragColor.rgb += rimColor * rimFactor * rimIntensity;`)
-    toonShaderUniformsList.push(shader.uniforms)
+    ;(skel ? skelToonShaderUniformsList : toonShaderUniformsList).push(shader.uniforms)
   }
   return material
 }
@@ -22774,6 +22846,131 @@ function relayoutField() {
 // that framing is derived from the field's size exactly ONCE (framedOnce),
 // the very first time hands are built, and never revisited after that.
 function noopQuatChange() {}
+// ---------------------------------------------------------------------
+// RENDER SKELETON IN FRONT (2026-10-23, direct request, ported from HANDO: a toggleable group that spawns a skeleton model into the scene, drawn above the hand whatever the pose, matching the hand's pose / offset / rotation). Every
+// FIELD hand gets its own overlay, a clone of the chosen model (SKELETON HAND by default; any hand-rig model of the Hand Models list, built in or imported):
+//  - a sibling of the hand's clone inside its wrapper, placed every frame from the clone's own position / rotation / scale composed with a fixed alignment (wrist rest onto wrist rest, hand length ratio, pointing direction), so
+//    Field Layout, the whole-hand rotation, scale and every hand-level move carry it;
+//  - posed by copying the hand's pose every frame: each bone's local rotation DELTA from its own rest pose is applied on top of the skeleton's rest pose (so a main model whose bind pose differs still gives the same pose);
+//  - own toon material per hand (the skeleton's own Toon Shading settings) with that hand's crop planes, so Hide Wrist / the crop block crops it too;
+//  - drawn just after its hand's fill mesh with the depth buffer cleared first, so it is on top of its hand yet any hand drawn later (closer in the Render Order) still covers it.
+// Hands are given their overlay lazily (a budget per frame, so switching it on in a big field does not freeze one frame). Not drawn in the Pose Preview / Loading Preview.
+// MEASURED WITH A MERGED MESH ONLY: the model goes through findSkinnedMesh() like every hand model, so a model with two material slots is one mesh here and uses the first part's texture for both (HANDO keeps the parts apart).
+// ---------------------------------------------------------------------
+const skelFront = { modelId: null, root: null, loading: false, token: 0, tmpl: null, rest: null, alignMat: new THREE.Matrix4() }
+const SKEL_FRONT_ATTACH_PER_FRAME = 60 // a judgment call (not measured): how many hands get an overlay per frame
+const _sfDelta = new THREE.Quaternion()
+const _sfMat = new THREE.Matrix4()
+function skelFrontModelId() { return cfg.skelFrontModel || 'repo:SKELETON HAND' }
+function skelFrontModelOptions() {
+  const out = HAND_MODEL_BUILTINS.map((m) => ({ value: m.id, text: m.name }))
+  const saved = Array.isArray(cfg.handModels) ? cfg.handModels : []
+  saved.forEach((it) => { if (it && it.source === 'local' && it.id && localHandModelPresent[it.id] !== false) out.push({ value: it.id, text: it.name + ' (imported)' }) })
+  const cur = typeof cfg === 'object' && cfg && cfg.skelFrontModel
+  if (cur && !out.some((o) => o.value === cur)) out.push({ value: cur, text: cur })
+  return out
+}
+function skelFrontDetach(hand) {
+  const o = hand._skel
+  if (!o) return
+  if (o.root.parent) o.root.parent.remove(o.root)
+  if (o.material) o.material.dispose()
+  hand._skel = null
+}
+function skelFrontUnload() { // drops every overlay so another model can take its place; a load still in flight is cancelled by its token
+  skelFront.token++
+  hands.forEach(skelFrontDetach)
+  skelFront.root = null; skelFront.tmpl = null; skelFront.rest = null; skelFront.modelId = null; skelFront.loading = false
+  sceneNeedsRedraw = true
+}
+function skelFrontReload() { skelFrontUnload(); skelFrontEnsure() }
+function skelFrontEnsure() { // the toggle changed (or boot / a rebuilt field): show / hide the overlays, start the model load when it is wanted and not there yet
+  const on = !!cfg.renderSkeletonFront
+  hands.forEach((h) => { if (h._skel) h._skel.root.visible = on })
+  sceneNeedsRedraw = true
+  if (!on || skelFront.root || skelFront.loading || !modelLoaded || !modelMeasurementsReady) return
+  skelFront.loading = true
+  const id = skelFrontModelId()
+  const token = ++skelFront.token
+  lpLoadPreviewModel(id).then((root) => {
+    if (token !== skelFront.token) return
+    skelFront.loading = false
+    if (!root) { console.warn('Render Skeleton In Front: "' + id + '" is not usable as a hand model'); return }
+    skelFrontPrepare(root, id)
+    sceneNeedsRedraw = true // the per-frame sync gives every hand its overlay
+  })
+}
+function skelFrontPrepare(root, id) { // measured once per model: alignment of its rest wrist / pointing direction / hand length onto the active model's
+  const mesh = findSkinnedMesh(root)
+  root.updateMatrixWorld(true)
+  const wo = new THREE.Vector3(), to = new THREE.Vector3()
+  mesh.skeleton.getBoneByName('rHand').getWorldPosition(wo)
+  mesh.skeleton.getBoneByName('rMid3').getWorldPosition(to)
+  const dir = to.clone().sub(wo)
+  const len = Math.max(dir.length(), 0.001)
+  dir.normalize()
+  const q = new THREE.Quaternion().setFromUnitVectors(dir, pointDirRawModel)
+  const sc = handLengthRaw / len
+  const pos = wristPosRaw.clone().sub(wo.applyQuaternion(q).multiplyScalar(sc))
+  skelFront.alignMat.compose(pos, q, new THREE.Vector3(sc, sc, sc))
+  skelFront.rest = {}
+  mesh.skeleton.bones.forEach((b) => { skelFront.rest[b.name] = b.quaternion.clone() })
+  skelFront.tmpl = createToonMaterial(mesh.material.map || null, true) // the skeleton's own Toon Shading settings
+  skelFront.root = root
+  skelFront.modelId = id
+}
+function skelFrontAttach(hand) {
+  if (!skelFront.root || hand._skel || !hand.skinnedMesh || !hand.wrapper) return
+  const ov = cloneSkeletal(skelFront.root)
+  const mesh = findSkinnedMesh(ov)
+  if (!mesh) return
+  ov.traverse((o) => {
+    if (o.isMesh && o !== mesh) o.visible = false
+    if (o.quaternion && o.quaternion._onChangeCallback) o.quaternion._onChangeCallback = noopQuatChange // as for the hands: no Euler recompute on every bone write
+  })
+  const m = skelFront.tmpl.clone()
+  m.onBeforeCompile = skelFront.tmpl.onBeforeCompile // clone() does not carry it over (see createFieldHand())
+  applyClipRigToMaterial(m, hand.clipRig, hand.wristClipPlane)
+  mesh.material = m
+  mesh.onBeforeRender = (r) => r.clearDepth()
+  ov.matrixAutoUpdate = false
+  ov.visible = !!cfg.renderSkeletonFront
+  hand.wrapper.add(ov)
+  const bones = new Map()
+  mesh.skeleton.bones.forEach((b) => bones.set(b.name, { bone: b, rest: skelFront.rest[b.name] || b.quaternion.clone() }))
+  hand._skel = { root: ov, mesh, material: m, bones }
+}
+function skelFrontSyncAll() { // every rendered frame, before the scene graph update: each hand's pose -> its skeleton's bones, and the overlay's own transform
+  if (!cfg.renderSkeletonFront) return
+  if (!skelFront.root) { if (!skelFront.loading) skelFrontEnsure(); return }
+  let budget = SKEL_FRONT_ATTACH_PER_FRAME
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i]
+    if (!h.skinnedMesh || !h.wrapper.parent || !h.wrapper.visible) continue
+    if (!h._skel) { if (budget-- <= 0) { sceneNeedsRedraw = true; continue }; skelFrontAttach(h); if (!h._skel) continue }
+    const o = h._skel
+    const bones = h.skinnedMesh.skeleton.bones
+    for (let k = 0; k < bones.length; k++) {
+      const b = bones[k]
+      const e = o.bones.get(b.name)
+      if (!e) continue
+      const mr = boneRestQuat[b.name]
+      if (mr) { _sfDelta.copy(mr).invert().multiply(b.quaternion); e.bone.quaternion.copy(e.rest).multiply(_sfDelta) } else e.bone.quaternion.copy(b.quaternion)
+    }
+    _sfMat.compose(h.clone.position, h.clone.quaternion, h.clone.scale).multiply(skelFront.alignMat)
+    o.root.matrix.copy(_sfMat)
+    o.root.matrixWorldNeedsUpdate = true
+  }
+}
+function setupRenderSkeletonGroup() { // the toggleable "Render Skeleton In Front" subgroup of Field Layout (on/off checkbox in its label); the Toon Shading copy sits in it like the Toon Shading group
+  const keys = ['skelFrontModel']
+  ;['toonSteps', 'toonStepThreshold', 'toonStepThresholdPick', 'toonShadowFloor', 'toonShadowFloorPick', 'toonLightCeiling', 'toonLightCeilingPick', 'toonGradient', 'toonBaseTint', 'textureInfluence', 'toonTint', 'rimIntensity', 'rimPower', 'rimColor'].forEach((k) => keys.push(skelToonKey(k)))
+  keys.push('skelSavedToon')
+  wrapGatedSubgroup('renderSkeletonFront', keys, 'Render Skeleton In Front')
+  buildToonGradientWidget('skelToonGradient')
+  safeRefreshSelectOptions('skelFrontModel')
+  skelFrontEnsure()
+}
 function createFieldHand() {
   const clone = cloneSkeletal(modelRoot)
   clone.quaternion.copy(alignQuat)
@@ -24462,6 +24659,7 @@ function animate(dt, now) {
     if (__shouldRenderThisFrame) {
       if (isPaused) { lastPausedRenderMs = __nowForRender; sceneNeedsRedraw = false }
       const __renderStart = performance.now()
+      skelFrontSyncAll() // Render Skeleton In Front
       updateSceneGraphForRender()
       const __hR = rlsHeap()
       if (rlog.r) rendererLogBeforeRender()
@@ -24574,7 +24772,7 @@ armLengthWidgetResyncs.push(() => {
   const sig = [camera.position.x, camera.position.y, camera.position.z, camera.fov, cfg.cameraRoll || 0, t.x, t.y, t.z].map((v) => Math.round(v * 100)).join(',') + '|' + LIGHTING_PRESET_KEYS.map((k) => cfg[k]).join(',') + '|' + cfg.loadingPreviewCameraSelector + '|' + cfg.loadingPreviewLightingSelector + '|' + TOON_PRESET_KEYS.map((k) => cfg[k]).join(',')
   if (sig === marksLastSig) return
   marksLastSig = sig
-  refreshListPickerMarksByKey('savedCameras'); refreshListPickerMarksByKey('savedLighting'); refreshListPickerMarksByKey('savedToon'); refreshListPickerMarksByKey('loadingPreviewSavedCameras'); refreshListPickerMarksByKey('loadingPreviewSavedLighting')
+  refreshListPickerMarksByKey('savedCameras'); refreshListPickerMarksByKey('savedLighting'); refreshListPickerMarksByKey('savedToon'); refreshListPickerMarksByKey('skelSavedToon'); refreshListPickerMarksByKey('loadingPreviewSavedCameras'); refreshListPickerMarksByKey('loadingPreviewSavedLighting')
 })
 gateGroupHeader('Floor', 'floorEnabled')
 updateFloorRowVisibility()
@@ -24582,6 +24780,7 @@ updateFloor()
 setupHandOffsetStartupGroup()
 setupSphereSequenceGroup()
 setupCropCapGroup()
+setupRenderSkeletonGroup()
 setupUiButtonsTweenGroup()
 setupLoadingPreviewEasingGroup()
 setupLoadingPreviewSpeedCurveGroup()
@@ -24864,6 +25063,7 @@ function updateRenderOrder() {
     if (hand.skinnedMesh) hand.skinnedMesh.renderOrder = roBase
     if (hand.outlineMesh) hand.outlineMesh.renderOrder = roBase - 0.001
     if (hand.emissionMesh) hand.emissionMesh.renderOrder = roBase - 0.001
+    if (hand._skel) hand._skel.mesh.renderOrder = roBase + 0.001 // Render Skeleton In Front: just after its own hand's fill mesh
     // Arm Length (Hide Wrist) -- reuses this same live cursor-distance
     // value (`live`) rather than recomputing it. See computeArmLengthT()/
     // applyHandArmLength()'s own comments for why this now runs every
