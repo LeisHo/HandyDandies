@@ -20290,11 +20290,32 @@ async function restoreCustomClickFunctions() {
 const LOADING_PREVIEW_LIGHT_ROW_KEYS = ['loadingPreviewKeyAzimuth', 'loadingPreviewKeyElevation', 'loadingPreviewKeyLightType', 'loadingPreviewKeyDistance', 'loadingPreviewKeyTargetHeight', 'loadingPreviewKeyIntensity', 'loadingPreviewKeyColor', 'loadingPreviewAmbientIntensity', 'loadingPreviewAmbientSkyColor', 'loadingPreviewAmbientGroundColor']
 function flashModelButton(btn, msg) { if (!btn) return; const orig = btn.dataset.origText || btn.textContent; btn.dataset.origText = orig; btn.textContent = msg; setTimeout(() => { btn.textContent = orig }, 1600) }
 // The list always holds the repo models (first) plus whatever was imported; imported ones keep their place.
+// 2026-10-23 (direct report: "in the model selector, it says model not on device"): an imported ("local") model lives only in the browser it was imported in, so every other browser / device listed it as "not on this device",
+// and a saved choice of it could not be followed. Several of those imports are now built-in models of the same name (the project holds the file), so a local entry with a built-in's name is a duplicate: it is dropped from the list
+// and anything that pointed at it (the Hand Model choice, the Loading Preview Model) is moved to the built-in. Imports of the same name among themselves keep only the last. The alias below is for a differently named copy of a
+// built-in (HandiBonesB-IK.glb is byte-for-byte HD_IK_12k.glb, checked 2026-10-23).
+const HAND_MODEL_LOCAL_ALIASES = { 'handibonesb-ik': 'repo:HD_IK_12k' }
+function builtinHandModelFor(name) { // the built-in model whose file name or list name is `name` (case-insensitive), or null
+  const n = String(name || '').toLowerCase()
+  if (HAND_MODEL_LOCAL_ALIASES[n]) return HAND_MODEL_BUILTINS.find((b) => b.id === HAND_MODEL_LOCAL_ALIASES[n]) || null
+  return HAND_MODEL_BUILTINS.find((b) => decodeURIComponent(b.url.split('/').pop()).replace(/\.(glb|gltf)$/i, '').toLowerCase() === n || b.name.toLowerCase() === n) || null
+}
 function refreshHandModelList() {
   let saved = cfg.handModels
   if (typeof saved === 'string') { try { saved = JSON.parse(saved) } catch (e) { saved = [] } }
   if (!Array.isArray(saved)) saved = []
-  const locals = saved.filter((it) => it && it.source === 'local' && it.id)
+  const remap = {} // dropped local id -> the id that replaces it
+  const keep = new Map() // lower-case name -> the last local entry of that name
+  saved.forEach((it) => {
+    if (!(it && it.source === 'local' && it.id)) return
+    const b = builtinHandModelFor(it.name)
+    if (b) { remap[it.id] = b.id; return }
+    const k = String(it.name || '').toLowerCase()
+    if (keep.has(k)) remap[keep.get(k).id] = it.id // an earlier import of the same name: this one replaces it
+    keep.set(k, it)
+  })
+  const locals = saved.filter((it) => it && it.source === 'local' && it.id && keep.get(String(it.name || '').toLowerCase()) === it)
+  ;['handModelId', 'loadingPreviewModelId'].forEach((k) => { if (remap[cfg[k]]) { cfg[k] = remap[cfg[k]]; try { syncValue(k, cfg[k]) } catch (e) { /* no panel */ } } })
   const items = HAND_MODEL_BUILTINS.map((m) => ({ name: m.name, id: m.id, source: 'repo' })).concat(locals)
   if (JSON.stringify(items) === JSON.stringify(saved)) return
   cfg.handModels = items
@@ -20333,7 +20354,7 @@ function importHandModelFile(btn) {
       const title = file.name.replace(/\.(glb|gltf)$/i, '')
       const sameName = (s) => String(s || '').toLowerCase() === title.toLowerCase()
       const list = Array.isArray(cfg.handModels) ? cfg.handModels : []
-      const builtinSame = HAND_MODEL_BUILTINS.find((b) => sameName(decodeURIComponent(b.url.split('/').pop()).replace(/\.(glb|gltf)$/i, '')) || sameName(b.name))
+      const builtinSame = builtinHandModelFor(title)
       if (builtinSame) { flashModelButton(btn, 'Built-in name'); alert('"' + title + '" is a built-in model (' + builtinSame.name + '). Built-in models are files in the project and cannot be overwritten from here, so nothing was imported - rename the file to import it as its own model.'); return }
       const existing = list.find((it) => it && it.source === 'local' && sameName(it.name))
       let id
