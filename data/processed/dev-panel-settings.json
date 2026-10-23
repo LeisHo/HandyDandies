@@ -26616,10 +26616,10 @@
       "fieldRows": 30,
       "fieldCols": 11,
       "rowSpacing": 16,
-      "columnSpacing": 26,
-      "handScale": 2,
-      "alternateRowOffset": 13,
-      "progressiveRowOffset": 1,
+      "columnSpacing": 30,
+      "handScale": 2.5,
+      "alternateRowOffset": 15,
+      "progressiveRowOffset": -10,
       "useProgressiveOffset": false,
       "hideHands": false,
       "fieldOffsetX": 0,
@@ -79889,7 +79889,7 @@
     },
     {
       "key": "Saved Dev Settings",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [],
       "settings": []
