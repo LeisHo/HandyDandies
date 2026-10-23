@@ -4677,6 +4677,12 @@ function syncCameraPanelFromLive() {
   if (z !== __lastSyncedCameraZ) { syncValue('cameraZ', z); __lastSyncedCameraZ = z }
   if (fov !== __lastSyncedCameraFov) { syncValue('cameraFov', fov); __lastSyncedCameraFov = fov }
   if (zoom !== __lastSyncedCameraZoom) { syncValue('cameraZoom', zoom); __lastSyncedCameraZoom = zoom }
+  // 2026-10-22 (direct report: setting a camera rotation to 180 on one axis also changed another rotation slider). One orientation has several Yaw / Pitch / Roll spellings (e.g. Pitch 180 is the same view as Yaw 180 + Roll 180),
+  // and reading the sliders back from the live camera every frame picked one of them, rewriting the other sliders. The sliders are the source of truth for the rotation (the orbit controls cannot rotate the camera), so when the
+  // camera already shows the orientation the sliders describe they are left exactly as set; they are only read back when the camera was turned by something else (a camera preset, Default, a restore).
+  _camEuler.set(THREE.MathUtils.degToRad(cfg.cameraPitch || 0), THREE.MathUtils.degToRad(cfg.cameraYaw || 0), THREE.MathUtils.degToRad(cfg.cameraRoll || 0), 'YXZ')
+  _camQ.setFromEuler(_camEuler)
+  if (Math.abs(_camQ.dot(camera.quaternion)) > 1 - 1e-8) return
   _camEuler.setFromQuaternion(camera.quaternion, 'YXZ')
   const yaw = Math.round(THREE.MathUtils.radToDeg(_camEuler.y) * 1000) / 1000, pitch = Math.round(THREE.MathUtils.radToDeg(_camEuler.x) * 1000) / 1000, roll = Math.round(THREE.MathUtils.radToDeg(_camEuler.z) * 1000) / 1000
   if (yaw !== __lastSyncedCameraYaw) { syncValue('cameraYaw', yaw); __lastSyncedCameraYaw = yaw }
