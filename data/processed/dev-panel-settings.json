@@ -617,8 +617,8 @@
       "modelRotY": 0,
       "modelRotZ": 0,
       "baseRotationX": 0,
-      "baseRotationY": 0,
-      "baseRotationZ": 0,
+      "baseRotationY": 180,
+      "baseRotationZ": 180,
       "poseOffsetX": 0,
       "poseOffsetY": 0,
       "poseOffsetZ": 0,
@@ -18961,15 +18961,15 @@
           ]
         }
       ],
-      "cameraX": 3.692307692307559,
-      "cameraY": 1.1920291036067448e-12,
-      "cameraZ": 334.9790255242904,
+      "cameraX": 3.692307692307692,
+      "cameraY": 2.367377203395856e-13,
+      "cameraZ": 334.979025524292,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":3.692307692307692,\"cameraY\":2.367377203395856e-13,\"cameraZ\":334.979025524292,\"cameraFov\":20,\"cameraZoom\":334.99999999999994,\"cameraRoll\":0,\"targetX\":3.692307692307692,\"targetY\":2.162248864538674e-13,\"targetZ\":-0.02097447570793065}",
-      "cameraZoom": 334.9999999999994,
+      "cameraZoom": 334.99999999999994,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -19564,7 +19564,7 @@
       "showFrameRate": true,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": false,
+      "exportLogsUiButton": true,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -27017,8 +27017,8 @@
       "modelRotY": 0,
       "modelRotZ": 0,
       "baseRotationX": 0,
-      "baseRotationY": 0,
-      "baseRotationZ": 0,
+      "baseRotationY": 180,
+      "baseRotationZ": 180,
       "poseOffsetX": 0,
       "poseOffsetY": 0,
       "poseOffsetZ": 0,
@@ -45964,7 +45964,7 @@
       "showFrameRate": true,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": false,
+      "exportLogsUiButton": true,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -53417,8 +53417,8 @@
       "modelRotY": 0,
       "modelRotZ": 0,
       "baseRotationX": 0,
-      "baseRotationY": 0,
-      "baseRotationZ": 0,
+      "baseRotationY": 180,
+      "baseRotationZ": 180,
       "poseOffsetX": 0,
       "poseOffsetY": 0,
       "poseOffsetZ": 0,
@@ -72364,7 +72364,7 @@
       "showFrameRate": true,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": false,
+      "exportLogsUiButton": true,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -80467,7 +80467,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -80642,7 +80642,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -80668,7 +80668,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Max Z Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -80945,7 +80945,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -81371,7 +81371,7 @@
                 "type": "group",
                 "group": {
                   "key": "Whole-Hand Rotation at Base",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -82586,7 +82586,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -82605,7 +82605,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -82652,7 +82652,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -88880,9 +88880,9 @@
     "desktop": {
       "left": 4.75,
       "top": 66.5,
-      "width": 622.0875244140625,
-      "height": 561.2000122070312,
-      "collapsed": true
+      "width": 625.2875366210938,
+      "height": 562.7999877929688,
+      "collapsed": false
     },
     "mobile": {
       "left": 20,
