@@ -14,7 +14,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD_IK_10k",
+      "handModelId": "local:mvkchs16",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -139,6 +139,31 @@
         {
           "name": "HandiBonesB-IK",
           "id": "local:mvc1a66c",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_10k",
+          "id": "local:mvkcheel",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_1k",
+          "id": "local:mvkchs16",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_300",
+          "id": "local:mvkchwaj",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_5k",
+          "id": "local:mvkci2rk",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_500",
+          "id": "local:mvkcim8u",
           "source": "local"
         }
       ],
@@ -19069,11 +19094,11 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 2.5,
-      "toonShadowFloor": 50,
-      "toonLightCeiling": 80,
-      "toonGradient": "[{\"p\":0,\"c\":\"#fea858\"},{\"p\":1,\"c\":\"#964040\"}]",
+      "toonSteps": 4,
+      "toonStepThreshold": 5,
+      "toonShadowFloor": 7,
+      "toonLightCeiling": 82,
+      "toonGradient": "[{\"p\":0,\"c\":\"#054d00\"},{\"p\":1,\"c\":\"#42e0ff\"}]",
       "toonBaseTint": "#ffffff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
@@ -19371,10 +19396,10 @@
       "passGlow": 0,
       "emissionColor": "#000000",
       "emissionIntensity": 5,
-      "bgColor": "#c7774d",
+      "bgColor": "#002f4d",
       "colorPresets": "[{\"id\":\"seed1\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0040ff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff5900\\\"}]\",\"bg\":\"#00308f\",\"s\":2,\"t\":3.2,\"f\":9,\"c\":99},{\"id\":\"seed2\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#000000\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#000000\",\"#ffffff\"]},{\"id\":\"seed3\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#ffffff\",\"#000000\"]},{\"id\":\"seed4\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#00b32d\\\"}]\",\"bg\":\"#a80000\",\"s\":2,\"t\":2.3,\"f\":40,\"c\":82},{\"id\":\"seed5\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#7a005a\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff6600\\\"}]\",\"bg\":\"#80003e\",\"s\":2,\"t\":2.3,\"f\":39,\"c\":90},{\"id\":\"seed6\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#e65c00\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed7\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#003c8a\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed8\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff0000\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed9\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed10\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#11008f\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed11\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#000cad\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#db0000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed12\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#c20000\\\"}]\",\"bg\":\"#00076b\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed13\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0300cc\\\"},{\\\"p\\\":0.6731,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed14\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":0.5192,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#0300cc\\\"}]\",\"bg\":\"#000657\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed15\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e40c0c\",\"s\":5,\"t\":1.45,\"f\":90,\"c\":83},{\"id\":\"seed16\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#054d00\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#42e0ff\\\"}]\",\"bg\":\"#002f4d\",\"s\":4,\"t\":5,\"f\":7,\"c\":82},{\"id\":\"seed17\",\"g\":\"[{\\\"p\\\":0.6529,\\\"c\\\":\\\"#000000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#292e3d\",\"s\":3,\"t\":3.8,\"f\":0,\"c\":100},{\"id\":\"pmvk9o23c\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#fea858\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#964040\\\"}]\",\"bg\":\"#c7774d\",\"s\":2,\"t\":2.5,\"f\":50,\"c\":80}]",
       "floorEnabled": true,
-      "floorColor": "#c7774d",
+      "floorColor": "#002f4d",
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
@@ -21578,9 +21603,9 @@
       "custom42RotationXCurveEnabled": false,
       "custom42RotationXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42RotationXCurveRange": "{\"min\":0,\"max\":0}",
-      "custom42RotationYCurveEnabled": false,
+      "custom42RotationYCurveEnabled": true,
       "custom42RotationYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom42RotationYCurveRange": "{\"min\":0,\"max\":0}",
+      "custom42RotationYCurveRange": "{\"min\":0,\"max\":15}",
       "custom42RotationZCurveEnabled": true,
       "custom42RotationZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3645641081315818,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2764447597754497,\"y\":0.022005208333333304}}]",
       "custom42RotationZCurveRange": "{\"min\":0,\"max\":15}",
@@ -21618,7 +21643,7 @@
       "custom42RotationY": 0,
       "custom42RotationZ": 0,
       "custom42RotationLoopRetransition": false,
-      "custom42RotationMode": "Rotation Around Cursor",
+      "custom42RotationMode": "Rotation at Crop",
       "custom42TargetPose": "MiddleFinger",
       "custom42SkipIfSamePose": true,
       "custom42TweenSelector": "FLOWER+0_MAX PALM-0",
@@ -21723,10 +21748,10 @@
       "custom42Trig1RotationCurveXOrigin": "Global Setting",
       "custom42Trig1RotationXCurveEnabled": true,
       "custom42Trig1RotationXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.29727165787576365,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2728721587675027,\"y\":0.010807291666666718}}]",
-      "custom42Trig1RotationXCurveRange": "{\"min\":0,\"max\":15}",
-      "custom42Trig1RotationYCurveEnabled": false,
-      "custom42Trig1RotationYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom42Trig1RotationYCurveRange": "{\"min\":0,\"max\":0}",
+      "custom42Trig1RotationXCurveRange": "{\"min\":0,\"max\":35}",
+      "custom42Trig1RotationYCurveEnabled": true,
+      "custom42Trig1RotationYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6030118376348934,\"y\":0.38447914123535154},{\"x\":1,\"y\":1}]",
+      "custom42Trig1RotationYCurveRange": "{\"min\":0,\"max\":35}",
       "custom42Trig1RotationZCurveEnabled": false,
       "custom42Trig1RotationZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42Trig1RotationZCurveRange": "{\"min\":0,\"max\":0}",
@@ -21760,11 +21785,11 @@
       "custom42Trig1WristProgressionCurveEnabled": false,
       "custom42Trig1WristProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42Trig1RotationEnabled": true,
-      "custom42Trig1RotationX": 0,
+      "custom42Trig1RotationX": 35,
       "custom42Trig1RotationY": 0,
       "custom42Trig1RotationZ": 0,
       "custom42Trig1RotationLoopRetransition": false,
-      "custom42Trig1RotationMode": "Rotation Around Cursor",
+      "custom42Trig1RotationMode": "Rotation at Crop",
       "custom42Trig1TargetPose": "",
       "custom42Trig1SkipIfSamePose": false,
       "custom42Trig1TweenSelector": "FLOWER+60_MAX PALM-50",
@@ -22050,10 +22075,10 @@
       "custom43WristRotationCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom43WristProgressionCurveEnabled": false,
       "custom43WristProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom43RotationEnabled": false,
-      "custom43RotationX": 0,
-      "custom43RotationY": 1,
-      "custom43RotationZ": 0,
+      "custom43RotationEnabled": true,
+      "custom43RotationX": 101,
+      "custom43RotationY": 76,
+      "custom43RotationZ": 39,
       "custom43RotationLoopRetransition": false,
       "custom43RotationMode": "Rotation at Crop",
       "custom43TargetPose": "",
@@ -26414,7 +26439,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD_IK_10k",
+      "handModelId": "local:mvkchs16",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -26539,6 +26564,31 @@
         {
           "name": "HandiBonesB-IK",
           "id": "local:mvc1a66c",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_10k",
+          "id": "local:mvkcheel",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_1k",
+          "id": "local:mvkchs16",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_300",
+          "id": "local:mvkchwaj",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_5k",
+          "id": "local:mvkci2rk",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_500",
+          "id": "local:mvkcim8u",
           "source": "local"
         }
       ],
@@ -45469,11 +45519,11 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 2.5,
-      "toonShadowFloor": 50,
-      "toonLightCeiling": 80,
-      "toonGradient": "[{\"p\":0,\"c\":\"#fea858\"},{\"p\":1,\"c\":\"#964040\"}]",
+      "toonSteps": 4,
+      "toonStepThreshold": 5,
+      "toonShadowFloor": 7,
+      "toonLightCeiling": 82,
+      "toonGradient": "[{\"p\":0,\"c\":\"#054d00\"},{\"p\":1,\"c\":\"#42e0ff\"}]",
       "toonBaseTint": "#0091ff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
@@ -45771,10 +45821,10 @@
       "passGlow": 0,
       "emissionColor": "#000000",
       "emissionIntensity": 5,
-      "bgColor": "#c7774d",
+      "bgColor": "#002f4d",
       "colorPresets": "[{\"id\":\"seed1\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0040ff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff5900\\\"}]\",\"bg\":\"#00308f\",\"s\":2,\"t\":3.2,\"f\":9,\"c\":99},{\"id\":\"seed2\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#000000\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#000000\",\"#ffffff\"]},{\"id\":\"seed3\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#ffffff\",\"#000000\"]},{\"id\":\"seed4\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#00b32d\\\"}]\",\"bg\":\"#a80000\",\"s\":2,\"t\":2.3,\"f\":40,\"c\":82},{\"id\":\"seed5\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#7a005a\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff6600\\\"}]\",\"bg\":\"#80003e\",\"s\":2,\"t\":2.3,\"f\":39,\"c\":90},{\"id\":\"seed6\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#e65c00\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed7\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#003c8a\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed8\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff0000\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed9\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed10\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#11008f\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed11\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#000cad\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#db0000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed12\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#c20000\\\"}]\",\"bg\":\"#00076b\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed13\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0300cc\\\"},{\\\"p\\\":0.6731,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed14\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":0.5192,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#0300cc\\\"}]\",\"bg\":\"#000657\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed15\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e40c0c\",\"s\":5,\"t\":1.45,\"f\":90,\"c\":83},{\"id\":\"seed16\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#054d00\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#42e0ff\\\"}]\",\"bg\":\"#002f4d\",\"s\":4,\"t\":5,\"f\":7,\"c\":82},{\"id\":\"seed17\",\"g\":\"[{\\\"p\\\":0.6529,\\\"c\\\":\\\"#000000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#292e3d\",\"s\":3,\"t\":3.8,\"f\":0,\"c\":100},{\"id\":\"pmvk9o23c\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#fea858\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#964040\\\"}]\",\"bg\":\"#c7774d\",\"s\":2,\"t\":2.5,\"f\":50,\"c\":80}]",
       "floorEnabled": true,
-      "floorColor": "#c7774d",
+      "floorColor": "#002f4d",
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
@@ -47978,9 +48028,9 @@
       "custom42RotationXCurveEnabled": false,
       "custom42RotationXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42RotationXCurveRange": "{\"min\":0,\"max\":0}",
-      "custom42RotationYCurveEnabled": false,
+      "custom42RotationYCurveEnabled": true,
       "custom42RotationYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom42RotationYCurveRange": "{\"min\":0,\"max\":0}",
+      "custom42RotationYCurveRange": "{\"min\":0,\"max\":15}",
       "custom42RotationZCurveEnabled": true,
       "custom42RotationZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3645641081315818,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2764447597754497,\"y\":0.022005208333333304}}]",
       "custom42RotationZCurveRange": "{\"min\":0,\"max\":15}",
@@ -48018,7 +48068,7 @@
       "custom42RotationY": 0,
       "custom42RotationZ": 0,
       "custom42RotationLoopRetransition": false,
-      "custom42RotationMode": "Rotation Around Cursor",
+      "custom42RotationMode": "Rotation at Crop",
       "custom42TargetPose": "MiddleFinger",
       "custom42SkipIfSamePose": true,
       "custom42TweenSelector": "FLOWER+0_MAX PALM-0",
@@ -48123,10 +48173,10 @@
       "custom42Trig1RotationCurveXOrigin": "Global Setting",
       "custom42Trig1RotationXCurveEnabled": true,
       "custom42Trig1RotationXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.29727165787576365,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2728721587675027,\"y\":0.010807291666666718}}]",
-      "custom42Trig1RotationXCurveRange": "{\"min\":0,\"max\":15}",
-      "custom42Trig1RotationYCurveEnabled": false,
-      "custom42Trig1RotationYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom42Trig1RotationYCurveRange": "{\"min\":0,\"max\":0}",
+      "custom42Trig1RotationXCurveRange": "{\"min\":0,\"max\":35}",
+      "custom42Trig1RotationYCurveEnabled": true,
+      "custom42Trig1RotationYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6030118376348934,\"y\":0.38447914123535154},{\"x\":1,\"y\":1}]",
+      "custom42Trig1RotationYCurveRange": "{\"min\":0,\"max\":35}",
       "custom42Trig1RotationZCurveEnabled": false,
       "custom42Trig1RotationZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42Trig1RotationZCurveRange": "{\"min\":0,\"max\":0}",
@@ -48160,11 +48210,11 @@
       "custom42Trig1WristProgressionCurveEnabled": false,
       "custom42Trig1WristProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42Trig1RotationEnabled": true,
-      "custom42Trig1RotationX": 0,
+      "custom42Trig1RotationX": 35,
       "custom42Trig1RotationY": 0,
       "custom42Trig1RotationZ": 0,
       "custom42Trig1RotationLoopRetransition": false,
-      "custom42Trig1RotationMode": "Rotation Around Cursor",
+      "custom42Trig1RotationMode": "Rotation at Crop",
       "custom42Trig1TargetPose": "",
       "custom42Trig1SkipIfSamePose": false,
       "custom42Trig1TweenSelector": "FLOWER+60_MAX PALM-50",
@@ -48450,10 +48500,10 @@
       "custom43WristRotationCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom43WristProgressionCurveEnabled": false,
       "custom43WristProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom43RotationEnabled": false,
-      "custom43RotationX": 0,
-      "custom43RotationY": 1,
-      "custom43RotationZ": 0,
+      "custom43RotationEnabled": true,
+      "custom43RotationX": 101,
+      "custom43RotationY": 76,
+      "custom43RotationZ": 39,
       "custom43RotationLoopRetransition": false,
       "custom43RotationMode": "Rotation at Crop",
       "custom43TargetPose": "",
@@ -52814,7 +52864,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "repo:HD_IK_10k",
+      "handModelId": "local:mvkchs16",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -52939,6 +52989,31 @@
         {
           "name": "HandiBonesB-IK",
           "id": "local:mvc1a66c",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_10k",
+          "id": "local:mvkcheel",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_1k",
+          "id": "local:mvkchs16",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_300",
+          "id": "local:mvkchwaj",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_5k",
+          "id": "local:mvkci2rk",
+          "source": "local"
+        },
+        {
+          "name": "HD_IK_500",
+          "id": "local:mvkcim8u",
           "source": "local"
         }
       ],
@@ -71869,11 +71944,11 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 2.5,
-      "toonShadowFloor": 50,
-      "toonLightCeiling": 80,
-      "toonGradient": "[{\"p\":0,\"c\":\"#fea858\"},{\"p\":1,\"c\":\"#964040\"}]",
+      "toonSteps": 4,
+      "toonStepThreshold": 5,
+      "toonShadowFloor": 7,
+      "toonLightCeiling": 82,
+      "toonGradient": "[{\"p\":0,\"c\":\"#054d00\"},{\"p\":1,\"c\":\"#42e0ff\"}]",
       "toonBaseTint": "#ffffff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
@@ -72171,10 +72246,10 @@
       "passGlow": 0,
       "emissionColor": "#000000",
       "emissionIntensity": 5,
-      "bgColor": "#c7774d",
+      "bgColor": "#002f4d",
       "colorPresets": "[{\"id\":\"seed1\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0040ff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff5900\\\"}]\",\"bg\":\"#00308f\",\"s\":2,\"t\":3.2,\"f\":9,\"c\":99},{\"id\":\"seed2\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#000000\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#000000\",\"#ffffff\"]},{\"id\":\"seed3\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":2,\"t\":2.5,\"f\":0,\"c\":99,\"w\":[\"#ffffff\",\"#000000\"]},{\"id\":\"seed4\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#00b32d\\\"}]\",\"bg\":\"#a80000\",\"s\":2,\"t\":2.3,\"f\":40,\"c\":82},{\"id\":\"seed5\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#7a005a\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff6600\\\"}]\",\"bg\":\"#80003e\",\"s\":2,\"t\":2.3,\"f\":39,\"c\":90},{\"id\":\"seed6\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#e65c00\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed7\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff6600\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#7a005a\\\"}]\",\"bg\":\"#003c8a\",\"s\":2,\"t\":4.5,\"f\":90,\"c\":80},{\"id\":\"seed8\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ff0000\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed9\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e20000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed10\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#11008f\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed11\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#000cad\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#db0000\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed12\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#c20000\\\"}]\",\"bg\":\"#00076b\",\"s\":2,\"t\":2.95,\"f\":40,\"c\":40},{\"id\":\"seed13\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#0300cc\\\"},{\\\"p\\\":0.6731,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#ffffff\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed14\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ffffff\\\"},{\\\"p\\\":0.5192,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#0300cc\\\"}]\",\"bg\":\"#000657\",\"s\":3,\"t\":5,\"f\":63,\"c\":100},{\"id\":\"seed15\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#ff0000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#e40c0c\",\"s\":5,\"t\":1.45,\"f\":90,\"c\":83},{\"id\":\"seed16\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#054d00\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#42e0ff\\\"}]\",\"bg\":\"#002f4d\",\"s\":4,\"t\":5,\"f\":7,\"c\":82},{\"id\":\"seed17\",\"g\":\"[{\\\"p\\\":0.6529,\\\"c\\\":\\\"#000000\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#ffffff\\\"}]\",\"bg\":\"#292e3d\",\"s\":3,\"t\":3.8,\"f\":0,\"c\":100},{\"id\":\"pmvk9o23c\",\"g\":\"[{\\\"p\\\":0,\\\"c\\\":\\\"#fea858\\\"},{\\\"p\\\":1,\\\"c\\\":\\\"#964040\\\"}]\",\"bg\":\"#c7774d\",\"s\":2,\"t\":2.5,\"f\":50,\"c\":80}]",
       "floorEnabled": true,
-      "floorColor": "#c7774d",
+      "floorColor": "#002f4d",
       "floorZOffset": 0,
       "floorXYScale": 1,
       "pixelRatio": 1.25,
@@ -74378,9 +74453,9 @@
       "custom42RotationXCurveEnabled": false,
       "custom42RotationXCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42RotationXCurveRange": "{\"min\":0,\"max\":0}",
-      "custom42RotationYCurveEnabled": false,
+      "custom42RotationYCurveEnabled": true,
       "custom42RotationYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom42RotationYCurveRange": "{\"min\":0,\"max\":0}",
+      "custom42RotationYCurveRange": "{\"min\":0,\"max\":15}",
       "custom42RotationZCurveEnabled": true,
       "custom42RotationZCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.3645641081315818,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2764447597754497,\"y\":0.022005208333333304}}]",
       "custom42RotationZCurveRange": "{\"min\":0,\"max\":15}",
@@ -74418,7 +74493,7 @@
       "custom42RotationY": 0,
       "custom42RotationZ": 0,
       "custom42RotationLoopRetransition": false,
-      "custom42RotationMode": "Rotation Around Cursor",
+      "custom42RotationMode": "Rotation at Crop",
       "custom42TargetPose": "MiddleFinger",
       "custom42SkipIfSamePose": true,
       "custom42TweenSelector": "FLOWER+0_MAX PALM-0",
@@ -74523,10 +74598,10 @@
       "custom42Trig1RotationCurveXOrigin": "Global Setting",
       "custom42Trig1RotationXCurveEnabled": true,
       "custom42Trig1RotationXCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.29727165787576365,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2728721587675027,\"y\":0.010807291666666718}}]",
-      "custom42Trig1RotationXCurveRange": "{\"min\":0,\"max\":15}",
-      "custom42Trig1RotationYCurveEnabled": false,
-      "custom42Trig1RotationYCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom42Trig1RotationYCurveRange": "{\"min\":0,\"max\":0}",
+      "custom42Trig1RotationXCurveRange": "{\"min\":0,\"max\":35}",
+      "custom42Trig1RotationYCurveEnabled": true,
+      "custom42Trig1RotationYCurve": "[{\"x\":0,\"y\":0},{\"x\":0.6030118376348934,\"y\":0.38447914123535154},{\"x\":1,\"y\":1}]",
+      "custom42Trig1RotationYCurveRange": "{\"min\":0,\"max\":35}",
       "custom42Trig1RotationZCurveEnabled": false,
       "custom42Trig1RotationZCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42Trig1RotationZCurveRange": "{\"min\":0,\"max\":0}",
@@ -74560,11 +74635,11 @@
       "custom42Trig1WristProgressionCurveEnabled": false,
       "custom42Trig1WristProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom42Trig1RotationEnabled": true,
-      "custom42Trig1RotationX": 0,
+      "custom42Trig1RotationX": 35,
       "custom42Trig1RotationY": 0,
       "custom42Trig1RotationZ": 0,
       "custom42Trig1RotationLoopRetransition": false,
-      "custom42Trig1RotationMode": "Rotation Around Cursor",
+      "custom42Trig1RotationMode": "Rotation at Crop",
       "custom42Trig1TargetPose": "",
       "custom42Trig1SkipIfSamePose": false,
       "custom42Trig1TweenSelector": "FLOWER+60_MAX PALM-50",
@@ -74850,10 +74925,10 @@
       "custom43WristRotationCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom43WristProgressionCurveEnabled": false,
       "custom43WristProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
-      "custom43RotationEnabled": false,
-      "custom43RotationX": 0,
-      "custom43RotationY": 1,
-      "custom43RotationZ": 0,
+      "custom43RotationEnabled": true,
+      "custom43RotationX": 101,
+      "custom43RotationY": 76,
+      "custom43RotationZ": 39,
       "custom43RotationLoopRetransition": false,
       "custom43RotationMode": "Rotation at Crop",
       "custom43TargetPose": "",
@@ -79797,7 +79872,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -79893,7 +79968,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -79928,7 +80003,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -80945,7 +81020,7 @@
           "type": "group",
           "group": {
             "key": "Pose",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -81371,7 +81446,7 @@
                 "type": "group",
                 "group": {
                   "key": "Whole-Hand Rotation at Base",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -82179,7 +82254,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -82290,7 +82365,7 @@
           "type": "group",
           "group": {
             "key": "Camera",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -88879,9 +88954,9 @@
   "panelGeometry": {
     "desktop": {
       "left": 4.75,
-      "top": 66.5,
-      "width": 625.2875366210938,
-      "height": 562.7999877929688,
+      "top": 308.0874938964844,
+      "width": 631.6875,
+      "height": 324.38751220703125,
       "collapsed": false
     },
     "mobile": {
