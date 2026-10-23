@@ -14,7 +14,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvkm89hi",
+      "handModelId": "local:mvkmfhnt",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -173,12 +173,12 @@
         },
         {
           "name": "SKELETON HAND",
-          "id": "local:mvkm3hrs",
+          "id": "local:mvkm89hi",
           "source": "local"
         },
         {
           "name": "SKELETON HAND",
-          "id": "local:mvkm89hi",
+          "id": "local:mvkmfhnt",
           "source": "local"
         }
       ],
@@ -457,7 +457,7 @@
       "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 391.99999999999994,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -26454,7 +26454,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvkm89hi",
+      "handModelId": "local:mvkmfhnt",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -26613,12 +26613,12 @@
         },
         {
           "name": "SKELETON HAND",
-          "id": "local:mvkm3hrs",
+          "id": "local:mvkm89hi",
           "source": "local"
         },
         {
           "name": "SKELETON HAND",
-          "id": "local:mvkm89hi",
+          "id": "local:mvkmfhnt",
           "source": "local"
         }
       ],
@@ -26897,7 +26897,7 @@
       "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 391.99999999999994,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -52894,7 +52894,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvkm89hi",
+      "handModelId": "local:mvkmfhnt",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -53053,12 +53053,12 @@
         },
         {
           "name": "SKELETON HAND",
-          "id": "local:mvkm3hrs",
+          "id": "local:mvkm89hi",
           "source": "local"
         },
         {
           "name": "SKELETON HAND",
-          "id": "local:mvkm89hi",
+          "id": "local:mvkmfhnt",
           "source": "local"
         }
       ],
@@ -53337,7 +53337,7 @@
       "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 392,
+      "loadingPreviewKeyTargetHeight": 391.99999999999994,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -89000,8 +89000,8 @@
     "desktop": {
       "left": 4.75,
       "top": 308.0874938964844,
-      "width": 647.6875,
-      "height": 332.38751220703125,
+      "width": 650.8875122070312,
+      "height": 333.9875183105469,
       "collapsed": false
     },
     "mobile": {
