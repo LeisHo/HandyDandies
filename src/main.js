@@ -23036,11 +23036,13 @@ function findClipBlockNode(root) { return root.getObjectByName('Clipping_Block')
 // The block comes from data/processed/HAND3D/Clipping Block.glb (exported on its own by the user, 2026-10-20: the same box geometry, already positioned in the hand's frame, a few millimetres different in X / Z from the
 // copy inside HandipantsOL_Clip); if that file cannot be read, the block inside HandipantsOL_Clip.glb is used. It is for the "hide up to the wrist" crop only - Hide Model (a Loading Preview pose value) is unrelated.
 const CLIP_BLOCK_URL = '../data/processed/HAND3D/Clipping%20Block.glb'
-// SKELETON HAND block (2026-10-23, ported from HANDO's Crop Geometry): data/processed/HAND3D/Clipping Blocks.glb is HANDO's Clipping Block.glb (4 blocks, authored in metres in the IK hands' frame: forearm base -> wrist
-// 0.2451); the "Clipping Block - SKELETON" box in it was authored for SKELETON HAND (base -> wrist 0.3063). A hand that has no block of its own borrows whichever of the two - the default box or that one - has its TOP nearest
-// the hand's own rest forearm-base -> wrist length (default top 0.2524 vs the IK hands' 0.2451; skeleton top 0.3215 vs 0.3063; the female hand's 0.102 stays on the default), so every earlier model keeps the default box exactly
-// as before. A rig in another unit (centimetres, x100) is first brought to metres: the length is divided by a power of ten (clipBlockRigInfo's unit) and the borrowed block is scaled up by it (addBorrowedClipBlock).
+// MODEL-SPECIFIC BLOCKS (2026-10-23, ported from HANDO's Crop Geometry): data/processed/HAND3D/Clipping Blocks.glb is HANDO's Clipping Block.glb (the whole Blender scene: the hand rig and meshes, which are ignored here, plus the
+// blocks, all authored in metres in the IK hands' frame: forearm base -> wrist 0.2451). "Clipping Block - SKELETON" was authored for SKELETON HAND (base -> wrist 0.3063) and "Clipping Block.FEMALE" for FEMALE HAND_8k (0.1019).
+// A hand that has no block of its own borrows whichever of {the default box, SKELETON, FEMALE} has its TOP nearest the hand's own rest forearm-base -> wrist length (tops: default 0.2524 against the IK hands' 0.2451; skeleton
+// 0.3215 against 0.3063; female 0.1208 against 0.1019), so every earlier model keeps the default box exactly as before. A rig in another unit (centimetres, x100) is first brought to metres: the length is divided by a power of
+// ten (clipBlockRigInfo's unit) and the borrowed block is scaled up by it (addBorrowedClipBlock).
 const CLIP_BLOCKS_URL = '../data/processed/HAND3D/Clipping%20Blocks.glb'
+const CLIP_BLOCK_VARIANTS = ['Clipping Block - SKELETON', 'Clipping Block.FEMALE'] // node names as authored (GLTFLoader keeps them in userData.name; the object's own name has the spaces turned to underscores and the dot removed)
 function clipBlockRigInfo(root) { // { unit, dist }: the rig's power-of-ten unit and its rest forearm-base -> wrist length in metres
   const sm = findSkinnedMesh(root)
   const a = sm && sm.skeleton.getBoneByName('rForearmBend'), b = sm && sm.skeleton.getBoneByName('rHand')
@@ -23055,22 +23057,32 @@ function clipBlockRigInfo(root) { // { unit, dist }: the rig's power-of-ten unit
 function clipBlockTop(b) { b.geometry.computeBoundingBox(); return b.position.y + b.scale.y * b.geometry.boundingBox.max.y }
 async function pickBorrowedClipBlock(root) { // -> { block, unit }
   const info = clipBlockRigInfo(root)
-  const def = await loadBorrowedClipBlock(false)
-  const skel = await loadBorrowedClipBlock(true)
-  const useSkel = !!(def && skel && skel !== def && info.dist > 0 && Math.abs(clipBlockTop(skel) - info.dist) < Math.abs(clipBlockTop(def) - info.dist))
-  return { block: useSkel ? skel : def, unit: info.unit }
+  const def = await loadBorrowedClipBlock(null)
+  let best = def
+  if (def && info.dist > 0) {
+    let bestGap = Math.abs(clipBlockTop(def) - info.dist)
+    for (const name of CLIP_BLOCK_VARIANTS) {
+      const v = await loadBorrowedClipBlock(name)
+      if (!v) continue
+      const gap = Math.abs(clipBlockTop(v) - info.dist)
+      if (gap < bestGap) { best = v; bestGap = gap }
+    }
+  }
+  return { block: best, unit: info.unit }
 }
 function readClipBlockFrom(url, nodeName) {
   return gltfLoader.loadAsync(url).then((g) => {
-    const b = nodeName ? g.scene.getObjectByName(nodeName.replace(/ /g, '_')) : findClipBlockNode(g.scene)
+    let b = null
+    if (nodeName) g.scene.traverse((o) => { if (!b && o.isMesh && o.geometry && ((o.userData && o.userData.name) === nodeName || o.name === nodeName.replace(/\s/g, '_'))) b = o })
+    else b = findClipBlockNode(g.scene)
     return b && b.geometry ? { geometry: b.geometry, position: b.position.clone(), quaternion: b.quaternion.clone(), scale: b.scale.clone() } : null
   }).catch((err) => { console.warn('Clipping Block source ' + url + ' unavailable:', err); return null })
 }
-let borrowedSkeletonClipBlockPromise = null
-function loadBorrowedClipBlock(skeletonVariant) {
-  if (skeletonVariant) {
-    if (!borrowedSkeletonClipBlockPromise) borrowedSkeletonClipBlockPromise = readClipBlockFrom(CLIP_BLOCKS_URL, 'Clipping Block - SKELETON') // null when the file cannot be read: the default box stays
-    return borrowedSkeletonClipBlockPromise
+const borrowedVariantClipBlockPromises = {}
+function loadBorrowedClipBlock(variantName) { // variantName: a name in CLIP_BLOCK_VARIANTS, or falsy for the default box
+  if (variantName) {
+    if (!borrowedVariantClipBlockPromises[variantName]) borrowedVariantClipBlockPromises[variantName] = readClipBlockFrom(CLIP_BLOCKS_URL, variantName) // null when the file cannot be read or has no such node: the default box stays
+    return borrowedVariantClipBlockPromises[variantName]
   }
   if (!borrowedClipBlockPromise) {
     borrowedClipBlockPromise = readClipBlockFrom(CLIP_BLOCK_URL).then((b) => b || readClipBlockFrom(MODEL_URL)).then((b) => {
