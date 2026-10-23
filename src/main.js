@@ -1551,6 +1551,12 @@ function finalizeReveal() {
   updateLoadingPreviewText()
   try { startUiButtonsTween() } catch (e) { console.error('UI Buttons Tween failed to start', e) } // sets the buttons' starting scale before they become visible
   document.body.classList.add('hd-revealed') // shows the Pause / Reset / Color Presets buttons (style.css hides them until now)
+  // Start Paused: a pause saved from the Pause button is applied once the field has been painted (so the first frame is the real one), in dev mode only.
+  if (DEV_MODE && cfg.startPaused) {
+    isPausedForVisibility = false
+    setPaused(true)
+    const pb = document.querySelector('.dp-row[data-key="pauseAnimations"] button'); if (pb) pb.textContent = 'RESUME'
+  }
   if (startupEarlyClick) { startupEarlyClick = false; setTimeout(() => { try { onStartupPointerDown({ button: 0, target: null }) } catch (err) { console.error('early startup click replay failed', err) } }, 0) } // the click that came too early
   // The loading-preview canvas is a top-level sibling of #loading now
   // (2026-09-17, decoupled specifically so this moment doesn't force it
@@ -2615,6 +2621,9 @@ const DEV_GROUPS = [
   {
     title: 'Pause Button',
     controls: [
+      // Start Paused (2026-10-23, direct request: "if I select the pause button, then save, on next refresh the rendering will stay paused"): follows the Pause button / the Debug PAUSE button (setPausedByUser()), so a Save while paused
+      // stores it, and the next load pauses once the field is revealed (finalizeReveal()). Dev mode only, like Hide Hands: a normal visitor restores the same saved settings and must not get a frozen page.
+      { key: 'startPaused', label: 'Start Paused On Load (Dev Mode, Follows The Pause Button)', type: 'checkbox', def: false },
       { key: 'pauseBtnXOffset', label: 'X Offset (Px)', type: 'slider', min: 0, max: 200, step: 1, def: 12, perDevice: true, onChange: () => applyPauseButtonStyle() },
       { key: 'pauseBtnYOffset', label: 'Y Offset (Px)', type: 'slider', min: 0, max: 200, step: 1, def: 12, perDevice: true, onChange: () => applyPauseButtonStyle() },
       { key: 'pauseBtnSize', label: 'Button Size (Px)', type: 'slider', min: 20, max: 120, step: 1, def: 40, perDevice: true, onChange: () => applyPauseButtonStyle() },
@@ -4118,7 +4127,7 @@ const DEV_GROUPS = [
       // forward by the paused duration). Not persisted through Copy/Save
       // -- a session-only runtime toggle, same reasoning as Mouse Log's
       // own session-only state.
-      { key: 'pauseAnimations', label: 'PAUSE', type: 'button', onClick: (btn) => { setPaused(!isPaused); btn.textContent = isPaused ? 'RESUME' : 'PAUSE' } },
+      { key: 'pauseAnimations', label: 'PAUSE', type: 'button', onClick: (btn) => { setPausedByUser(!isPaused); btn.textContent = isPaused ? 'RESUME' : 'PAUSE' } },
       // Direct request: a click log (location + what it triggered) and a
       // regular cursor-position log, both feeding one shared scrollable
       // display built by buildMouseTrackingLogWidget() (a plain, session-
@@ -23361,6 +23370,14 @@ function setPaused(v) {
   // displayed icon/label too.
   updatePauseButtonIcon()
 }
+// A pause / resume chosen by the user (the Pause button or the Debug PAUSE button), as opposed to the automatic pause while the tab is hidden or unfocused (syncPauseWithVisibility()): it is the one that is remembered for the
+// next load. It takes over from an automatic pause, and is stored in the Start Paused setting so a Save keeps it.
+function setPausedByUser(v) {
+  isPausedForVisibility = false
+  setPaused(v)
+  cfg.startPaused = isPaused
+  try { syncValue('startPaused', isPaused) } catch (e) { /* panel not built */ }
+}
 // Always-visible Global Pause button (direct request -- "add a small
 // pause button icon... at any time... does not trigger any cursor
 // tracking or tweening functions"). The button itself is plain static
@@ -23474,7 +23491,7 @@ function setupPauseButton() {
   if (!btn) return
   btn.addEventListener('click', (e) => {
     e.stopPropagation()
-    setPaused(!isPaused)
+    setPausedByUser(!isPaused)
   })
   const resetBtn = document.getElementById('resetButton')
   if (resetBtn) resetBtn.addEventListener('click', (e) => { e.stopPropagation(); resetAllHands() })
