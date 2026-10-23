@@ -77,6 +77,16 @@ let devIndependence = { mobile: {}, landscape: {} } // { [key]: boolean } -- def
 // registration (renderDynamicGroup()) can look itself up in it directly,
 // instead of only ever seeing whatever `applyStoredValues()` already
 // iterated at that earlier moment.
+// 2026-10-22 (dev mode startup): while the host is still building the panel's dynamic groups the panel is shown collapsed (.dp-building, header only) and Save is refused - a Save from a half-built panel is how settings were lost.
+let panelBuilding = false
+let afterPanelBuiltHook = null // set inside initDevPanel(): re-renders what needs the host's late rows (the hotkey badges of the custom click function controls)
+export function setDevPanelBuilding(on) {
+  const was = panelBuilding
+  panelBuilding = !!on
+  const p = document.getElementById('devPanel')
+  if (p) p.classList.toggle('dp-building', panelBuilding)
+  if (was && !panelBuilding && afterPanelBuiltHook) { try { afterPanelBuiltHook() } catch (err) { /* cosmetic */ } }
+}
 let lastRestoredValues = null // { desktop: {...}, mobile: {...}, landscape: {...} } | null
 // Host hook, set by initDevPanel() from opts.onDevVisibilityChanged (2026-
 // 09-24, alongside onDeviceTabChanged) -- module-level rather than a
@@ -3971,6 +3981,11 @@ export function initDevPanel(groups, opts = {}) {
     panel.appendChild(handle)
   })
   document.body.appendChild(panel)
+  if (opts.buildDeferred) {
+    setDevPanelBuilding(true) // the host calls setDevPanelBuilding(false) once every group exists
+    // Failsafe so a restore that never finishes cannot hide the panel for good. 180 s is a judgment call, not a measured value.
+    setTimeout(() => { if (panelBuilding) setDevPanelBuilding(false) }, 180000)
+  }
 
   buildDevPanel(groupsEl)
   organizeDevPanelSubgroups(groupsEl)
@@ -4022,6 +4037,11 @@ export function initDevPanel(groups, opts = {}) {
   }, true)
 
   function saveSettings() {
+    if (panelBuilding) { // not while the groups are still being built (the saved file would lose what is not built yet)
+      saveHeaderBtn.textContent = '\u23F3'; saveHeaderBtn.title = 'The panel is still being built - not saved'
+      setTimeout(() => { saveHeaderBtn.textContent = '\u{1F4BE}'; saveHeaderBtn.title = 'Save' }, 1200)
+      return Promise.resolve({ ok: false, error: 'the panel is still being built' })
+    }
     // Undock/Dock (§12f-1-adjacent, ported from TEMPLATE_DEV_PANEL.html) --
     // an undocked group's own .dp-group is no longer a descendant of
     // `groupsEl` at all (it's living inside its own floating panel,
@@ -4104,6 +4124,7 @@ export function initDevPanel(groups, opts = {}) {
   // applyFullPanelState() (Undo / Use / Set as Default) did. After a reload devHotkeys therefore stayed {} and the
   // very next Save committed {} over the saved hotkeys, so they looked unsaved. Runs after onRestore so rows built
   // by the host (custom click functions) already exist when the badges render.
+  afterPanelBuiltHook = () => renderAllHotkeyBadges()
   function restoreSavedHotkeys(settings) {
     devHotkeys = settings && settings.devHotkeys ? { ...settings.devHotkeys } : {}
     renderAllHotkeyBadges()

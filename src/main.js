@@ -11,7 +11,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { nestImportedGroups, DEV_MODE, initDevPanel, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible, mergeImportedItem } from './devpanel/devPanel.js?v=107'
+import { nestImportedGroups, DEV_MODE, initDevPanel, setDevPanelBuilding, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible, mergeImportedItem } from './devpanel/devPanel.js?v=108'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -4328,6 +4328,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
   organizeSubgroups: (groupsEl) => { organizeGroupSubgroups(groupsEl, 'Pose', POSE_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Field Layout', FIELD_LAYOUT_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Debug', SNAPSHOT_SUBGROUP_SPECS); organizeGroupSubgroups(groupsEl, 'Camera', CAMERA_SUBGROUP_SPECS) },
   // keepStaleKey: Save keeps saved settings this page does not hold (older code), but not the settings of a custom click function / Multi Trigger that was deleted (its id is no longer in this page's list).
   remoteSave: { endpoint: SAVE_SETTINGS_ENDPOINT, secret: DEV_PANEL_SAVE_SECRET, keepStaleKey: saveShouldKeepStaleKey },
+  buildDeferred: true, // dev mode: the panel shows collapsed until the custom click function groups are built (setDevPanelBuilding(false) at the end of onRestore's deferred build)
   // ROOT CAUSE of the middle/ring finger "outstretched" bug's REAL
   // return, 2026-09-16 (direct user report, correctly suspecting "the
   // default position") -- `poseDefaultValues` (declared below) used to
@@ -4387,10 +4388,20 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('resyncPoseDefaultValues', resyncPoseDefaultValues)
     startupValuesApplied = true
     prof('startFieldBuild', startFieldBuild)
-    const tCcf = performance.now()
-    await restoreCustomClickFunctions() // sliced: one function per frame
-    if (DEBUG_TIMING) (window.__dpProfile = window.__dpProfile || []).push({ label: 'restoreCustomClickFunctions (wall, sliced)', atMs: Math.round(tCcf), ms: Math.round(performance.now() - tCcf) })
-    prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
+    // 2026-10-22 (dev mode, direct request after a 39 s load with a 23 s freeze afterwards): building the ~13 custom click function groups (about 70,000 DOM nodes) ran in slices ALONGSIDE the field build and the warm-up,
+    // slowing both, and its closing steps ran as one long block after the loading screen. In dev mode they now wait until the loading screen is gone (fieldRevealed) and run in frame-sized slices with the panel held collapsed
+    // (setDevPanelBuilding); everything the loading needs (values, camera, hand model, startup preview, the field itself) no longer waits for them. A normal visitor has no panel, so nothing changes for them: same order as before.
+    const buildCustomFunctions = async () => {
+      const tCcf = performance.now()
+      await restoreCustomClickFunctions() // sliced: one function per frame
+      if (DEBUG_TIMING) (window.__dpProfile = window.__dpProfile || []).push({ label: 'restoreCustomClickFunctions (wall, sliced)', atMs: Math.round(tCcf), ms: Math.round(performance.now() - tCcf) })
+      prof('enforceCustomClickFunctionsAnchorOrder', enforceCustomClickFunctionsAnchorOrder)
+    }
+    const conflictStep = () => {
+      exclusiveTriggersReady = true // from here on a user turning a click function on / changing its trigger switches an overlapping one off
+      refreshCustomFunctionConflictWarnings()
+    }
+    if (!DEV_MODE) await buildCustomFunctions()
     prof('placeDepthControlsInFeatureGroups', placeDepthControlsInFeatureGroups)
     prof('placeLoadingPreviewLightingRows', placeLoadingPreviewLightingRows)
     safeRefreshSelectOptions('loadingPreviewModelId')
@@ -4406,8 +4417,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     applyFrameRateDisplay() // shows / hides the colour + refresh rows now that the panel exists
     prof('setupLoadingPreviewLayoutGroup', setupLoadingPreviewLayoutGroup)
     try { await setupResponsiveVelocity() } catch (e) { console.error('Responsive Velocity setup failed', e) }
-    exclusiveTriggersReady = true // from here on a user turning a click function on / changing its trigger switches an overlapping one off
-    refreshCustomFunctionConflictWarnings()
+    if (!DEV_MODE) conflictStep()
     prof('placeHandModelRows', placeHandModelRows)
     prof('placeSmallScaleModelRows', placeSmallScaleModelRows)
     prof('loadCameraDefaultFromCfg', loadCameraDefaultFromCfg)
@@ -4424,6 +4434,23 @@ const cfg = initDevPanel(DEV_GROUPS, {
     prof('writeStartupCache', writeStartupCache)
     prof('maybeBuildStartupLoadingPreview', maybeBuildStartupLoadingPreview)
     prof('tryStartField (from onRestore)', tryStartField)
+    if (DEV_MODE) {
+      // The deferred part (not awaited: onRestore returns now, so the settings restore finishes and the field can start). Always ends by showing the panel, whatever happens.
+      ;(async () => {
+        try {
+          await waitForFieldReveal(90000)
+          logStartupTiming('dev panel build starting (loading screen is gone)')
+          await yieldFrame()
+          await buildCustomFunctions()
+          await yieldFrame(); conflictStep()
+          await yieldFrame(); prof('refreshItemSelectorMarks', refreshAllItemSelectorMarks)
+          await yieldFrame(); try { pruneTopLevelGhostGroups() } catch (e) { /* panel not built */ }
+        } catch (e) { console.error('Dev panel build failed', e) } finally {
+          setDevPanelBuilding(false)
+          logStartupTiming('dev panel built')
+        }
+      })()
+    }
   },
   // Delete-function button (direct spec item) -- devPanel.js's own
   // existing Delete Group/Setting (🗑) icon already lets a real user
@@ -22865,6 +22892,14 @@ function rebuildField() {
 // an async function that never reaches an await runs to completion synchronously, so the
 // callers that need the finished group right away (Add Click Function, Type changes) are
 // unaffected.
+// Resolves once the loading screen is gone (fieldRevealed), or after maxMs.
+function waitForFieldReveal(maxMs) {
+  return new Promise((resolve) => {
+    const t0 = performance.now()
+    const tick = () => { if (fieldRevealed || performance.now() - t0 > maxMs) resolve(); else setTimeout(tick, 100) }
+    tick()
+  })
+}
 function makeSliceYielder(budgetMs) {
   let last = performance.now()
   return async () => {

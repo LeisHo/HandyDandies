@@ -155,6 +155,10 @@ body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:n
   display: flex; flex-direction: column;
 }
 .dp-panel.hidden { display: none; }
+/* While the host builds the panel's groups (dev mode startup, .dp-building) only the header shows; building behind a hidden body is much cheaper than building a visible one. */
+.dp-panel.dp-building { height: auto !important; min-height: 0 !important; }
+.dp-panel.dp-building .dp-body, .dp-panel.dp-building .dp-resize { display: none !important; }
+.dp-panel.dp-building .dp-header .dp-title::after { content: ' (building\2026)'; font-size: 0.7em; font-weight: 400; letter-spacing: 0; text-transform: none; opacity: 0.75; }
 .dp-panel.dp-collapsed .dp-body,
 .dp-panel.dp-collapsed .dp-resize { display: none; }
 .dp-header {
