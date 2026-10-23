@@ -45563,10 +45563,10 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 2,
-      "toonStepThreshold": 2.5,
+      "toonSteps": 1,
+      "toonStepThreshold": 0.2,
       "toonShadowFloor": 0,
-      "toonLightCeiling": 99,
+      "toonLightCeiling": 0,
       "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]",
       "toonBaseTint": "#0091ff",
       "textureInfluence": 0,
@@ -82714,7 +82714,7 @@
                 "type": "group",
                 "group": {
                   "key": "Toon Shading",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -89404,8 +89404,8 @@
     "mobile": {
       "left": 20,
       "top": 292.2738037109375,
-      "width": 401.2857360839844,
-      "height": 480.4702453613281,
+      "width": 408.1428527832031,
+      "height": 483.5178527832031,
       "collapsed": false
     }
   }
