@@ -173,7 +173,7 @@
         },
         {
           "name": "SKELETON HAND",
-          "id": "local:mvkkjhaw",
+          "id": "local:mvkm3hrs",
           "source": "local"
         }
       ],
@@ -452,7 +452,7 @@
       "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 391.99999999999994,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -26608,7 +26608,7 @@
         },
         {
           "name": "SKELETON HAND",
-          "id": "local:mvkkjhaw",
+          "id": "local:mvkm3hrs",
           "source": "local"
         }
       ],
@@ -26887,7 +26887,7 @@
       "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 391.99999999999994,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -53043,7 +53043,7 @@
         },
         {
           "name": "SKELETON HAND",
-          "id": "local:mvkkjhaw",
+          "id": "local:mvkm3hrs",
           "source": "local"
         }
       ],
@@ -53322,7 +53322,7 @@
       "loadingPreviewKeyElevation": 51.000000000000014,
       "loadingPreviewKeyLightType": "Directional",
       "loadingPreviewKeyDistance": 4,
-      "loadingPreviewKeyTargetHeight": 391.99999999999994,
+      "loadingPreviewKeyTargetHeight": 392,
       "loadingPreviewKeyIntensity": 6,
       "loadingPreviewKeyColor": "#ffffff",
       "loadingPreviewAmbientIntensity": 0,
@@ -88985,8 +88985,8 @@
     "desktop": {
       "left": 4.75,
       "top": 308.0874938964844,
-      "width": 641.2875366210938,
-      "height": 329.1875,
+      "width": 644.4874877929688,
+      "height": 330.7875061035156,
       "collapsed": false
     },
     "mobile": {
