@@ -80635,7 +80635,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -82807,14 +82807,14 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
           "type": "group",
           "group": {
             "key": "New Group (10)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
