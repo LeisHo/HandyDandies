@@ -2204,6 +2204,7 @@ function renestRenderOrderRows() {
   const fcOld = fcRow && fcRow.closest('.dp-group')
   if (flBody && fcOld && (fcOld.dataset.key === 'New Group (11)' || fcOld.dataset.key === 'Quality / Performance')) flBody.appendChild(fcRow)
   FIELD_LAYOUT_SUBGROUP_SPECS.forEach((sp) => renestSubgroupRows('Field Layout', sp))
+  renestSubgroupRows('Loading Preview', LOADING_PREVIEW_TOON_SPEC)
 
   const gb = renestSubgroupRows('Debug', SNAPSHOT_SUBGROUP_SPECS[0])
   const w = document.getElementById('dpSnapshotWidget')
@@ -4364,6 +4365,28 @@ const SAVE_SETTINGS_ENDPOINT = '/api/save-settings'
     else c.onChange = (v) => { try { effect[k](v) } catch (err) { /* early boot */ } }
     fieldControls.push(c)
   })
+  { // the Loading Preview's copy of the Toon Shading controls (see lpToonKey()), pushed into the Loading Preview group
+    const lpControls = DEV_GROUPS.find((g) => g.title === 'Loading Preview').controls
+    const LK = (k) => 'lp' + k.charAt(0).toUpperCase() + k.slice(1)
+    const lpEffect = {
+      toonSteps: () => rebuildLpGradientMap(), toonStepThreshold: () => rebuildLpGradientMap(), toonShadowFloor: () => rebuildLpGradientMap(), toonLightCeiling: () => rebuildLpGradientMap(), toonGradient: () => rebuildLpGradientMap(),
+      toonBaseTint: (v) => forEachLpToonMaterial((m) => m.color.set(v)),
+      textureInfluence: (v) => setLpToonUniform('textureInfluence', v / 100),
+      toonTint: (v) => setLpToonUniform('toonTint', new THREE.Color(v)), rimColor: (v) => setLpToonUniform('rimColor', new THREE.Color(v)),
+      rimIntensity: (v) => setLpToonUniform('rimIntensity', v), rimPower: (v) => setLpToonUniform('rimPower', v)
+    }
+    const lpPicks = { toonStepThresholdPick: 'threshold', toonShadowFloorPick: 'floor', toonLightCeilingPick: 'ceiling' }
+    ;['toonSteps', 'toonStepThreshold', 'toonStepThresholdPick', 'toonShadowFloor', 'toonShadowFloorPick', 'toonLightCeiling', 'toonLightCeilingPick', 'toonGradient', 'toonBaseTint', 'textureInfluence', 'toonTint', 'rimIntensity', 'rimPower', 'rimColor'].forEach((k) => {
+      const src = toonControls.find((c) => c.key === k)
+      if (!src) return
+      const c = { ...src, key: LK(k) }
+      if (src.placeAfter) c.placeAfter = LK(src.placeAfter)
+      if (lpPicks[k]) c.onClick = (btn) => pickToonValueFromScreen(lpPicks[k], btn, 'lp')
+      else c.onChange = (v) => { try { lpEffect[k](v) } catch (err) { /* early boot */ } }
+      lpControls.push(c)
+    })
+    lpControls.push({ key: 'lpSavedToon', label: 'Saved Toon Shading', type: 'list-picker', def: [], itemLabel: 'Toon', exportable: true, importable: true, isInUse: (item) => lpToonItemMatchesLive(item), captureCurrent: () => captureLpToonPreset(), onUse: (item) => useLpToonPreset(item) })
+  }
   fieldControls.push({ key: 'skelSavedToon', label: 'Saved Toon Shading', type: 'list-picker', def: [], itemLabel: 'Toon', exportable: true, importable: true, isInUse: (item) => skelToonItemMatchesLive(item), captureCurrent: () => captureSkelToonPreset(), onUse: (item) => useSkelToonPreset(item) })
 }
 // Camera group (direct request 2026-10-14): its sliders are perDevice, which has no Show in Mobile/Landscape checkbox of its own; opt them into the visibility-only one so the group has it like every other group.
@@ -7371,9 +7394,13 @@ function updateTrackingTargets() {
 let toonMaterial = null
 const toonShaderUniformsList = []
 const skelToonShaderUniformsList = [] // the Render Skeleton In Front overlay's materials (see createToonMaterial(map, true))
+const lpToonShaderUniformsList = [] // the Loading Preview hands' materials (see createToonMaterial(map, 'lp'))
 function setToonUniform(name, value) {
   toonShaderUniformsList.forEach((u) => { if (u[name]) u[name].value = value })
-  if (name.startsWith('cropCap')) skelToonShaderUniformsList.forEach((u) => { if (u[name]) u[name].value = value }) // the Crop Cap settings are shared with the overlay
+  if (name.startsWith('cropCap')) { // the Crop Cap settings are shared with the overlay and the Loading Preview
+    skelToonShaderUniformsList.forEach((u) => { if (u[name]) u[name].value = value })
+    lpToonShaderUniformsList.forEach((u) => { if (u[name]) u[name].value = value })
+  }
 }
 // Every field hand now gets its OWN cloned toon/outline material (see
 // rebuildField()'s own comment on wristClipPlane for why) -- these two
@@ -7489,7 +7516,7 @@ function toonThresholdForMidBrightness(B, floor, ceiling) {
   return THREE.MathUtils.clamp(Math.round(Math.log(frac) / Math.log(0.5) / 0.05) * 0.05, 0.2, 5)
 }
 function pickToonValueFromScreen(which, btn, skel) { // skel: the Render Skeleton In Front copy of the group (its own settings)
-  const K = (k) => (skel ? skelToonKey(k) : k)
+  const K = (k) => (skel === 'lp' ? lpToonKey(k) : skel ? skelToonKey(k) : k)
   const label = btn.textContent
   btn.textContent = 'Click a color...'
   pickScreenColor().then((hex) => {
@@ -7509,7 +7536,7 @@ function pickToonValueFromScreen(which, btn, skel) { // skel: the Render Skeleto
       syncValue(K('toonLightCeiling'), v)
       msg = 'Ceiling ' + v + '%'
     }
-    (skel ? rebuildSkelGradientMap : rebuildGradientMap)()
+    (skel === 'lp' ? rebuildLpGradientMap : skel ? rebuildSkelGradientMap : rebuildGradientMap)()
     btn.textContent = msg
     setTimeout(() => { btn.textContent = label }, 2500)
   })
@@ -7590,6 +7617,53 @@ function skelToonItemMatchesLive(item) {
     return typeof a === 'string' && typeof b === 'string' ? a.toLowerCase() === b.toLowerCase() : nearNum(a, b, 1e-3)
   })
 }
+// The Loading Preview's own Toon Shading settings (2026-10-23, direct request: "provide the toon shader setting group within the loading preview group as well"): the same controls as the Toon Shading group, under keys lpToonSteps ...
+// lpRimColor / lpToonGradient, driving only the Loading Preview hands' materials (made from lpToonTemplate by lpToonCloneMaterial()). A saved preset stores the MAIN key names, like the skeleton's.
+const lpToonState = { tmpl: null }
+function lpToonKey(k) { return 'lp' + k.charAt(0).toUpperCase() + k.slice(1) }
+function lpToonCloneMaterial() { // a Loading Preview hand's material: a clone of the preview template (own settings), not of the hands' one
+  if (!lpToonState.tmpl) lpToonState.tmpl = createToonMaterial(toonMaterial ? toonMaterial.map || null : null, 'lp')
+  const m = lpToonState.tmpl.clone()
+  m.onBeforeCompile = lpToonState.tmpl.onBeforeCompile // clone() does not carry it over (see createFieldHand())
+  return m
+}
+function forEachLpToonMaterial(fn) {
+  if (lpToonState.tmpl) fn(lpToonState.tmpl)
+  ;[loadingPreviewHand, loadingPreviewHand2].forEach((h) => { if (h && h.skinnedMesh && h.skinnedMesh.material && h.skinnedMesh.material !== toonMaterial) fn(h.skinnedMesh.material) })
+}
+function setLpToonUniform(name, value) { lpToonShaderUniformsList.forEach((u) => { if (u[name]) u[name].value = value }) }
+function rebuildLpGradientMap() {
+  const tex = makeGradientTexture(cfg.lpToonSteps, cfg.lpToonShadowFloor, cfg.lpToonLightCeiling, cfg.lpToonStepThreshold, cfg.lpToonGradient)
+  forEachLpToonMaterial((m) => { m.gradientMap = tex; m.needsUpdate = true })
+  sceneNeedsRedraw = true
+}
+function captureLpToonPreset() {
+  const item = {}
+  TOON_PRESET_KEYS.forEach((key) => { item[key] = cfg[lpToonKey(key)] })
+  return item
+}
+function lpToonItemMatchesLive(item) {
+  return TOON_PRESET_KEYS.every((k) => {
+    if (item[k] === undefined) return true
+    const a = item[k], b = cfg[lpToonKey(k)]
+    return typeof a === 'string' && typeof b === 'string' ? a.toLowerCase() === b.toLowerCase() : nearNum(a, b, 1e-3)
+  })
+}
+function useLpToonPreset(item) {
+  TOON_PRESET_KEYS.forEach((key) => {
+    if (item[key] === undefined) return
+    const k = lpToonKey(key)
+    cfg[k] = item[key]
+    syncValue(k, item[key])
+  })
+  forEachLpToonMaterial((m) => m.color.set(cfg.lpToonBaseTint))
+  setLpToonUniform('textureInfluence', cfg.lpTextureInfluence / 100)
+  setLpToonUniform('toonTint', new THREE.Color(cfg.lpToonTint))
+  setLpToonUniform('rimIntensity', cfg.lpRimIntensity)
+  setLpToonUniform('rimPower', cfg.lpRimPower)
+  setLpToonUniform('rimColor', new THREE.Color(cfg.lpRimColor))
+  rebuildLpGradientMap()
+}
 function useSkelToonPreset(item) {
   TOON_PRESET_KEYS.forEach((key) => {
     if (item[key] === undefined) return
@@ -7637,8 +7711,8 @@ function useSkelToonPreset(item) {
 // `rebuildField()` time, same as before this cache-key attempt existed.
 // `skel` (2026-10-23): the Render Skeleton In Front overlay's own material - it reads the skeleton's copy of every Toon Shading setting (skelToonSteps ... skelToonGradient, see skelToonKey()) and registers its shader
 // uniforms in skelToonShaderUniformsList instead, so the main Toon Shading sliders never touch it and its own sliders never touch the hands.
-function createToonMaterial(map, skel) {
-  const K = (k) => (skel ? skelToonKey(k) : k)
+function createToonMaterial(map, skel) { // skel: false = the hands, true = the Render Skeleton In Front overlay, 'lp' = the Loading Preview hands (own settings each, see lpToonKey())
+  const K = (k) => (skel === 'lp' ? lpToonKey(k) : skel ? skelToonKey(k) : k)
   const material = new THREE.MeshToonMaterial({
     map,
     color: new THREE.Color(cfg[K('toonBaseTint')]),
@@ -7679,7 +7753,7 @@ function createToonMaterial(map, skel) {
       .replace('#include <opaque_fragment>', `if ( cropCapOn > 0.5 && cropCapMode > 2.5 && ! gl_FrontFacing ) outgoingLight = cropCapColor;\n#include <opaque_fragment>`)
       .replace('#include <map_fragment>', `#include <map_fragment>\nfloat toonLuma = dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) );\nvec3 toonDuotone = mix( vec3( 0.0 ), toonTint, toonLuma );\ndiffuseColor.rgb = mix( toonTint, toonDuotone, textureInfluence );`)
       .replace('#include <dithering_fragment>', `#include <dithering_fragment>\nfloat rimFactor = pow( 1.0 - max( dot( normalize( vRimNormal ), normalize( vRimViewDir ) ), 0.0 ), rimPower );\nif ( cropCapOn > 0.5 && ! gl_FrontFacing ) rimFactor = 0.0;\ngl_FragColor.rgb += rimColor * rimFactor * rimIntensity;`)
-    ;(skel ? skelToonShaderUniformsList : toonShaderUniformsList).push(shader.uniforms)
+    ;(skel === 'lp' ? lpToonShaderUniformsList : skel ? skelToonShaderUniformsList : toonShaderUniformsList).push(shader.uniforms)
   }
   return material
 }
@@ -10301,9 +10375,8 @@ function ensureLoadingPreviewHand2(seq) {
   const plane = new THREE.Plane()
   const rig = makeClipRig(clone)
   if (skinnedMesh && toonMaterial) {
-    skinnedMesh.material = toonMaterial.clone()
+    skinnedMesh.material = lpToonCloneMaterial() // the Loading Preview's own Toon Shading settings
     applyClipRigToMaterial(skinnedMesh.material, rig, plane, true)
-    skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
   }
   clone.matrixAutoUpdate = false // its matrix is composed by hand each frame (it can be a reflection)
   loadingPreviewScene.add(clone)
@@ -10558,12 +10631,8 @@ function buildLoadingPreview(bypassEnabledGate) {
   const loadingPreviewWristClipPlane = new THREE.Plane()
   const loadingPreviewClipRig = makeClipRig(clone)
   if (skinnedMesh && toonMaterial) {
-    skinnedMesh.material = toonMaterial.clone()
+    skinnedMesh.material = lpToonCloneMaterial() // the Loading Preview's own Toon Shading settings (the template carries onBeforeCompile, see lpToonCloneMaterial())
     applyClipRigToMaterial(skinnedMesh.material, loadingPreviewClipRig, loadingPreviewWristClipPlane, true)
-    // Material.clone() doesn't carry over onBeforeCompile -- see
-    // rebuildField()'s own matching comment for the real bug this once
-    // caused (toon rim-light/tint shading silently reverting to default).
-    skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
   }
   loadingPreviewScene.add(clone)
   loadingPreviewHand = { clone, skinnedMesh, wristClipPlane: loadingPreviewWristClipPlane, clipRig: loadingPreviewClipRig }
@@ -22962,6 +23031,12 @@ function skelFrontSyncAll() { // every rendered frame, before the scene graph up
     o.root.matrixWorldNeedsUpdate = true
   }
 }
+// The "Toon Shading (Loading Preview)" subgroup of Loading Preview (a plain, collapsible one; the title differs from the Toon Shading group's so the two never share a key in a saved layout).
+const LOADING_PREVIEW_TOON_SPEC = { title: 'Toon Shading (Loading Preview)', collapsed: true, keys: ['lpToonSteps', 'lpToonStepThreshold', 'lpToonStepThresholdPick', 'lpToonShadowFloor', 'lpToonShadowFloorPick', 'lpToonLightCeiling', 'lpToonLightCeilingPick', 'lpToonGradient', 'lpToonBaseTint', 'lpTextureInfluence', 'lpToonTint', 'lpRimIntensity', 'lpRimPower', 'lpRimColor', 'lpSavedToon'] }
+function setupLoadingPreviewToonGroup() {
+  renestSubgroupRows('Loading Preview', LOADING_PREVIEW_TOON_SPEC)
+  buildToonGradientWidget('lpToonGradient')
+}
 function setupRenderSkeletonGroup() { // the toggleable "Render Skeleton In Front" subgroup of Field Layout (on/off checkbox in its label); the Toon Shading copy sits in it like the Toon Shading group
   const keys = ['skelFrontModel']
   ;['toonSteps', 'toonStepThreshold', 'toonStepThresholdPick', 'toonShadowFloor', 'toonShadowFloorPick', 'toonLightCeiling', 'toonLightCeilingPick', 'toonGradient', 'toonBaseTint', 'textureInfluence', 'toonTint', 'rimIntensity', 'rimPower', 'rimColor'].forEach((k) => keys.push(skelToonKey(k)))
@@ -24773,7 +24848,7 @@ armLengthWidgetResyncs.push(() => {
   const sig = [camera.position.x, camera.position.y, camera.position.z, camera.fov, cfg.cameraRoll || 0, t.x, t.y, t.z].map((v) => Math.round(v * 100)).join(',') + '|' + LIGHTING_PRESET_KEYS.map((k) => cfg[k]).join(',') + '|' + cfg.loadingPreviewCameraSelector + '|' + cfg.loadingPreviewLightingSelector + '|' + TOON_PRESET_KEYS.map((k) => cfg[k]).join(',')
   if (sig === marksLastSig) return
   marksLastSig = sig
-  refreshListPickerMarksByKey('savedCameras'); refreshListPickerMarksByKey('savedLighting'); refreshListPickerMarksByKey('savedToon'); refreshListPickerMarksByKey('skelSavedToon'); refreshListPickerMarksByKey('loadingPreviewSavedCameras'); refreshListPickerMarksByKey('loadingPreviewSavedLighting')
+  refreshListPickerMarksByKey('savedCameras'); refreshListPickerMarksByKey('savedLighting'); refreshListPickerMarksByKey('savedToon'); refreshListPickerMarksByKey('skelSavedToon'); refreshListPickerMarksByKey('lpSavedToon'); refreshListPickerMarksByKey('loadingPreviewSavedCameras'); refreshListPickerMarksByKey('loadingPreviewSavedLighting')
 })
 gateGroupHeader('Floor', 'floorEnabled')
 updateFloorRowVisibility()
@@ -24782,6 +24857,7 @@ setupHandOffsetStartupGroup()
 setupSphereSequenceGroup()
 setupCropCapGroup()
 setupRenderSkeletonGroup()
+setupLoadingPreviewToonGroup()
 setupUiButtonsTweenGroup()
 setupLoadingPreviewEasingGroup()
 setupLoadingPreviewSpeedCurveGroup()
