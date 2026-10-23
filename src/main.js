@@ -23656,6 +23656,7 @@ function resetAllHands() {
   clearTimeout(clickPoseClickTimer); clickPoseClickCount = 0
   clearTimeout(rightClickPoseClickTimer); rightClickPoseClickCount = 0
   Object.keys(clickHoldPoseTriggers).forEach((k) => { if (clickHoldPoseTriggers[k]) clickHoldPoseTriggers[k].active = false })
+  hands.forEach(skelFrontDetach) // Render Skeleton In Front: the overlays go too (this reset drops every _-key, hand._skel included, which would orphan an overlay still in the wrapper); the per-frame sync gives each hand a fresh one at rest
   hands.forEach((hand) => {
     Object.keys(hand).forEach((k) => { if (k.charAt(0) === '_') delete hand[k] })
     hand._handoffSettleFrames = 0
