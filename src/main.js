@@ -7811,7 +7811,7 @@ const IK_RIG_SPLAY2_JOINT_INDEX = { thumb: 2, index: 1, middle: 1, ring: 1, pink
 // The IK rig's bind-pose rest rotations (read from HandiBonesB-IK.glb / HD_IK_*.glb node rotations): a loaded model whose rHand and rThumb1 rest rotations are both within IK_RIG_TOLERANCE_DEG of
 // these is this rig. The earlier model differs by 89.2 / 106.4 deg, the IK LOD files by <= 0.05 deg, so the separation is not a close call.
 const IK_RIG_REST_REF = { rHand: [-0.11599858850240707, 0.9928736090660095, -0.00641510309651494, 0.026555685326457024], rThumb1: [0.04745800793170929, 0.7883297801017761, 0.4728289842605591, 0.3907897472381592] }
-const IK_RIG_TOLERANCE_DEG = 3
+const IK_RIG_TOLERANCE_DEG = 15 // 2026-10-22: was 3. The 2026-10-22 HAND-021 exports (HD_IK_*) re-rolled rThumb1 by 5.40 deg (rHand unchanged, 0.00), which failed the old 3 deg test, switched the IK posing off and posed every joint with the old rig maths. 15 is a judgment call, not a measured value: anything between 5.4 and the earlier model's 89.2 / 106.4 deg separates the two rigs.
 let RIG_LOCAL_AXIS_POSING = false
 const _ikRigRefQ = new THREE.Quaternion()
 function detectLocalAxisRig() {
