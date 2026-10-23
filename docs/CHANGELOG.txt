@@ -18571,7 +18571,7 @@ Not changed: `order` (layout), textOverrides, devVisibility and devIndependence 
 Checked with a Node test of the real function using a stubbed fetch (kept newer keys, dropped a deleted function and a removed trigger, new values won for shared keys, a failed read refused to save). Not tried against the live page.
 
 
-2026-10-22 - Tween Stop applies to triggering (main.js?v=557)
+2026-10-22 - Tween Stop applies to triggering (main.js?v=566)
 Direct request: releasing a Click+Hold when only part of the field had been triggered left the not-yet-triggered hands doing nothing, while the triggered ones wound down by Tween Stop, so a big gap opened between them.
 Now, with Tween Stop and Tween Stop Delay on (Sequence / Chain mode), a hand that is still waiting on its Start Time delay at release keeps its pending claim and is still triggered during the stop window (Tween Stop Start Time + Tween Stop Delay, counted from the release). It starts straight in the stopping phase with its clock anchored to the release, so its speed follows the same slow-down (full speed inside the Start Time window, then decaying to a halt) and the sequence only travels as far as the rest of the window allows. Splay eases in over that progress instead of jumping. A hand whose claim would land after the window is dropped, as before. A new press, or another function claiming the hand, cancels it. Tween Stop off, Tween Stop Delay off, Single Pose mode and On Click behave as before.
 Files: src/main.js (holdStopParams(), endClickHoldPose() idle branch, updateClickHoldPoseForHand() cleanup + commit, stopping phase splay, per-frame hold gate).
@@ -18627,7 +18627,7 @@ cropCapTone (default Reactive) sets the shader uniform cropCapMode (0 Reactive, 
 Limits: Floor / Ceiling use the first directional light (the key light); a scene with no directional light falls back to the Reactive normal. NOT seen on screen; checked node --check, tests/top-level-load-check.js and balanced #if / #endif in the GLSL.
 
 --------------------------------------------------------------------------------
-2026-10-22  -  Color Presets: Steps slider, stepped thumbnails, delete (minus) and drag-reorder (main.js?v=557)
+2026-10-22  -  Color Presets: Steps slider, stepped thumbnails, delete (minus) and drag-reorder (main.js?v=566)
 --------------------------------------------------------------------------------
 Color Preset selector (the button right of Pause / Reset, top left):
  * Steps: a vertical 1-6 slider on the right of the panel that opens, shown in dev mode while a preset is selected. The value is stored in the preset (s), applied to the scene as it moves (Toon Steps, ramp rebuilt) and the preset's thumbnail is redrawn. 1 is new: the Toon Steps dev-panel slider now goes 1-6 (was 2-6) and the lit ramp texture accepts one flat band (makeGradientTexture() used to force at least 2).
