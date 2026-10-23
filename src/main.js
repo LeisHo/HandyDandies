@@ -3889,7 +3889,7 @@ const DEV_GROUPS = [
   {
     title: 'Toon Shading',
     controls: [
-      { key: 'toonSteps', label: 'Toon Steps (Count)', type: 'slider', min: 2, max: 6, step: 1, def: 2, onChange: () => rebuildGradientMap() },
+      { key: 'toonSteps', label: 'Toon Steps (Count)', type: 'slider', min: 1, max: 6, step: 1, def: 2, onChange: () => rebuildGradientMap() },
       { key: 'toonStepThreshold', label: 'Toon Step Threshold (Bias)', type: 'slider', min: 0.2, max: 5, step: 0.05, def: 2.7, onChange: () => rebuildGradientMap() },
       // Eyedropper (2026-10-11): click any color on screen; its brightness (0 = black .. 100 = white) becomes this step's value.
       { key: 'toonStepThresholdPick', label: 'Pick Step Threshold From Screen Color (Eyedropper)', type: 'button', onClick: (btn) => pickToonValueFromScreen('threshold', btn) },
@@ -7346,7 +7346,7 @@ function toonGradientHexAt(stops, t) {
   return '#' + mix(1) + mix(3) + mix(5)
 }
 function makeGradientTexture(steps, shadowFloor, lightCeiling, threshold) {
-  const size = Math.max(2, Math.round(steps))
+  const size = Math.max(1, Math.round(steps)) // 1 = one flat band (the colour preset slider goes down to 1)
   const data = new Uint8Array(size * 4)
   const grad = parseToonGradient(cfg.toonGradient || '')
   const tc = new THREE.Color()
@@ -23330,6 +23330,8 @@ setupPauseButton()
 // changed. Built from JS (no index.html / style.css edit); looks come from the Pause Button group's settings. The list is the 'colorPresets' control, so it is saved with the other dev-panel settings; editing is dev-mode only.
 // =====================================================================================================================
 let colorPresetEditingId = null
+let colorPresetDeleteArmed = false // dev mode: the minus tile is on, the next preset clicked is deleted
+let colorPresetJustDragged = false // a drag-reorder just ended: swallow the click that follows it
 function getColorPresets() {
   try { const a = JSON.parse(cfg.colorPresets); if (Array.isArray(a)) return a } catch (e) { /* default below */ }
   return COLOR_PRESET_SEED.map((p) => ({ ...p }))
@@ -23339,10 +23341,13 @@ function setColorPresets(arr) {
   cfg.colorPresets = json
   try { syncValue('colorPresets', json) } catch (e) { /* panel not built */ }
 }
+// 2026-10-22 (direct request): the thumbnail shows the preset's gradient cut into its toon steps - s hard bands, band i taking the gradient colour at i / (s - 1) (the colour the lit ramp texture uses, see makeGradientTexture()).
 function colorPresetSwatch(p) {
-  if (p.w && p.w.length) return 'linear-gradient(135deg, ' + p.w.join(', ') + ')'
-  const stops = parseToonGradient(p.g || '')
-  return 'linear-gradient(135deg, ' + stops.map((x) => x.c + ' ' + (x.p * 100).toFixed(1) + '%').join(', ') + ')'
+  const n = Math.max(1, Math.min(6, Math.round(+p.s || 2)))
+  const stops = p.w && p.w.length ? p.w.map((c, i) => ({ p: p.w.length < 2 ? 0 : i / (p.w.length - 1), c })) : parseToonGradient(p.g || '')
+  const bands = []
+  for (let i = 0; i < n; i++) bands.push(toonGradientHexAt(stops, n === 1 ? 1 : i / (n - 1)) + ' ' + (i / n * 100).toFixed(2) + '% ' + ((i + 1) / n * 100).toFixed(2) + '%')
+  return 'linear-gradient(135deg, ' + bands.join(', ') + ')'
 }
 // Puts the preset's toon values, gradient and background / floor colour on screen (same path as the dev-panel rows: cfg + row via syncValue, then the effects).
 function applyColorPreset(p) {
@@ -23433,6 +23438,11 @@ function renderColorPresetPanel() {
   if (!panel || panel.style.display === 'none') return
   const st = colorPresetBtnStyle(), presets = getColorPresets()
   panel.textContent = ''
+  const layout = document.createElement('div') // left: the tiles and the editor; right: the Steps slider (dev mode, while a preset is being edited)
+  layout.style.cssText = 'display:flex;gap:10px;align-items:stretch'
+  const main = document.createElement('div')
+  main.style.cssText = 'flex:1 1 auto;min-width:0'
+  layout.appendChild(main); panel.appendChild(layout)
   const grid = document.createElement('div')
   grid.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px'
   const tileCss = 'box-sizing:border-box;width:' + st.size + 'px;height:' + st.size + 'px;padding:0;margin:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;user-select:none;-webkit-tap-highlight-color:transparent;border-radius:' + st.radius + ';'
@@ -23440,7 +23450,46 @@ function renderColorPresetPanel() {
     const b = document.createElement('button')
     b.type = 'button'
     b.style.cssText = tileCss + 'border:4px solid ' + p.bg + ';background:' + colorPresetSwatch(p) + ';' + (p.id === colorPresetEditingId ? 'outline:2px solid ' + st.fg + ';outline-offset:2px;' : '')
-    b.addEventListener('click', (e) => { e.stopPropagation(); applyColorPreset(p); colorPresetEditingId = DEV_MODE ? p.id : null; renderColorPresetPanel() })
+    b.dataset.presetId = p.id
+    if (DEV_MODE && colorPresetDeleteArmed) b.style.cssText += 'outline:2px dashed #ff3b30;outline-offset:2px;'
+    if (DEV_MODE) b.style.touchAction = 'none'
+    b.addEventListener('click', (e) => {
+      e.stopPropagation()
+      if (colorPresetJustDragged) return
+      if (DEV_MODE && colorPresetDeleteArmed) { // minus is on: this click deletes the preset (the minus turns itself off again)
+        setColorPresets(getColorPresets().filter((x) => x.id !== p.id))
+        if (colorPresetEditingId === p.id) colorPresetEditingId = null
+        colorPresetDeleteArmed = false; renderColorPresetPanel(); return
+      }
+      applyColorPreset(p); colorPresetEditingId = DEV_MODE ? p.id : null; renderColorPresetPanel()
+    })
+    // dev mode: drag a tile onto another to reorder (a move of under 6 px stays a click); the new order is written into the saved list when it is dropped
+    if (DEV_MODE) b.addEventListener('pointerdown', (e) => {
+      if (e.button > 0 || colorPresetDeleteArmed) return
+      const x0 = e.clientX, y0 = e.clientY; let moved = false
+      const tiles = () => Array.from(grid.children).filter((c) => c.dataset && c.dataset.presetId)
+      const mv = (ev) => {
+        if (!moved && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 6) return
+        if (!moved) { moved = true; b.style.opacity = '0.45'; try { b.setPointerCapture(ev.pointerId) } catch (err) { /* synthetic pointer */ } }
+        const el = document.elementFromPoint(ev.clientX, ev.clientY)
+        const over = el && el.closest ? el.closest('[data-preset-id]') : null
+        if (!over || over === b || over.parentElement !== grid) return
+        const list = tiles()
+        if (list.indexOf(over) < list.indexOf(b)) grid.insertBefore(b, over); else grid.insertBefore(b, over.nextSibling)
+      }
+      const up = () => {
+        b.removeEventListener('pointermove', mv); b.removeEventListener('pointerup', up); b.removeEventListener('pointercancel', up)
+        b.style.opacity = ''
+        if (!moved) return
+        colorPresetJustDragged = true; setTimeout(() => { colorPresetJustDragged = false }, 0)
+        const all = getColorPresets(), byId = new Map(all.map((x) => [x.id, x]))
+        const next = tiles().map((t) => byId.get(t.dataset.presetId)).filter(Boolean)
+        all.forEach((x) => { if (!next.includes(x)) next.push(x) })
+        setColorPresets(next)
+        renderColorPresetPanel()
+      }
+      b.addEventListener('pointermove', mv); b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up)
+    })
     grid.appendChild(b)
   })
   if (DEV_MODE) {
@@ -23449,6 +23498,7 @@ function renderColorPresetPanel() {
     plus.style.cssText = tileCss + 'border:' + st.bw + ' solid ' + st.border + ';background:' + st.bg + ';color:' + st.fg + ';'
     plus.addEventListener('click', (e) => {
       e.stopPropagation()
+      colorPresetDeleteArmed = false
       const np = { id: 'p' + Date.now().toString(36), g: cfg.toonGradient, bg: cfg.floorEnabled ? (cfg.floorColor || '#ffffff') : (cfg.bgColor || '#ffffff'), ...COLOR_PRESET_NEW_DEFAULTS }
       setColorPresets(getColorPresets().concat([np]))
       applyColorPreset(np)
@@ -23456,8 +23506,14 @@ function renderColorPresetPanel() {
       renderColorPresetPanel()
     })
     grid.appendChild(plus)
+    const minus = document.createElement('button') // subtract: turns delete mode on / off
+    minus.type = 'button'; minus.textContent = '\u2212'; minus.title = 'Delete a preset: press this, then press the preset'
+    const mc = colorPresetDeleteArmed ? '#ff3b30' : st.border
+    minus.style.cssText = tileCss + 'border:' + st.bw + ' solid ' + mc + ';background:' + st.bg + ';color:' + (colorPresetDeleteArmed ? '#ff3b30' : st.fg) + ';'
+    minus.addEventListener('click', (e) => { e.stopPropagation(); colorPresetDeleteArmed = !colorPresetDeleteArmed; renderColorPresetPanel() })
+    grid.appendChild(minus)
   }
-  panel.appendChild(grid)
+  main.appendChild(grid)
   const cur = DEV_MODE && presets.find((p) => p.id === colorPresetEditingId)
   if (!cur) return
   const ed = document.createElement('div')
@@ -23470,6 +23526,7 @@ function renderColorPresetPanel() {
     setColorPresets(all)
     if (patch.g !== undefined) { cfg.toonGradient = patch.g; syncValue('toonGradient', patch.g); rebuildGradientMap() }
     if (patch.bg !== undefined) applyColorPresetBackground(patch.bg)
+    if (patch.s !== undefined) { cfg.toonSteps = patch.s; syncValue('toonSteps', patch.s); rebuildGradientMap(); sceneNeedsRedraw = true }
     const sw = grid.children[i]; if (sw) { sw.style.background = colorPresetSwatch(all[i]); sw.style.borderColor = all[i].bg }
   }
   const gradEd = buildColorPresetGradientEditor(null, (g) => update({ g }))
@@ -23487,7 +23544,18 @@ function renderColorPresetPanel() {
   del.addEventListener('click', (e) => { e.stopPropagation(); setColorPresets(getColorPresets().filter((p) => p.id !== cur.id)); colorPresetEditingId = null; renderColorPresetPanel() })
   row.appendChild(bgIn); row.appendChild(del)
   ed.appendChild(row)
-  panel.appendChild(ed)
+  main.appendChild(ed)
+  // Steps: a vertical 1-6 slider on the right of the panel; the number of toon steps is stored in the preset (s) and applied as it moves, and the thumbnail is redrawn with that many bands
+  const side = document.createElement('div')
+  side.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;padding-left:10px;border-left:1px solid rgba(255,255,255,0.25)'
+  const sLab = document.createElement('div'); sLab.textContent = 'Steps'; sLab.style.cssText = 'font-size:11px;opacity:0.8'
+  const sVal = document.createElement('div'); sVal.textContent = String(cur.s ?? 2); sVal.style.cssText = 'font-size:14px;font-weight:600'
+  const sl = document.createElement('input')
+  sl.type = 'range'; sl.min = '1'; sl.max = '6'; sl.step = '1'; sl.value = String(cur.s ?? 2); sl.setAttribute('orient', 'vertical')
+  sl.style.cssText = 'writing-mode:vertical-lr;direction:rtl;width:24px;height:150px;margin:0;cursor:pointer;touch-action:none'
+  sl.addEventListener('input', () => { sVal.textContent = sl.value; update({ s: +sl.value }) })
+  side.appendChild(sLab); side.appendChild(sVal); side.appendChild(sl)
+  layout.appendChild(side)
 }
 function setupColorPresetUi() {
   if (document.getElementById('presetButton')) return
@@ -23502,10 +23570,10 @@ function setupColorPresetUi() {
     e.stopPropagation()
     const open = panel.style.display === 'none'
     panel.style.display = open ? 'block' : 'none'
-    if (open) renderColorPresetPanel(); else colorPresetEditingId = null
+    if (open) renderColorPresetPanel(); else { colorPresetEditingId = null; colorPresetDeleteArmed = false }
   })
   // a press anywhere else closes it (a native colour dialog never sends one to the page)
-  document.addEventListener('pointerdown', (e) => { if (panel.style.display !== 'none' && !(e.target.closest && e.target.closest('#presetPanel, #presetButton'))) { panel.style.display = 'none'; colorPresetEditingId = null } }, true)
+  document.addEventListener('pointerdown', (e) => { if (panel.style.display !== 'none' && !(e.target.closest && e.target.closest('#presetPanel, #presetButton'))) { panel.style.display = 'none'; colorPresetEditingId = null; colorPresetDeleteArmed = false } }, true)
   applyColorPresetButtonStyle()
 }
 setupColorPresetUi()
