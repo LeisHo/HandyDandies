@@ -14,7 +14,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvkchs16",
+      "handModelId": "local:mvkci2rk",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -18987,14 +18987,14 @@
         }
       ],
       "cameraX": 3.692307692307692,
-      "cameraY": 2.367377203395856e-13,
-      "cameraZ": 334.979025524292,
+      "cameraY": 2.260253265681236e-13,
+      "cameraZ": 160.03235879686773,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
       "cameraDefaultPreset": "{\"cameraX\":3.692307692307692,\"cameraY\":2.367377203395856e-13,\"cameraZ\":334.979025524292,\"cameraFov\":20,\"cameraZoom\":334.99999999999994,\"cameraRoll\":0,\"targetX\":3.692307692307692,\"targetY\":2.162248864538674e-13,\"targetZ\":-0.02097447570793065}",
-      "cameraZoom": 334.99999999999994,
+      "cameraZoom": 160.05333327257566,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -26439,7 +26439,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvkchs16",
+      "handModelId": "local:mvkci2rk",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -52864,7 +52864,7 @@
       "pausedRenderFps": 15,
       "renderOrderRules": "{\"v\":3,\"rules\":[{\"t\":\"if\",\"name\":\"WHOLE ARM Z\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\",\"armBase\",\"middleTip\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AT CENTER\",\"on\":true,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"ARMS POINTING AWAY TO CAM\",\"on\":true,\"join\":\"and\",\"win\":\"A\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"armBase\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"loses\",\"ys\":\"B\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]},{\"t\":\"if\",\"name\":\"EQUAL Z\",\"on\":false,\"join\":\"and\",\"win\":\"B\",\"conds\":[{\"xs\":\"A\",\"xp\":[\"palmCenter\",\"armBase\",\"armEnd\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"},{\"xs\":\"B\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"z\",\"cmp\":\"beats\",\"ys\":\"A\",\"yp\":[\"armBase\"],\"yq\":\"all\"},{\"xs\":\"A\",\"xp\":[\"palmCenter\"],\"xq\":\"all\",\"m\":\"cam\",\"cmp\":\"beats\",\"ys\":\"B\",\"yp\":[\"palmCenter\"],\"yq\":\"all\"}]}]}",
       "renderOrderFlipLock": true,
-      "handModelId": "local:mvkchs16",
+      "handModelId": "local:mvkci2rk",
       "handModels": [
         {
           "name": "Handipants Fixed Bone",
@@ -79872,7 +79872,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -79946,7 +79946,7 @@
           "type": "group",
           "group": {
             "key": "Background",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
