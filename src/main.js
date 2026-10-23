@@ -23490,10 +23490,20 @@ setupPauseButton()
 let colorPresetEditingId = null
 let colorPresetDeleteArmed = false // dev mode: the minus tile is on, the next preset clicked is deleted
 let colorPresetJustDragged = false // a drag-reorder just ended: swallow the click that follows it
-function getColorPresets() {
+// 2026-10-23 (direct request: "even not in dev mode, I should be able to add color schemes"): a visitor without the dev panel cannot save to the shared settings file, so the schemes added in normal mode are kept in this browser
+// (localStorage) and listed after the shared ones; they can be edited and deleted there. In dev mode the list is the shared one as before (a scheme added with the + in dev mode is saved with the settings).
+const USER_COLOR_PRESETS_KEY = 'handyDandies.userColorPresets'
+function getUserColorPresets() {
+  try { const a = JSON.parse(localStorage.getItem(USER_COLOR_PRESETS_KEY)); if (Array.isArray(a)) return a.filter((p) => p && p.id) } catch (e) { /* none */ }
+  return []
+}
+function setUserColorPresets(arr) { try { localStorage.setItem(USER_COLOR_PRESETS_KEY, JSON.stringify(arr)) } catch (e) { /* storage blocked: the scheme lasts until the page is closed */ } }
+function isUserColorPreset(p) { return !!p && String(p.id).charAt(0) === 'u' }
+function getSharedColorPresets() {
   try { const a = JSON.parse(cfg.colorPresets); if (Array.isArray(a)) return a } catch (e) { /* default below */ }
   return COLOR_PRESET_SEED.map((p) => ({ ...p }))
 }
+function getColorPresets() { return DEV_MODE ? getSharedColorPresets() : getSharedColorPresets().concat(getUserColorPresets()) }
 function setColorPresets(arr) {
   const json = JSON.stringify(arr)
   cfg.colorPresets = json
@@ -23619,7 +23629,7 @@ function renderColorPresetPanel() {
         if (colorPresetEditingId === p.id) colorPresetEditingId = null
         colorPresetDeleteArmed = false; renderColorPresetPanel(); return
       }
-      applyColorPreset(p); colorPresetEditingId = DEV_MODE ? p.id : null; renderColorPresetPanel()
+      applyColorPreset(p); colorPresetEditingId = (DEV_MODE || isUserColorPreset(p)) ? p.id : null; renderColorPresetPanel() // (normal mode edits only the schemes added in this browser)
     })
     // dev mode: drag a tile onto another to reorder (a move of under 6 px stays a click); the new order is written into the saved list when it is dropped
     if (DEV_MODE) b.addEventListener('pointerdown', (e) => {
@@ -23650,20 +23660,22 @@ function renderColorPresetPanel() {
     })
     grid.appendChild(b)
   })
-  if (DEV_MODE) {
-    const plus = document.createElement('button')
+  {
+    const plus = document.createElement('button') // (2026-10-23: in every mode; a scheme added in normal mode is kept in this browser, see getUserColorPresets())
     plus.type = 'button'; plus.textContent = '+'
     plus.style.cssText = tileCss + 'border:' + st.bw + ' solid ' + st.border + ';background:' + st.bg + ';color:' + st.fg + ';'
     plus.addEventListener('click', (e) => {
       e.stopPropagation()
       colorPresetDeleteArmed = false
-      const np = { id: 'p' + Date.now().toString(36), g: cfg.toonGradient, bg: cfg.floorEnabled ? (cfg.floorColor || '#ffffff') : (cfg.bgColor || '#ffffff'), ...COLOR_PRESET_NEW_DEFAULTS }
-      setColorPresets(getColorPresets().concat([np]))
+      const np = { id: (DEV_MODE ? 'p' : 'u') + Date.now().toString(36), g: cfg.toonGradient, bg: cfg.floorEnabled ? (cfg.floorColor || '#ffffff') : (cfg.bgColor || '#ffffff'), ...COLOR_PRESET_NEW_DEFAULTS }
+      if (DEV_MODE) setColorPresets(getColorPresets().concat([np])); else setUserColorPresets(getUserColorPresets().concat([np]))
       applyColorPreset(np)
       colorPresetEditingId = np.id
       renderColorPresetPanel()
     })
     grid.appendChild(plus)
+  }
+  if (DEV_MODE) {
     const minus = document.createElement('button') // subtract: turns delete mode on / off
     minus.type = 'button'; minus.textContent = '\u2212'; minus.title = 'Delete a preset: press this, then press the preset'
     const mc = colorPresetDeleteArmed ? '#ff3b30' : st.border
@@ -23672,20 +23684,37 @@ function renderColorPresetPanel() {
     grid.appendChild(minus)
   }
   main.appendChild(grid)
-  const cur = DEV_MODE && presets.find((p) => p.id === colorPresetEditingId)
-  if (!cur) return
+  const found = presets.find((p) => p.id === colorPresetEditingId)
+  const cur = found && (DEV_MODE || isUserColorPreset(found)) ? found : null // dev mode edits every scheme, normal mode the ones added in this browser
+  // Steps (2026-10-23, direct request: the toon step slider is always available): with a scheme being edited it sets that scheme's steps (below); otherwise it sets the live toon steps, as the Toon Steps row does.
+  const addStepsSlider = (value, onInput) => {
+    const side = document.createElement('div')
+    side.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;padding-left:10px;border-left:1px solid rgba(255,255,255,0.25)'
+    const sLab = document.createElement('div'); sLab.textContent = 'Steps'; sLab.style.cssText = 'font-size:11px;opacity:0.8'
+    const sVal = document.createElement('div'); sVal.textContent = String(value); sVal.style.cssText = 'font-size:14px;font-weight:600'
+    const sl = document.createElement('input')
+    sl.type = 'range'; sl.min = '1'; sl.max = '6'; sl.step = '1'; sl.value = String(value); sl.setAttribute('orient', 'vertical')
+    sl.style.cssText = 'writing-mode:vertical-lr;direction:rtl;width:24px;height:150px;margin:0;cursor:pointer;touch-action:none'
+    sl.addEventListener('input', () => { sVal.textContent = sl.value; onInput(+sl.value) })
+    side.appendChild(sLab); side.appendChild(sVal); side.appendChild(sl)
+    layout.appendChild(side)
+  }
+  if (!cur) {
+    addStepsSlider(Math.max(1, Math.min(6, Math.round(+cfg.toonSteps || 2))), (s) => { cfg.toonSteps = s; syncValue('toonSteps', s); rebuildGradientMap(); sceneNeedsRedraw = true })
+    return
+  }
   const ed = document.createElement('div')
   ed.style.cssText = 'margin-top:10px;display:flex;flex-direction:column;gap:8px;min-width:' + (st.size * 4) + 'px'
   const update = (patch) => { // writes the change into the preset, then onto the screen
-    const all = getColorPresets(), i = all.findIndex((p) => p.id === cur.id)
+    const all = DEV_MODE ? getColorPresets() : getUserColorPresets(), i = all.findIndex((p) => p.id === cur.id) // (normal mode: the list kept in this browser)
     if (i < 0) return
     all[i] = { ...all[i], ...patch }
     if (patch.g !== undefined) delete all[i].w // an edited gradient no longer uses the BW / WB swatch override
-    setColorPresets(all)
+    if (DEV_MODE) setColorPresets(all); else setUserColorPresets(all)
     if (patch.g !== undefined) { cfg.toonGradient = patch.g; syncValue('toonGradient', patch.g); rebuildGradientMap() }
     if (patch.bg !== undefined) applyColorPresetBackground(patch.bg)
     if (patch.s !== undefined) { cfg.toonSteps = patch.s; syncValue('toonSteps', patch.s); rebuildGradientMap(); sceneNeedsRedraw = true }
-    const sw = grid.children[i]; if (sw) { sw.style.background = colorPresetSwatch(all[i]); sw.style.borderColor = all[i].bg }
+    const sw = grid.querySelector('[data-preset-id="' + cur.id + '"]'); if (sw) { sw.style.background = colorPresetSwatch(all[i]); sw.style.borderColor = all[i].bg }
   }
   const gradEd = buildColorPresetGradientEditor(null, (g) => update({ g }))
   gradEd.set(cur.g)
@@ -23699,21 +23728,12 @@ function renderColorPresetPanel() {
   const del = document.createElement('button')
   del.type = 'button'; del.textContent = '\u{1F5D1}'
   del.style.cssText = 'margin-left:auto;padding:2px 8px;cursor:pointer;background:transparent;color:inherit;border:1px solid rgba(255,255,255,0.4);border-radius:4px;font-size:16px'
-  del.addEventListener('click', (e) => { e.stopPropagation(); setColorPresets(getColorPresets().filter((p) => p.id !== cur.id)); colorPresetEditingId = null; renderColorPresetPanel() })
+  del.addEventListener('click', (e) => { e.stopPropagation(); if (DEV_MODE) setColorPresets(getColorPresets().filter((p) => p.id !== cur.id)); else setUserColorPresets(getUserColorPresets().filter((p) => p.id !== cur.id)); colorPresetEditingId = null; renderColorPresetPanel() })
   row.appendChild(bgIn); row.appendChild(del)
   ed.appendChild(row)
   main.appendChild(ed)
   // Steps: a vertical 1-6 slider on the right of the panel; the number of toon steps is stored in the preset (s) and applied as it moves, and the thumbnail is redrawn with that many bands
-  const side = document.createElement('div')
-  side.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;padding-left:10px;border-left:1px solid rgba(255,255,255,0.25)'
-  const sLab = document.createElement('div'); sLab.textContent = 'Steps'; sLab.style.cssText = 'font-size:11px;opacity:0.8'
-  const sVal = document.createElement('div'); sVal.textContent = String(cur.s ?? 2); sVal.style.cssText = 'font-size:14px;font-weight:600'
-  const sl = document.createElement('input')
-  sl.type = 'range'; sl.min = '1'; sl.max = '6'; sl.step = '1'; sl.value = String(cur.s ?? 2); sl.setAttribute('orient', 'vertical')
-  sl.style.cssText = 'writing-mode:vertical-lr;direction:rtl;width:24px;height:150px;margin:0;cursor:pointer;touch-action:none'
-  sl.addEventListener('input', () => { sVal.textContent = sl.value; update({ s: +sl.value }) })
-  side.appendChild(sLab); side.appendChild(sVal); side.appendChild(sl)
-  layout.appendChild(side)
+  addStepsSlider(cur.s ?? 2, (s) => update({ s }))
 }
 function setupColorPresetUi() {
   if (document.getElementById('presetButton')) return
