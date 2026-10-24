@@ -3560,9 +3560,14 @@ function applyPanelGeometry(panel, geom, applyCollapse = false) { // applyCollap
   const vw = window.innerWidth || document.documentElement.clientWidth || 1024
   const vh = window.innerHeight || document.documentElement.clientHeight || 768
   const minW = 220, minH = 140, visibleStripPx = 60
-  const width = Math.min(Math.max(geom.width || minW, minW), Math.max(vw - 20, minW))
+  // 2026-10-23 (direct report: on mobile in dev mode the panel's right edge was stuck to the browser's right edge): the lenient desktop rule below (a 60 px strip may stay on screen) let a restored panel extend to / past the
+  // right edge, where an OS edge-swipe steals the touch so it could not be grabbed or resized. On a narrow viewport the whole panel is kept inside the same edge margin dragging and resizing already use.
+  const mx = vw < 768 ? MOBILE_EDGE_GESTURE_MARGIN_PX : 0
+  const width = Math.min(Math.max(geom.width || minW, minW), Math.max(vw - 20 - 2 * mx, minW))
   const height = Math.min(Math.max(geom.height || minH, minH), Math.max(vh - 20, minH))
-  const left = Math.min(Math.max(geom.left ?? 0, visibleStripPx - width), vw - visibleStripPx)
+  const left = mx > 0
+    ? Math.max(mx, Math.min(geom.left ?? mx, vw - width - mx))
+    : Math.min(Math.max(geom.left ?? 0, visibleStripPx - width), vw - visibleStripPx)
   const top = Math.min(Math.max(geom.top ?? 0, 0), Math.max(vh - visibleStripPx, 0))
   // A panel that is collapsed right now is expanded first, so the size below is set on the expanded panel and the collapse (below) remembers the right height. Geometry saved before the flag existed has no `collapsed`: left as is.
   if (applyCollapse && geom.collapsed !== undefined && panel._setCollapsed) panel._setCollapsed(false)

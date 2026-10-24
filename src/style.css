@@ -154,6 +154,10 @@ body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:n
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
   display: flex; flex-direction: column;
 }
+/* 2026-10-23: on a phone the default (nothing saved yet) position keeps the same 20 px clear of the right edge that dragging / resizing / a restored position keep (an OS edge-swipe would steal a touch there). */
+@media (max-width: 767px) {
+  .dp-panel { right: 20px; width: min(320px, calc(100vw - 40px)); }
+}
 .dp-panel.hidden { display: none; }
 /* While the host builds the panel's groups (dev mode startup, .dp-building) only the header shows; building behind a hidden body is much cheaper than building a visible one. */
 .dp-panel.dp-building { height: auto !important; min-height: 0 !important; }
