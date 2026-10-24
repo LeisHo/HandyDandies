@@ -96,6 +96,15 @@ const HAND_MODEL_LS_KEY = 'handyDandies.handModelId'
 const HAND_MODEL_PENDING_KEY = 'handyDandies.handModelPending' // set by Use, cleared by the next load once the choice is on the server
 const HAND_MODEL_BONES = ['rHand', 'rMid3', 'rForearmBend', 'rMid1'] // the rig names the measurements and poses rely on
 let activeHandModelId = HAND_MODEL_DEFAULT_ID
+// Crop Geometry (2026-10-23): the clipping blocks of Clipping Blocks.glb (label -> { geometry, position, quaternion, scale }), read once by loadCropBlockSources(); see makeClipRig(). Declared here, not next to its functions, because
+// top-level setup code can reach them before a late declaration line runs (a load-order outage once already).
+const CROP_PLANE_LABEL = 'Plane'
+const CROP_DEFAULT_LABEL = 'Clipping Block'
+const CROP_SKELETON_LABEL = 'Clipping Block - SKELETON'
+let cropBlockSources = null
+let cropBlockLabels = []
+let cropBlockSourcesPromise = null
+const cropVoxCache = new Map()
 const localHandModelPresent = {} // id -> true when this browser holds the imported file
 function handModelIdb() {
   return new Promise((resolve, reject) => {
@@ -1538,7 +1547,7 @@ function tryStartField() {
   // whatever comes next; don't treat this comment's own reasoning above
   // as the settled explanation.
   if (!fieldWarmCompiled) renderer.compile(scene, camera)
-  window.__debug = { mergeHandParts, findSkinnedMesh, clipBlockRigInfo, pickBorrowedClipBlock, loadBorrowedClipBlock, addBorrowedClipBlock, refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, get rigLocalAxisPosing() { return RIG_LOCAL_AXIS_POSING }, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness, savedPoseByName, selectedSequenceEntries, resolveTweenSequencePoses }
+  window.__debug = { mergeHandParts, findSkinnedMesh, clipBlockRigInfo, loadCropBlockSources, clipRigResolve, clipRigOf, cropVoxFor, get cropBlockSources() { return cropBlockSources }, refreshLoadingPreviewLayout, lpLen, cleanupDeletedVelocityGroup, rvReconcileSets, rvDebug: () => ({ vel: [rvVx, rvVy], speed: rvSpeed, sets: rvSetList, hasState: rvHasState, trig: [rvTrigPx, rvTrigPy], trail: rvTrail.length }), updateResponsiveVelocity, rvConflicts, rvAddSet, rvRefreshUi, refreshCustomFunctionConflictWarnings, enforceExclusiveTrigger, restoreCustomClickFunctions, updateSmallScaleModels, placeSmallScaleModelRows, smallScaleGeomCache, get smallScaleLevels() { return smallScaleLevels }, updateFingerCurlSkip, refreshAllTweenSequenceSelectors, reconcileCustomFunctions, captureCustomFunctionsForUndo, renameCustomFunction, placeHandModelRows, syncHandModelWithSettings, refreshHandModelList, get activeHandModelId() { return activeHandModelId }, importHandModelFile, useHandModel, placeLoadingPreviewLightingRows, applyOffsetRotationToHand, applyOffsetRotationRetransition, parseClickPoseConfig, parseClickHoldConfig, cropPointInWrapperFrame, rotateHandAboutCropPoint, rotateHandAboutWorldPoint, cursorFieldPoint, captureClickCursorPivot, rotationDegAt, applyWorldRigid, rotationModeOf, get customFunctionCollapseReady() { return customFunctionCollapseReady }, markCustomFunctionCollapseReady: () => { customFunctionCollapseReady = true }, applyCustomFunctionCollapse, persistCustomClickFunctionIds, bakeOffsetRotationIntoAccum, loopLapProgress, loopLapEnd, rotateHandAboutArmBase, updateLoadingPreviewHand2, buildLoopTimelines, loopPoseValuesBeyondLap, get palmCenterPosRaw() { return palmCenterPosRaw }, get handoPivotRaw() { return handoPivotRaw }, get handBoundsBoxCenterRaw() { return handBoundsBoxCenterRaw }, get alignQuat() { return alignQuat }, get loadingPreviewModelScale() { return loadingPreviewModelScale }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, handBoundsCenterLocal, LOADING_PREVIEW_REFERENCE_RADIUS, importTwoHandTween, convertHandoCameraPreset, applyLoadingPreviewCameraPreset, animateFrame: (...a) => animate(...a), releaseStartupHold, trackingActiveFor, placeStartupRetransitionGroup, startupHandScale, updateFieldCenterMarker, get fieldCenterPoint() { return fieldCenterPoint }, retransitionScalerMul, startupHandPhaseUnfinished, applyFieldBounds, onFieldBoundsChanged, retransitionDistanceMs, untriggeredVisibleSpheres, allVisibleHandsFinished, handStartupLocked, triggerClickPose, checkStartupFloorHide, get startupFloorHidden() { return startupFloorHidden }, get floorMesh() { return floorMesh }, updateLoadingPreviewAnimation, get loadingPreview2() { return { hand: loadingPreviewHand, hand2: loadingPreviewHand2, scene: loadingPreviewScene, camera: loadingPreviewCamera, renderer: loadingPreviewRenderer } }, updateSphereSequence, get sphereState() { return { stage: sphereStage, mesh: sphereMesh, on: sphereOn, start: sphereStart, dur: sphereDur, cap: sphereCap, done: sphereDone, keep: sphereKeepForHands, clicks: sphereClickCount } }, stackOnDefault, applyCameraOrientation, syncCameraPanelFromLive, curveByDomain, get domains() { return { xyAll: [xyAllMinDist, xyAllDistRange], splayAll: [splayAllMin, splayAllRange], cropAll: [cropAllMin, cropAllRange], restAll: [restAllMinDist, restAllDistRange], live: [liveFieldMinDist, liveFieldDistRange], splay: [splayFieldMin, splayFieldRange], crop: [cropFieldMin, cropFieldRange], xy: [xyFieldMinDist, xyFieldDistRange], rest: [restFieldMinDist, restFieldDistRange] } }, modelBaseFrameQ, computeBaseRotationQuat, cloneBaseRb, makeClipRig, updateClipRigPlanes, setClipRigT, updateOnScreenFlags, evaluateArmLengthCurve, THREE, scene, camera, controls, renderer, composer, outlinePass, hands, cfg, sceneState, handLengthRaw, alignQuat, computeBaseScale, updateRenderOrder, cursorTarget, poseDefaultValues, setSelectedPoseAsDefault, getSelectedSavedPoseItem, updateCursorTarget, targetPlane, cursorNDC, applyAllFingerPoses, applyPoseValuesToHand, get cloneBaseQuat() { return cloneBaseQuat }, triggerClickPose, startClickHoldPose, endClickHoldPose, updateClickPoseForHand, updateClickHoldPoseForHand, getOrInitHandCP, getOrInitHandCHP, computeResponsiveWristSplayDeg, applyWristPoseToSkeleton, applyCurlToSkeleton, get rigLocalAxisPosing() { return RIG_LOCAL_AXIS_POSING }, FINGER_NAMES, FINGER_JOINTS, boneRestQuat, FINGER_CURL_AXIS, cameraDefaultValues, applyCameraPreset, captureCameraPreset, setSelectedCameraAsDefault, updateCameraMaxExtentsBound, enforceCameraPanExtent, applyCameraLockState, applyLightingPreset, captureLightingPreset, updateLoadingPreviewAnimation, get loadingPreviewLapIndex() { return loadingPreviewLapIndex }, get loadingPreviewSequenceDone() { return loadingPreviewSequenceDone }, get loadingPreviewDirection() { return loadingPreviewDirection }, get loadingPreviewCamera() { return loadingPreviewCamera }, get loadingPreviewOrbitControls() { return loadingPreviewOrbitControls }, get loadingPreviewCameraTarget() { return loadingPreviewCameraTarget }, get loadingPreviewHand() { return loadingPreviewHand }, applyLoadingPreviewPose, resolveTweenSegmentsWithAnchor, lerpTweenSegments, lerpLoopSegments, isHoldEntry, updateLoadingPreviewWristClip, lerpPoseValues, get loadingPreviewRenderer() { return loadingPreviewRenderer }, get loadingPreviewScene() { return loadingPreviewScene }, get handBoundsRadiusLocal() { return handBoundsRadiusLocal }, get handBoundsCenterLocal() { return handBoundsCenterLocal }, multiPointCommit, multiPointEligibleFunctions, get multiPointActiveTouchCount() { return multiPointActiveTouchCount }, get multiPointSessionFiredPoseId() { return multiPointSessionFiredPoseId }, detectPoseJumps, get poseJumpLogEntries() { return poseJumpLogEntries }, applyCurlToSkeletonReference, handLogTriggerLabel, applyAllFingerCurls, syncCameraPanelFromLive, animSpeedMs, chainSequenceCount, applyFieldBounds, cursorDistXY, hexBrightnessPct, toonThresholdForMidBrightness, savedPoseByName, selectedSequenceEntries, resolveTweenSequencePoses }
   // Do NOT hide the loading screen yet: the hands exist but may not have been painted. finalizeReveal() hides it once the field has rendered a couple of frames (or after a 4 s safety net).
   setTimeout(finalizeReveal, 4000)
 }
@@ -2580,7 +2589,8 @@ const _trkQ0 = new THREE.Quaternion(), _trkRbInv = new THREE.Quaternion(), _trkC
 // World position of the hand's arm base with no tracking rotation: wrapper.position + s * q0 * (forearmBase - cutPoint), q0 = currentBaseQuat * Rb^-1 (same maths as applyHandArmLength()).
 function armBasePivotInto(hand, out) {
   const t = THREE.MathUtils.clamp(hand.currentArmLengthT ?? 0, 0, 1)
-  if (hand.clipRig) _trkCut.set(0, forearmPosRaw.y - t * hand.clipRig.topY0, 0)
+  const cropRig = clipRigOf(hand)
+  if (cropRig) _trkCut.set(0, forearmPosRaw.y - t * cropRig.topY0, 0)
   else _trkCut.copy(wristPosRaw).sub(forearmPosRaw).multiplyScalar(-t)
   const rb = hand.currentBaseRb
   if (rb && (rb.x !== 0 || rb.y !== 0 || rb.z !== 0)) _trkQ0.copy(hand.currentBaseQuat).multiply(_trkRbInv.copy(rb).invert())
@@ -3592,6 +3602,9 @@ const DEV_GROUPS = [
       // directly, skipping Default/Reactive entirely). Placed above both,
       // since it gates everything below it.
       { key: 'cropWristEnabled', label: 'Crop Wrist (Master On/Off)', type: 'checkbox', def: true },
+      // Crop Geometry (2026-10-23, direct request): what the wrist crop cuts with. 'Plane' = one flat plane across the forearm (the original crop); the other entries are the clipping blocks of Clipping Blocks.glb (HANDO's Clipping Block.glb), cut
+      // exactly as authored (see makeClipRig). A skeleton hand always cuts with the SKELETON block for any block choice. Not used for Hide Model, which is its own full-width plane.
+      { key: 'cropGeometry', label: 'Crop Geometry', type: 'select', def: 'Clipping Block', placeAfter: 'cropWristEnabled', options: () => cropGeometryOptions(), onChange: () => onCropGeometryChanged() },
       // Cuts away the forearm from a percentage down from the wrist -- 0%
       // clips nothing, 100% cuts off exactly at the wrist joint (hiding
       // the entire forearm). The whole hand shifts to compensate (see
@@ -4417,6 +4430,7 @@ const cfg = initDevPanel(DEV_GROUPS, {
     migrateTwoHandTweenList()
     safeRefreshSelectOptions('loadingPreviewEndCountMode')
     safeRefreshSelectOptions('distCurveXOrigin')
+    safeRefreshSelectOptions('cropGeometry')
     updateLoadingPreviewLightTypeRows()
     safeRefreshSelectOptions('loadingPreviewKeyLightType')
     prof('setupLoadingPreviewTextGroup', setupLoadingPreviewTextGroup)
@@ -7584,15 +7598,16 @@ function createToonMaterial(map) {
     shader.uniforms.cropCapOn = { value: cfg.cropCapEnabled ? 1 : 0 }
     shader.uniforms.cropCapMode = { value: cropCapModeValue(cfg.cropCapTone) }
     shader.uniforms.cropCapColor = { value: new THREE.Color(cfg.cropCapColor) }
+    shader.uniforms.cropCapDirW = { value: new THREE.Vector3() } // replaced by the hand's crop uniform set while a clipping block crops (cropInjectShader())
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `varying vec3 vRimNormal;\nvarying vec3 vRimViewDir;\n#include <common>`)
       .replace('#include <project_vertex>', `#include <project_vertex>\nvRimNormal = normalize( normalMatrix * objectNormal );\nvRimViewDir = normalize( -mvPosition.xyz );`)
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `varying vec3 vRimNormal;\nvarying vec3 vRimViewDir;\nuniform vec3 rimColor;\nuniform float rimIntensity;\nuniform float rimPower;\nuniform float textureInfluence;\nuniform vec3 toonTint;\nuniform float cropCapOn;\nuniform float cropCapMode;\nuniform vec3 cropCapColor;\n#include <common>`)
-      // Crop Cap: a back face seen through the crop (the inside of the far wall) is lit as a flat face whose normal is the crop plane's, pointing at the removed side (the clipping planes are in view space here; the Clipping Block's
-      // top plane is index 2 of 6, the single-plane fallback is index 0). Its colour is the hand's own base colour (Toon Texture Tint), and it goes through the same toon gradient as the rest of the hand, so it takes the
+      .replace('#include <common>', `varying vec3 vRimNormal;\nvarying vec3 vRimViewDir;\nuniform vec3 rimColor;\nuniform float rimIntensity;\nuniform float rimPower;\nuniform float textureInfluence;\nuniform vec3 toonTint;\nuniform float cropCapOn;\nuniform float cropCapMode;\nuniform vec3 cropCapColor;\nuniform vec3 cropCapDirW;\n#include <common>`)
+      // Crop Cap: a back face seen through the crop (the inside of the far wall) is lit as a flat face looking at the removed side: the clipping block's down axis (cropCapDirW, set while a block crops) or, for the plane, the negated
+      // clipping-plane normal (clippingPlanes is in view space here). Its colour is the hand's own base colour (Toon Texture Tint), and it goes through the same toon gradient as the rest of the hand, so it takes the
       // light's shade steps: facing the light = the ceiling, facing away = the floor, and every step in between.
-      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>\n#if NUM_CLIPPING_PLANES > 0\nif ( cropCapOn > 0.5 && ! gl_FrontFacing ) {\n#if NUM_CLIPPING_PLANES > 1\nnormal = - normalize( clippingPlanes[ 2 ].xyz );\n#else\nnormal = - normalize( clippingPlanes[ 0 ].xyz );\n#endif\n#if NUM_DIR_LIGHTS > 0\nif ( cropCapMode > 0.5 && cropCapMode < 1.5 ) normal = - normalize( directionalLights[ 0 ].direction );\nif ( cropCapMode > 1.5 && cropCapMode < 2.5 ) normal = normalize( directionalLights[ 0 ].direction );\n#endif\ndiffuseColor.rgb = toonTint;\n}\n#endif`)
+      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>\nbool capApplied = false;\nif ( cropCapOn > 0.5 && ! gl_FrontFacing ) {\nif ( length( cropCapDirW ) > 0.5 ) { normal = normalize( ( viewMatrix * vec4( cropCapDirW, 0.0 ) ).xyz ); capApplied = true; }\n#if NUM_CLIPPING_PLANES > 0\nelse { normal = - normalize( clippingPlanes[ 0 ].xyz ); capApplied = true; }\n#endif\nif ( capApplied ) {\n#if NUM_DIR_LIGHTS > 0\nif ( cropCapMode > 0.5 && cropCapMode < 1.5 ) normal = - normalize( directionalLights[ 0 ].direction );\nif ( cropCapMode > 1.5 && cropCapMode < 2.5 ) normal = normalize( directionalLights[ 0 ].direction );\n#endif\ndiffuseColor.rgb = toonTint;\n}\n}`)
       // Tone (cropCapMode): 0 Reactive = the plane's own normal (above); 1 Shadow Floor / 2 Light Ceiling = the normal turned straight away from / at the first directional light (its uniform is the direction TO the light), so every
       // cap gets the floor / ceiling step; 3 Color Picker = the picked colour replaces the lit result, before tone mapping and colour space like every other colour.
       .replace('#include <opaque_fragment>', `if ( cropCapOn > 0.5 && cropCapMode > 2.5 && ! gl_FrontFacing ) outgoingLight = cropCapColor;\n#include <opaque_fragment>`)
@@ -10223,6 +10238,7 @@ function ensureLoadingPreviewHand2(seq) {
     skinnedMesh.material = toonMaterial.clone()
     applyClipRigToMaterial(skinnedMesh.material, rig, plane, true)
     skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
+    cropPatchRigMaterial(skinnedMesh.material, rig)
   }
   clone.matrixAutoUpdate = false // its matrix is composed by hand each frame (it can be a reflection)
   loadingPreviewScene.add(clone)
@@ -10323,9 +10339,11 @@ function updateHand2WristClip(percent, hideModelPercent = 0) {
   if (!h || !h.skinnedMesh) return
   lpApplyHideModel(h, hideModelPercent) // Hide Model is its own full-width plane (see lpApplyHideModel)
   hideModelPercent = 0
-  if (h.clipRig) {
-    setClipRigT(h.clipRig, percent / 100, hideModelPercent / 100)
-    updateClipRigPlanes(h.clipRig)
+  const rigH = clipRigOf(h)
+  if (rigH) {
+    setClipRigT(rigH, percent / 100, hideModelPercent / 100)
+    h.clone.updateMatrixWorld(true)
+    updateClipRigPlanes(rigH)
     return
   }
   const farBone = h.skinnedMesh.skeleton.getBoneByName('rForearmBend')
@@ -10483,6 +10501,7 @@ function buildLoadingPreview(bypassEnabledGate) {
     // rebuildField()'s own matching comment for the real bug this once
     // caused (toon rim-light/tint shading silently reverting to default).
     skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
+    cropPatchRigMaterial(skinnedMesh.material, loadingPreviewClipRig)
   }
   loadingPreviewScene.add(clone)
   loadingPreviewHand = { clone, skinnedMesh, wristClipPlane: loadingPreviewWristClipPlane, clipRig: loadingPreviewClipRig }
@@ -11409,10 +11428,11 @@ function updateLoadingPreviewWristClip(hideWristPercent, hideModelPercent = 0) {
   if (!loadingPreviewHand || !loadingPreviewHand.skinnedMesh || !loadingPreviewHand.wristClipPlane) return
   lpApplyHideModel(loadingPreviewHand, hideModelPercent) // Hide Model is its own full-width plane (the wrist crop below only handles Hide Wrist)
   hideModelPercent = 0
-  if (loadingPreviewHand.clipRig) { // Clipping Block path (see makeClipRig)
-    setClipRigT(loadingPreviewHand.clipRig, (typeof hideWristPercent === 'number' ? hideWristPercent : 100) / 100, (typeof hideModelPercent === 'number' ? hideModelPercent : 0) / 100)
+  const lpRig = clipRigOf(loadingPreviewHand)
+  if (lpRig) { // Clipping Block path (see makeClipRig)
+    setClipRigT(lpRig, (typeof hideWristPercent === 'number' ? hideWristPercent : 100) / 100, (typeof hideModelPercent === 'number' ? hideModelPercent : 0) / 100)
     loadingPreviewHand.clone.updateMatrixWorld(true)
-    updateClipRigPlanes(loadingPreviewHand.clipRig)
+    updateClipRigPlanes(lpRig)
     return
   }
   const farBone = loadingPreviewHand.skinnedMesh.skeleton.getBoneByName('rForearmBend')
@@ -15081,7 +15101,7 @@ function applyWorldRigid(hand, Q, T) {
 // the bones move with the pose, so this drifts away from the static cut point (the wrapper origin) whenever the arm is bent. Falls back to the origin (the static cut point) when there is no crop block or the bone runs parallel to the face.
 const _cropA = new THREE.Vector3(), _cropB = new THREE.Vector3(), _cropI = new THREE.Vector3(), _cropInv = new THREE.Matrix4()
 function cropPointInWrapperFrame(hand, out) {
-  const rig = hand.clipRig
+  const rig = clipRigOf(hand)
   const sk = hand.skinnedMesh && hand.skinnedMesh.skeleton
   if (!rig || !sk) return out.set(0, 0, 0)
   const boneA = sk.getBoneByName('rForearmBend'), boneB = sk.getBoneByName('rForearmTwist')
@@ -20445,7 +20465,8 @@ function lpLoadPreviewModel(id) {
     if (!skinned) throw new Error('no skinned mesh')
     const missing = HAND_MODEL_BONES.filter((n) => !skinned.skeleton.getBoneByName(n))
     if (missing.length) throw new Error('missing rig bones ' + missing.join(', '))
-    if (!findClipBlockNode(root)) { const c = await pickBorrowedClipBlock(root); if (c.block) addBorrowedClipBlock(root, c.block, c.unit) } // the same borrowed crop block as the Hand model (see addBorrowedClipBlock)
+    await loadCropBlockSources() // the same clipping blocks as the Hand model (see makeClipRig)
+    root.userData.cropUnit = clipBlockRigInfo(root).unit; root.userData.cropModelId = id
     root.traverse((o) => { if (o.isMesh && o !== skinned) o.visible = false }) // the outline / crop-block meshes, like the Hand model's own load
     root.updateMatrixWorld(true)
     lpLoadedRoots.set(id, root)
@@ -22286,6 +22307,7 @@ updateLoadingPreviewSequenceVisibility()
 // time, even called alone) -- this must never take down the whole page.
 safeRefreshSelectOptions('chpTargetPose')
 safeRefreshSelectOptions('distCurveXOrigin')
+safeRefreshSelectOptions('cropGeometry')
 ;['armRotationXOrigin', 'palmRotationXOrigin', 'armLengthXOrigin', 'wristSplayXOrigin'].forEach((k) => safeRefreshSelectOptions(k))
 safeRefreshSelectOptions('rchpTargetPose')
 safeRefreshSelectOptions('clickTargetPose')
@@ -22365,9 +22387,10 @@ const _cutPointRaw = new THREE.Vector3()
 function applyHandArmLength(hand, hideT) {
   const scaleFactor = computeBaseScale()
   const baseQuat = hand.currentBaseQuat
-  if (hand.clipRig) {
-    setClipRigT(hand.clipRig, hideT)
-    _cutPointRaw.set(forearmPosRaw.x, THREE.MathUtils.clamp(hideT, 0, 1) * hand.clipRig.topY0, forearmPosRaw.z) // the box's top face is the cut
+  const cropRig = clipRigOf(hand)
+  if (cropRig) {
+    setClipRigT(cropRig, hideT)
+    _cutPointRaw.set(forearmPosRaw.x, THREE.MathUtils.clamp(hideT, 0, 1) * cropRig.topY0, forearmPosRaw.z) // the box's top face is the cut
   } else {
     _cutPointRaw.copy(forearmPosRaw).lerp(wristPosRaw, hideT)
   }
@@ -22436,26 +22459,173 @@ function applyHandArmLength(hand, hideT) {
 // planes (world space, from the block's own matrixWorld, so it follows the hand's rotation and scale) and clipped with
 // material.clipIntersection = true, which discards only fragments that are inside ALL six, i.e. inside the box.
 // Models without the block fall back to the single wrist plane (updateWristClipPlaneForHand's old path).
-const _clipNormalMatrix = new THREE.Matrix3()
-function makeClipRig(clone) {
-  // GLTFLoader sanitizes node names (spaces become underscores), so the file's "Clipping Block" loads as "Clipping_Block".
-  const block = clone.getObjectByName('Clipping_Block') || clone.getObjectByName('Clipping Block')
-  if (!block || !block.geometry) return null
-  block.geometry.computeBoundingBox()
-  const bb = block.geometry.boundingBox
-  block.visible = false
-  return {
-    block,
-    clone,
-    scaleY0: block.scale.y,
-    maxY: bb.max.y,
-    minY: bb.min.y,
-    baseY: block.position.y,
-    topY0: block.position.y + block.scale.y * bb.max.y, // top of the box as authored, in the clone's frame
-    planes: [0, 1, 2, 3, 4, 5].map(() => new THREE.Plane()),
-    localN: [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]],
-    localC: [-bb.max.x, bb.min.x, -bb.max.y, bb.min.y, -bb.max.z, bb.min.z] // outward normals: inside the box = negative side of every plane
+// CROP GEOMETRY (2026-10-23, direct request: "whenever wrist cropping is used, provide a drop down to select the cropping geometry", the geometries being those of HANDO's Clipping Block.glb, plus a Plane option; ported from HANDO's
+// cropGeometryUpdate). Each hand has a rig whose "block" is an Object3D carrying one of the file's blocks' node transform (placed on the hand's clone, so it follows the hand's rotation / scale / position), and the block's mesh is
+// voxelised once into a 3D texture (a scanline parity test along its Y axis: 1 = inside). The hand's materials discard a fragment whose world position lands inside the voxels (cropClipped(), injected into the toon fill, the emission
+// mesh and the hull outline), so a Concave or Convex block cuts exactly as authored. The block as authored is the 100% crop; Hide Wrist slides it down the forearm so its top sits at t * its authored top (setClipRigT; 0 parks it
+// far away = nothing cropped, and the shader test is switched off). 'Plane' = no block: the single per-hand clipping plane across the forearm (updateWristClipPlaneForHand), as before blocks existed. A skeleton model (its model id
+// contains "skeleton") always uses the SKELETON block for any block choice, because only that one was authored for its proportions; choosing Plane still gives the plane.
+// The bounding-box top of the block is still what places the arm-length compensation / tracking cut point (topY0); for Concave and Convex that is the top of their box, not of their curved face.
+function cropWantKey() { return (typeof cfg === 'object' && cfg && cfg.cropGeometry) || CROP_DEFAULT_LABEL }
+function cropGeometryOptions() { // 'Plane' + the blocks of Clipping Blocks.glb + the saved choice (so a choice made before the file loaded is not dropped)
+  const out = [CROP_PLANE_LABEL]
+  cropBlockLabels.forEach((l) => { if (!out.includes(l)) out.push(l) })
+  const saved = typeof cfg === 'object' && cfg && cfg.cropGeometry
+  if (saved && !out.includes(saved)) out.push(saved)
+  return out
+}
+function cropUniformSet() { // one per hand, shared by that hand's fill / outline / emission materials
+  return { cropOn: { value: 0 }, cropTex: { value: null }, cropToLocal: { value: new THREE.Matrix4() }, cropMin: { value: new THREE.Vector3() }, cropSize: { value: new THREE.Vector3(1, 1, 1) }, cropCapDirW: { value: new THREE.Vector3() } }
+}
+// Voxelise a closed mesh (any shape): for every (x, z) column cast a ray along the mesh's Y, sort where it crosses the surface, and fill the cells between the 1st/2nd, 3rd/4th ... crossings. 128 cells along the longest side. (HANDO's cropVoxelize.)
+function cropVoxelize(geometry) {
+  geometry.computeBoundingBox()
+  const bb = geometry.boundingBox
+  const size = bb.getSize(new THREE.Vector3())
+  const cell = Math.max(size.x, size.y, size.z) / 128
+  const pad = cell * 2
+  const min = new THREE.Vector3(bb.min.x - pad, bb.min.y - pad, bb.min.z - pad)
+  const nx = Math.min(200, Math.ceil((size.x + 2 * pad) / cell)), ny = Math.min(200, Math.ceil((size.y + 2 * pad) / cell)), nz = Math.min(200, Math.ceil((size.z + 2 * pad) / cell))
+  const pos = geometry.attributes.position
+  const idx = geometry.index
+  const triCount = (idx ? idx.count : pos.count) / 3
+  const tri = new Float32Array(triCount * 9)
+  for (let t = 0; t < triCount; t++) {
+    for (let k = 0; k < 3; k++) {
+      const vi = idx ? idx.getX(t * 3 + k) : t * 3 + k
+      tri[t * 9 + k * 3] = pos.getX(vi); tri[t * 9 + k * 3 + 1] = pos.getY(vi); tri[t * 9 + k * 3 + 2] = pos.getZ(vi)
+    }
   }
+  const data = new Uint8Array(nx * ny * nz)
+  const ys = []
+  for (let iz = 0; iz < nz; iz++) {
+    for (let ix = 0; ix < nx; ix++) {
+      const x = min.x + (ix + 0.5) * cell + cell * 1.7e-3, z = min.z + (iz + 0.5) * cell + cell * 2.3e-3 // a hair off the cell centre so a ray rarely lands exactly on an edge
+      ys.length = 0
+      for (let t = 0; t < triCount; t++) {
+        const o = t * 9
+        const ax = tri[o], ay = tri[o + 1], az = tri[o + 2], bx = tri[o + 3], by = tri[o + 4], bz = tri[o + 5], cx = tri[o + 6], cy = tri[o + 7], cz = tri[o + 8]
+        const d = (bz - cz) * (ax - cx) + (cx - bx) * (az - cz)
+        if (Math.abs(d) < 1e-14) continue // edge-on in the x/z plane
+        const l1 = ((bz - cz) * (x - cx) + (cx - bx) * (z - cz)) / d
+        const l2 = ((cz - az) * (x - cx) + (ax - cx) * (z - cz)) / d
+        const l3 = 1 - l1 - l2
+        if (l1 < 0 || l2 < 0 || l3 < 0) continue
+        ys.push(l1 * ay + l2 * by + l3 * cy)
+      }
+      if (ys.length < 2) continue
+      ys.sort((a, b) => a - b)
+      let k = 0
+      for (let iy = 0; iy < ny; iy++) {
+        const y = min.y + (iy + 0.5) * cell
+        while (k < ys.length && ys[k] < y) k++
+        if (k & 1) data[ix + iy * nx + iz * nx * ny] = 255 // an odd number of crossings below = inside
+      }
+    }
+  }
+  const tex = new THREE.Data3DTexture(data, nx, ny, nz)
+  tex.format = THREE.RedFormat
+  tex.type = THREE.UnsignedByteType
+  tex.minFilter = THREE.LinearFilter
+  tex.magFilter = THREE.LinearFilter
+  tex.wrapS = tex.wrapT = tex.wrapR = THREE.ClampToEdgeWrapping
+  tex.unpackAlignment = 1
+  tex.needsUpdate = true
+  return { tex, min, extent: new THREE.Vector3(nx * cell, ny * cell, nz * cell) }
+}
+function cropVoxFor(label) { // one voxel texture per block, shared by every hand
+  let v = cropVoxCache.get(label)
+  if (!v) { v = cropVoxelize(cropBlockSources[label].geometry); cropVoxCache.set(label, v) }
+  return v
+}
+// Decides which block (or the plane) this rig uses right now from the Crop Geometry setting, and puts that block's authored transform on the rig's block object. Cheap enough to re-run on any change; clipRigOf() re-runs it by itself when the setting differs.
+function clipRigResolve(rig) {
+  rig.wantKey = cropWantKey()
+  rig.vox = null
+  let label = rig.wantKey
+  if (label === CROP_PLANE_LABEL || !cropBlockSources) label = null
+  else if (rig.skeleton && cropBlockSources[CROP_SKELETON_LABEL]) label = CROP_SKELETON_LABEL // a skeleton model always cuts with the SKELETON block
+  else if (!cropBlockSources[label]) label = cropBlockSources[CROP_DEFAULT_LABEL] ? CROP_DEFAULT_LABEL : null // a stale saved choice
+  rig.label = label
+  rig.U.cropOn.value = 0
+  rig.U.cropCapDirW.value.set(0, 0, 0)
+  if (!label) { rig.parked = true; return }
+  const s = cropBlockSources[label], u = rig.unit
+  rig.block.position.copy(s.position).multiplyScalar(u)
+  rig.block.quaternion.copy(s.quaternion)
+  rig.block.scale.copy(s.scale).multiplyScalar(u)
+  s.geometry.computeBoundingBox()
+  const bb = s.geometry.boundingBox
+  rig.scaleY0 = rig.block.scale.y
+  rig.minY = bb.min.y
+  rig.maxY = bb.max.y
+  rig.baseY = rig.block.position.y
+  rig.topY0 = rig.baseY + rig.scaleY0 * rig.maxY // top of the box as authored, in the clone's frame
+  if (rig.plane) { rig.plane.normal.set(0, 1, 0); rig.plane.constant = 1e9 }
+  setClipRigT(rig, rig.lastT ?? 0, rig.lastModelT ?? 0)
+}
+function makeClipRig(clone) { // null when Clipping Blocks.glb could not be read: the hand then crops with its single plane only
+  if (!cropBlockSources) return null
+  const block = new THREE.Object3D()
+  block.name = 'Clipping_Block'
+  clone.add(block)
+  const rig = {
+    block, clone, U: cropUniformSet(), plane: null, fillMat: null, label: null, wantKey: null, vox: null, parked: true,
+    unit: (clone.userData && clone.userData.cropUnit) || 1,
+    skeleton: /skeleton/i.test(String((clone.userData && clone.userData.cropModelId) || '')),
+    scaleY0: 1, minY: 0, maxY: 0, baseY: 0, topY0: 0
+  }
+  clipRigResolve(rig)
+  return rig
+}
+// The rig while it cuts with a block, null in plane mode (every caller then takes its existing single-plane path).
+function clipRigOf(hand) {
+  const r = hand && hand.clipRig
+  if (!r) return null
+  if (r.wantKey !== cropWantKey()) clipRigResolve(r)
+  return r.label ? r : null
+}
+function onCropGeometryChanged() {
+  try {
+    hands.forEach((h) => { if (h.clipRig) clipRigResolve(h.clipRig) })
+    ;[loadingPreviewHand, loadingPreviewHand2].forEach((h) => { if (h && h.clipRig) clipRigResolve(h.clipRig) })
+    sceneNeedsRedraw = true
+  } catch (err) { /* early boot: the next clipRigOf() call applies the setting */ }
+}
+// The block test, added to a material's own shader (toon fill / emission: after project_vertex; the hull outline's own shader: after its position is built). (HANDO's cropInjectShader.)
+const CROP_GLSL_PARS = `
+varying vec3 vCropW;
+uniform float cropOn;
+uniform sampler3D cropTex;
+uniform mat4 cropToLocal;
+uniform vec3 cropMin;
+uniform vec3 cropSize;
+`
+const CROP_GLSL_FUNC = `
+bool cropClipped( vec3 w ) {
+  if ( cropOn < 0.5 ) return false;
+  vec3 uv = ( ( cropToLocal * vec4( w, 1.0 ) ).xyz - cropMin ) / cropSize;
+  if ( any( lessThan( uv, vec3( 0.0 ) ) ) || any( greaterThan( uv, vec3( 1.0 ) ) ) ) return false;
+  return texture( cropTex, uv ).r > 0.5;
+}
+`
+function cropInjectShader(shader, U, shaderIsHull) {
+  Object.keys(U).forEach((k) => { shader.uniforms[k] = U[k] })
+  const vAnchor = shaderIsHull ? 'gl_Position = projectionMatrix * mvPosition;' : '#include <project_vertex>'
+  const posExpr = shaderIsHull ? 'outlinePosition' : 'transformed'
+  shader.vertexShader = 'varying vec3 vCropW;\n' + shader.vertexShader.replace(vAnchor, vAnchor + '\nvCropW = ( modelMatrix * vec4( ' + posExpr + ', 1.0 ) ).xyz;')
+  shader.fragmentShader = CROP_GLSL_PARS + CROP_GLSL_FUNC + shader.fragmentShader.replace('void main() {', 'void main() {\n  if ( cropClipped( vCropW ) ) discard;')
+}
+// Wraps the material's current onBeforeCompile (call this AFTER it is final: Material.clone() drops it, and the toon one is re-assigned by the caller). No customProgramCacheKey override: the default key is the onBeforeCompile source,
+// which differs between a patched and an unpatched material (and from the Loading Preview's own Progress Crop wrapper), so programs are only ever shared between identical code.
+function cropPatchRigMaterial(mat, rig) {
+  if (!mat || !rig || mat.__cropU === rig.U) return
+  const U = rig.U
+  const hull = !!mat.isShaderMaterial
+  const prev = mat.onBeforeCompile
+  mat.onBeforeCompile = (shader, renderer) => { if (prev) prev.call(mat, shader, renderer); cropInjectShader(shader, U, hull) }
+  mat.__cropU = U
+  mat.needsUpdate = true
 }
 // Hide Model (2026-10-19, direct request: a pose slider like Hide Wrist whose 100% goes "all the way to the end of the model to hide the entire model"; HANDO's `hideModel` / `hand2HideModel`): modelT 0 .. 1 raises the
 // top of the clip to modelT * (the end of the model, the furthest skeleton joint along the clone's Y + 15% for the fingertip). Whichever of Hide Wrist (t) and Hide Model reaches higher wins. Up to the wrist the block is
@@ -22473,6 +22643,7 @@ function clipRigModelEndY(rig) {
   return m * 1.15
 }
 function setClipRigT(rig, t, modelT = 0) {
+  rig.lastT = t; rig.lastModelT = modelT // remembered so a Crop Geometry change can put the new block straight into place (clipRigResolve)
   const tt = THREE.MathUtils.clamp(t, 0, 1)
   rig.block.scale.y = rig.scaleY0
   const topWrist = tt <= 0 ? 0 : tt * rig.topY0
@@ -22482,6 +22653,7 @@ function setClipRigT(rig, t, modelT = 0) {
   // The box's own origin is NOT its bottom (on the shipped models its local top is below the origin: maxY < 0), so stretch it about its authored BOTTOM at the full-wrist state, B: height scales so the top lands on `top`,
   // and the position follows so the bottom stays at B. (A first version scaled about the origin and, with maxY < 0, never grew past the wrist: Hide Model 100% hid the same as Hide Wrist 100%.)
   const bottom = rig.baseY + rig.scaleY0 * rig.minY
+  rig.parked = false
   if (top > rig.topY0 && rig.topY0 > bottom) {
     const k = (top - bottom) / (rig.topY0 - bottom)
     rig.block.scale.y = rig.scaleY0 * k
@@ -22489,6 +22661,7 @@ function setClipRigT(rig, t, modelT = 0) {
     return
   }
   const te = rig.topY0 > 0 ? Math.min(top / rig.topY0, 1) : tt
+  rig.parked = te <= 0
   rig.block.position.y = te <= 0 ? rig.baseY - Math.max(10, rig.topY0 * 2) : rig.baseY - (1 - te) * rig.topY0 // 0 parks it far below the mesh: clips nothing (10 for a metre-based rig, twice the block's top for a centimetre one)
 }
 const _clipSpanV = new THREE.Vector3()
@@ -22501,20 +22674,28 @@ function modelSpanAlongAxis(skeleton, farPos, dir) { // how far (along dir from 
   })
   return m * 1.15
 }
-function updateClipRigPlanes(rig) {
-  _clipNormalMatrix.getNormalMatrix(rig.block.matrixWorld)
-  for (let i = 0; i < 6; i++) {
-    const n = rig.localN[i]
-    rig.planes[i].normal.set(n[0], n[1], n[2])
-    rig.planes[i].constant = rig.localC[i]
-    rig.planes[i].applyMatrix4(rig.block.matrixWorld, _clipNormalMatrix)
-  }
+function updateClipRigPlanes(rig) { // block mode: hands the block's current pose and voxels to the shaders (the single clipping plane is parked far away so it cuts nothing); plane mode (no label) is the caller's own plane code
+  const U = rig.U
+  if (!rig.label) { U.cropOn.value = 0; return }
+  if (!rig.vox) rig.vox = cropVoxFor(rig.label)
+  U.cropTex.value = rig.vox.tex
+  U.cropMin.value.copy(rig.vox.min)
+  U.cropSize.value.copy(rig.vox.extent)
+  if (rig.plane) { rig.plane.normal.set(0, 1, 0); rig.plane.constant = 1e9 }
+  if (rig.parked) { U.cropOn.value = 0; return } // slid fully off the forearm: nothing to cut, skip the per-pixel test
+  U.cropToLocal.value.copy(rig.block.matrixWorld).invert()
+  U.cropCapDirW.value.setFromMatrixColumn(rig.block.matrixWorld, 1).normalize().negate() // Crop Cap: the block's up axis points at the hand; the cut face looks the other way, into the removed block
+  U.cropOn.value = 1
 }
 function applyClipRigToMaterial(mat, rig, singlePlane, isFill = false) {
   if (!mat) return
-  mat.clippingPlanes = rig ? rig.planes : [singlePlane]
-  mat.clipIntersection = !!rig
-  if (rig && isFill) rig.fillMat = mat // the hand's toon fill material: setClipRigT() switches it to double-sided for the Crop Cap
+  mat.clippingPlanes = [singlePlane] // always the one per-hand plane: in plane mode it is the crop, in block mode it is parked far away (updateClipRigPlanes) so the program never has to change between the two
+  mat.clipIntersection = false
+  if (rig) {
+    rig.plane = singlePlane
+    if (rig.label) { singlePlane.normal.set(0, 1, 0); singlePlane.constant = 1e9 }
+    if (isFill) rig.fillMat = mat // the hand's toon fill material: setClipRigT() switches it to double-sided for the Crop Cap
+  }
 }
 // Crop Cap (2026-10-22, direct request: render the cropped model with the cut end capped instead of a hollow shell): computing the real cut surface per hand per frame is too heavy, so the cap is faked. While a hand is cropped its fill
 // material is drawn double-sided, and the toon shader lights every BACK face (what is seen through the cut: the inside of the far wall) as a flat face with the crop plane's normal and the hand's base colour, through the same toon gradient as the hand (so it takes the toon steps by the light direction). Only a cropped hand pays for the
@@ -22532,7 +22713,8 @@ const _clipDir = new THREE.Vector3()
 const _clipPoint = new THREE.Vector3()
 function updateWristClipPlaneForHand(hand) {
   if (!hand.skinnedMesh) return
-  if (hand.clipRig) { updateClipRigPlanes(hand.clipRig); return }
+  const cropRig = clipRigOf(hand)
+  if (cropRig) { updateClipRigPlanes(cropRig); return }
   const farBone = hand.skinnedMesh.skeleton.getBoneByName('rForearmBend')
   const nearBone = hand.skinnedMesh.skeleton.getBoneByName('rHand')
   if (!farBone || !nearBone) return
@@ -22769,9 +22951,10 @@ function createFieldHand() {
     // of the injected code at all. Re-assigning the function reference
     // explicitly after cloning is the fix.
     skinnedMesh.material.onBeforeCompile = toonMaterial.onBeforeCompile
+    cropPatchRigMaterial(skinnedMesh.material, clipRig)
   }
   const outlineMesh = skinnedMesh ? buildOutlineMesh(skinnedMesh) : null
-  if (outlineMesh) { applyClipRigToMaterial(outlineMesh.material, clipRig, handWristClipPlane); clone.add(outlineMesh) }
+  if (outlineMesh) { applyClipRigToMaterial(outlineMesh.material, clipRig, handWristClipPlane); cropPatchRigMaterial(outlineMesh.material, clipRig); clone.add(outlineMesh) }
   // Emission Material outline mechanic (2026-09-24) -- unlike outlineMesh
   // above, this mesh is NOT built here; it's HandyOL.glb's own 2nd
   // skinned primitive, already a child of `clone` from the GLTF load
@@ -22782,6 +22965,7 @@ function createFieldHand() {
   if (emissionMesh) {
     emissionMesh.material = ensureEmissionMaterial().clone()
     applyClipRigToMaterial(emissionMesh.material, clipRig, handWristClipPlane)
+    cropPatchRigMaterial(emissionMesh.material, clipRig)
     emissionMesh.visible = false // updateOutlineVisibility() (below) decides the real state
   }
   // Depth-buffer-per-hand technique: both materials keep depthTest ON
@@ -23055,22 +23239,11 @@ const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('https://unpkg.com/three@0.169.0/examples/jsm/libs/draco/gltf/')
 const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
-// Clipping Block for models that do not carry one (2026-10-20, direct request: "for cursor tracking wrist cropping, make sure the cropping object is the previous geometry, instead of a whole plane"). The wrist crop is the
-// "Clipping Block" box mesh (see makeClipRig); a model without it (the saved Hand model, HD IK 1k, has none - nor do HandipantsFixedBone and the other HD IK exports) fell back to ONE flat plane across the whole forearm, which
-// looks like a plane cutting the arm. All of these share the rig of HandipantsOL_Clip (rForearmBend at the origin, rHand 0.2452 up the same axis, measured from the files), so the block of HandipantsOL_Clip - a scene-root
-// sibling of the Armature - is borrowed: its geometry and transform are read once and a copy is added to the loaded root, where every clone picks it up like a native block. Models that have their own keep it.
-let borrowedClipBlockPromise = null
-function findClipBlockNode(root) { return root.getObjectByName('Clipping_Block') || root.getObjectByName('Clipping Block') || null }
-// The block comes from data/processed/HAND3D/Clipping Block.glb (exported on its own by the user, 2026-10-20: the same box geometry, already positioned in the hand's frame, a few millimetres different in X / Z from the
-// copy inside HandipantsOL_Clip); if that file cannot be read, the block inside HandipantsOL_Clip.glb is used. It is for the "hide up to the wrist" crop only - Hide Model (a Loading Preview pose value) is unrelated.
-const CLIP_BLOCK_URL = '../data/processed/HAND3D/Clipping%20Block.glb'
-// MODEL-SPECIFIC BLOCKS (2026-10-23, ported from HANDO's Crop Geometry): data/processed/HAND3D/Clipping Blocks.glb is HANDO's Clipping Block.glb (the whole Blender scene: the hand rig and meshes, which are ignored here, plus the
-// blocks, all authored in metres in the IK hands' frame: forearm base -> wrist 0.2451). "Clipping Block - SKELETON" was authored for SKELETON HAND (base -> wrist 0.3063) and "Clipping Block.FEMALE" for FEMALE HAND_8k (0.1019).
-// A hand that has no block of its own borrows whichever of {the default box, SKELETON, FEMALE} has its TOP nearest the hand's own rest forearm-base -> wrist length (tops: default 0.2524 against the IK hands' 0.2451; skeleton
-// 0.3215 against 0.3063; female 0.1208 against 0.1019), so every earlier model keeps the default box exactly as before. A rig in another unit (centimetres, x100) is first brought to metres: the length is divided by a power of
-// ten (clipBlockRigInfo's unit) and the borrowed block is scaled up by it (addBorrowedClipBlock).
+// Clipping blocks for the wrist crop (2026-10-23, direct request: a Crop Geometry dropdown with the geometries of HANDO's Clipping Block.glb). data/processed/HAND3D/Clipping Blocks.glb is that file (the whole Blender scene: a hand rig and
+// meshes, which are ignored here, plus the blocks "Clipping Block", "... - Concave", "... - Convex", "... - SKELETON" and "...FEMALE", all authored in metres in the IK hands' frame: forearm base -> wrist 0.2451). Every block is read ONCE
+// (geometry + node transform) into cropBlockSources before the first hand is built; each hand then gets its own rig (makeClipRig) that places the chosen block on its own clone. A rig in another unit (centimetres, x100) is first brought to
+// metres: clipBlockRigInfo's unit is a power of ten, and the block's position / scale are multiplied by it (clipRigResolve). The native block some models carry (HandipantsOL_Clip) is ignored: the file's blocks are the one source.
 const CLIP_BLOCKS_URL = '../data/processed/HAND3D/Clipping%20Blocks.glb'
-const CLIP_BLOCK_VARIANTS = ['Clipping Block - SKELETON', 'Clipping Block.FEMALE'] // node names as authored (GLTFLoader keeps them in userData.name; the object's own name has the spaces turned to underscores and the dot removed)
 function clipBlockRigInfo(root) { // { unit, dist }: the rig's power-of-ten unit and its rest forearm-base -> wrist length in metres
   const sm = findSkinnedMesh(root)
   const a = sm && sm.skeleton.getBoneByName('rForearmBend'), b = sm && sm.skeleton.getBoneByName('rHand')
@@ -23082,60 +23255,38 @@ function clipBlockRigInfo(root) { // { unit, dist }: the rig's power-of-ten unit
   const unit = d > 1e-9 ? Math.pow(10, Math.round(Math.log10(d / 0.2451))) : 1
   return { unit, dist: d / unit }
 }
-function clipBlockTop(b) { b.geometry.computeBoundingBox(); return b.position.y + b.scale.y * b.geometry.boundingBox.max.y }
-async function pickBorrowedClipBlock(root) { // -> { block, unit }
-  const info = clipBlockRigInfo(root)
-  const def = await loadBorrowedClipBlock(null)
-  let best = def
-  if (def && info.dist > 0) {
-    let bestGap = Math.abs(clipBlockTop(def) - info.dist)
-    for (const name of CLIP_BLOCK_VARIANTS) {
-      const v = await loadBorrowedClipBlock(name)
-      if (!v) continue
-      const gap = Math.abs(clipBlockTop(v) - info.dist)
-      if (gap < bestGap) { best = v; bestGap = gap }
-    }
+function loadCropBlockSources() { // -> Promise (never rejects): fills cropBlockSources / cropBlockLabels; they stay empty (the wrist crop falls back to the plane) when the file cannot be read
+  if (!cropBlockSourcesPromise) {
+    cropBlockSourcesPromise = gltfLoader.loadAsync(CLIP_BLOCKS_URL).then((g) => {
+      g.scene.updateMatrixWorld(true)
+      const found = {}
+      const order = []
+      g.scene.traverse((o) => {
+        const orig = String((o.userData && o.userData.name) || o.name || '') // GLTFLoader keeps the authored node name in userData.name (the object's own name has the spaces turned to underscores and the dot removed)
+        if (!o.isMesh || !o.geometry || !/^clipping[ _]block/i.test(orig)) return
+        const label = orig.replace(/_/g, ' ')
+        if (found[label]) return
+        found[label] = { geometry: o.geometry, position: o.position.clone(), quaternion: o.quaternion.clone(), scale: o.scale.clone() }
+        order.push(label)
+      })
+      if (!order.length) { console.warn('No Clipping Block found in ' + CLIP_BLOCKS_URL + ' - the wrist crop uses the plane'); return null }
+      cropBlockLabels = order.slice().sort((x, y) => (x === CROP_DEFAULT_LABEL ? -1 : y === CROP_DEFAULT_LABEL ? 1 : 0))
+      cropBlockSources = found
+      try { safeRefreshSelectOptions('cropGeometry') } catch (err) { /* panel not built yet: the startup refresh covers it */ }
+      return found
+    }).catch((err) => { console.warn('Clipping Blocks source ' + CLIP_BLOCKS_URL + ' unavailable:', err); return null })
   }
-  return { block: best, unit: info.unit }
-}
-function readClipBlockFrom(url, nodeName) {
-  return gltfLoader.loadAsync(url).then((g) => {
-    let b = null
-    if (nodeName) g.scene.traverse((o) => { if (!b && o.isMesh && o.geometry && ((o.userData && o.userData.name) === nodeName || o.name === nodeName.replace(/\s/g, '_'))) b = o })
-    else b = findClipBlockNode(g.scene)
-    return b && b.geometry ? { geometry: b.geometry, position: b.position.clone(), quaternion: b.quaternion.clone(), scale: b.scale.clone() } : null
-  }).catch((err) => { console.warn('Clipping Block source ' + url + ' unavailable:', err); return null })
-}
-const borrowedVariantClipBlockPromises = {}
-function loadBorrowedClipBlock(variantName) { // variantName: a name in CLIP_BLOCK_VARIANTS, or falsy for the default box
-  if (variantName) {
-    if (!borrowedVariantClipBlockPromises[variantName]) borrowedVariantClipBlockPromises[variantName] = readClipBlockFrom(CLIP_BLOCKS_URL, variantName) // null when the file cannot be read or has no such node: the default box stays
-    return borrowedVariantClipBlockPromises[variantName]
-  }
-  if (!borrowedClipBlockPromise) {
-    borrowedClipBlockPromise = readClipBlockFrom(CLIP_BLOCK_URL).then((b) => b || readClipBlockFrom(MODEL_URL)).then((b) => {
-      if (!b) console.warn('No Clipping Block source could be read - the wrist crop falls back to a plane')
-      return b
-    })
-  }
-  return borrowedClipBlockPromise
-}
-function addBorrowedClipBlock(root, src, unit) {
-  const mesh = new THREE.Mesh(src.geometry, new THREE.MeshBasicMaterial())
-  mesh.name = 'Clipping_Block'
-  const u = unit || 1
-  mesh.position.copy(src.position).multiplyScalar(u); mesh.quaternion.copy(src.quaternion); mesh.scale.copy(src.scale).multiplyScalar(u)
-  mesh.visible = false
-  root.add(mesh)
+  return cropBlockSourcesPromise
 }
 resolveHandModelUrl().then((handModelUrl) => gltfLoader.load(
   handModelUrl,
   function onHandModelLoaded(gltf) {
     const root = gltf.scene
-    if (!gltf.__clipBlockChecked) { // a model without a Clipping Block borrows one, then this same callback runs again
+    if (!gltf.__clipBlockChecked) { // the clipping blocks (Clipping Blocks.glb) are read once before the first hand is built, then this same callback runs again
       gltf.__clipBlockChecked = true
-      if (!findClipBlockNode(root)) { pickBorrowedClipBlock(root).then((c) => { if (c.block) addBorrowedClipBlock(root, c.block, c.unit); onHandModelLoaded(gltf) }); return }
+      loadCropBlockSources().then(() => onHandModelLoaded(gltf)); return
     }
+    root.userData.cropUnit = clipBlockRigInfo(root).unit; root.userData.cropModelId = activeHandModelId // every hand clone carries these (Object3D.clone copies userData): makeClipRig reads the unit and whether this is a skeleton model
     const skinned = findSkinnedMesh(root)
     if (!skinned) {
       if (revertHandModelAndReload('no skinned mesh')) return
