@@ -1,7 +1,7 @@
 {
   "values": {
     "desktop": {
-      "startPaused": true,
+      "startPaused": false,
       "pauseBtnXOffset": 12,
       "pauseBtnYOffset": 12,
       "pauseBtnSize": 40,
@@ -26475,7 +26475,7 @@
       "custom54ClkSpeedCurveRange": "{\"min\":500,\"max\":1500}"
     },
     "mobile": {
-      "startPaused": true,
+      "startPaused": false,
       "pauseBtnXOffset": 12,
       "pauseBtnYOffset": 12,
       "pauseBtnSize": 40,
@@ -52949,7 +52949,7 @@
       "custom54ClkSpeedCurveRange": "{\"min\":500,\"max\":1500}"
     },
     "landscape": {
-      "startPaused": true,
+      "startPaused": false,
       "pauseBtnXOffset": 12,
       "pauseBtnYOffset": 12,
       "pauseBtnSize": 40,
