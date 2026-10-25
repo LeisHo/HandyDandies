@@ -182,10 +182,10 @@
       "offScreenPoseEvery": 5,
       "fieldRows": 33,
       "fieldCols": 33,
-      "rowSpacing": 5,
-      "columnSpacing": 10,
-      "handScale": 0.8,
-      "alternateRowOffset": 5,
+      "rowSpacing": 9,
+      "columnSpacing": 15,
+      "handScale": 1,
+      "alternateRowOffset": 7.5,
       "progressiveRowOffset": 1,
       "useProgressiveOffset": false,
       "hideHands": false,
@@ -80770,7 +80770,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -80781,7 +80781,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
