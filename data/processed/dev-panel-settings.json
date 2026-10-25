@@ -45543,7 +45543,7 @@
           "targetZ": -0.02097447570793065
         }
       ],
-      "cameraShowFrame": true,
+      "cameraShowFrame": false,
       "cameraFrameThickness": 3,
       "lockCameraPan": true,
       "lockCameraZoom": false,
