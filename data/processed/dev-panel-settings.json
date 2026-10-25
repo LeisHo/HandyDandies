@@ -249,7 +249,7 @@
       "armRotationTargetDepth": 55,
       "armRotationDefault": 100,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4705058964949961,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5724435461808519,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.16189637176003624,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":60}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -26723,7 +26723,7 @@
       "armRotationTargetDepth": 5.6,
       "armRotationDefault": 93,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4705058964949961,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5724435461808519,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.16189637176003624,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":60}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -53197,7 +53197,7 @@
       "armRotationTargetDepth": 3.4,
       "armRotationDefault": 100,
       "armRotationCurveEnabled": true,
-      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4900077886909296,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4705058964949961,\"y\":0}}]",
+      "armRotationCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.5724435461808519,\"y\":0},\"bg\":0},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.16189637176003624,\"y\":0}}]",
       "armRotationRangePct": "{\"min\":0,\"max\":60}",
       "armRotationOffsetX": 0,
       "armRotationOffsetY": 0,
@@ -80781,7 +80781,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -82127,7 +82127,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -82150,7 +82150,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
