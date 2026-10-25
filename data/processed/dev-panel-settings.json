@@ -26643,8 +26643,8 @@
       "offScreenBufferEnabled": true,
       "offScreenBufferDistance": 30,
       "handWristSplayRange": "{\"min\":-60,\"max\":75}",
-      "handWristBendRange": "{\"min\":-180,\"max\":180}",
-      "handWristRotationRange": "{\"min\":-360,\"max\":360}",
+      "handWristBendRange": "{\"min\":-60,\"max\":60}",
+      "handWristRotationRange": "{\"min\":-45,\"max\":45}",
       "skipOffScreenPoseWork": true,
       "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": true,
@@ -81097,7 +81097,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Bend",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -81114,7 +81114,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
