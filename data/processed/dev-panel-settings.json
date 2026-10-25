@@ -19010,14 +19010,14 @@
         }
       ],
       "cameraX": 3.692307692307692,
-      "cameraY": 2.2915308790212025e-13,
-      "cameraZ": 211.11257778203614,
+      "cameraY": 2.367377203395856e-13,
+      "cameraZ": 334.979025524292,
       "cameraFov": 20,
       "cameraYaw": 0,
       "cameraPitch": 0,
       "cameraRoll": 0,
-      "cameraDefaultPreset": "{\"cameraX\":3.692307692307692,\"cameraY\":2.2915308790212025e-13,\"cameraZ\":211.11257778203614,\"cameraFov\":20,\"cameraZoom\":211.13355225774407,\"cameraRoll\":0,\"targetX\":3.692307692307692,\"targetY\":2.162248864538674e-13,\"targetZ\":-0.02097447570793065}",
-      "cameraZoom": 211.13355225774407,
+      "cameraDefaultPreset": "{\"cameraX\":3.692307692307692,\"cameraY\":2.367377203395856e-13,\"cameraZ\":334.979025524292,\"cameraFov\":20,\"cameraZoom\":334.99999999999994,\"cameraRoll\":0,\"targetX\":3.692307692307692,\"targetY\":2.162248864538674e-13,\"targetZ\":-0.02097447570793065}",
+      "cameraZoom": 334.99999999999994,
       "cameraZoomSpeed": 0.3,
       "savedCameras": [
         {
@@ -80120,7 +80120,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -80155,7 +80155,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -80226,7 +80226,7 @@
                       "type": "group",
                       "group": {
                         "key": "Animation Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": true,
                         "items": [
                           {
@@ -80479,7 +80479,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > Progress Crop",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -80770,7 +80770,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -81080,7 +81080,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Splay",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -81097,7 +81097,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Bend",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -81114,7 +81114,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": false,
                   "items": [
                     {
@@ -82127,7 +82127,7 @@
           "type": "group",
           "group": {
             "key": "Cursor Tracking",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -82150,7 +82150,7 @@
                 "type": "group",
                 "group": {
                   "key": "Responsive Arm Rotation",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -82869,7 +82869,7 @@
     },
     {
       "key": "New Group (11)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -89584,8 +89584,8 @@
     "desktop": {
       "left": 4.75,
       "top": 90.4000015258789,
-      "width": 1347.6875,
-      "height": 567.6625366210938,
+      "width": 761.2875366210938,
+      "height": 569.2625122070312,
       "collapsed": false
     },
     "mobile": {
