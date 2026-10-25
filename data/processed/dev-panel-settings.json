@@ -27081,8 +27081,8 @@
       "offScreenPositionEvery": 2,
       "throttleOffScreenPose": true,
       "offScreenPoseEvery": 5,
-      "fieldRows": 30,
-      "fieldCols": 11,
+      "fieldRows": 38,
+      "fieldCols": 16,
       "rowSpacing": 7,
       "columnSpacing": 12,
       "handScale": 1,
@@ -82051,7 +82051,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -82062,7 +82062,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
