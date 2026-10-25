@@ -324,6 +324,27 @@ CHANGELOG.txt's matching 2026-09-15 entry for the full account.
   convention) was deliberately left untouched. See CHANGELOG.txt's
   matching 2026-09-20 (3rd follow-up round) entry for full detail and
   live verification.
+  **CORRECTED 2026-10-25 — the common-ancestor mechanism this entry
+  describes was REMOVED, not extended.** The canonical template dropped
+  `devSelectionAncestorGroupChain()`/`findDevSelectionCommonAncestorGroup()`
+  entirely on 2026-10-25 in favor of a simpler rule ("insert the new
+  group directly before the first-selected item, in that item's own
+  current parent" — no common-ancestor computation needed, since the
+  first item's own parent already IS the correct nesting level by
+  construction), and this project's own copy of both functions was
+  deleted to match — neither has any caller left. The no-selection
+  fallback this entry calls "deliberately left untouched" is ALSO no
+  longer untouched: a new `lastInteractedDevGroup`/
+  `recordDevGroupInteraction()` tracker (2 triggers: expanding a group,
+  changing a setting inside one) now nests a no-selection new group at
+  the top of whichever group was most recently interacted with,
+  falling back to this project's original bottom-of-list placement only
+  when nothing's been tracked yet. The SAME 2 rules were also ported to
+  the list-picker's own separate "+Group" button (a different, flat
+  path-string group model — see its own adaptation notes). See
+  CHANGELOG.txt's matching 2026-10-25 entry for full detail and live
+  verification (3 scenarios on the top-level panel groups, 2 on the
+  list-picker).
 - **Renaming a devPanel.js group is PURELY COSMETIC — it never changes
   the group's own internal identity, which is exactly what caused a
   real data-loss incident 2026-09-19.** `openTextEditFor()` (the rename

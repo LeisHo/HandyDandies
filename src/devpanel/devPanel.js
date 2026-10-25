@@ -88,6 +88,20 @@ export function setDevPanelBuilding(on) {
   if (was && !panelBuilding && afterPanelBuiltHook) { try { afterPanelBuiltHook() } catch (err) { /* cosmetic */ } }
 }
 let lastRestoredValues = null // { desktop: {...}, mobile: {...}, landscape: {...} } | null
+// "+ Add Group" no-selection placement -- ported from TEMPLATE_DEV_PANEL.html's
+// own 2026-10-25 addDevGroup() rework (direct request: "When i click new
+// group with a left click [no selection], place the group at the top of the
+// group/subgroup I most recently interacted within"). Tracks the single
+// `.dp-group` the user most recently "interacted with" -- no per-tab split
+// needed here, unlike the template, since this project has ONE shared
+// `groupsEl` for Desktop/Mobile/Landscape (see this file's own CLAUDE.md
+// gotcha on why a template port is never a straight copy-paste). Updated by
+// recordDevGroupInteraction() (below) on exactly 2 triggers, same as the
+// template: (1) expanding a group (never collapsing -- see
+// createGroupElement()'s own header click handler), (2) changing any
+// setting living inside a group (see initDevPanel()'s own delegated
+// input/change listener). Read by addGroupBtn's own click handler.
+let lastInteractedDevGroup = null
 // Host hook, set by initDevPanel() from opts.onDevVisibilityChanged (2026-
 // 09-24, alongside onDeviceTabChanged) -- module-level rather than a
 // closure over `opts`, since the 2 places that actually change
@@ -696,6 +710,13 @@ function renderListPickerItemRow(entry, item) {
       r.classList.toggle('dp-list-picker-row-selected', r.__item === entry.selectedItem)
       r.classList.toggle('dp-list-picker-row-multi-selected', entry.multiSelected.has(r.__item))
     })
+    // Trigger (2) for lastInteractedGroupPath (see its own declaration
+    // comment) -- this control's closest analog to "changing a setting
+    // that lives inside a group" (buildGroupHeader()'s own expand click
+    // is trigger (1)): picking an item that belongs to a group counts as
+    // interacting with that group. An ungrouped item leaves the tracked
+    // path untouched (nothing to record).
+    if (item.group) entry.lastInteractedGroupPath = item.group
   })
   return row
 }
@@ -867,8 +888,16 @@ function buildGroupHeader(entry, path0) {
     entry.multiSelected = new Set()
     entry.listEl.querySelectorAll('.dp-list-picker-row-selected, .dp-list-picker-row-multi-selected').forEach((r) => r.classList.remove('dp-list-picker-row-selected', 'dp-list-picker-row-multi-selected'))
     g.classList.toggle('collapsed')
-    if (g.classList.contains('collapsed')) entry.collapsedGroups.add(path)
-    else entry.collapsedGroups.delete(path)
+    if (g.classList.contains('collapsed')) {
+      entry.collapsedGroups.add(path)
+    } else {
+      entry.collapsedGroups.delete(path)
+      // Trigger (1) for lastInteractedGroupPath (see its own declaration
+      // comment) -- expanding a group counts as "interacting with" it;
+      // collapsing never does, ported from the same rule as the
+      // top-level dev-panel groups' own recordDevGroupInteraction().
+      entry.lastInteractedGroupPath = path
+    }
   })
   return header
 }
@@ -1777,7 +1806,14 @@ function buildListPickerRow(ctrl, row) {
     groupOrder: [],
     collapsedGroups: new Set(), pendingGroups: [], exportChecked: new Set(),
     selectedGroups: new Set(), // group paths picked with Ctrl / Cmd-click on a header (for Rename / Duplicate)
-    lastPick: 'item' // 'item' | 'group': which kind the Rename button acts on
+    lastPick: 'item', // 'item' | 'group': which kind the Rename button acts on
+    // No-selection "+Group" placement (2026-10-25 port, adapted from
+    // TEMPLATE_DEV_PANEL.html's own lastInteractedDevGroup -- see
+    // addGroupBtn's own click handler below for the full reasoning and
+    // the 2 triggers that update this). A full group PATH ('' meaning
+    // top-level, i.e. "nothing tracked yet"), not a DOM node -- this
+    // control's own groups are flat path strings, not elements.
+    lastInteractedGroupPath: ''
   }
   numEls[ctrl.key] = entry
   // First press inside this picker ends its startup state (see renderListPickerRows): groups it gets later behave normally.
@@ -1916,11 +1952,48 @@ function buildListPickerRow(ctrl, row) {
     entry.listEl.querySelectorAll('.dp-lp-group-selected').forEach((g) => g.classList.remove('dp-lp-group-selected'))
   })
   addGroupBtn.addEventListener('click', () => {
-    const existingNames = new Set([...entry.items.map((it) => it.group).filter(Boolean), ...entry.pendingGroups])
-    let name = 'New Group'
+    // Placement, CORRECTED 2026-10-25 -- adapted from
+    // TEMPLATE_DEV_PANEL.html's own 2026-10-25 addDevGroup() rework (same
+    // 2 rules as the top-level dev-panel groups' own addGroupBtn handler
+    // -- see its comment, above in this file, for the full reasoning) to
+    // THIS control's own flat path-string group model: item.group /
+    // entry.pendingGroups hold "Parent/Child"-style LP_GROUP_PATH_SEP-
+    // joined paths, not nested DOM nodes (see renderListPickerRows()'s
+    // own comment). "Insert directly before the first selected item, in
+    // its own current parent" becomes "nest the new group under the SAME
+    // group path as the first selected item" -- this model has no
+    // sibling ORDER for a group among a parent's own items
+    // (renderGroupNode() always renders a node's own items before its
+    // subgroups, in natural occurrence order), the way the top-level
+    // panel's real DOM nodes support arbitrary row/group interleaving, so
+    // "directly before" doesn't translate literally here; nesting at the
+    // right level is what carries over. entry.groupOrder's own
+    // "newest-first" priority (2026-09-15) only ever ranks TOP-LEVEL
+    // group names, so it's only pushed to when the new group ends up
+    // AT the top level (no selection and nothing tracked, i.e. the
+    // pre-existing fallback below) -- harmless to leave untouched for a
+    // nested path, since renderListPickerRows() only consults it for
+    // `topOrder`, which a nested path is never part of.
+    //
+    // WITHOUT a selection: entry.lastInteractedGroupPath (see its own
+    // declaration comment) if still a real group in this picker --
+    // nested under IT. Falls back to this control's existing top-of-
+    // top-level-list placement when nothing's been interacted with yet,
+    // or the tracked path no longer exists.
+    const firstSelected = entry.multiSelected.size > 0 ? Array.from(entry.multiSelected)[0] : null
+    const existingPaths = new Set([...entry.items.map((it) => it.group).filter(Boolean), ...entry.pendingGroups])
+    let parentPath = ''
+    if (firstSelected) {
+      parentPath = firstSelected.group || ''
+    } else if (entry.lastInteractedGroupPath && existingPaths.has(entry.lastInteractedGroupPath)) {
+      parentPath = entry.lastInteractedGroupPath
+    }
+    const makePath = (leaf) => (parentPath ? parentPath + LP_GROUP_PATH_SEP + leaf : leaf)
+    let leaf = 'New Group'
     let n = 2
-    while (existingNames.has(name)) { name = 'New Group (' + n + ')'; n++ }
-    entry.groupOrder = [name, ...entry.groupOrder]
+    while (existingPaths.has(makePath(leaf))) { leaf = 'New Group (' + n + ')'; n++ }
+    const name = makePath(leaf)
+    if (!parentPath) entry.groupOrder = [name, ...entry.groupOrder]
     if (entry.multiSelected.size > 0) {
       entry.items = entry.items.map((it) => (entry.multiSelected.has(it) ? { ...it, group: name } : it))
       entry.multiSelected = new Set()
@@ -2122,6 +2195,18 @@ export function makeLogBoxCollapsible(logEl, label) {
   })
   return header
 }
+// Records `g` as the most recently "interacted with" group for
+// addGroupBtn's own no-selection placement rule (see
+// `lastInteractedDevGroup`'s own declaration comment above) -- a plain
+// module-level setter, not a closure, since this is called from both a
+// top-level function (createGroupElement()'s own header click handler,
+// below) and from inside initDevPanel()'s closure (the delegated
+// input/change listener), neither of which has access to the other's
+// scope.
+function recordDevGroupInteraction(g) {
+  if (!g || !g.classList || !g.classList.contains('dp-group')) return
+  lastInteractedDevGroup = g
+}
 export function createGroupElement(title) {
   const g = el('div', 'dp-group')
   g.dataset.key = title
@@ -2209,6 +2294,11 @@ export function createGroupElement(title) {
     if (e.target.closest('.dp-group-gate-row')) return
     if (textEditModeEnabled) { openTextEditFor(titleText, title, title); return }
     g.classList.toggle('collapsed')
+    // Direct request (ported from TEMPLATE_DEV_PANEL.html's own 2026-10-25
+    // recordDevGroupInteraction() call): expanding a group counts as
+    // "interacting with" it, for addGroupBtn's own no-selection placement
+    // rule. Only the EXPAND transition counts, never collapse.
+    if (!g.classList.contains('collapsed')) recordDevGroupInteraction(g)
   })
   g.appendChild(h)
   g.appendChild(gb)
@@ -2383,45 +2473,16 @@ function refreshGroupCascadeChrome(g) {
 // a name already in use ANYWHERE (nested or not) is unavailable for a
 // new group, so this exact duplicate can no longer be created going
 // forward.
-// Deepest ancestor `.dp-group` chain for a selected element (row or
-// group), nearest-first -- ported from TEMPLATE_DEV_PANEL.html's own
-// devSelectionAncestorGroupChain() (2026-09-20), adapted to this
-// project's own `.dp-group`/`.dp-group-body` class names (the template
-// uses `.dev-section`/`.dev-section-content` -- see this project's own
-// CLAUDE.md gotcha on why a template port is never a straight copy-
-// paste). Relies on the same fixed DOM shape every group already has:
-// `.dp-group > .dp-group-body` (rows and/or subgroups) -- so "el's
-// parent is a `.dp-group-body`" is exactly "el sits directly inside some
-// group." A top-level item (direct child of `groupsEl`) naturally
-// produces an empty chain.
-function devSelectionAncestorGroupChain(el) {
-  const chain = []
-  let node = el
-  while (node.parentElement && node.parentElement.classList.contains('dp-group-body')) {
-    const g = node.parentElement.parentElement
-    if (!g || !g.classList.contains('dp-group')) break
-    chain.push(g)
-    node = g
-  }
-  return chain
-}
-// The DEEPEST group that contains every one of the given selected
-// elements, or null if they share no common containing group (all
-// top-level, or spanning two subtrees with nothing in common) -- ported
-// from the template's own findDevSelectionCommonAncestorGroup()
-// (2026-09-20, direct request: "the added group should be within the
-// same settings group that the selected settings were in. If selected
-// settings...are within different setting groups, place the new group
-// in the first layer of nest groups that both settings are within").
-function findDevSelectionCommonAncestorGroup(elements) {
-  if (!elements.length) return null
-  const chains = elements.map(devSelectionAncestorGroupChain)
-  const [first, ...rest] = chains
-  for (const candidate of first) {
-    if (rest.every((chain) => chain.includes(candidate))) return candidate
-  }
-  return null
-}
+// devSelectionAncestorGroupChain()/findDevSelectionCommonAncestorGroup()
+// -- the 2026-09-20 port of TEMPLATE_DEV_PANEL.html's own "nest in the
+// deepest group common to every selected item" logic -- were REMOVED
+// 2026-10-25, superseded by addGroupBtn's own simpler "insert directly
+// before the first selected item, in its own current parent" rule (see
+// that handler's own comment, below, for the full reasoning). This
+// mirrors the template's own 2026-10-25 removal of the same 2 functions
+// verbatim -- see this project's CLAUDE.md gotcha entry on this port for
+// the correction note pointing back to the superseded 2026-09-20 entry.
+// Neither function has any other caller.
 function addCustomGroup(groupsEl) {
   const existing = new Set(Array.from(groupsEl.querySelectorAll('.dp-group')).map((g) => g.dataset.key))
   let name = 'New Group'
@@ -4763,32 +4824,79 @@ export function initDevPanel(groups, opts = {}) {
     commit(findCtrl('dp_textEditMode'), !textEditModeEnabled)
     textEditBtn.classList.toggle('active', textEditModeEnabled)
   })
+  // Trigger (2) for lastInteractedDevGroup (see its own declaration
+  // comment) -- ported from TEMPLATE_DEV_PANEL.html's own 2026-10-25
+  // setupDevGroupInteractionTracking(). One delegated listener covers
+  // every control type uniformly (slider drag, checkbox/select change,
+  // text edit, list-picker/multi-select hidden-input update), including
+  // ones a host's own render*Controls() adds later -- no per-control-type
+  // wiring needed. Walks to the NEAREST enclosing `.dp-group-body` (the
+  // deepest group actually containing the changed control), matching
+  // "within" in the template's own request wording. A control that
+  // doesn't live inside any group (a top-level row, directly under
+  // `groupsEl`) has no enclosing `.dp-group-body` and is correctly a
+  // no-op here.
+  ;['input', 'change'].forEach((evtName) => {
+    panel.addEventListener(evtName, (e) => {
+      const body = e.target.closest('.dp-group-body')
+      if (!body) return
+      recordDevGroupInteraction(body.parentElement)
+    }, true)
+  })
   // A plain left click: if armed (a right-click already started a
   // selection), this still just creates the group and folds the
   // selection in -- addCustomGroup() always does that when a selection
   // exists, regardless of how it got armed. If NOT armed, unchanged
   // original behavior (create an empty group immediately).
   addGroupBtn.addEventListener('click', () => {
-    // Placement -- ported from TEMPLATE_DEV_PANEL.html's 2026-09-20
-    // addDevGroup() rework (direct request: "the added group should be
-    // within the same settings group that the selected settings were
-    // in. If selected settings...are within different setting groups,
-    // place the new group in the first layer of nest groups that both
-    // settings are within"). Computed BEFORE addCustomGroup() runs,
-    // since moving the selected items would change their own ancestor
-    // chain. Only the has-a-selection-with-a-common-ancestor case is
-    // affected -- addCustomGroup()'s own existing placement (this
-    // project's bottom-of-list convention, a pre-existing divergence
-    // from the template's own top-of-list one) is untouched for every
-    // other case (no selection, or an all-top-level/no-common-ancestor
-    // selection).
+    // Placement, CORRECTED 2026-10-25 -- ported from
+    // TEMPLATE_DEV_PANEL.html's own 2026-10-25 addDevGroup() rework,
+    // which REPLACED (not extended) the 2026-09-20 "deepest common
+    // ancestor" logic this handler used to call
+    // (findDevSelectionCommonAncestorGroup(), now removed -- see
+    // addCustomGroup()'s own comment above). Direct request (the
+    // template's own): "place the group in the same nesting and order
+    // location as the first item [selected] ... place the group at the
+    // top of the group/subgroup I most recently interacted within" [no
+    // selection].
+    //
+    // WITH a selection: insert the new (still-empty) group directly in
+    // front of the FIRST selected item (devPanelSelectedItems is a Set,
+    // so insertion order = selection order -- "first" means
+    // first-clicked, not necessarily topmost on screen), in that item's
+    // OWN current parent. Simpler than, and replaces, the old "deepest
+    // common ancestor of every selected item" computation -- the first
+    // item's own parent already IS the correct nesting level by
+    // construction, no separate common-ancestor search needed. A later
+    // selected item from a DIFFERENT subgroup still gets moved into the
+    // new group same as before (the devPanelSelectedItems.forEach(...)
+    // below) -- only WHERE the group itself lands changed, not whether
+    // cross-subgroup items get folded in.
+    //
+    // WITHOUT a selection: use lastInteractedDevGroup (see its own
+    // declaration/recordDevGroupInteraction() comment) if it's still a
+    // real, attached group -- top of ITS content. Falls back to this
+    // project's existing bottom-of-list placement (addCustomGroup()'s
+    // own groupsEl.appendChild(g), a pre-existing divergence from the
+    // template's own top-of-list convention -- left untouched by this
+    // port, same as the 2026-09-20 port before it) when nothing has
+    // been interacted with yet this session, or the tracked group was
+    // since deleted.
     const selected = Array.from(devPanelSelectedItems)
-    const commonAncestor = selected.length ? findDevSelectionCommonAncestorGroup(selected) : null
+    const firstSelected = selected.length ? selected[0] : null
     const g = addCustomGroup(groupsEl)
-    if (commonAncestor) {
-      const targetBody = commonAncestor.querySelector(':scope > .dp-group-body')
-      targetBody.insertBefore(g, targetBody.firstChild)
+    if (firstSelected && firstSelected.parentElement) {
+      firstSelected.parentElement.insertBefore(g, firstSelected)
       g.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    } else if (!firstSelected) {
+      const tracked = lastInteractedDevGroup
+      const trackedBody = (tracked && document.body.contains(tracked)) ? tracked.querySelector(':scope > .dp-group-body') : null
+      if (trackedBody) {
+        trackedBody.insertBefore(g, trackedBody.firstChild)
+        g.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+      // else: addCustomGroup() already appended it to the bottom of
+      // groupsEl -- existing fallback, untouched.
     }
     if (devPanelSelectedItems.size) {
       const gb = g.querySelector(':scope > .dp-group-body')
