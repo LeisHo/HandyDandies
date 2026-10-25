@@ -415,6 +415,10 @@ let lpLastValues = null, lpHand2LastValues = null
 // Smooth loading (2026-10-18): loadingWarmMode = updateRenderOrder() is running behind the loading screen (only the first idle repose of the hands, in a time budget); fieldPreposeDeadline = the latest the reveal waits for it;
 // loadingPreviewBuiltRoot = the model the preview hand was cloned from (a restored model setting that resolves to the same one must not rebuild the preview).
 let loadingWarmMode = false, fieldPreposeDeadline = 0, loadingPreviewBuiltRoot = null
+// Reveal timeline (2026-10-25, "a long pause between the loading animation ending and the UI buttons appearing", mobile): fieldStartedAtMs = when tryStartField() let the field start; fieldPreposeLog = 0 / 1 (waiting for first poses
+// logged) / 2 (wait-over logged); fieldWorkDoneLogged = the "all loading work done" line was written; fieldReposedCache = hands-with-a-first-pose share, refreshed at most every 100 ms because loadingProgressNow() runs several times a frame.
+let fieldStartedAtMs = 0, fieldPreposeLog = 0, fieldWorkDoneLogged = false
+const fieldReposedCache = { at: 0, frac: 0 }
 // On-screen frame rate (Debug > Show Frame Rate, 2026-10-18): frames actually drawn since the last refresh.
 let frameRateDrawn = 0, frameRateWindowStart = 0, frameRateEl = null
 const endSeq = { phase: 'off', finished: false, lapAtBegin: 0, timer: 0, seq: null, tr1: null, tr2: null, lapIndex: 1, lapStartMs: 0, holdEndMs: 0, dir: 1, lapStyle: 'Loop', total: 1, speedMs: 1000, pauseEndMs: 0, retStartMs: 0, retDur: 0, from1: null, from2: null }
@@ -1185,11 +1189,26 @@ function setupLoadingPreviewProgressCropGroup() {
 // The loading progress, 0..1. There is no single measured progress value in this app, so it is built from the real startup stages: model (10%), settings applied (10%), the hands built in slices (45%), the shader warm-up and
 // hand reveal (35%) - and never ahead of the elapsed share of Min Loading Time (the reveal is held back until both are done, so the two reach 100% together). With "Use Real-Time Loading Progress" off it is the Min Loading Time share alone. Those weights are a judgment call, not a measurement.
 // The crop runs ONCE (2026-10-17, direct request: "the cropping from 100 to 0 only runs once"): 0 -> 1 over the loading, then it holds at 1 - the loading screen going away does not restart it (it used to loop 0 -> 1 over Min Loading Time in the live preview).
+// Share (0..1) of the hands that have had their first idle pose; 1 once the reveal no longer waits for them (the 2 s cap in tryStartField()). Only called from the warm-up's last stage, when `hands` exists.
+function fieldReposedFrac() {
+  if (!hands.length) return 1
+  const now = performance.now()
+  if (fieldPreposeDeadline && now > fieldPreposeDeadline) return 1
+  if (now - fieldReposedCache.at > 100) {
+    let n = 0
+    for (let i = 0; i < hands.length; i++) if (hands[i].everReposed) n++
+    fieldReposedCache.at = now; fieldReposedCache.frac = n / hands.length
+  }
+  return fieldReposedCache.frac
+}
 function loadingProgressNow(real = cfg.loadingPreviewProgressCropRealtime !== false) {
   const now = performance.now()
   if (fieldRevealed) return lpLiveCycle.active ? lpLiveCycle.progress : 1
   if (fieldStarted) return 1
-  const warm = fieldWarmStage >= 3 ? 1 : fieldWarmStage >= 1 ? 0.3 * (fieldWarmStage >= 2 ? 1 : Math.min(1, (now - fieldWarmStartMs) / FIELD_WARM_CAP_MS)) + 0.7 * (hands.length ? fieldWarmRevealIndex / hands.length : 0) : 0
+  // 2026-10-25: the warm-up share used to read 100% the moment the last hand was shown, but the reveal then still waits for every hand's first pose (up to 2 s, see tryStartField()). With the progress at 100% the Progress Crop curve's
+  // end (and the 200 ms laps of the Animation Speed Curve) had already wiped / sped up the loading hand, so that wait looked like a long empty pause. The first-pose share is now the last 15% of the warm-up share (a judgment call, not a measurement).
+  const warmShare = fieldWarmStage >= 1 ? 0.3 * (fieldWarmStage >= 2 ? 1 : Math.min(1, (now - fieldWarmStartMs) / FIELD_WARM_CAP_MS)) + 0.7 * (hands.length ? fieldWarmRevealIndex / hands.length : 0) : 0
+  const warm = fieldWarmStage >= 3 ? 0.85 + 0.15 * fieldReposedFrac() : 0.85 * warmShare
   const work = 0.1 * (modelMeasurementsReady ? 1 : 0) + 0.1 * (startupSettingsReady ? 1 : 0) + 0.45 * (fieldBuildDone ? 1 : fieldBuildFrac) + 0.35 * warm
   const timeFrac = Math.min(1, (now - pageLoadStartMs) / Math.max(cfg.loadingMinTimeMs || 0, 1))
   loadingProgressShown = Math.max(loadingProgressShown, Math.min(work, timeFrac)) // the real progress (never ahead of the Min Loading Time clock, never backwards)
@@ -1453,6 +1472,7 @@ function tryStartField() {
     setTimeout(() => { if (fieldWarmStage < 3) advanceFieldWarmup() }, FIELD_WARM_CAP_MS + 100) // animate() may not be ticking (hidden tab): finish regardless
   }
   if (fieldWarmStage !== 3) return // advanceFieldWarmup() (animate) calls tryStartField() again when the hands are warmed
+  if (!fieldWorkDoneLogged) { fieldWorkDoneLogged = true; logLoadingPreview('field built and warmed up -- still to come before the loading screen hides: Min Loading Time, every hand\'s first pose, the End Sequence wait, two painted field frames') }
   if (cfg.loadingPreviewEnabled) {
     const minMs = Math.max(0, cfg.loadingMinTimeMs || 0)
     const elapsed = performance.now() - pageLoadStartMs
@@ -1496,7 +1516,11 @@ function tryStartField() {
   // does not tick animate() at all).
   if (hands.length) {
     if (!fieldPreposeDeadline) fieldPreposeDeadline = performance.now() + 2000
-    if (performance.now() < fieldPreposeDeadline && hands.some((h) => !h.everReposed)) { setTimeout(tryStartField, 50); return }
+    if (performance.now() < fieldPreposeDeadline && hands.some((h) => !h.everReposed)) {
+      if (fieldPreposeLog === 0) { fieldPreposeLog = 1; logLoadingPreview(`waiting for ${hands.filter((h) => !h.everReposed).length} of ${hands.length} hands to get their first pose (at most 2000 ms)`) }
+      setTimeout(tryStartField, 50); return
+    }
+    if (fieldPreposeLog === 1) { fieldPreposeLog = 2; logLoadingPreview(`first-pose wait over (${hands.filter((h) => !h.everReposed).length} hands still without one)`) }
   }
   // End Sequence (2026-10-18): hold the reveal (and with it the whole startup sequence) until the loading animation has finished its lap and the End Sequence has played.
   if (endSeqShouldRun()) {
@@ -1504,6 +1528,7 @@ function tryStartField() {
     if (endSeq.phase !== 'done') return
   }
   fieldStarted = true
+  fieldStartedAtMs = performance.now()
   logStartupTiming('fieldStarted = true')
   logLoadingPreview(`field starting -- loading screen hides; preview ${lpLiveOn() ? 'stays visible (Show Loading Preview is on)' : 'is hidden'}`)
   // (the field itself was built in slices earlier -- see rebuildFieldChunked())
@@ -1555,6 +1580,7 @@ function finalizeReveal() {
   if (fieldRevealed) return
   fieldRevealed = true
   logStartupTiming('reveal finalized (field painted)')
+  logLoadingPreview(`reveal -- the loading screen hides and the buttons appear, ${Math.round(performance.now() - fieldStartedAtMs)} ms after the field started (${fieldRevealFrames} field frame(s) painted${fieldRevealFrames < 2 ? ' -- the 4 s safety net ended the wait' : ''})`)
   syncLoadingPreviewBackground() // drops the loading-screen blocker
   loadingEl.classList.add('hidden')
   updateLoadingPreviewText()
@@ -24902,7 +24928,11 @@ function animate(dt, now) {
       fieldWarmLastRenderMs = window.__lastComposerMs
       __frameProfiler.frames++
       frameRateDrawn++
-      if (fieldStarted && !fieldRevealed && ++fieldRevealFrames >= 2) finalizeReveal() // two painted field frames, then the loading screen goes
+      if (fieldStarted && !fieldRevealed) { // two painted field frames, then the loading screen goes
+        fieldRevealFrames++
+        logLoadingPreview(`field frame ${fieldRevealFrames} drawn: ${Math.round(performance.now() - __animateTotalStart)} ms of animate() so far, drawing ${Math.round(window.__lastComposerMs || 0)} ms`)
+        if (fieldRevealFrames >= 2) finalizeReveal()
+      }
     }
     // Covers everything from the true top of animate() through the
     // frame-profile block itself -- NOT the Loading Preview render
@@ -25257,7 +25287,9 @@ function updateRenderOrder() {
   }
   if (!loadingWarmMode) computeRenderOrderRanks()
   __u = rlsLap('uro: render order ranks', __u)
-  const warmReposeDeadline = loadingWarmMode ? performance.now() + 6 : 0 // 6 ms: the same slice the field build uses (a judgment call, not a measurement)
+  // 6 ms per frame while the field is still warming up (the same slice the field build uses); 30 ms once the warm-up is done and only the hands' first poses are left (2026-10-25: nothing else needs the frame then, and a phone doing 6 ms
+  // slices needs dozens of frames, which the reveal waited out as an empty pause). Both are judgment calls, not measurements.
+  const warmReposeDeadline = loadingWarmMode ? performance.now() + (fieldWarmStage >= 3 ? 30 : 6) : 0
   const __skipPose = cfg.skipOffScreenPoseWork === true && cfg.skipOffScreenFingerCurls !== false // hands outside every camera need Skip Finger Curls For Off-Screen Hands on (it defines "outside the camera")
   const __retainRot = cfg.retainRotationArmWork === true
   const __posN = cfg.throttleOffScreenPosition === true && cfg.skipOffScreenFingerCurls !== false ? Math.max(2, Math.round(cfg.offScreenPositionEvery || 2)) : 0 // Throttle Positional Transposition From Click Functions For Hands Outside The Camera
