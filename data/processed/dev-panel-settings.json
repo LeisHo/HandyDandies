@@ -27111,7 +27111,7 @@
       "fieldBoundsYMaxCurveRange": "{\"min\":-275,\"max\":300}",
       "fieldBoundsZMin": "-800",
       "fieldBoundsZMinCurveEnabled": true,
-      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.9528458288968122,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.21830206454793544,\"y\":-0.19709192911783857}}]",
+      "fieldBoundsZMinCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.7402827925433746,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.36313339237418496,\"y\":0}}]",
       "fieldBoundsZMinCurveRange": "{\"min\":-500,\"max\":-320}",
       "fieldBoundsZMax": "240",
       "fieldBoundsZMaxCurveEnabled": true,
@@ -82237,7 +82237,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Position Min Z Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
