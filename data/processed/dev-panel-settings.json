@@ -19131,7 +19131,7 @@
       ],
       "toonSteps": 2,
       "toonStepThreshold": 1.8,
-      "toonShadowFloor": 6,
+      "toonShadowFloor": 0,
       "toonLightCeiling": 100,
       "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]",
       "toonBaseTint": "#ffffff",
@@ -45603,16 +45603,16 @@
           "ambientGroundColor": "#ffffff"
         }
       ],
-      "toonSteps": 1,
-      "toonStepThreshold": 0.2,
+      "toonSteps": 2,
+      "toonStepThreshold": 1.8,
       "toonShadowFloor": 0,
-      "toonLightCeiling": 0,
+      "toonLightCeiling": 100,
       "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]",
-      "toonBaseTint": "#0091ff",
+      "toonBaseTint": "#ffffff",
       "textureInfluence": 0,
       "toonTint": "#ffffff",
       "rimIntensity": 0,
-      "rimPower": 0.5,
+      "rimPower": 0,
       "rimColor": "#ffffff",
       "invertColorsEnabled": false,
       "savedToon": [
@@ -72079,7 +72079,7 @@
       ],
       "toonSteps": 2,
       "toonStepThreshold": 1.8,
-      "toonShadowFloor": 6,
+      "toonShadowFloor": 0,
       "toonLightCeiling": 100,
       "toonGradient": "[{\"p\":0,\"c\":\"#ffffff\"},{\"p\":1,\"c\":\"#ffffff\"}]",
       "toonBaseTint": "#ffffff",
@@ -80019,7 +80019,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -82876,7 +82876,7 @@
           "type": "group",
           "group": {
             "key": "New Group (10)",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -82887,7 +82887,7 @@
                 "type": "group",
                 "group": {
                   "key": "Toon Shading",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
