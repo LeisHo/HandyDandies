@@ -17930,6 +17930,8 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
 // is within 0.2% of that value's slider range of the target pose's value. The 0.2% is a judgment call, not a
 // measurement: small enough that a visible difference never counts as the same pose, large enough to absorb
 // float noise from a tween that has just finished.
+// Pose keys that are NOT finger values (wrist bend / splay / rotation, Whole-Hand and Rotation-at-Base rotation, Pose Offset, Pose Scale, elbow and forearm): Skip If Same Pose does not compare them. Declared with the function that uses it, which only runs on a click.
+const POSE_NOT_FINGER_RE = /^(wrist|modelRot|baseRotation|poseOffset|poseLocalOffset|poseScale|elbow|forearm)/
 let _poseSameTol = null
 function poseSameTolerance() {
   if (_poseSameTol) return _poseSameTol
@@ -17952,6 +17954,7 @@ function handInPose(hand, target) {
   const tol = poseSameTolerance()
   for (let i = 0; i < POSE_PRESET_KEYS.length; i++) {
     const k = POSE_PRESET_KEYS[i]
+    if (POSE_NOT_FINGER_RE.test(k)) continue // 2026-10-25: only the fingers decide "same pose" - wrist, whole-hand / base rotation, offsets, scale and the arm (elbow / forearm) are ignored
     const tv = target[k] !== undefined ? target[k] : POSE_KEY_DEFAULTS[k]
     const cv = cur[k] !== undefined ? cur[k] : POSE_KEY_DEFAULTS[k]
     if (Math.abs(cv - tv) > tol[k]) return false
