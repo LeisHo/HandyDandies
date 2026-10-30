@@ -4404,8 +4404,74 @@ export function initDevPanel(groups, opts = {}) {
   const deleteStateBtn = el('button', null, { type: 'button', textContent: 'Delete', title: 'Delete the selected item. Shift-click a range or Ctrl-click to select several first and delete them all.' })
   const setDefaultStateBtn = el('button', null, { type: 'button', textContent: 'Set Default' })
   const exportStateBtn = el('button', null, { type: 'button', textContent: 'Export' })
-  savedStatesBtnRow.append(saveStateBtn, overwriteStateBtn, useStateBtn, renameStateBtn, deleteStateBtn, setDefaultStateBtn, exportStateBtn)
-  savedStatesBody.append(savedStatesStatus, savedStatesList, savedStatesBtnRow)
+  const importStateBtn = el('button', null, { type: 'button', textContent: 'Import', title: 'Load a .json file from Export (e.g. from an online build, to test offline)' })
+  savedStatesBtnRow.append(saveStateBtn, overwriteStateBtn, useStateBtn, renameStateBtn, deleteStateBtn, setDefaultStateBtn, exportStateBtn, importStateBtn)
+  // Import -- the mirror of Export above, direct request (2026-10-30): so
+  // settings exported from an ONLINE build can be loaded into an OFFLINE
+  // one with no shared/remote store needed. Validates before applying
+  // (per direct request, "Add an error message if settings are missing
+  // or there are unrecognized settings or whatever") -- applyStoredValues()
+  // already silently ignores any key not found on a real control
+  // (devGroups.forEach... only ever reads ctrl.key, never flags a value
+  // in the file with no matching control), which is correct tolerance
+  // for ordinary cross-version drift but leaves the user with no way to
+  // tell anything was skipped. This project's own captureFullPanelState()/
+  // applyFullPanelState() use a different shape than the canonical
+  // TEMPLATE_DEV_PANEL.html's (per-device `values` object, not a flat
+  // `controls` map keyed 1:1 to DOM ids) -- adapted accordingly, not a
+  // verbatim copy.
+  const importStatusEl = el('div', 'dp-ss-status-line')
+  const importFileInput = el('input', null, { type: 'file', accept: '.json,application/json' })
+  importFileInput.style.display = 'none'
+  importFileInput.addEventListener('change', () => {
+    const file = importFileInput.files && importFileInput.files[0]
+    importFileInput.value = ''
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = async () => {
+      let state
+      try {
+        state = JSON.parse(reader.result)
+      } catch (err) {
+        importStatusEl.textContent = `Import failed: not valid JSON (${err.message}).`
+        importStatusEl.style.color = '#ff6b6b'
+        return
+      }
+      if (!state || typeof state !== 'object' || Array.isArray(state)) {
+        importStatusEl.textContent = 'Import failed: file is not a dev panel settings export.'
+        importStatusEl.style.color = '#ff6b6b'
+        return
+      }
+      const KNOWN_TOP_LEVEL_KEYS = ['values', 'order', 'textOverrides', 'devVisibility', 'devIndependence', 'panelGeometry', 'devHotkeys']
+      if (!KNOWN_TOP_LEVEL_KEYS.some((k) => k in state)) {
+        importStatusEl.textContent = 'Import failed: file does not look like a dev panel settings export (no recognized fields).'
+        importStatusEl.style.color = '#ff6b6b'
+        return
+      }
+      const knownKeys = new Set()
+      devGroups.forEach((group) => group.controls.forEach((ctrl) => knownKeys.add(ctrl.key)))
+      const importedKeys = new Set()
+      DEVICES.forEach((d) => { if (state.values && state.values[d]) Object.keys(state.values[d]).forEach((k) => importedKeys.add(k)) })
+      const unrecognized = [...importedKeys].filter((k) => !knownKeys.has(k))
+      const missing = [...knownKeys].filter((k) => !importedKeys.has(k))
+      await applyStateExtra(state)
+      applyFullPanelState(state)
+      activeStateName = ''
+      renderSavedStatesList()
+      const parts = ['Imported.']
+      if (unrecognized.length) parts.push(`${unrecognized.length} unrecognized setting${unrecognized.length === 1 ? '' : 's'} ignored (${unrecognized.slice(0, 5).join(', ')}${unrecognized.length > 5 ? ', ...' : ''}).`)
+      if (missing.length) parts.push(`${missing.length} current setting${missing.length === 1 ? '' : 's'} not found in the file, left unchanged.`)
+      importStatusEl.textContent = parts.join(' ')
+      importStatusEl.style.color = (unrecognized.length || missing.length) ? '#e0b84a' : ''
+    }
+    reader.onerror = () => {
+      importStatusEl.textContent = 'Import failed: could not read the file.'
+      importStatusEl.style.color = '#ff6b6b'
+    }
+    reader.readAsText(file)
+  })
+  importStateBtn.addEventListener('click', () => importFileInput.click())
+  savedStatesBody.append(savedStatesStatus, savedStatesList, savedStatesBtnRow, importFileInput, importStatusEl)
   groupsEl.insertBefore(savedStatesGroup, groupsEl.firstChild)
 
   function getSavedStates() {
