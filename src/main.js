@@ -9399,7 +9399,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // Mode of "Sequence" shows the selector correctly on first load too,
       // not just after manually re-touching the dropdown.
       {
-        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence', 'None'],
+        key: `${p}Mode`, label: 'Mode', type: 'select', def: 'Single Pose', options: () => ['Single Pose', 'Sequence', 'Chain', 'None'],
         onChange: () => { updateClickTriggerModeVisibility(p, ['PauseDurationMs']); updateSingleTimingGateVisibility(p); updateSequencePlayModeVisibility(p); updateChainModeVisibility(p) }
       },
       // Offset/Rotation -- see makeClickHoldPoseGroup()'s own matching
@@ -9466,6 +9466,9 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // Pose 2. Sequence mode only. The time-scale slider below only applies while this is on.
       { key: `${p}GlideToFirstPose`, label: 'Glide To Pose 1', type: 'checkbox', def: false, onChange: () => updateChainModeVisibility(p) },
       { key: `${p}FirstGlideTimeScale`, label: 'First Transition Time Scale (x)', type: 'slider', min: 0.1, max: 5, step: 0.05, def: 1 },
+      // Chain mode for single-click (fire-and-forget) functions (2026-11-01, direct request: "provide me the chain mode for single click functions as well, not just hold"): the same ordered list of saved Tween
+      // Sequences the hold-kind factory has, concatenated into one longer sequence when the trigger starts (see chainOrSelectedEntries()). Animation Speed is per sequence in a chain (chainSequenceCount()).
+      { key: `${p}TweenChain`, label: 'Chain (Sequences, In Order)', type: 'multi-select', def: [], options: () => (cfg.savedTweenSequences || []).map((s) => ({ value: s.name, group: s.group || null })) },
       // Tween's own SEPARATE speed/curve/range trio -- see
       // makeClickHoldPoseGroup()'s own matching comment for the full
       // reasoning (shared word-for-word). No Loop checkbox here -- Click
@@ -15516,6 +15519,15 @@ function selectedSequenceEntries(p) {
   const raw = seq ? sequencePoseEntries(seq) : []
   return cfg[`${p}ReverseSequence`] ? raw.slice().reverse() : raw
 }
+// The raw entries a trigger plays: the selected Sequence, or - in Chain mode - every sequence listed in `${p}TweenChain`, in order, concatenated (not reversed, like the hold-kind Chain). Used by the single-click
+// (fire-and-forget) family; the hold-kind family resolves the same list inside startClickHoldPose().
+function chainOrSelectedEntries(p) {
+  if (cfg[`${p}Mode`] !== 'Chain') return selectedSequenceEntries(p)
+  return (cfg[`${p}TweenChain`] || []).flatMap((seqName) => {
+    const seq = (cfg.savedTweenSequences || []).find((s) => s.name === seqName)
+    return seq ? sequencePoseEntries(seq) : []
+  })
+}
 // BASE MODIFIERS on the field's click / hold functions (2026-10-22, direct report: "I imported a tween TWO FINGER WALK -90 and the click hold function didn't recognize the wrist splay I added as a base modifier"). A sequence
 // imported from HANDO carries seq.baseModifiers (see lpApplyBaseMod()); the field plays a sequence as a list of pose NAMES that every consumer looks up in Saved Poses, so the modifiers are baked in at that lookup: a sequence
 // with modifiers on hands its entries out as BM_ENTRY_PREFIX + sequence name + BM_SEP + pose name, and savedPoseByName() turns such a name into the saved pose with the modifiers added (cached while the pose and the sequence's
@@ -16066,7 +16078,7 @@ function onClickCtxFor(p, stamp) {
   POSE_PRESET_KEYS.forEach((key) => { snap[key] = cfg[key] })
   let namedPoses = null, rawEntries = null
   if (isSequenceOrChainMode(clk)) {
-    rawEntries = selectedSequenceEntries(clk)
+    rawEntries = chainOrSelectedEntries(clk)
     const resolved = resolveTweenSequencePoses(rawEntries, true)
     if (resolved.length >= 1) namedPoses = resolved
   }
@@ -17653,7 +17665,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     cp.offsetBaked = false // a fresh ramp starts a fresh (not-yet-locked-in) increment
     releaseHandFromOtherFunctions(hand, p)
     logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(p), isSequenceOrChainMode(p)
-      ? `triggered -> tween "${cfg[`${p}TweenSelector`]}"`
+      ? `triggered -> tween "${cfg[`${p}Mode`] === 'Chain' ? (cfg[`${p}TweenChain`] || []).join(' + ') : cfg[`${p}TweenSelector`]}"`
       : `triggered -> pose "${cfg[`${p}TargetPose`]}"`)
   }
   if (cp.phase === 'forward') {
@@ -18012,7 +18024,7 @@ function triggerClickPose(p, onlyHands = null) {
   let namedPoses = null
   let rawEntries = null // the sequence's raw entries, Hold objects intact (2026-10-15: pose-kind functions now play Holds)
   if (isTween) {
-    rawEntries = selectedSequenceEntries(p)
+    rawEntries = chainOrSelectedEntries(p)
     const resolved = resolveTweenSequencePoses(rawEntries, true)
     if (resolved.length >= 1) namedPoses = resolved
   }
@@ -20153,7 +20165,7 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   { type: 'row', suffix: 'Enabled' },
   { type: 'row', suffix: 'Type' }, { type: 'row', suffix: 'TouchPointCount' }, { type: 'row', suffix: 'ClickCount' },
   { type: 'row', suffix: 'Mode' },
-  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'SkipIfSamePose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'GlideToFirstPose' }, { type: 'row', suffix: 'FirstGlideTimeScale' },
+  { type: 'row', suffix: 'TargetPose' }, { type: 'row', suffix: 'SkipIfSamePose' }, { type: 'row', suffix: 'TweenSelector' }, { type: 'row', suffix: 'ReverseSequence' }, { type: 'row', suffix: 'GlideToFirstPose' }, { type: 'row', suffix: 'FirstGlideTimeScale' }, { type: 'row', suffix: 'TweenChain' },
   { type: 'row', suffix: 'TransitionSpeedMs' }, { type: 'row', suffix: 'TweenSpeedMs' },
   { type: 'row', suffix: 'PauseDurationMs' },
   { type: 'row', suffix: 'SequencePlayMode' }, { type: 'row', suffix: 'SequenceCount' }, { type: 'row', suffix: 'SequenceCountMode' },
@@ -21839,9 +21851,9 @@ function updateClickTriggerModeVisibility(p, extraSinglePoseKeys, extraTweenKeys
 // Owns TweenSelector (Sequence mode only) vs TweenChain (Chain mode only)
 // -- the one pair of controls that DON'T share visibility between the 2
 // modes, since each mode reads a different one of them. A no-op for
-// CLICK_POSE_KEYS/rc callers (no `${p}TweenChain` row exists there at
-// all, since makeClickPoseGroup() never offers Chain as a Mode option --
-// the `document.querySelector` below just finds nothing).
+// CLICK_POSE_KEYS/rc callers (UPDATED 2026-11-01: makeClickPoseGroup() now
+// offers Chain too, so every pose-kind function has a `${p}TweenChain` row
+// and this runs for it exactly as for the hold kind).
 function updateChainModeVisibility(p) {
   const mode = cfg[`${p}Mode`]
   const selectorRow = document.querySelector(`.dp-row[data-key="${p}TweenSelector"]`)
