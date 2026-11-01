@@ -17737,7 +17737,10 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
         cp.sequenceDirection = 1
         cp.phase = 'sequencePlaying'
       } else {
-        cp.phase = 'paused'; cp.pauseStartTime = now
+        // Sequence Hold Duration also applies at the end of a SINGLE-loop sequence (2026-11-01, direct report: it held between loops but not when the sequence plays once). The hold is simply added in front of the
+        // Pause Duration: 'paused' (which keeps reapplying the final pose) starts counting its Pause Duration only after the hold, so end pose -> hold -> pause -> retransition. The startup transition never holds (see 'paused').
+        const singleLoopHoldMs = isTween && p !== STARTUP_FN ? Math.max(cfg[`${p}SequenceHoldMs`] || 0, 0) : 0
+        cp.phase = 'paused'; cp.pauseStartTime = now + singleLoopHoldMs
       }
     }
   } else if (cp.phase === 'sequencePlaying') {
