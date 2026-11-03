@@ -14902,7 +14902,10 @@ function updateFingerCurlSkip() {
     for (let i = 0; i < hands.length; i++) { hands[i]._curlResumed = !!hands[i]._curlSkip; hands[i]._curlSkip = false }
     return
   }
-  const cullBuffer = cfg.offScreenBufferEnabled === true ? Math.max(cfg.offScreenBufferDistance || 0, 0) : 0 // Off-Screen Buffer: extra distance beyond the view boundary before a hand counts as outside
+  // Hand Offset On Startup (2026-11-03): while any hand is waiting for / playing its startup sequence the Off-Screen Buffer is not added. The sphere test already covers the whole hand (radius x 3), the camera does not move
+  // during the sequence, and with the buffer on a 33 x 33 field poses about 2.3 x as many hands per frame as are on screen (the logs: 440-770 hands re-posed per frame, frames of 130-360 ms).
+  const startupBusy = startupHandOffsetStage === 1 && hands.some((h) => { const c = h._cp && h._cp[STARTUP_FN]; return !!c && (c.phase !== 'idle' || !!c.pendingClaimAt) })
+  const cullBuffer = cfg.offScreenBufferEnabled === true && !startupBusy ? Math.max(cfg.offScreenBufferDistance || 0, 0) : 0 // Off-Screen Buffer: extra distance beyond the view boundary before a hand counts as outside
   const cams = [camera]
   if (typeof cameraPreviews !== 'undefined' && cameraPreviews && cameraPreviews.length) for (const pc of cameraPreviews) if (pc && pc.camera) cams.push(pc.camera)
   for (let k = 0; k < cams.length; k++) {
