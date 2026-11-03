@@ -17816,7 +17816,11 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     cp.phase = 'forward'
     cp.triggerTime = now
     notePositionalCommit(hand, p)
-    cp.fwdNom = 0; cp.liveTick = now
+    // Hand Offset On Startup (2026-11-03, direct report: concentric rings of hands starting together): the hand's clock starts at its SCHEDULED start time (pendingClaimAt), not at the frame that happened to process the claim.
+    // With 1,089 hands a frame takes 150-400 ms, longer than most of the Start Time spread, so every hand whose delay had passed started in the same frame and showed the same progress. A hand claimed late now starts already
+    // that far in (its own delay is graded), so the stagger shows however long the frames are. Other functions keep starting at the commit frame.
+    cp.fwdNom = p === STARTUP_FN ? Math.max(now - cp.pendingClaimAt, 0) : 0
+    cp.liveTick = now
     cp.frozenSplayDeg = cp.pendingFrozenSplayDeg
     cp.fromSplayDeg = cp.pendingFromSplayDeg // CORRECTED 2026-09-27 -- see the arm-time capture's own comment
     cp.frozenSpeedMs = cp.pendingFrozenSpeedMs
