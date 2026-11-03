@@ -20649,7 +20649,7 @@
       "startupFnSpeedCurveContinual": false,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3087881405465225,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29516545825625473,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1130}",
+      "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveContinual": false,
@@ -76219,7 +76219,7 @@
       "startupFnSpeedCurveContinual": false,
       "startupFnSpeedCurveXOrigin": "Global Setting",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3087881405465225,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29516545825625473,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1130}",
+      "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveContinual": false,
@@ -87530,7 +87530,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
