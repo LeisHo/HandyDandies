@@ -25193,7 +25193,7 @@ function animate(dt, now) {
     console.error('animate() frame threw -- rendering skipped for this frame, loop continues:', err)
   }
 }
-window.VisibilityTickLoop.setKeepRunningUnfocused(() => !fieldRevealed) // the loading screen and its preview keep running when the user clicks out of the browser; after the reveal the usual hidden / unfocused pause applies
+if (window.VisibilityTickLoop.setKeepRunningUnfocused) window.VisibilityTickLoop.setKeepRunningUnfocused(() => !fieldRevealed) // the loading screen and its preview keep running when the user clicks out of the browser; after the reveal the usual hidden / unfocused pause applies
 window.VisibilityTickLoop.registerTick(animate)
 // Keeps the EXISTING virtual-clock pause mechanism (nowVirtual()/
 // pauseOffsetMs, see setPaused()'s own declaration) continuous across a
