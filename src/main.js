@@ -3884,6 +3884,9 @@ const DEV_GROUPS = [
         type: 'list-picker',
         def: [],
         itemLabel: 'Sequence',
+        // Export Selected (direct request 2026-11-03, for the animation sequence
+        // item selector the Loading Preview's Loading Tween Sequence dropdown reads from).
+        exportable: true,
         captureCurrent: () => captureTweenSequencePreset(),
         onUse: (item) => useTweenSequencePreset(item),
         // Mirrors 'savedPoses'' own onChange: the Double Click Hold
