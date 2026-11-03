@@ -20677,7 +20677,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveContinual": false,
-      "startupFnSpeedCurveXOrigin": "Global Setting",
+      "startupFnSpeedCurveXOrigin": "Closest Hand",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3087881405465225,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29516545825625473,\"y\":0}}]",
       "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
       "startupFnStartTimeCurveEnabled": true,
@@ -48492,7 +48492,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveContinual": false,
-      "startupFnSpeedCurveXOrigin": "Global Setting",
+      "startupFnSpeedCurveXOrigin": "Closest Hand",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1685528265308713,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.4175697061138417,\"y\":0}}]",
       "startupFnSpeedCurveRange": "{\"min\":975,\"max\":975}",
       "startupFnStartTimeCurveEnabled": true,
@@ -76307,7 +76307,7 @@
       "startupFnSpeedCurveEnabled": true,
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveContinual": false,
-      "startupFnSpeedCurveXOrigin": "Global Setting",
+      "startupFnSpeedCurveXOrigin": "Closest Hand",
       "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3087881405465225,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.29516545825625473,\"y\":0}}]",
       "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
       "startupFnStartTimeCurveEnabled": true,
@@ -87657,7 +87657,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -87763,7 +87763,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Hand Scale Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
