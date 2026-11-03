@@ -421,6 +421,9 @@ let lpLastValues = null, lpHand2LastValues = null
 // Smooth loading (2026-10-18): loadingWarmMode = updateRenderOrder() is running behind the loading screen (only the first idle repose of the hands, in a time budget); fieldPreposeDeadline = the latest the reveal waits for it;
 // loadingPreviewBuiltRoot = the model the preview hand was cloned from (a restored model setting that resolves to the same one must not rebuild the preview).
 let loadingWarmMode = false, fieldPreposeDeadline = 0, loadingPreviewBuiltRoot = null
+// Scratch for applyWristPoseToSkeleton()'s IK-rig wrist (2026-11-03): in the early block so no top-level caller can reach them before they are initialised.
+const _wpQ = new THREE.Quaternion(), _wpQx = new THREE.Quaternion(), _wpQz = new THREE.Quaternion()
+const _wpAxX = new THREE.Vector3(1, 0, 0), _wpAxY = new THREE.Vector3(0, 1, 0), _wpAxZ = new THREE.Vector3(0, 0, 1)
 // Reveal timeline (2026-10-25, "a long pause between the loading animation ending and the UI buttons appearing", mobile): fieldStartedAtMs = when tryStartField() let the field start; fieldPreposeLog = 0 / 1 (waiting for first poses
 // logged) / 2 (wait-over logged); fieldWorkDoneLogged = the "all loading work done" line was written; fieldReposedCache = hands-with-a-first-pose share, refreshed at most every 100 ms because loadingProgressNow() runs several times a frame.
 let fieldStartedAtMs = 0, fieldPreposeLog = 0, fieldWorkDoneLogged = false
@@ -8870,9 +8873,21 @@ function applyWristPoseToSkeleton(skeleton, values = cfg, extraSplayDeg = 0, wri
     splay = Math.min(Math.max(splay, handWristLimits.splay.min), handWristLimits.splay.max)
     rotn = Math.min(Math.max(rotn, handWristLimits.rot.min), handWristLimits.rot.max)
   }
-  bone.rotateX(THREE.MathUtils.degToRad(bend))
-  bone.rotateZ(THREE.MathUtils.degToRad(splay))
-  bone.rotateY(THREE.MathUtils.degToRad(rotn))
+  // Ported from HANDO (2026-11-03, direct report: "the wrist bend and wrist rotation values don't match HANDO"; HANDO changed this 2026-11-01, "Wrist Bend / Splay / Rotation axes (IK rig)" + "Wrist Splay direction inverted"). On the
+  // local-axis (IK) rig whose wrist bone is a child of rForearmTwist, all three wrist angles turn the wrist bone about the axes of that PARENT, pivot at the wrist joint: the bone's local rotation is
+  // Ry(Wrist Rotation) * Rx(Wrist Bend) * Rz(-Wrist Splay) * rest, so Rotation's Y is fixed, Bend's X is carried by Rotation, Splay's Z by Rotation and Bend (splay negated, as in HANDO). The old order here was the bone's OWN local
+  // axes, intrinsic Bend, Splay, Rotation, which gives a different pose for any pose with two or more non-zero wrist angles (and a different axis even for one). Other rigs keep the old rotation below.
+  const twistBone = localAxisRigOf(skeleton) ? skeletonBone(skeleton, 'rForearmTwist') : null
+  if (twistBone && bone.parent === twistBone) {
+    _wpQ.setFromAxisAngle(_wpAxY, THREE.MathUtils.degToRad(rotn))
+    _wpQx.setFromAxisAngle(_wpAxX, THREE.MathUtils.degToRad(bend))
+    _wpQz.setFromAxisAngle(_wpAxZ, -THREE.MathUtils.degToRad(splay))
+    bone.quaternion.copy(_wpQ).multiply(_wpQx).multiply(_wpQz).multiply(rest)
+  } else {
+    bone.rotateX(THREE.MathUtils.degToRad(bend))
+    bone.rotateZ(THREE.MathUtils.degToRad(splay))
+    bone.rotateY(THREE.MathUtils.degToRad(rotn))
+  }
   if (localAxisRigOf(skeleton)) applyIkRigForearmToSkeleton(skeleton, values) // IK rig only: Elbow Bend / Elbow Side Bend / Forearm Twist
 }
 function applyWristPose() {
