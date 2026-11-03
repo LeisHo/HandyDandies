@@ -20661,8 +20661,8 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.1122917175292969}},{\"x\":1,\"y\":1}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1054}",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.00739907139489887,\"y\":0.6189585367838542}},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":392}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -48476,7 +48476,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.1122917175292969}},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.00739907139489887,\"y\":0.6189585367838542}},{\"x\":1,\"y\":1}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":280}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -76291,8 +76291,8 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.1122917175292969}},{\"x\":1,\"y\":1}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":1054}",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.00739907139489887,\"y\":0.6189585367838542}},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":392}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -83779,7 +83779,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -87657,7 +87657,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
