@@ -20752,19 +20752,19 @@
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": false,
       "frameRateDropThresholdFps": 5,
-      "logFrameProfileEnabled": false,
+      "logFrameProfileEnabled": true,
       "logRendererEnabled": true,
       "logFrameSectionsEnabled": true,
       "logSystemEnabled": true,
       "logHandBreakdownEnabled": false,
-      "logPoseJumpsEnabled": false,
+      "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
       "showFrameRate": false,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": false,
+      "exportLogsUiButton": true,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -48537,19 +48537,19 @@
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": false,
       "frameRateDropThresholdFps": 5,
-      "logFrameProfileEnabled": false,
+      "logFrameProfileEnabled": true,
       "logRendererEnabled": true,
       "logFrameSectionsEnabled": true,
       "logSystemEnabled": true,
       "logHandBreakdownEnabled": false,
-      "logPoseJumpsEnabled": false,
+      "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
       "showFrameRate": false,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": false,
+      "exportLogsUiButton": true,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -76322,19 +76322,19 @@
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": false,
       "frameRateDropThresholdFps": 5,
-      "logFrameProfileEnabled": false,
+      "logFrameProfileEnabled": true,
       "logRendererEnabled": true,
       "logFrameSectionsEnabled": true,
       "logSystemEnabled": true,
       "logHandBreakdownEnabled": false,
-      "logPoseJumpsEnabled": false,
+      "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
       "showFrameRate": false,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": false,
+      "exportLogsUiButton": true,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -83689,7 +83689,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -83952,7 +83952,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -84053,7 +84053,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -84412,7 +84412,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > Progress Crop",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -87209,7 +87209,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -87228,7 +87228,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
