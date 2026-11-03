@@ -20699,7 +20699,7 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveContinual": false,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
-      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4297432579993843,\"y\":0.14041659037272136}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35499038690036777,\"y\":0}}]",
+      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1370469512965613,\"y\":0.5404165903727214}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.0018877330442682583,\"y\":-0.6129166920979817}}]",
       "startupFnRetransitionSpeedCurveRange": "{\"min\":400,\"max\":905}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -20712,7 +20712,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveContinual": false,
       "startupFnRetransitionStartTimeCurveXOrigin": "Closest Hand",
-      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.37537751832856187,\"y\":0.2963541666666667}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35169550247416936,\"y\":0}}]",
+      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2056905514120622,\"y\":0.8946876525878906}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.16827983648293388,\"y\":-0.5119791666666667}}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":418}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
@@ -76329,7 +76329,7 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveContinual": false,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
-      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4297432579993843,\"y\":0.14041659037272136}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35499038690036777,\"y\":0}}]",
+      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.1370469512965613,\"y\":0.5404165903727214}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.0018877330442682583,\"y\":-0.6129166920979817}}]",
       "startupFnRetransitionSpeedCurveRange": "{\"min\":400,\"max\":905}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -76342,7 +76342,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveContinual": false,
       "startupFnRetransitionStartTimeCurveXOrigin": "Closest Hand",
-      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.37537751832856187,\"y\":0.2963541666666667}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35169550247416936,\"y\":0}}]",
+      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2056905514120622,\"y\":0.8946876525878906}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.16827983648293388,\"y\":-0.5119791666666667}}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":418}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
@@ -87437,7 +87437,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -87657,7 +87657,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
