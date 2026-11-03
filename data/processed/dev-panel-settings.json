@@ -84042,7 +84042,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -84178,7 +84178,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -93834,7 +93834,7 @@
       "left": 4.75,
       "top": 90.4000015258789,
       "width": 1519.2000732421875,
-      "height": 585.25,
+      "height": 586.8500366210938,
       "collapsed": false
     },
     "mobile": {
