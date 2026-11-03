@@ -16534,12 +16534,16 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
     if (contOn(p, 'TweenStopStartTimeCurve')) st.stoppingStartDelay = cfg[`${p}TweenStopStartTimeCurveEnabled`] ? liveCurveValue(hand, trig.tweenStopStartCurveParsed, trig.tweenStopStartRangeParsed, p, 'TweenStopStartTimeCurveVisibleOnly') : 0
     if (contOn(p, 'TweenStopDelayCurve')) st.stoppingDelayMs = Math.max(cfg[`${p}TweenStopDelayCurveEnabled`] ? liveCurveValue(hand, trig.tweenStopDelayCurveParsed, trig.tweenStopDelayRangeParsed, p, 'TweenStopDelayCurveVisibleOnly') : (cfg[`${p}TweenStopDelayMs`] || 0), 1)
   } else if (st.phase === 'retransition') {
+    // Hand Offset On Startup (2026-11-03): retransitionStartTime is the SCHEDULED start (it can lie several frames back), so the first refresh takes the whole time since then (no extra dt) and lets the progress catch up to it
+    // (below); every other function keeps its clock as it was.
+    let retJustBeganStartup = false
     if (st._retSeenStart !== st.retransitionStartTime) { // a new retransition just began
       st._retSeenStart = st.retransitionStartTime
       st.retProg = 0
       st.retElapsed = Math.max(now - st.retransitionStartTime, 0)
+      retJustBeganStartup = p === STARTUP_FN
     }
-    st.retElapsed += dt
+    if (!retJustBeganStartup) st.retElapsed += dt
     const isTw = kind === 'hold' && !!st.retransitionIsTween
     // Continually Recomputes off: the Retransition Start Time delay / Speed duration of THIS retransition are read once, when it begins, and kept.
     const rtBegan = st._retFrozenFor !== st.retransitionStartTime
@@ -16551,7 +16555,7 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
     const speedMs = rt0.speedMs
     advancePositionalProgress(st, hand, p, dt)
     st.retransitionDelay = delay
-    const eff = Math.min(dt, st.retElapsed - delay)
+    const eff = Math.min(retJustBeganStartup ? Infinity : dt, st.retElapsed - delay)
     if (eff > 0) st.retProg = Math.min((st.retProg ?? 0) + eff / (speedMs / retransitionScalerMul(hand, p)), 1)
   }
 }
@@ -17923,7 +17927,8 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
         // Sequence Hold Duration also applies at the end of a SINGLE-loop sequence (2026-11-01, direct report: it held between loops but not when the sequence plays once). The hold is simply added in front of the
         // Pause Duration: 'paused' (which keeps reapplying the final pose) starts counting its Pause Duration only after the hold, so end pose -> hold -> pause -> retransition. The startup transition never holds (see 'paused').
         const singleLoopHoldMs = isTween && p !== STARTUP_FN ? Math.max(cfg[`${p}SequenceHoldMs`] || 0, 0) : 0
-        cp.phase = 'paused'; cp.pauseStartTime = now + singleLoopHoldMs
+        // Hand Offset On Startup: the pause (and so the retransition) counts from the moment the forward pass really ended, not from the frame that noticed it (frames are 100-400 ms with 1,089 hands; see the matching change where the forward clock starts).
+        cp.phase = 'paused'; cp.pauseStartTime = (p === STARTUP_FN ? now - Math.max(elapsed - speedMs, 0) : now) + singleLoopHoldMs
       }
     }
   } else if (cp.phase === 'sequencePlaying') {
@@ -18045,7 +18050,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     if (now - cp.pauseStartTime >= pauseDurationMs) {
       cp.phase = 'retransition'
       cp.retransitionStart = cp.lastAppliedValues || { ...poseDefaultValues }
-      cp.retransitionStartTime = now
+      cp.retransitionStartTime = p === STARTUP_FN ? Math.min(now, cp.pauseStartTime + pauseDurationMs) : now // startup: the scheduled moment (see where the forward pass ends), not the frame that noticed it
       // Item 6 (2026-09-27): "Regardless of how far the hands offset or
       // rotate, if they have retransition turned on, they will always
       // retransition back to the original default pose and position and
