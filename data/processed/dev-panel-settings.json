@@ -20725,12 +20725,12 @@
       "sphereFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3776634014167311,\"y\":0}},{\"x\":0.7013170503235198,\"y\":1,\"h1\":{\"x\":0.18465017196373468,\"y\":0},\"h2\":{\"x\":-0.14763427456929518,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.09298306857513239,\"y\":0}}]",
       "sphereFnSpeedCurveEnabled": true,
       "sphereFnSpeedCurveVisibleOnly": true,
-      "sphereFnSpeedCurveXOrigin": "Global Setting",
+      "sphereFnSpeedCurveXOrigin": "Closest Hand",
       "sphereFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.430298627920699,\"y\":0.03343734741210935}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.47385419209798174}}]",
       "sphereFnSpeedCurveRange": "{\"min\":919,\"max\":1098}",
       "sphereFnStartTimeCurveEnabled": true,
       "sphereFnStartTimeCurveVisibleOnly": true,
-      "sphereFnStartTimeCurveXOrigin": "Global Setting",
+      "sphereFnStartTimeCurveXOrigin": "Closest Hand",
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.6119791666666666}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":359}",
       "sphereFnStartDistanceCurveEnabled": false,
@@ -48540,12 +48540,12 @@
       "sphereFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3776634014167311,\"y\":0}},{\"x\":0.7013170503235198,\"y\":1,\"h1\":{\"x\":0.18465017196373468,\"y\":0},\"h2\":{\"x\":-0.14763427456929518,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.09298306857513239,\"y\":0}}]",
       "sphereFnSpeedCurveEnabled": true,
       "sphereFnSpeedCurveVisibleOnly": true,
-      "sphereFnSpeedCurveXOrigin": "Global Setting",
+      "sphereFnSpeedCurveXOrigin": "Closest Hand",
       "sphereFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.430298627920699,\"y\":0.03343734741210935}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.47385419209798174}}]",
       "sphereFnSpeedCurveRange": "{\"min\":919,\"max\":1098}",
       "sphereFnStartTimeCurveEnabled": true,
       "sphereFnStartTimeCurveVisibleOnly": true,
-      "sphereFnStartTimeCurveXOrigin": "Global Setting",
+      "sphereFnStartTimeCurveXOrigin": "Closest Hand",
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.6119791666666666}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":359}",
       "sphereFnStartDistanceCurveEnabled": false,
@@ -76355,12 +76355,12 @@
       "sphereFnEasingCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3776634014167311,\"y\":0}},{\"x\":0.7013170503235198,\"y\":1,\"h1\":{\"x\":0.18465017196373468,\"y\":0},\"h2\":{\"x\":-0.14763427456929518,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.09298306857513239,\"y\":0}}]",
       "sphereFnSpeedCurveEnabled": true,
       "sphereFnSpeedCurveVisibleOnly": true,
-      "sphereFnSpeedCurveXOrigin": "Global Setting",
+      "sphereFnSpeedCurveXOrigin": "Closest Hand",
       "sphereFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.430298627920699,\"y\":0.03343734741210935}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.47385419209798174}}]",
       "sphereFnSpeedCurveRange": "{\"min\":919,\"max\":1098}",
       "sphereFnStartTimeCurveEnabled": true,
       "sphereFnStartTimeCurveVisibleOnly": true,
-      "sphereFnStartTimeCurveXOrigin": "Global Setting",
+      "sphereFnStartTimeCurveXOrigin": "Closest Hand",
       "sphereFnStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.13289772912856024,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.6119791666666666}}]",
       "sphereFnStartTimeRange": "{\"min\":0,\"max\":359}",
       "sphereFnStartDistanceCurveEnabled": false,
@@ -87318,7 +87318,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -87620,7 +87620,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -88028,7 +88028,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
