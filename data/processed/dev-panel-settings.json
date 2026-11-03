@@ -20631,7 +20631,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.20821614893441898,\"y\":0.31229171752929685}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.646025610734892,\"y\":-0.4410418192545573}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.10306161298735135,\"y\":0.765625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6198300624251076,\"y\":-0.1010416666666667}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":200}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -48416,7 +48416,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.20821614893441898,\"y\":0.31229171752929685}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.646025610734892,\"y\":-0.4410418192545573}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.10306161298735135,\"y\":0.765625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6198300624251076,\"y\":-0.1010416666666667}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":280}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -76201,7 +76201,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.20821614893441898,\"y\":0.31229171752929685}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.646025610734892,\"y\":-0.4410418192545573}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.10306161298735135,\"y\":0.765625}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6198300624251076,\"y\":-0.1010416666666667}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":200}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -87209,7 +87209,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -87228,7 +87228,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -87567,7 +87567,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
