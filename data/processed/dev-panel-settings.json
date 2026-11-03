@@ -20661,8 +20661,8 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.47855159349529897,\"y\":0.6722918192545573}},{\"x\":1,\"y\":1}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":186}",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.4203125}},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":89}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -48476,7 +48476,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.47855159349529897,\"y\":0.6722918192545573}},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.4203125}},{\"x\":1,\"y\":1}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":280}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -76291,8 +76291,8 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.47855159349529897,\"y\":0.6722918192545573}},{\"x\":1,\"y\":1}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":186}",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.4203125}},{\"x\":1,\"y\":1}]",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":89}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -84042,7 +84042,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -84143,7 +84143,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -84178,7 +84178,7 @@
                 "type": "group",
                 "group": {
                   "key": "New Group (7)",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -84502,7 +84502,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > Progress Crop",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -84793,7 +84793,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -87299,7 +87299,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -87318,7 +87318,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -87365,7 +87365,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Tween",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -87437,7 +87437,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -87620,7 +87620,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -87657,7 +87657,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
