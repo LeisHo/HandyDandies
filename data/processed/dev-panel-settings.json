@@ -20661,8 +20661,8 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3691012174856896,\"y\":0.9522916158040364}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.4677083333333334}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":312}",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.14760638104150847,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6145321706755048,\"y\":0}}]",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":487}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -20678,8 +20678,8 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveContinual": false,
       "startupFnSpeedCurveXOrigin": "Closest Hand",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36364568020608773,\"y\":0.2630203247070313}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35484860449094546,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.18088516052820217,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6030755507128303,\"y\":0}}]",
+      "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1129}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveContinual": false,
@@ -48476,7 +48476,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3691012174856896,\"y\":0.9522916158040364}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.4677083333333334}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.14760638104150847,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6145321706755048,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":280}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -76291,8 +76291,8 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3691012174856896,\"y\":0.9522916158040364}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.4677083333333334}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":312}",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.14760638104150847,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6145321706755048,\"y\":0}}]",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":487}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -76308,8 +76308,8 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveContinual": false,
       "startupFnSpeedCurveXOrigin": "Closest Hand",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36364568020608773,\"y\":0.2630203247070313}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35484860449094546,\"y\":0}}]",
-      "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.18088516052820217,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.6030755507128303,\"y\":0}}]",
+      "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1129}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
       "startupFnStartTimeCurveContinual": false,
@@ -87437,7 +87437,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -87448,7 +87448,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": true,
                         "items": [
                           {
@@ -87485,7 +87485,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": true,
                         "items": [
                           {
@@ -87620,7 +87620,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -87657,7 +87657,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -88001,7 +88001,7 @@
           "type": "group",
           "group": {
             "key": "Field Grid Sphere Sequence",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -88028,7 +88028,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -88077,7 +88077,7 @@
                 "type": "group",
                 "group": {
                   "key": "Sphere > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
