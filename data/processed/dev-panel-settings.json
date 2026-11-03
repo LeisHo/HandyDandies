@@ -501,7 +501,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.03419445697053541,\"y\":0},\"bg\":0.18},{\"x\":0.8742644845372948,\"y\":0,\"h2\":{\"x\":-0.2639907517000085,\"y\":0.5584373474121094}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.03419445697053541,\"y\":0},\"bg\":0.18},{\"x\":0.5856783188571846,\"y\":0,\"h2\":{\"x\":-0.2639907517000085,\"y\":0.5584373474121094}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -28286,7 +28286,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.03419445697053541,\"y\":0},\"bg\":0.18},{\"x\":0.8742644845372948,\"y\":0,\"h2\":{\"x\":-0.2639907517000085,\"y\":0.5584373474121094}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.03419445697053541,\"y\":0},\"bg\":0.18},{\"x\":0.5856783188571846,\"y\":0,\"h2\":{\"x\":-0.2639907517000085,\"y\":0.5584373474121094}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -56071,7 +56071,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.03419445697053541,\"y\":0},\"bg\":0.18},{\"x\":0.8742644845372948,\"y\":0,\"h2\":{\"x\":-0.2639907517000085,\"y\":0.5584373474121094}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.03419445697053541,\"y\":0},\"bg\":0.18},{\"x\":0.5856783188571846,\"y\":0,\"h2\":{\"x\":-0.2639907517000085,\"y\":0.5584373474121094}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -83952,7 +83952,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -84053,7 +84053,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -84412,7 +84412,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > Progress Crop",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -87209,7 +87209,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -87228,7 +87228,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -87530,7 +87530,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -87567,7 +87567,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
