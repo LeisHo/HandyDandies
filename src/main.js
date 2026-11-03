@@ -419,6 +419,13 @@ let loadingWarmMode = false, fieldPreposeDeadline = 0, loadingPreviewBuiltRoot =
 // logged) / 2 (wait-over logged); fieldWorkDoneLogged = the "all loading work done" line was written; fieldReposedCache = hands-with-a-first-pose share, refreshed at most every 100 ms because loadingProgressNow() runs several times a frame.
 let fieldStartedAtMs = 0, fieldPreposeLog = 0, fieldWorkDoneLogged = false
 const fieldReposedCache = { at: 0, frac: 0 }
+// Time-paced loading progress (2026-11-03, direct request: "the Progress Crop curve should match the total time of loading ... reach 0% at 90% loading, then going back to 100% in a relatively short time"). Each loading stage is weighted by how long it took on the
+// PREVIOUS load on this device (loadStagePrev, kept in localStorage), so the progress is close to linear in time; the stages are: ready (JS start + model + settings), field build, shader compile, hand reveal, first poses. LOAD_STAGE_DEFAULT_MS is the first-visit
+// fallback (taken from one desktop log, a judgment call). The real work fills 0 .. loadWorkShare() (where the Progress Crop curve reaches its lowest crop, 0.9 when that cannot be read); the rest (the wipe-out end of the curve) plays over loadingFinishMs() after the work is done.
+const LOAD_STAGES_KEY = 'handyDandies.loadStages.v1'
+const LOAD_WORK_SHARE_DEFAULT = 0.9, LOAD_FINISH_MAX_MS = 1000, LOAD_FINISH_MIN_MS = 300, LOAD_STAGE_DEFAULT_MS = [1000, 2000, 250, 4600, 50]
+const loadStageT = { ready: 0, build: 0, compile: 0, reveal: 0, poses: 0 } // ms after page load when each stage was first seen finished
+let loadWorkShareKey = null, loadWorkShareVal = LOAD_WORK_SHARE_DEFAULT, loadStagePrev, loadingWorkDoneAt = 0, loadStageSaved = false, loadingFinishTimerSet = false
 // On-screen frame rate (Debug > Show Frame Rate, 2026-10-18): frames actually drawn since the last refresh.
 let frameRateDrawn = 0, frameRateWindowStart = 0, frameRateEl = null
 const endSeq = { phase: 'off', finished: false, lapAtBegin: 0, timer: 0, seq: null, tr1: null, tr2: null, lapIndex: 1, lapStartMs: 0, holdEndMs: 0, dir: 1, lapStyle: 'Loop', total: 1, speedMs: 1000, pauseEndMs: 0, retStartMs: 0, retDur: 0, from1: null, from2: null }
@@ -1201,18 +1208,86 @@ function fieldReposedFrac() {
   }
   return fieldReposedCache.frac
 }
+// Each stage's duration on the previous load on this device (ms), or the first-visit defaults.
+function loadStageDurations() {
+  if (loadStagePrev === undefined) {
+    loadStagePrev = null
+    try {
+      const a = JSON.parse(localStorage.getItem(LOAD_STAGES_KEY + '.' + realDeviceClass()) || 'null')
+      if (Array.isArray(a) && a.length === 5 && a.every((v) => Number.isFinite(v) && v >= 1)) loadStagePrev = a
+    } catch (err) { /* unavailable -- use the defaults */ }
+  }
+  return loadStagePrev || LOAD_STAGE_DEFAULT_MS
+}
+// How long the wipe-out end of the Progress Crop curve (loadWorkShare() .. 100%) plays after the work is done: the same share of the work time it has of the progress, kept between 0.3 s and 1 s (direct request: at most 1 second; the 0.3 s floor is a judgment call).
+// Where on the progress axis the real work ends: the last X where the Progress Crop curve is at its lowest crop (the user's curve reaches 0% there and then rises back to 100% over the rest). 0.9 when the curve is off, unreadable or ends at its lowest.
+function loadWorkShare() {
+  const key = cfg.loadingPreviewProgressCropEnabled ? String(cfg.loadingPreviewProgressCropCurve) + '|' + String(cfg.loadingPreviewProgressCropRange) : 'off'
+  if (key === loadWorkShareKey) return loadWorkShareVal
+  loadWorkShareKey = key
+  loadWorkShareVal = LOAD_WORK_SHARE_DEFAULT
+  if (key !== 'off') {
+    try {
+      const pts = sphereParse(cfg.loadingPreviewProgressCropCurve, null)
+      if (pts && pts.length >= 2) {
+        const N = 500, ys = []
+        let lo = Infinity
+        for (let i = 0; i <= N; i++) { const y = THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, i / N), 0, 1); ys.push(y); if (y < lo) lo = y }
+        let last = -1
+        for (let i = 0; i <= N; i++) if (ys[i] <= lo + 0.005) last = i
+        const x = last / N
+        if (x >= 0.5 && x < 0.995) loadWorkShareVal = x
+      }
+    } catch (err) { /* keep the default */ }
+  }
+  return loadWorkShareVal
+}
+function loadingFinishMs() {
+  const d = loadStageDurations()
+  const work = d.reduce((a, b) => a + b, 0)
+  const share = loadWorkShare()
+  return Math.min(LOAD_FINISH_MAX_MS, Math.max(LOAD_FINISH_MIN_MS, work * (1 - share) / share))
+}
 function loadingProgressNow(real = cfg.loadingPreviewProgressCropRealtime !== false) {
   const now = performance.now()
   if (fieldRevealed) return lpLiveCycle.active ? lpLiveCycle.progress : 1
   if (fieldStarted) return 1
-  // 2026-10-25: the warm-up share used to read 100% the moment the last hand was shown, but the reveal then still waits for every hand's first pose (up to 2 s, see tryStartField()). With the progress at 100% the Progress Crop curve's
-  // end (and the 200 ms laps of the Animation Speed Curve) had already wiped / sped up the loading hand, so that wait looked like a long empty pause. The first-pose share is now the last 15% of the warm-up share (a judgment call, not a measurement).
-  const warmShare = fieldWarmStage >= 1 ? 0.3 * (fieldWarmStage >= 2 ? 1 : Math.min(1, (now - fieldWarmStartMs) / FIELD_WARM_CAP_MS)) + 0.7 * (hands.length ? fieldWarmRevealIndex / hands.length : 0) : 0
-  // (2026-11-03: the first-pose share is the last 3%, not the last 15% -- a 15% share made the warm-up end at 94.75% and the progress then jumped straight to 100% (seen in a real log: 95% -> 100% in 1 ms), skipping the part of the Progress Crop curve between 95% and 100%.)
-  const warm = fieldWarmStage >= 3 ? 0.97 + 0.03 * fieldReposedFrac() : 0.97 * warmShare
-  const work = 0.1 * (modelMeasurementsReady ? 1 : 0) + 0.1 * (startupSettingsReady ? 1 : 0) + 0.45 * (fieldBuildDone ? 1 : fieldBuildFrac) + 0.35 * warm
-  const timeFrac = Math.min(1, (now - pageLoadStartMs) / Math.max(cfg.loadingMinTimeMs || 0, 1))
-  loadingProgressShown = Math.max(loadingProgressShown, Math.min(work, timeFrac)) // the real progress (never ahead of the Min Loading Time clock, never backwards)
+  const t = now - pageLoadStartMs
+  const d = loadStageDurations()
+  // when each stage was first seen finished (these only ever move forward)
+  if (!loadStageT.ready && modelMeasurementsReady && startupSettingsReady) loadStageT.ready = t
+  if (!loadStageT.build && loadStageT.ready && fieldBuildDone) loadStageT.build = t
+  if (!loadStageT.compile && loadStageT.build && fieldWarmStage >= 2) loadStageT.compile = t
+  if (!loadStageT.reveal && loadStageT.compile && fieldWarmStage >= 3) loadStageT.reveal = t
+  const reposed = fieldWarmStage >= 3 ? fieldReposedFrac() : 0
+  if (!loadStageT.poses && loadStageT.reveal && reposed >= 1) loadStageT.poses = t
+  // share of each stage done: the ready stage and the compile are waits with no count, so they ramp over their previous duration (never quite to 100% until they finish)
+  const sf = [
+    loadStageT.ready ? 1 : Math.min(0.95, t / d[0]),
+    fieldBuildDone ? 1 : fieldBuildFrac,
+    fieldWarmStage >= 2 ? 1 : (fieldWarmStage >= 1 ? Math.min(0.95, (now - fieldWarmStartMs) / d[2]) : 0),
+    fieldWarmStage >= 3 ? 1 : (fieldWarmStage >= 1 && hands.length ? fieldWarmRevealIndex / hands.length : 0),
+    reposed
+  ]
+  let w = 0, sum = 0
+  for (let i = 0; i < 5; i++) { w += d[i] * sf[i]; sum += d[i] }
+  const share = loadWorkShare()
+  let total = share * (w / sum)
+  if (loadStageT.poses) {
+    if (!loadingWorkDoneAt) {
+      loadingWorkDoneAt = now
+      logLoadingPreview(`all loading work done at ${Math.round(t)} ms -- the end of the Progress Crop curve (${(share * 100).toFixed(1)}% -> 100%) plays over the next ${Math.round(loadingFinishMs())} ms`)
+      if (cfg.loadingPreviewEnabled && !loadStageSaved) { // remember how long each stage took for the next load on this device
+        loadStageSaved = true
+        const T = loadStageT
+        const dur = [T.ready, T.build - T.ready, T.compile - T.build, T.reveal - T.compile, T.poses - T.reveal].map((v) => Math.max(1, Math.round(v)))
+        try { localStorage.setItem(LOAD_STAGES_KEY + '.' + realDeviceClass(), JSON.stringify(dur)) } catch (err) { /* private mode -- only an optimisation */ }
+      }
+    }
+    total = share + (1 - share) * Math.min(1, (now - loadingWorkDoneAt) / loadingFinishMs())
+  }
+  const timeFrac = Math.min(1, t / Math.max(cfg.loadingMinTimeMs || 0, 1))
+  loadingProgressShown = Math.max(loadingProgressShown, Math.min(total, timeFrac)) // the real progress (never ahead of the Min Loading Time clock, never backwards)
   return real ? loadingProgressShown : timeFrac // real = stage progress; otherwise just the Min Loading Time clock (Progress Crop's own checkbox picks which)
 }
 // Per loading hand: a fragment-shader clip against ONE plane in the hand's own frame (injected through onBeforeCompile on top of the toon shader, so it is independent per hand - the optional second hand has its own orientation -
@@ -1527,6 +1602,11 @@ function tryStartField() {
   if (endSeqShouldRun()) {
     if (endSeq.phase === 'off') startEndSequence()
     if (endSeq.phase !== 'done') return
+  }
+  // Time-paced loading progress (2026-11-03): the field does not start before the wipe-out end of the Progress Crop curve has played (loadingFinishMs() after the work was done), so it is not cut off.
+  if (cfg.loadingPreviewEnabled && loadingWorkDoneAt) {
+    const left = loadingFinishMs() - (performance.now() - loadingWorkDoneAt)
+    if (left > 0) { if (!loadingFinishTimerSet) { loadingFinishTimerSet = true; setTimeout(() => { loadingFinishTimerSet = false; tryStartField() }, left + 10) } return }
   }
   fieldStarted = true
   fieldStartedAtMs = performance.now()
