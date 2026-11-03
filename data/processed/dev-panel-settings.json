@@ -20780,14 +20780,14 @@
       "logLoadingPreviewEnabled": true,
       "logHandBehaviourEnabled": true,
       "logHandBehaviourDetailedEnabled": false,
-      "logFrameRateDropsEnabled": false,
+      "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 5,
-      "logFrameProfileEnabled": false,
+      "logFrameProfileEnabled": true,
       "logRendererEnabled": false,
       "logFrameSectionsEnabled": false,
       "logSystemEnabled": false,
       "logHandBreakdownEnabled": false,
-      "logPoseJumpsEnabled": false,
+      "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
@@ -48595,14 +48595,14 @@
       "logLoadingPreviewEnabled": true,
       "logHandBehaviourEnabled": true,
       "logHandBehaviourDetailedEnabled": false,
-      "logFrameRateDropsEnabled": false,
+      "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 5,
-      "logFrameProfileEnabled": false,
+      "logFrameProfileEnabled": true,
       "logRendererEnabled": false,
       "logFrameSectionsEnabled": false,
       "logSystemEnabled": false,
       "logHandBreakdownEnabled": false,
-      "logPoseJumpsEnabled": false,
+      "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
@@ -76410,14 +76410,14 @@
       "logLoadingPreviewEnabled": true,
       "logHandBehaviourEnabled": true,
       "logHandBehaviourDetailedEnabled": false,
-      "logFrameRateDropsEnabled": false,
+      "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 5,
-      "logFrameProfileEnabled": false,
+      "logFrameProfileEnabled": true,
       "logRendererEnabled": false,
       "logFrameSectionsEnabled": false,
       "logSystemEnabled": false,
       "logHandBreakdownEnabled": false,
-      "logPoseJumpsEnabled": false,
+      "logPoseJumpsEnabled": true,
       "poseJumpBoneThresholdDeg": 15,
       "poseJumpPositionThreshold": 2,
       "logRenderReorderEnabled": false,
@@ -83779,7 +83779,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -87299,7 +87299,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -87318,7 +87318,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -87485,7 +87485,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": true,
                         "items": [
                           {
@@ -87620,7 +87620,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -87657,7 +87657,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
