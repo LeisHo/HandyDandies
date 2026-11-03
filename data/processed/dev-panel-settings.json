@@ -20711,8 +20711,8 @@
       "startupFnRetransitionStartTimeCurveEnabled": true,
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveContinual": false,
-      "startupFnRetransitionStartTimeCurveXOrigin": "Global Setting",
-      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.0938389237933375,\"y\":0.783020273844401}},{\"x\":1,\"y\":1}]",
+      "startupFnRetransitionStartTimeCurveXOrigin": "Closest Hand",
+      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.12990801060003992,\"y\":0.6030207316080729}},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":0}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
@@ -48526,7 +48526,7 @@
       "startupFnRetransitionStartTimeCurveEnabled": true,
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveContinual": false,
-      "startupFnRetransitionStartTimeCurveXOrigin": "Global Setting",
+      "startupFnRetransitionStartTimeCurveXOrigin": "Closest Hand",
       "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3567004088400583,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":100}",
       "sphereSeqEnabled": true,
@@ -76341,8 +76341,8 @@
       "startupFnRetransitionStartTimeCurveEnabled": true,
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveContinual": false,
-      "startupFnRetransitionStartTimeCurveXOrigin": "Global Setting",
-      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.0938389237933375,\"y\":0.783020273844401}},{\"x\":1,\"y\":1}]",
+      "startupFnRetransitionStartTimeCurveXOrigin": "Closest Hand",
+      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.12990801060003992,\"y\":0.6030207316080729}},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":0}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
@@ -87448,7 +87448,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": true,
                         "items": [
                           {
@@ -87620,7 +87620,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -87763,7 +87763,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Hand Scale Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
