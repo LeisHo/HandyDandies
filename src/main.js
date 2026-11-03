@@ -6235,8 +6235,34 @@ function handLogTriggerLabel(p) {
 function appendHandBehaviourLogLine(line) {
   if (logsPaused) return
   handBehaviourLogEntries.push(line)
-  if (handBehaviourLogEntries.length > HAND_BEHAVIOUR_LOG_MAX_ENTRIES) handBehaviourLogEntries.shift()
+  if (handBehaviourLogEntries.length > HAND_BEHAVIOUR_LOG_MAX_ENTRIES) { const k = handBehaviourLogEntries.findIndex((e) => !e.includes(' startupFn curve check -- ')); handBehaviourLogEntries.splice(k < 0 ? 0 : k, 1) } // the startup curve check lines (logStartupCurveDiagnostic()) are kept; the per-hand lines that follow a 1,089-hand startup would push them out of the 200
   scheduleLogDomFlush(_handBehaviourLogFlushFlag, () => handBehaviourLogEl, handBehaviourLogEntries)
+}
+// Hand Offset On Startup curve check (2026-11-03, direct request: the Start Time / Speed curves look even on the curve but the animation shows a clear split between a chunk of close hands and the rest). With Log Hand Behaviour on, the
+// click that triggers the startup sequence writes a short summary to the Hand Behaviour Log: the curve's distance domain (how many hands are in it, nearest distance, range, X origin), then one line per 0.1 of the curve's X axis
+// (the hands in it, how many of them are on screen, and the Start Time delay and Speed duration they were given), and one line for the hands beyond X = 1, which are clamped to the curve's end. Reading it shows whether the split is in the numbers.
+function logStartupCurveDiagnostic(rows) {
+  const p = STARTUP_FN
+  const visT = cfg[`${p}StartTimeCurveVisibleOnly`] !== false
+  const mnT = visT ? xyFieldMinDist : xyAllMinDist, rgT = visT ? xyFieldDistRange : xyAllDistRange
+  const keyT = `${p}StartTimeCurveXOrigin`
+  const f = (v) => (Number.isFinite(v) ? v.toFixed(1) : '-')
+  const stamp = () => `[${new Date().toLocaleTimeString()}] startupFn curve check -- `
+  const onN = rows.filter((r) => r.on).length
+  appendHandBehaviourLogLine(stamp() + `${rows.length} hands triggered, ${onN} of them on screen | mode ${cfg[`${p}Mode`]} | Start Time: Visible Hands Only ${visT}, X origin "${cfg[keyT]}", domain nearest ${f(mnT)} range ${f(rgT)} | Speed: Visible Hands Only ${cfg[`${p}SpeedCurveVisibleOnly`] !== false}, X origin "${cfg[`${p}SpeedCurveXOrigin`]}" | click NDC ${cursorNDC.x.toFixed(3)}, ${cursorNDC.y.toFixed(3)} | window ${window.innerWidth}x${window.innerHeight}`)
+  const bins = []
+  rows.forEach((r) => {
+    const x = normFieldDist(r.d, mnT, rgT, keyT)
+    const b = x >= 1 ? 10 : Math.floor(x * 10)
+    ;(bins[b] || (bins[b] = [])).push(r)
+  })
+  for (let b = 0; b <= 10; b++) {
+    const g = bins[b]
+    if (!g || !g.length) continue
+    const dl = g.map((r) => r.delay), sp = g.map((r) => r.speed)
+    const mean = (a) => a.reduce((s, v) => s + v, 0) / a.length
+    appendHandBehaviourLogLine(stamp() + (b === 10 ? 'X >= 1 (beyond the domain, clamped)' : `X ${(b / 10).toFixed(1)}-${((b + 1) / 10).toFixed(1)}`) + `: ${g.length} hands (${g.filter((r) => r.on).length} on screen) | start delay ms min ${f(Math.min(...dl))} mean ${f(mean(dl))} max ${f(Math.max(...dl))} | speed ms min ${f(Math.min(...sp))} mean ${f(mean(sp))} max ${f(Math.max(...sp))}`)
+  }
 }
 function logHandBehaviourEvent(handIndex, source, text) {
   if (!cfg.logHandBehaviourEnabled) return
@@ -18153,6 +18179,7 @@ function triggerClickPose(p, onlyHands = null) {
   let splay3dMin = Infinity, splay3dMax = -Infinity
   hands.forEach((h3) => { if (h3._onScr === false) return; const d3 = handPoint(h3).distanceTo(cursorTarget); if (d3 < splay3dMin) splay3dMin = d3; if (d3 > splay3dMax) splay3dMax = d3 })
   const splay3dRange = Math.max(splay3dMax - splay3dMin, 0.001)
+  const startupDiag = (p === STARTUP_FN && cfg.logHandBehaviourEnabled) ? [] : null // Log Hand Behaviour on: one summary of the startup curve inputs/outputs per hand (see logStartupCurveDiagnostic())
   hands.forEach((hand, i) => {
     if (onlyHands && !onlyHands.has(hand)) return // Skip If Same Pose / Multi Trigger already chose this trigger for other hands
     if (p === STARTUP_FN ? hand._startupTriggered : handStartupLocked(hand)) return // startup sequence: already-triggered hands are never retriggered; every other function skips a hand still in its startup sequence
@@ -18208,10 +18235,12 @@ function triggerClickPose(p, onlyHands = null) {
     cp.pendingFrozenOffsetNorm = captureCameraOffsetNorm(hand, p)
     cp.pendingFrozenHandQuat = hand.wrapper.quaternion.clone() // Hand Axes Offset (2026-10-04)
     cp.pendingFrozenSpeedMs = cfg[`${p}SpeedCurveEnabled`] ? curveByDomain(p, 'SpeedCurveVisibleOnly', dists[i], trig.speedCurveParsed, trig.speedRangeParsed) : 0
+    if (startupDiag) startupDiag.push({ i, d: dists[i], delay, speed: cp.pendingFrozenSpeedMs, on: hand._onScr !== false })
     // On Click (2026-10-20): the main function waits for its On Click sequence, which starts at the moment the main one would have (same Start Time / Start Distance).
     cp.awaitClk = false
     if (cp.pendingClaimAt && onClickOn(p) && armOnClickForHand(hand, p, cp.pendingClaimAt, now, sTween, tweenFractionCap, cp.pendingFrozenSplayDeg)) { cp.awaitClk = true; cp.pendingClaimAt = 0 }
   })
+  if (startupDiag && startupDiag.length) logStartupCurveDiagnostic(startupDiag)
 }
 // Click / Double / Triple / Quadruple-Click Pose disambiguation: N
 // underlying 'click' events can't be told apart from N-1 separate clicks
