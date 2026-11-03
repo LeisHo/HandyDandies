@@ -501,7 +501,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.959195259720775,\"y\":0,\"h2\":{\"x\":-0.44129576098109247,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.9884965683954868,\"y\":0,\"h2\":{\"x\":-0.18148510380443628,\"y\":0.42510401407877607},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -28286,7 +28286,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.959195259720775,\"y\":0,\"h2\":{\"x\":-0.44129576098109247,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.9884965683954868,\"y\":0,\"h2\":{\"x\":-0.18148510380443628,\"y\":0.42510401407877607},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -56071,7 +56071,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.959195259720775,\"y\":0,\"h2\":{\"x\":-0.44129576098109247,\"y\":0}},{\"x\":1,\"y\":1}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.9884965683954868,\"y\":0,\"h2\":{\"x\":-0.18148510380443628,\"y\":0.42510401407877607},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -83952,7 +83952,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -84053,7 +84053,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -84412,7 +84412,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > Progress Crop",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -87567,7 +87567,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -93743,8 +93743,8 @@
     "desktop": {
       "left": 4.75,
       "top": 90.4000015258789,
-      "width": 777.2875366210938,
-      "height": 577.25,
+      "width": 1516.487548828125,
+      "height": 580.4500122070312,
       "collapsed": false
     },
     "mobile": {
