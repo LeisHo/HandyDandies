@@ -88,7 +88,15 @@ const HAND_MODEL_BUILTINS = [
   { id: 'repo:HD_IK_10k_T', name: 'HD IK 10k T (9,794 tris)', url: '../data/processed/HAND3D/HD_IK_10k_T.glb', source: 'repo' },
   { id: 'repo:SKELETON HAND', name: 'SKELETON HAND (4,987 tris)', url: '../data/processed/HAND3D/SKELETON%20HAND.glb', source: 'repo' },
   { id: 'repo:SKELETON HAND_W', name: 'SKELETON HAND W (4,987 tris)', url: '../data/processed/HAND3D/SKELETON%20HAND_W.glb', source: 'repo' },
-  { id: 'repo:FEMALE HAND_8k', name: 'FEMALE HAND 8k (8,142 tris)', url: '../data/processed/HAND3D/FEMALE%20HAND_8k.glb', source: 'repo' }
+  { id: 'repo:FEMALE HAND_8k', name: 'FEMALE HAND 8k (8,142 tris)', url: '../data/processed/HAND3D/FEMALE%20HAND_8k.glb', source: 'repo' },
+  // 2026-11-03 (direct report: "I don't see the new models on mobile"): these five were imported with the Hand Models Import button, which keeps a file in the importing browser only (IndexedDB), so every other device listed
+  // them as "not on this device" and could not load them. Now files of the project, named exactly like the imports (the file name without .glb) so refreshHandModelList() drops the device-local entries of the same name and
+  // moves the Hand Model choice (handModelId, loadingPreviewModelId) to these, on every device. Copied byte for byte from HANDO's data/HAND MODELS/HAND3D/HAND-021/.
+  { id: 'repo:HAND_IK_3K_5mmOL', name: 'HAND_IK_3K_5mmOL', url: '../data/processed/HAND3D/HAND_IK_3K_5mmOL.glb', source: 'repo' },
+  { id: 'repo:HAND_IK_6K_5mmOL', name: 'HAND_IK_6K_5mmOL', url: '../data/processed/HAND3D/HAND_IK_6K_5mmOL.glb', source: 'repo' },
+  { id: 'repo:HAND_IK_8K_5mmOL', name: 'HAND_IK_8K_5mmOL', url: '../data/processed/HAND3D/HAND_IK_8K_5mmOL.glb', source: 'repo' },
+  { id: 'repo:HAND_IK_10K_5mmOL', name: 'HAND_IK_10K_5mmOL', url: '../data/processed/HAND3D/HAND_IK_10K_5mmOL.glb', source: 'repo' },
+  { id: 'repo:HAND_IK_12K_5mmOL', name: 'HAND_IK_12K_5mmOL', url: '../data/processed/HAND3D/HAND_IK_12K_5mmOL.glb', source: 'repo' }
 ]
 const lpLoadedRoots = new Map() // model id -> the loaded, prepared scene root (only for ids that loaded fine)
 const lpModelLoads = new Map() // model id -> the load promise (a model is fetched once)
