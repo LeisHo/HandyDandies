@@ -169,8 +169,8 @@
       "offScreenBufferEnabled": true,
       "offScreenBufferDistance": 30,
       "handWristSplayRange": "{\"min\":-75,\"max\":80}",
-      "handWristBendRange": "{\"min\":-45,\"max\":45}",
-      "handWristRotationRange": "{\"min\":-30,\"max\":30}",
+      "handWristBendRange": "{\"min\":-75,\"max\":75}",
+      "handWristRotationRange": "{\"min\":-45,\"max\":45}",
       "skipOffScreenPoseWork": false,
       "retainRotationArmWork": false,
       "skipOffScreenSceneUpdate": true,
@@ -84703,7 +84703,7 @@
     },
     {
       "key": "New Group (2)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -84714,7 +84714,7 @@
           "type": "group",
           "group": {
             "key": "Field Layout",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -85030,7 +85030,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Bend",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -85047,7 +85047,7 @@
                 "type": "group",
                 "group": {
                   "key": "Hand Min Max Wrist Rotation",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": false,
                   "items": [
                     {
@@ -87209,7 +87209,7 @@
     },
     {
       "key": "Starting State",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -87228,7 +87228,7 @@
           "type": "group",
           "group": {
             "key": "Hand Offset On Startup",
-            "collapsed": false,
+            "collapsed": true,
             "locked": true,
             "items": [
               {
@@ -87513,7 +87513,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Easing",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -87530,7 +87530,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
