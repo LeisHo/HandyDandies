@@ -531,7 +531,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.22452945876501706,\"y\":-0.5548957824707031},\"bg\":0.18},{\"x\":0.9359315491608124,\"y\":0.02510401407877605,\"h2\":{\"x\":-0.4322107548758747,\"y\":0.44510421752929685},\"h1\":{\"x\":0.022913239925349327,\"y\":0.7251040140787761}},{\"x\":1,\"y\":1}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.16779186273266844,\"y\":-0.7082290649414062},\"bg\":0.18},{\"x\":0.9533892518065599,\"y\":0,\"h2\":{\"x\":-0.030551042063727496,\"y\":0.21843719482421875},\"h1\":{\"x\":0.004909950253684681,\"y\":0.4917709350585937}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.029698549328717294,\"y\":-0.02156244913736982}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -28346,7 +28346,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.22452945876501706,\"y\":-0.5548957824707031},\"bg\":0.18},{\"x\":0.9359315491608124,\"y\":0.02510401407877605,\"h2\":{\"x\":-0.4322107548758747,\"y\":0.44510421752929685},\"h1\":{\"x\":0.022913239925349327,\"y\":0.7251040140787761}},{\"x\":1,\"y\":1}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.16779186273266844,\"y\":-0.7082290649414062},\"bg\":0.18},{\"x\":0.9533892518065599,\"y\":0,\"h2\":{\"x\":-0.030551042063727496,\"y\":0.21843719482421875},\"h1\":{\"x\":0.004909950253684681,\"y\":0.4917709350585937}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.029698549328717294,\"y\":-0.02156244913736982}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -56161,7 +56161,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.22452945876501706,\"y\":-0.5548957824707031},\"bg\":0.18},{\"x\":0.9359315491608124,\"y\":0.02510401407877605,\"h2\":{\"x\":-0.4322107548758747,\"y\":0.44510421752929685},\"h1\":{\"x\":0.022913239925349327,\"y\":0.7251040140787761}},{\"x\":1,\"y\":1}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.16779186273266844,\"y\":-0.7082290649414062},\"bg\":0.18},{\"x\":0.9533892518065599,\"y\":0,\"h2\":{\"x\":-0.030551042063727496,\"y\":0.21843719482421875},\"h1\":{\"x\":0.004909950253684681,\"y\":0.4917709350585937}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.029698549328717294,\"y\":-0.02156244913736982}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -84042,7 +84042,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -84143,7 +84143,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
@@ -84502,7 +84502,7 @@
                 "type": "group",
                 "group": {
                   "key": "Loading Preview > Progress Crop",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
