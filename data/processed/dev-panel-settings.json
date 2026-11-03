@@ -20631,8 +20631,8 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.06480208012941549,\"y\":0.33229166666666665}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5515094680359364,\"y\":-0.3677083333333333}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":500}",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.31512874422627596,\"y\":0.878958257039388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.269482062737354,\"y\":0}}]",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":300}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -48416,7 +48416,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.06480208012941549,\"y\":0.33229166666666665}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5515094680359364,\"y\":-0.3677083333333333}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.31512874422627596,\"y\":0.878958257039388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.269482062737354,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":280}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -76201,8 +76201,8 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.06480208012941549,\"y\":0.33229166666666665}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5515094680359364,\"y\":-0.3677083333333333}}]",
-      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":500}",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.31512874422627596,\"y\":0.878958257039388}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.269482062737354,\"y\":0}}]",
+      "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":300}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
       "startupFnSequenceCountMode": "Loop",
@@ -87347,7 +87347,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -87358,7 +87358,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": true,
                         "items": [
                           {
@@ -87395,7 +87395,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": true,
                         "items": [
                           {
@@ -87567,7 +87567,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
