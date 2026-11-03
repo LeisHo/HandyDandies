@@ -423,7 +423,7 @@ const fieldReposedCache = { at: 0, frac: 0 }
 // PREVIOUS load on this device (loadStagePrev, kept in localStorage), so the progress is close to linear in time; the stages are: ready (JS start + model + settings), field build, shader compile, hand reveal, first poses. LOAD_STAGE_DEFAULT_MS is the first-visit
 // fallback (taken from one desktop log, a judgment call). The real work fills 0 .. loadWorkShare() (where the Progress Crop curve reaches its lowest crop, 0.9 when that cannot be read); the rest (the wipe-out end of the curve) plays over loadingFinishMs() after the work is done.
 const LOAD_STAGES_KEY = 'handyDandies.loadStages.v1'
-const LOAD_WORK_SHARE_DEFAULT = 0.9, LOAD_FINISH_MAX_MS = 1000, LOAD_FINISH_MIN_MS = 300, LOAD_STAGE_DEFAULT_MS = [1000, 2000, 250, 4600, 50]
+const LOAD_WORK_SHARE_DEFAULT = 0.9, LOAD_FINISH_MAX_MS = 1000, LOAD_FINISH_MIN_MS = 300, LOAD_HOLD_MS = 200, LOAD_STAGE_DEFAULT_MS = [1000, 2000, 250, 4600, 50]
 const loadStageT = { ready: 0, build: 0, compile: 0, reveal: 0, poses: 0 } // ms after page load when each stage was first seen finished
 let loadWorkShareKey = null, loadWorkShareVal = LOAD_WORK_SHARE_DEFAULT, loadStagePrev, loadingWorkDoneAt = 0, loadStageSaved = false, loadingFinishTimerSet = false
 // On-screen frame rate (Debug > Show Frame Rate, 2026-10-18): frames actually drawn since the last refresh.
@@ -1235,14 +1235,17 @@ function loadWorkShare() {
         for (let i = 0; i <= N; i++) { const y = THREE.MathUtils.clamp(evaluateArmLengthCurve(pts, i / N), 0, 1); ys.push(y); if (y < lo) lo = y }
         let last = -1
         for (let i = 0; i <= N; i++) if (ys[i] <= lo + 0.005) last = i
-        const x = last / N
+        let x = last / N
+        let bestY = Infinity // refine to the curve's exact lowest point (a sharp V between two samples would otherwise stop at 0.6% instead of 0%)
+        for (let i = 0; i <= 200; i++) { const xx = Math.min(1, Math.max(0, x - 0.002 + (0.004 * i) / 200)); const y = evaluateArmLengthCurve(pts, xx); if (y < bestY) { bestY = y; x = xx } }
         if (x >= 0.5 && x < 0.995) loadWorkShareVal = x
       }
     } catch (err) { /* keep the default */ }
   }
   return loadWorkShareVal
 }
-function loadingFinishMs() {
+// The wipe-out rise itself (without the hold at the lowest crop, LOAD_HOLD_MS, that comes before it).
+function loadingRiseMs() {
   const d = loadStageDurations()
   const work = d.reduce((a, b) => a + b, 0)
   const share = loadWorkShare()
@@ -1276,7 +1279,7 @@ function loadingProgressNow(real = cfg.loadingPreviewProgressCropRealtime !== fa
   if (loadStageT.poses) {
     if (!loadingWorkDoneAt) {
       loadingWorkDoneAt = now
-      logLoadingPreview(`all loading work done at ${Math.round(t)} ms -- the end of the Progress Crop curve (${(share * 100).toFixed(1)}% -> 100%) plays over the next ${Math.round(loadingFinishMs())} ms`)
+      logLoadingPreview(`all loading work done at ${Math.round(t)} ms -- the end of the Progress Crop curve (${(share * 100).toFixed(1)}% -> 100%) holds ${LOAD_HOLD_MS} ms at its lowest crop, then plays over ${Math.round(loadingRiseMs())} ms`)
       if (cfg.loadingPreviewEnabled && !loadStageSaved) { // remember how long each stage took for the next load on this device
         loadStageSaved = true
         const T = loadStageT
@@ -1284,7 +1287,7 @@ function loadingProgressNow(real = cfg.loadingPreviewProgressCropRealtime !== fa
         try { localStorage.setItem(LOAD_STAGES_KEY + '.' + realDeviceClass(), JSON.stringify(dur)) } catch (err) { /* private mode -- only an optimisation */ }
       }
     }
-    total = share + (1 - share) * Math.min(1, (now - loadingWorkDoneAt) / loadingFinishMs())
+    total = share + (1 - share) * Math.min(1, Math.max(0, now - loadingWorkDoneAt - LOAD_HOLD_MS) / loadingRiseMs())
   }
   const timeFrac = Math.min(1, t / Math.max(cfg.loadingMinTimeMs || 0, 1))
   loadingProgressShown = Math.max(loadingProgressShown, Math.min(total, timeFrac)) // the real progress (never ahead of the Min Loading Time clock, never backwards)
@@ -1605,7 +1608,7 @@ function tryStartField() {
   }
   // Time-paced loading progress (2026-11-03): the field does not start before the wipe-out end of the Progress Crop curve has played (loadingFinishMs() after the work was done), so it is not cut off.
   if (cfg.loadingPreviewEnabled && loadingWorkDoneAt) {
-    const left = loadingFinishMs() - (performance.now() - loadingWorkDoneAt)
+    const left = LOAD_HOLD_MS + loadingRiseMs() - (performance.now() - loadingWorkDoneAt)
     if (left > 0) { if (!loadingFinishTimerSet) { loadingFinishTimerSet = true; setTimeout(() => { loadingFinishTimerSet = false; tryStartField() }, left + 10) } return }
   }
   fieldStarted = true
