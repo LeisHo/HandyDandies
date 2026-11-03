@@ -20678,7 +20678,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveContinual": false,
       "startupFnSpeedCurveXOrigin": "Closest Hand",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.5363535563151042}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.30364634195963536}}]",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.006307964979539654,\"y\":0.7363541920979817}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.30364634195963536}}]",
       "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
@@ -76308,7 +76308,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveContinual": false,
       "startupFnSpeedCurveXOrigin": "Closest Hand",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.5363535563151042}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.30364634195963536}}]",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.006307964979539654,\"y\":0.7363541920979817}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.30364634195963536}}]",
       "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
@@ -87620,7 +87620,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
