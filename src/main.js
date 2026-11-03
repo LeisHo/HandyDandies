@@ -296,6 +296,12 @@ let handBoundsRadiusLocal = 1
 // needs a separate restQuatMap per model because it supports 2 DIFFERENT
 // model files with slightly different rest poses).
 const boneRestQuat = {}
+// Per-skeleton rest pose and rig kind (2026-11-03, direct report: the Loading Preview hands posed completely differently when the Loading Preview model was not the Hand model). Every posing function used to
+// reset bones to the ONE table above, captured from the Hand model, so a preview skeleton from a different file was reset to the wrong rest rotations (and, with a different parent chain, turned about 90 degrees).
+// A skeleton now carries its own rest table and rig kind when it comes from another model (_restMap / _localAxis, set by applyRestInfoToClone()); the field's hands (clones of the Hand model) carry neither
+// and keep using the shared table and RIG_LOCAL_AXIS_POSING exactly as before.
+function restMapOf(skeleton) { return (skeleton && skeleton._restMap) || boneRestQuat }
+function localAxisRigOf(skeleton) { return skeleton && skeleton._localAxis !== undefined ? skeleton._localAxis : RIG_LOCAL_AXIS_POSING }
 // Hide Wrist's own position-compensation -- the ABSOLUTE raw-frame
 // positions of the wrist and forearm-base bones (same frame as
 // alignQuat/handLengthRaw's own wristPos/tipPos measurements). Storing
@@ -8113,6 +8119,24 @@ function detectLocalAxisRig() {
   RIG_LOCAL_AXIS_POSING = diffs.every((d) => d <= IK_RIG_TOLERANCE_DEG)
   console.info('[rig] local-axis (IK rig) posing ' + (RIG_LOCAL_AXIS_POSING ? 'ON' : 'off') + ' -- rest-rotation difference from the IK rig, deg: ' + diffs.map((d, i) => Object.keys(IK_RIG_REST_REF)[i] + ' ' + (Number.isFinite(d) ? d.toFixed(2) : 'missing')).join(', '))
 }
+// The rest table and rig kind of a freshly loaded (still un-posed) model's skeleton; same test as detectLocalAxisRig().
+function skeletonRestInfo(skeleton) {
+  const rest = {}
+  skeleton.bones.forEach((b) => { rest[b.name] = b.quaternion.clone() })
+  const localAxis = Object.keys(IK_RIG_REST_REF).every((name) => {
+    if (!rest[name]) return false
+    _ikRigRefQ.fromArray(IK_RIG_REST_REF[name])
+    return THREE.MathUtils.radToDeg(rest[name].angleTo(_ikRigRefQ)) <= IK_RIG_TOLERANCE_DEG
+  })
+  return { rest, localAxis }
+}
+// A clone of another model than the Hand model (the Loading Preview's) is posed from that model's own rest table.
+function applyRestInfoToClone(clone, sourceRoot) {
+  if (!sourceRoot || sourceRoot === modelRoot) return
+  const info = sourceRoot.userData && sourceRoot.userData.restInfo
+  const sm = findSkinnedMesh(clone)
+  if (info && sm) { sm.skeleton._restMap = info.rest; sm.skeleton._localAxis = info.localAxis }
+}
 const _lcChainQ = new THREE.Quaternion()
 const _lcParentPos = new THREE.Vector3()
 const _lcParentScale = new THREE.Vector3()
@@ -8147,7 +8171,7 @@ function applyCurlToSkeletonLocal(fingerName, skeleton, values, parentFresh) {
   let prevBone = null
   joints.forEach((boneName, i) => {
     const bone = skeletonBone(skeleton, boneName)
-    const rest = boneRestQuat[boneName]
+    const rest = restMapOf(skeleton)[boneName]
     if (!bone || !rest) return
     bones[i] = bone
     if (!chainReady || bone.parent !== prevBone) {
@@ -8197,14 +8221,14 @@ function applyCurlToSkeletonLocal(fingerName, skeleton, values, parentFresh) {
 // the fingers (so applyAllFingerCurls()'s wrist.updateWorldMatrix(true, false) already carries the new forearm into the finger chain). A no-op for every other model.
 function applyIkRigForearmToSkeleton(skeleton, values) {
   const elbow = skeletonBone(skeleton, 'rForearmBend')
-  const elbowRest = boneRestQuat.rForearmBend
+  const elbowRest = restMapOf(skeleton).rForearmBend
   if (elbow && elbowRest) {
     elbow.quaternion.copy(elbowRest)
     elbow.rotateZ(THREE.MathUtils.degToRad(values.elbowBend || 0))
     elbow.rotateX(THREE.MathUtils.degToRad(values.elbowSideBend || 0))
   }
   const twist = skeletonBone(skeleton, 'rForearmTwist')
-  const twistRest = boneRestQuat.rForearmTwist
+  const twistRest = restMapOf(skeleton).rForearmTwist
   if (twist && twistRest) {
     twist.quaternion.copy(twistRest)
     twist.rotateY(THREE.MathUtils.degToRad(values.forearmTwist || 0))
@@ -8413,12 +8437,12 @@ const _curlWristRestInvScratch = new THREE.Quaternion()
 // world matrix (its ancestors included), so joint 0's parent chain only needs the one carpal level recomputed
 // instead of re-walking all 8 ancestors for every finger. Default false = the original behaviour.
 function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values = cfg, parentFresh = false) {
-  if (RIG_LOCAL_AXIS_POSING) return applyCurlToSkeletonLocal(fingerName, skeleton, values, parentFresh) // the IK rig (see IK RIG, above); every other model keeps the world-axis maths below untouched
+  if (localAxisRigOf(skeleton)) return applyCurlToSkeletonLocal(fingerName, skeleton, values, parentFresh) // the IK rig (see IK RIG, above); every other model keeps the world-axis maths below untouched
   const joints = FINGER_JOINTS[fingerName]
   const maxDegs = FINGER_MAX_DEG[fingerName]
   const sign = FINGER_SIGN[fingerName]
   const wristBoneForAxis = skeletonBone(skeleton, 'rHand')
-  const wristRestForAxis = boneRestQuat.rHand
+  const wristRestForAxis = restMapOf(skeleton).rHand
   let axisRefQuat
   if (wristBoneForAxis && wristRestForAxis) {
     // delta = wristRest^-1 * wristBone.currentLocalQuat (body-frame delta,
@@ -8518,7 +8542,7 @@ function applyCurlToSkeleton(fingerName, skeleton, baseQuat, wrapperQuat, values
   // mid-joint.
   joints.forEach((boneName, i) => {
     const bone = skeletonBone(skeleton, boneName)
-    const rest = boneRestQuat[boneName]
+    const rest = restMapOf(skeleton)[boneName]
     if (!bone || !rest) return
     bones[i] = bone
     if (!chainReady || bone.parent !== prevBone) {
@@ -8615,7 +8639,7 @@ function applyCurlToSkeletonReference(fingerName, skeleton, baseQuat, wrapperQua
   const maxDegs = FINGER_MAX_DEG[fingerName]
   const sign = FINGER_SIGN[fingerName]
   const wristBoneForAxis = skeleton.getBoneByName('rHand')
-  const wristRestForAxis = boneRestQuat.rHand
+  const wristRestForAxis = restMapOf(skeleton).rHand
   let axisRefQuat
   if (wristBoneForAxis && wristRestForAxis) {
     // delta = wristRest^-1 * wristBone.currentLocalQuat (body-frame delta,
@@ -8712,7 +8736,7 @@ function applyCurlToSkeletonReference(fingerName, skeleton, baseQuat, wrapperQua
   // mid-joint.
   joints.forEach((boneName, i) => {
     const bone = skeleton.getBoneByName(boneName)
-    const rest = boneRestQuat[boneName]
+    const rest = restMapOf(skeleton)[boneName]
     if (!bone || !rest) return
     bones[i] = bone
     bone.quaternion.copy(rest)
@@ -8780,7 +8804,7 @@ function applyCurl(fingerName) {
 // sources" -- explicit in the math itself).
 function applyWristPoseToSkeleton(skeleton, values = cfg, extraSplayDeg = 0, wristDelta = null) {
   const bone = skeletonBone(skeleton, 'rHand')
-  const rest = boneRestQuat.rHand
+  const rest = restMapOf(skeleton).rHand
   if (!bone || !rest) return
   bone.quaternion.copy(rest)
   // wristDelta: the click functions' Wrist group (see wristKindAmount()), added to the pose's own wrist angles; handWristLimits (Hand Min Max Wrist Splay / Bend / Rotation) then clamps the totals.
@@ -8794,7 +8818,7 @@ function applyWristPoseToSkeleton(skeleton, values = cfg, extraSplayDeg = 0, wri
   bone.rotateX(THREE.MathUtils.degToRad(bend))
   bone.rotateZ(THREE.MathUtils.degToRad(splay))
   bone.rotateY(THREE.MathUtils.degToRad(rotn))
-  if (RIG_LOCAL_AXIS_POSING) applyIkRigForearmToSkeleton(skeleton, values) // IK rig only: Elbow Bend / Elbow Side Bend / Forearm Twist
+  if (localAxisRigOf(skeleton)) applyIkRigForearmToSkeleton(skeleton, values) // IK rig only: Elbow Bend / Elbow Side Bend / Forearm Twist
 }
 function applyWristPose() {
   if (!modelLoaded) return
@@ -10500,6 +10524,7 @@ function ensureLoadingPreviewHand2(seq) {
   }
   if (loadingPreviewHand2) return
   const clone = cloneSkeletal(lpSourceRoot())
+  applyRestInfoToClone(clone, lpSourceRoot())
   const skinnedMesh = findSkinnedMesh(clone)
   const plane = new THREE.Plane()
   const rig = makeClipRig(clone)
@@ -10748,6 +10773,7 @@ function buildLoadingPreview(bypassEnabledGate) {
 
   loadingPreviewBuiltRoot = lpSourceRoot()
   const clone = cloneSkeletal(lpSourceRoot())
+  applyRestInfoToClone(clone, lpSourceRoot())
   clone.quaternion.copy(alignQuat)
   const skinnedMesh = findSkinnedMesh(clone)
   // Own cloned material + own Plane, mirroring rebuildField()'s per-field-
@@ -20776,6 +20802,7 @@ function lpLoadPreviewModel(id) {
     const missing = HAND_MODEL_BONES.filter((n) => !skinned.skeleton.getBoneByName(n))
     if (missing.length) throw new Error('missing rig bones ' + missing.join(', '))
     await loadCropBlockSources() // the same clipping blocks as the Hand model (see makeClipRig)
+    root.userData.restInfo = skeletonRestInfo(skinned.skeleton) // its own rest table / rig kind (bind pose, nothing has posed it yet)
     root.userData.cropUnit = clipBlockRigInfo(root).unit; root.userData.cropModelId = id
     root.traverse((o) => { if (o.isMesh && o !== skinned) o.visible = false }) // the outline / crop-block meshes, like the Hand model's own load
     root.updateMatrixWorld(true)
