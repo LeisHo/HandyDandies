@@ -1208,7 +1208,8 @@ function loadingProgressNow(real = cfg.loadingPreviewProgressCropRealtime !== fa
   // 2026-10-25: the warm-up share used to read 100% the moment the last hand was shown, but the reveal then still waits for every hand's first pose (up to 2 s, see tryStartField()). With the progress at 100% the Progress Crop curve's
   // end (and the 200 ms laps of the Animation Speed Curve) had already wiped / sped up the loading hand, so that wait looked like a long empty pause. The first-pose share is now the last 15% of the warm-up share (a judgment call, not a measurement).
   const warmShare = fieldWarmStage >= 1 ? 0.3 * (fieldWarmStage >= 2 ? 1 : Math.min(1, (now - fieldWarmStartMs) / FIELD_WARM_CAP_MS)) + 0.7 * (hands.length ? fieldWarmRevealIndex / hands.length : 0) : 0
-  const warm = fieldWarmStage >= 3 ? 0.85 + 0.15 * fieldReposedFrac() : 0.85 * warmShare
+  // (2026-11-03: the first-pose share is the last 3%, not the last 15% -- a 15% share made the warm-up end at 94.75% and the progress then jumped straight to 100% (seen in a real log: 95% -> 100% in 1 ms), skipping the part of the Progress Crop curve between 95% and 100%.)
+  const warm = fieldWarmStage >= 3 ? 0.97 + 0.03 * fieldReposedFrac() : 0.97 * warmShare
   const work = 0.1 * (modelMeasurementsReady ? 1 : 0) + 0.1 * (startupSettingsReady ? 1 : 0) + 0.45 * (fieldBuildDone ? 1 : fieldBuildFrac) + 0.35 * warm
   const timeFrac = Math.min(1, (now - pageLoadStartMs) / Math.max(cfg.loadingMinTimeMs || 0, 1))
   loadingProgressShown = Math.max(loadingProgressShown, Math.min(work, timeFrac)) // the real progress (never ahead of the Min Loading Time clock, never backwards)
