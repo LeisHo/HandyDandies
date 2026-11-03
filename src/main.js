@@ -5653,6 +5653,7 @@ function fireStartupHandOffset(ignoreStartDistance) {
   cfg.startupFnOffsetY = 0
   cfg.startupFnOffsetZ = startupHandZEnd() - startupHandZStart() // the accumulator starts at the start value; the transition adds the difference
   triggerClickPose(STARTUP_FN)
+  if (cfg.logHandBehaviourEnabled) scheduleStartupProgressProbes()
   startupIgnoreStartDistance = false
   return countStartupTriggeredHands() - before
 }
@@ -6237,6 +6238,30 @@ function appendHandBehaviourLogLine(line) {
   handBehaviourLogEntries.push(line)
   if (handBehaviourLogEntries.length > HAND_BEHAVIOUR_LOG_MAX_ENTRIES) { const k = handBehaviourLogEntries.findIndex((e) => !e.includes(' startupFn curve check -- ')); handBehaviourLogEntries.splice(k < 0 ? 0 : k, 1) } // the startup curve check lines (logStartupCurveDiagnostic()) are kept; the per-hand lines that follow a 1,089-hand startup would push them out of the 200
   scheduleLogDomFlush(_handBehaviourLogFlushFlag, () => handBehaviourLogEl, handBehaviourLogEntries)
+}
+// Startup progress probe (2026-11-03): at fixed times after the startup click, the Hand Behaviour Log gets one block per time: the hands grouped by their distance from the click (10 world units per group), with how many are still
+// waiting for their start time, how many are in the forward phase, how many are past it, and the forward progress (0 = not started, 1 = done) min / mean / max. Shows whether the hands near the click are really ahead of the rest and where the step is.
+function scheduleStartupProgressProbes() {
+  const t0 = performance.now()
+  ;[250, 500, 800, 1200, 1800].forEach((ms) => setTimeout(() => logStartupProgressProbe(Math.round(performance.now() - t0)), ms))
+}
+function logStartupProgressProbe(ms) {
+  const bins = []
+  hands.forEach((h) => {
+    const cp = h._cp && h._cp[STARTUP_FN], k = h._startupClick
+    if (!cp || !k) return
+    const b = Math.min(Math.floor(k.dist / 10), 15)
+    const g = bins[b] || (bins[b] = { n: 0, wait: 0, fwd: 0, past: 0, pr: [] })
+    g.n++
+    if (cp.phase === 'idle') { if (cp.pendingClaimAt) g.wait++; else g.past++ } else if (cp.phase === 'forward') { g.fwd++; g.pr.push(cp.dbgProg ?? 0) } else g.past++
+  })
+  const f = (v) => v.toFixed(2)
+  const stamp = `[${new Date().toLocaleTimeString()}] startupFn curve check -- progress @${ms}ms | `
+  bins.forEach((g, b) => {
+    if (!g) return
+    const pr = g.pr
+    appendHandBehaviourLogLine(stamp + `distance ${b * 10}${b === 15 ? '+' : '-' + (b * 10 + 10)}: ${g.n} hands: waiting ${g.wait}, forward ${g.fwd}, past forward ${g.past}` + (pr.length ? ` | forward progress min ${f(Math.min(...pr))} mean ${f(pr.reduce((s, v) => s + v, 0) / pr.length)} max ${f(Math.max(...pr))}` : ''))
+  })
 }
 // Hand Offset On Startup curve check (2026-11-03, direct request: the Start Time / Speed curves look even on the curve but the animation shows a clear split between a chunk of close hands and the rest). With Log Hand Behaviour on, the
 // click that triggers the startup sequence writes a short summary to the Hand Behaviour Log: the curve's distance domain (how many hands are in it, nearest distance, range, X origin), then one line per 0.1 of the curve's X axis
@@ -17825,6 +17850,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     speedMs = Math.max(speedMs * (cp.glideTimeFactor || 1), 1) // First Transition Time Scale
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
     const easedProgress = easingProfile ? easingProfilePAt(easingProfile, progress) : progress
+    if (p === STARTUP_FN) cp.dbgProg = progress // read by logStartupProgressProbe()
     // Start Distance Curve (2026-09-27) -- `cp.frozenTweenFractionCap`
     // (1 = no cap, frozen once at trigger time, same convention as
     // frozenSplayDeg/frozenSpeedMs) scales how FAR the interpolation
