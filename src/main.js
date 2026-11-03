@@ -20634,18 +20634,22 @@ function useHandModel(item) {
 function importHandModelFile(btn) {
   const input = document.createElement('input')
   input.type = 'file'
+  input.multiple = true // 2026-11-03: several files at once, each checked / named / overwrite-confirmed on its own
   input.accept = '.glb,.gltf,model/gltf-binary'
   input.addEventListener('change', async () => {
-    const file = input.files && input.files[0]
-    if (!file) return
+    const files = Array.from(input.files || [])
+    if (!files.length) return
+    const results = [] // true = imported or overwritten, false = skipped or failed
+    let reloadFor = null
+    for (const file of files) {
     try {
       const buf = await file.arrayBuffer()
       // Check it before keeping it: it has to be a skinned mesh with the hand rig this app's poses are built on.
       const gltf = await new Promise((resolve, reject) => gltfLoader.parse(buf, '', resolve, reject))
       const skinned = findSkinnedMesh(gltf.scene)
-      if (!skinned) { flashModelButton(btn, 'No skinned mesh'); alert('"' + file.name + '" has no skinned mesh, so it cannot be posed.'); return }
+      if (!skinned) { flashModelButton(btn, 'No skinned mesh'); alert('"' + file.name + '" has no skinned mesh, so it cannot be posed.'); results.push(false); continue }
       const missing = HAND_MODEL_BONES.filter((n) => !skinned.skeleton.getBoneByName(n))
-      if (missing.length) { flashModelButton(btn, 'Rig mismatch'); alert('"' + file.name + '" does not have the hand rig this app uses (missing bones: ' + missing.join(', ') + ').'); return }
+      if (missing.length) { flashModelButton(btn, 'Rig mismatch'); alert('"' + file.name + '" does not have the hand rig this app uses (missing bones: ' + missing.join(', ') + ').'); results.push(false); continue }
       // Same name as a model already in the list (2026-10-23, direct request: "if it shares the same name as an existing model, ask me if I want to overwrite, then overwrite, don't duplicate"): an imported model of that name is
       // asked about and, on yes, REPLACED in place (same list entry and id, so nothing is duplicated and the saved choice keeps pointing at it). A built-in (repo) model of that file name cannot be replaced from the browser (it
       // is a file in the project), so the import is stopped instead of adding a second copy.
@@ -20653,15 +20657,16 @@ function importHandModelFile(btn) {
       const sameName = (s) => String(s || '').toLowerCase() === title.toLowerCase()
       const list = Array.isArray(cfg.handModels) ? cfg.handModels : []
       const builtinSame = builtinHandModelFor(title)
-      if (builtinSame) { flashModelButton(btn, 'Built-in name'); alert('"' + title + '" is a built-in model (' + builtinSame.name + '). Built-in models are files in the project and cannot be overwritten from here, so nothing was imported - rename the file to import it as its own model.'); return }
+      if (builtinSame) { flashModelButton(btn, 'Built-in name'); alert('"' + title + '" is a built-in model (' + builtinSame.name + '). Built-in models are files in the project and cannot be overwritten from here, so nothing was imported - rename the file to import it as its own model.'); results.push(false); continue }
       const existing = list.find((it) => it && it.source === 'local' && sameName(it.name))
       let id
       if (existing) {
-        if (!confirm('A model called "' + title + '" is already in the Hand Models list. Overwrite it with this file?')) { flashModelButton(btn, 'Cancelled'); return }
+        if (!confirm('A model called "' + title + '" is already in the Hand Models list. Overwrite it with this file?')) { flashModelButton(btn, 'Cancelled'); results.push(false); continue }
         id = existing.id
         lpLoadedRoots.delete(id); lpModelLoads.delete(id) // the Loading Preview must not keep the old file's scene
       } else {
         id = 'local:' + Date.now().toString(36)
+        while (list.some((it) => it && it.id === id)) id += 'x' // two files read in the same millisecond
       }
       await handModelIdbPut(id, { name: file.name, title, blob: new Blob([buf], { type: 'model/gltf-binary' }) })
       localHandModelPresent[id] = true
@@ -20671,12 +20676,17 @@ function importHandModelFile(btn) {
         syncValue('handModels', items)
       }
       flashModelButton(btn, existing ? 'Overwritten' : 'Imported')
-      if (existing && id === activeHandModelId) { alert('"' + title + '" is the model in use. The page reloads now to measure the new file.'); location.reload() } // (the model is measured once at load)
+      results.push(true)
+      if (existing && id === activeHandModelId) reloadFor = title // (the model is measured once at load)
     } catch (e) {
       console.error('Hand model import failed', e)
       flashModelButton(btn, 'Failed')
       alert('Could not read "' + file.name + '" as a 3D model.')
+      results.push(false)
     }
+    }
+    if (files.length > 1) flashModelButton(btn, results.filter(Boolean).length + ' of ' + files.length + ' imported')
+    if (reloadFor) { alert('"' + reloadFor + '" is the model in use. The page reloads now to measure the new file.'); location.reload() } // (the model is measured once at load)
   })
   input.click()
 }
