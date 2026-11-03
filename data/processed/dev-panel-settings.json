@@ -20778,7 +20778,7 @@
       "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
       "logLoadingPreviewEnabled": true,
-      "logHandBehaviourEnabled": false,
+      "logHandBehaviourEnabled": true,
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 5,
@@ -48593,7 +48593,7 @@
       "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
       "logLoadingPreviewEnabled": true,
-      "logHandBehaviourEnabled": false,
+      "logHandBehaviourEnabled": true,
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 5,
@@ -76408,7 +76408,7 @@
       "handNumbersEnabled": false,
       "handNumbersColor": "#00ff04",
       "logLoadingPreviewEnabled": true,
-      "logHandBehaviourEnabled": false,
+      "logHandBehaviourEnabled": true,
       "logHandBehaviourDetailedEnabled": false,
       "logFrameRateDropsEnabled": true,
       "frameRateDropThresholdFps": 5,
@@ -83779,7 +83779,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
