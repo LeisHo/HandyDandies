@@ -5596,12 +5596,31 @@ function allVisibleHandsFinished() {
   for (let i = 0; i < hands.length; i++) { if (!startupHandVisible(hands[i])) continue; any = true; if (!hands[i]._startupSeqDone) return false }
   return any
 }
+// Hand Offset On Startup is for the hands the camera shows (2026-11-03, direct request: "all off screen hands dont need to be animated or posed, they can just be spawned in whatever pose they would be in after the startup").
+// A hand whose grid point is outside the view by more than one hand length (so no part of it can show) takes no part: it never gets the startup state (displacement, tiny scale), is marked triggered and finished, and
+// sits in its normal idle state. The reach keeps the hands at the screen edge, whose fingers can still reach into view, in the sequence.
+const _startupViewV = new THREE.Vector3()
+function startupHandInView(h) {
+  const p = h.basePosition
+  if (!p) return true
+  if (!(camera.aspect > 0) || !(camera.fov > 0)) return true // the camera is not set up yet: leave every hand in the sequence
+  camera.updateMatrixWorld()
+  _startupViewV.copy(p).project(camera)
+  if (!(_startupViewV.z > -1 && _startupViewV.z < 1)) return false
+  const half = camera.position.distanceTo(p) * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) // half the view height at this hand's distance
+  const m = (HAND_SCALE_REFERENCE_LENGTH * (cfg.handScale || 1)) / Math.max(half, 1e-6) // one hand length, in view units (NDC)
+  return Math.abs(_startupViewV.y) <= 1 + m && Math.abs(_startupViewV.x) <= 1 + m / camera.aspect
+}
 function applyStartupHandOffset() {
   const on = !!cfg.handOffsetOnStartupEnabled && startupHandOffsetStage === 0
   for (let i = 0; i < hands.length; i++) {
     const h = hands[i]
     if (!h._customOffsetAccum) h._customOffsetAccum = { x: 0, y: 0, z: 0 }
     const a = h._customOffsetAccum
+    if (startupHandOffsetStage === 0) { // before the click: decide who takes part (a later change of the view does not change it after the click)
+      if (h._startupExempt) { delete h._startupExempt; delete h._startupTriggered; delete h._startupSeqDone }
+      if (on && !startupHandInView(h)) { h._startupExempt = true; h._startupTriggered = true; h._startupSeqDone = true; a.x = 0; a.y = 0; a.z = 0; h._startupAccum = false; continue }
+    }
     if (on) { a.x = 0; a.y = 0; a.z = startupHandZStart(); h._startupAccum = true }
     else if (h._startupAccum && startupHandOffsetStage === 0) { a.x = 0; a.y = 0; a.z = 0; h._startupAccum = false }
   }
