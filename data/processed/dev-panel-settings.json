@@ -501,7 +501,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.8081301992080749,\"y\":0,\"h2\":{\"x\":-0.07706566383065039,\"y\":0.44510421752929685}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.3424570028317352,\"y\":0,\"h2\":{\"x\":-0.32192666473903403,\"y\":0.17177073160807288}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -28286,7 +28286,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.8081301992080749,\"y\":0,\"h2\":{\"x\":-0.07706566383065039,\"y\":0.44510421752929685}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.3424570028317352,\"y\":0,\"h2\":{\"x\":-0.32192666473903403,\"y\":0.17177073160807288}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -56071,7 +56071,7 @@
       "loadingPreviewProgressCropRealtime": true,
       "loadingPreviewProgressCropFlip": false,
       "loadingPreviewProgressCropRange": "{\"min\":0,\"max\":100}",
-      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.8081301992080749,\"y\":0,\"h2\":{\"x\":-0.07706566383065039,\"y\":0.44510421752929685}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
+      "loadingPreviewProgressCropCurve": "[{\"x\":0,\"y\":1,\"h1\":{\"x\":0.2845420897037337,\"y\":0},\"bg\":0.18},{\"x\":0.3424570028317352,\"y\":0,\"h2\":{\"x\":-0.32192666473903403,\"y\":0.17177073160807288}},{\"x\":0.9759255623480467,\"y\":0,\"h2\":{\"x\":-0.05957560834685516,\"y\":0},\"h1\":{\"x\":0.0016397109451726788,\"y\":0.12000020345052087}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.06822916666666667}}]",
       "loadingPreviewEndEnabled": false,
       "loadingPreviewEndSequence": "2 TWIDS - END",
       "loadingPreviewEndReverse": false,
@@ -83689,7 +83689,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": false,
+      "collapsed": true,
       "locked": true,
       "items": [
         {
@@ -83952,7 +83952,7 @@
     },
     {
       "key": "New Group (9)",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -84053,7 +84053,7 @@
           "type": "group",
           "group": {
             "key": "Loading Preview",
-            "collapsed": true,
+            "collapsed": false,
             "locked": true,
             "items": [
               {
