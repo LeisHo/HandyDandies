@@ -20661,7 +20661,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.39310554821798077,\"y\":0.3456250508626302}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5114225493889866,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3691012174856896,\"y\":0.9522916158040364}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.4677083333333334}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":312}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -48476,7 +48476,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.39310554821798077,\"y\":0.3456250508626302}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5114225493889866,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3691012174856896,\"y\":0.9522916158040364}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.4677083333333334}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":280}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -76291,7 +76291,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.39310554821798077,\"y\":0.3456250508626302}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5114225493889866,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.3691012174856896,\"y\":0.9522916158040364}},{\"x\":1,\"y\":1,\"h2\":{\"x\":0,\"y\":-0.4677083333333334}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":312}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -87437,7 +87437,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -87657,7 +87657,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
