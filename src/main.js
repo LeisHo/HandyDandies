@@ -1601,15 +1601,16 @@ function tryStartField() {
     }
     if (fieldPreposeLog === 1) { fieldPreposeLog = 2; logLoadingPreview(`first-pose wait over (${hands.filter((h) => !h.everReposed).length} hands still without one)`) }
   }
+  // Time-paced loading progress (2026-11-03): the loading animation keeps playing, and the End Sequence / field start wait, until the end of the Progress Crop curve (the hold at its lowest crop and the wipe-out) has played (direct request 2026-11-03: "the loading animation should continue until the whole progress is finished"). The End Sequence, which stops the animation on its last pose, starts only after that.
+  if (cfg.loadingPreviewEnabled && loadingPreviewRenderer) loadingProgressNow(true) // makes sure "all work done" has been seen even if this runs before the next animation frame
+  if (cfg.loadingPreviewEnabled && loadingPreviewRenderer && loadingWorkDoneAt) {
+    const left = LOAD_HOLD_MS + loadingRiseMs() - (performance.now() - loadingWorkDoneAt)
+    if (left > 0) { if (!loadingFinishTimerSet) { loadingFinishTimerSet = true; setTimeout(() => { loadingFinishTimerSet = false; tryStartField() }, left + 10) } return }
+  }
   // End Sequence (2026-10-18): hold the reveal (and with it the whole startup sequence) until the loading animation has finished its lap and the End Sequence has played.
   if (endSeqShouldRun()) {
     if (endSeq.phase === 'off') startEndSequence()
     if (endSeq.phase !== 'done') return
-  }
-  // Time-paced loading progress (2026-11-03): the field does not start before the wipe-out end of the Progress Crop curve has played (loadingFinishMs() after the work was done), so it is not cut off.
-  if (cfg.loadingPreviewEnabled && loadingWorkDoneAt) {
-    const left = LOAD_HOLD_MS + loadingRiseMs() - (performance.now() - loadingWorkDoneAt)
-    if (left > 0) { if (!loadingFinishTimerSet) { loadingFinishTimerSet = true; setTimeout(() => { loadingFinishTimerSet = false; tryStartField() }, left + 10) } return }
   }
   fieldStarted = true
   fieldStartedAtMs = performance.now()
