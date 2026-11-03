@@ -25325,14 +25325,18 @@ const REORDER_SMOOTHING = 0.15
 function updateRenderOrder() {
   let __u = rlsT()
   idleReposeFrameCounter++
-  updateTrackingPoints(true) // before the on-screen flags: every hand-to-cursor measure below uses the tracking point
+  // Loading skips the cursor tracking measurements (2026-11-03, direct request): behind the loading screen nothing is visible and the cursor does nothing, yet at 1,089 hands these loops cost several ms per frame (tracking points, tracking
+  // domains, targets, the distance ranges) and the field warm-up needs one batch per frame, so every ms here lengthens the load. They still run once every 8th frame (and on the first one) so every value the hands' first pose reads
+  // (the tracking points, the nearest / farthest distances) exists and is recent; at the field start they run every frame again. The 8 is a judgment call, not a measurement.
+  const __trkThrottled = loadingWarmMode && hands.length > 0 && hands[hands.length - 1]._xyCursorDist !== undefined && (idleReposeFrameCounter % 8) !== 0
+  if (!__trkThrottled) updateTrackingPoints(true) // before the on-screen flags: every hand-to-cursor measure below uses the tracking point
   __u = rlsLap('uro: tracking points', __u)
   updateOnScreenFlags()
   __u = rlsLap('uro: on-screen flags', __u)
   updateFingerCurlSkip()
   __u = rlsLap('uro: finger-curl skip flags', __u)
-  refreshTrackingDomains() // the tracking domains need this frame's on-screen flags
-  updateScreenUnitsPerPx() // world units per screen pixel at the field plane, for the screen-space click-function distance
+  if (!__trkThrottled) refreshTrackingDomains() // the tracking domains need this frame's on-screen flags
+  if (!__trkThrottled) updateScreenUnitsPerPx() // world units per screen pixel at the field plane, for the screen-space click-function distance
   __u = rlsLap('uro: tracking domains / screen units', __u)
   // Everything an IDLE hand's finger curl depends on, as one string (2026-10-04): pose settings (finger,
   // wrist, model rotation) and the shared base orientation. The curl is independent of the wrapper's
@@ -25425,6 +25429,7 @@ function updateRenderOrder() {
   liveFieldDistRange = liveDistRange
   __u = rlsLap('uro: live distances', __u)
   // Wrist Splay / Wrist Cropping each measure to the cursor at their own Cursor Target Depth (2026-10-11).
+  if (!__trkThrottled) { // (see __trkThrottled above) the tracking targets / markers and the distance-range loops below keep their last values while the field loads
   updateTrackingTargets()
   updateTrackingPointMarkers()
   updateFieldCenterMarker()
@@ -25482,6 +25487,7 @@ function updateRenderOrder() {
   xyFieldMinDist = xyMin
   xyFieldDistRange = Math.max(xyMax - xyMin, 0.001)
   xyAllMinDist = xyAMin; xyAllDistRange = Math.max(xyAMax - xyAMin, 0.001)
+  }
   __u = rlsLap('uro: field distance ranges', __u)
   const nowMs = nowVirtual() // virtual clock (see its own declaration) -- one shared timestamp for every hand's own Click-Hold-Pose/Click-Pose progress this frame, not a separate call per hand; only reached at all while !isPaused (animate()'s own gate), so this line simply never runs during a pause
   // effectiveRenderOrder (the 3D cursor distance with the optional overlap smoothing) feeds the XYZ cursor modes, so it is settled for every hand BEFORE the ranks are computed.
