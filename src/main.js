@@ -1670,6 +1670,7 @@ function tryStartField() {
 function finalizeReveal() {
   if (fieldRevealed) return
   fieldRevealed = true
+  syncPauseWithVisibility() // the window may be unfocused right now: from here the hidden / unfocused pause applies (and the virtual clock pauses with it)
   logStartupTiming('reveal finalized (field painted)')
   logLoadingPreview(`reveal -- the loading screen hides and the buttons appear, ${Math.round(performance.now() - fieldStartedAtMs)} ms after the field started (${fieldRevealFrames} field frame(s) painted${fieldRevealFrames < 2 ? ' -- the 4 s safety net ended the wait' : ''})`)
   syncLoadingPreviewBackground() // drops the loading-screen blocker
@@ -25192,6 +25193,7 @@ function animate(dt, now) {
     console.error('animate() frame threw -- rendering skipped for this frame, loop continues:', err)
   }
 }
+window.VisibilityTickLoop.setKeepRunningUnfocused(() => !fieldRevealed) // the loading screen and its preview keep running when the user clicks out of the browser; after the reveal the usual hidden / unfocused pause applies
 window.VisibilityTickLoop.registerTick(animate)
 // Keeps the EXISTING virtual-clock pause mechanism (nowVirtual()/
 // pauseOffsetMs, see setPaused()'s own declaration) continuous across a
