@@ -20661,7 +20661,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38710446553490796,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3652141336466782,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.39310554821798077,\"y\":0.3456250508626302}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5114225493889866,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":312}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -20678,7 +20678,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveContinual": false,
       "startupFnSpeedCurveXOrigin": "Closest Hand",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36419122560955863,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35484860449094546,\"y\":0}}]",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36364568020608773,\"y\":0.2630203247070313}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35484860449094546,\"y\":0}}]",
       "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
@@ -20699,8 +20699,8 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveContinual": false,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
-      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4341364651654678,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionSpeedCurveRange": "{\"min\":400,\"max\":500}",
+      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4297432579993843,\"y\":0.14041659037272136}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35499038690036777,\"y\":0}}]",
+      "startupFnRetransitionSpeedCurveRange": "{\"min\":400,\"max\":905}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionDistRange": "{\"min\":50,\"max\":2000}",
@@ -20712,8 +20712,8 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveContinual": false,
       "startupFnRetransitionStartTimeCurveXOrigin": "Closest Hand",
-      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.386360494347042,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35169550247416936,\"y\":0}}]",
-      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":54}",
+      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.37537751832856187,\"y\":0.2963541666666667}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35169550247416936,\"y\":0}}]",
+      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":418}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
@@ -48476,7 +48476,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38710446553490796,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3652141336466782,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.39310554821798077,\"y\":0.3456250508626302}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5114225493889866,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":280}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -76291,7 +76291,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38710446553490796,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3652141336466782,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.39310554821798077,\"y\":0.3456250508626302}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.5114225493889866,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":312}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -76308,7 +76308,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveContinual": false,
       "startupFnSpeedCurveXOrigin": "Closest Hand",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36419122560955863,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35484860449094546,\"y\":0}}]",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36364568020608773,\"y\":0.2630203247070313}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35484860449094546,\"y\":0}}]",
       "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
@@ -76329,8 +76329,8 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveContinual": false,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
-      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4341364651654678,\"y\":0}},{\"x\":1,\"y\":1}]",
-      "startupFnRetransitionSpeedCurveRange": "{\"min\":400,\"max\":500}",
+      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4297432579993843,\"y\":0.14041659037272136}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35499038690036777,\"y\":0}}]",
+      "startupFnRetransitionSpeedCurveRange": "{\"min\":400,\"max\":905}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionDistRange": "{\"min\":50,\"max\":2000}",
@@ -76342,8 +76342,8 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveContinual": false,
       "startupFnRetransitionStartTimeCurveXOrigin": "Closest Hand",
-      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.386360494347042,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35169550247416936,\"y\":0}}]",
-      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":54}",
+      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.37537751832856187,\"y\":0.2963541666666667}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35169550247416936,\"y\":0}}]",
+      "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":418}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
       "sphereStartRadius": 0.1,
@@ -87437,7 +87437,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Retransition",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -87448,7 +87448,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Speed Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": true,
                         "items": [
                           {
@@ -87485,7 +87485,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Start Time Curve",
-                        "collapsed": true,
+                        "collapsed": false,
                         "locked": true,
                         "items": [
                           {
@@ -87620,7 +87620,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -87657,7 +87657,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
