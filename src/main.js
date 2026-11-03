@@ -1343,7 +1343,7 @@ function lpApplyProgressCrop(h, crop, flip) {
   if (crop >= 1) { pc.uni.value.set(0, 0, 0, -1); return } // everything cropped
   const sg = flip ? -pc.sgn : pc.sgn // s = sg * y grows toward the end that is cropped last
   const sMin = sg > 0 ? pc.yMin : -pc.yMax, sMax = sg > 0 ? pc.yMax : -pc.yMin
-  const m = (sMax - sMin) * 0.05 // a little margin: the posed fingers can reach slightly past the bind-pose box
+  const m = 0 // 2026-11-03, direct request: crop 100% shows none of the model and 0% all of it, evenly in between from the fingertips to the arm base. The old 5% margin (for fingers posed past the bind-pose box) made 95-100% show nothing and 0-4.5% show everything; 0 and 100% are handled above, and a vertex past either end of the box is only cut by a crop within a hair of that end.
   const thr = THREE.MathUtils.lerp(sMin - m, sMax + m, crop)
   pc.plane.set(_pcCorner.set(0, sg, 0), -thr).applyMatrix4(pc.fromClone) // the plane in the clone's frame -> the mesh's frame, where the vertex shader works
   pc.uni.value.set(pc.plane.normal.x, pc.plane.normal.y, pc.plane.normal.z, pc.plane.constant)
