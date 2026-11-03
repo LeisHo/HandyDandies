@@ -20775,7 +20775,7 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 2000,
-      "handNumbersEnabled": false,
+      "handNumbersEnabled": true,
       "handNumbersColor": "#00ff04",
       "logLoadingPreviewEnabled": true,
       "logHandBehaviourEnabled": true,
@@ -48590,7 +48590,7 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 2000,
-      "handNumbersEnabled": false,
+      "handNumbersEnabled": true,
       "handNumbersColor": "#00ff04",
       "logLoadingPreviewEnabled": true,
       "logHandBehaviourEnabled": true,
@@ -76405,7 +76405,7 @@
       "preventReorderFlash": false,
       "logCursorPositionEnabled": false,
       "cursorLogIntervalMs": 2000,
-      "handNumbersEnabled": false,
+      "handNumbersEnabled": true,
       "handNumbersColor": "#00ff04",
       "logLoadingPreviewEnabled": true,
       "logHandBehaviourEnabled": true,
@@ -83779,7 +83779,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
@@ -93834,7 +93834,7 @@
       "left": 4.75,
       "top": 90.4000015258789,
       "width": 1519.2000732421875,
-      "height": 588.4500122070312,
+      "height": 590.0499877929688,
       "collapsed": false
     },
     "mobile": {
