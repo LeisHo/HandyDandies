@@ -20661,7 +20661,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.9456249237060547}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.04006412010689642,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38710446553490796,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3652141336466782,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":312}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -20678,7 +20678,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveContinual": false,
       "startupFnSpeedCurveXOrigin": "Closest Hand",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36419122560955863,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.14972036947995837,\"y\":0}}]",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36419122560955863,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35484860449094546,\"y\":0}}]",
       "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
@@ -20699,7 +20699,7 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveContinual": false,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
-      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4740086135611618,\"y\":0.8070833841959635}},{\"x\":1,\"y\":1}]",
+      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4341364651654678,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionSpeedCurveRange": "{\"min\":400,\"max\":500}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -20712,7 +20712,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveContinual": false,
       "startupFnRetransitionStartTimeCurveXOrigin": "Closest Hand",
-      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.275432453319084,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.22978448542773122,\"y\":0}}]",
+      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.386360494347042,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35169550247416936,\"y\":0}}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":54}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
@@ -48476,7 +48476,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 5000,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.9456249237060547}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.04006412010689642,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38710446553490796,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3652141336466782,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":280}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -76291,7 +76291,7 @@
       "startupFnFirstGlideTimeScale": 0.1,
       "startupFnTweenChain": [],
       "startupFnTweenSpeedMs": 50,
-      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0,\"y\":0.9456249237060547}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.04006412010689642,\"y\":0}}]",
+      "startupFnTweenStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.38710446553490796,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.3652141336466782,\"y\":0}}]",
       "startupFnTweenStartTimeRange": "{\"min\":0,\"max\":312}",
       "startupFnSequencePlayMode": "Count",
       "startupFnSequenceCount": 1,
@@ -76308,7 +76308,7 @@
       "startupFnSpeedCurveVisibleOnly": true,
       "startupFnSpeedCurveContinual": false,
       "startupFnSpeedCurveXOrigin": "Closest Hand",
-      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36419122560955863,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.14972036947995837,\"y\":0}}]",
+      "startupFnSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.36419122560955863,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35484860449094546,\"y\":0}}]",
       "startupFnSpeedCurveRange": "{\"min\":1033,\"max\":1077}",
       "startupFnStartTimeCurveEnabled": true,
       "startupFnStartTimeCurveVisibleOnly": true,
@@ -76329,7 +76329,7 @@
       "startupFnRetransitionSpeedCurveVisibleOnly": true,
       "startupFnRetransitionSpeedCurveContinual": false,
       "startupFnRetransitionSpeedCurveXOrigin": "Global Setting",
-      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4740086135611618,\"y\":0.8070833841959635}},{\"x\":1,\"y\":1}]",
+      "startupFnRetransitionSpeedCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.4341364651654678,\"y\":0}},{\"x\":1,\"y\":1}]",
       "startupFnRetransitionSpeedCurveRange": "{\"min\":400,\"max\":500}",
       "startupFnRetransitionDistCurveEnabled": false,
       "startupFnRetransitionDistCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
@@ -76342,7 +76342,7 @@
       "startupFnRetransitionStartTimeCurveVisibleOnly": true,
       "startupFnRetransitionStartTimeCurveContinual": false,
       "startupFnRetransitionStartTimeCurveXOrigin": "Closest Hand",
-      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.275432453319084,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.22978448542773122,\"y\":0}}]",
+      "startupFnRetransitionStartTimeCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.386360494347042,\"y\":0}},{\"x\":1,\"y\":1,\"h2\":{\"x\":-0.35169550247416936,\"y\":0}}]",
       "startupFnRetransitionStartTimeRange": "{\"min\":0,\"max\":54}",
       "sphereSeqEnabled": true,
       "sphereStartZOffset": -15.5,
@@ -87437,7 +87437,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Retransition",
-                  "collapsed": false,
+                  "collapsed": true,
                   "locked": true,
                   "items": [
                     {
@@ -87448,7 +87448,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Speed Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": true,
                         "items": [
                           {
@@ -87485,7 +87485,7 @@
                       "type": "group",
                       "group": {
                         "key": "Startup > Retransition Start Time Curve",
-                        "collapsed": false,
+                        "collapsed": true,
                         "locked": true,
                         "items": [
                           {
@@ -87620,7 +87620,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Animation Speed Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
@@ -87657,7 +87657,7 @@
                 "type": "group",
                 "group": {
                   "key": "Startup > Start Time Curve",
-                  "collapsed": true,
+                  "collapsed": false,
                   "locked": true,
                   "items": [
                     {
