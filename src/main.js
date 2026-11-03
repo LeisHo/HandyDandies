@@ -9428,6 +9428,9 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // Positional Retransition (2026-10-19, direct request): On (default) = this function retransitions fully back to its starting state. Off = only the hand POSE retransitions with this function's Retransition settings; the hand's
       // click-function offset and rotation unwind instead at the Retransition Speed of the last triggered click function that has Positional Retransition on - and do not unwind at all while no such function has been triggered.
       { key: `${p}PositionalRetransition`, label: 'Positional Retransition', type: 'checkbox', def: true },
+      // Ignore Untouched Settings (2026-11-03, direct request): see beginUntouchedRetransition(). On = when this function takes a hand over from another one, the Offset / Rotation / Wrist amounts the previous function left on the hand that THIS function does not
+      // use keep unwinding to zero with the previous function's retransition (its speed, start time, easing, scaler) while this function runs, instead of staying frozen until this function's own retransition.
+      { key: `${p}IgnoreUntouchedSettings`, label: 'Ignore Untouched Settings', type: 'checkbox', def: false },
       { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 25000, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
       // Retransition Speed Curve -- direct request 2026-09-24 (item 5):
       // "In the Retransition settings group, add a Curve Graph input and
@@ -9782,6 +9785,9 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // Positional Retransition (2026-10-19, direct request): On (default) = this function retransitions fully back to its starting state. Off = only the hand POSE retransitions with this function's Retransition settings; the hand's
       // click-function offset and rotation unwind instead at the Retransition Speed of the last triggered click function that has Positional Retransition on - and do not unwind at all while no such function has been triggered.
       { key: `${p}PositionalRetransition`, label: 'Positional Retransition', type: 'checkbox', def: true },
+      // Ignore Untouched Settings (2026-11-03, direct request): see beginUntouchedRetransition(). On = when this function takes a hand over from another one, the Offset / Rotation / Wrist amounts the previous function left on the hand that THIS function does not
+      // use keep unwinding to zero with the previous function's retransition (its speed, start time, easing, scaler) while this function runs, instead of staying frozen until this function's own retransition.
+      { key: `${p}IgnoreUntouchedSettings`, label: 'Ignore Untouched Settings', type: 'checkbox', def: false },
       { key: `${p}RetransitionSpeedMs`, label: 'Retransition Speed (Ms)', type: 'slider', min: 0, max: 25000, step: 10, def: defaults.retransitionSpeedMs ?? 400 },
       // Retransition Speed Curve -- direct request 2026-09-24 (item 5) --
       // see makeClickHoldPoseGroup()'s own matching comment for the full
@@ -15703,6 +15709,99 @@ function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotat
     else hand._customRotationAccum.identity()
   }
 }
+// ---- Ignore Untouched Settings (2026-11-03, direct request) ----
+// "When turned on, all settings that this current function does not touch will continue retransitioning, while the main click function runs. If the previous click function rotated the hand 180 degrees on Y and this
+// current function has no rotation value, then when this one is triggered, the rotation continues retransitioning with the settings of the previous function."
+// How: the click-function Offset / Rotation / Wrist amounts live in per-hand accumulators shared by every function (_customOffsetAccum, _customRotationAccum + _customBaseRotAccum + _customCursorRigid, _wristAccum). A function
+// that takes a hand over does not touch the groups whose switch it has off (Offset or Offset To Camera, Rotation, Wrist), so until now their accumulated amount simply stayed frozen until THIS function's own retransition. With this
+// function's Ignore Untouched Settings on, the interrupted function's retransition (Retransition Start Time delay, Speed / Distance Curve duration, Distance Scaler, Easing Curve; the clock carried on if it was already
+// retransitioning) is run on those untouched accumulators from where they are now, down to zero, by updateUntouchedRetransition() before the functions apply. It stops when this function enters its own retransition (that one
+// snapshots whatever is left and unwinds it) or goes idle. "Touches" = the group's On/Off switch is on (an enabled group with all amounts 0 still counts as touched; a rotation Mode other than the old one is not told apart,
+// all three rotation accumulators are one group). Not followed: the interrupted function's Positional Retransition being off (its own borrowed timing), and a pose (a function always sets the whole pose).
+const ORPH_CATS = ['offset', 'rot', 'wrist']
+function orphTouches(p, cat) {
+  if (cat === 'offset') return !!(cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`])
+  if (cat === 'rot') return !!cfg[`${p}RotationEnabled`]
+  return !!cfg[`${p}WristEnabled`]
+}
+function orphHasAmount(hand, cat) {
+  if (cat === 'offset') { const a = hand._customOffsetAccum; return !!a && (a.x !== 0 || a.y !== 0 || a.z !== 0) }
+  if (cat === 'rot') return !!((hand._customRotationAccum && !isIdentityQuat(hand._customRotationAccum)) || (hand._customBaseRotAccum && !isIdentityQuat(hand._customBaseRotAccum)) || (hand._customCursorRigid && !isIdentityQuat(hand._customCursorRigid.q)))
+  const w = hand._wristAccum
+  return !!w && (w.splay !== 0 || w.bend !== 0 || w.rot !== 0)
+}
+// The interrupted function whose retransition is borrowed: one with Retransition on that is not a stage (On Click / On Release); one that is already retransitioning wins over one that is not.
+function pickUntouchedCandidate(cur, id, st, hold) {
+  if (isStagePrefix(id) || cfg[`${id}RetransitionEnabled`] === false) return cur
+  if (!cur || (st.phase === 'retransition' && cur.st.phase !== 'retransition')) return { id, st, hold }
+  return cur
+}
+function orphEase(o, r) { return o.easeOn ? easingProfilePAt(getEasingProfile(o.fn, o.isTw, o.trig, true), r) : r }
+function orphSnapshot(hand, cats) {
+  const s = {}
+  if (cats.includes('offset')) s.offset = hand._customOffsetAccum ? { x: hand._customOffsetAccum.x, y: hand._customOffsetAccum.y, z: hand._customOffsetAccum.z || 0 } : { x: 0, y: 0, z: 0 }
+  if (cats.includes('rot')) {
+    s.rot = hand._customRotationAccum ? hand._customRotationAccum.clone() : null
+    s.base = hand._customBaseRotAccum ? hand._customBaseRotAccum.clone() : null
+    s.cursor = hand._customCursorRigid ? { q: hand._customCursorRigid.q.clone(), t: hand._customCursorRigid.t.clone() } : null
+  }
+  if (cats.includes('wrist')) s.wrist = hand._wristAccum ? { splay: hand._wristAccum.splay, bend: hand._wristAccum.bend, rot: hand._wristAccum.rot } : null
+  return s
+}
+// Called where a function (B) takes a hand over, after the others were released. cand = the interrupted function to borrow the retransition from (or null).
+function beginUntouchedRetransition(hand, B, cand) {
+  if (isStagePrefix(B) || !cfg[`${B}IgnoreUntouchedSettings`]) { hand._orph = null; return }
+  const cats = ORPH_CATS.filter((c) => !orphTouches(B, c) && orphHasAmount(hand, c))
+  if (!cats.length) { hand._orph = null; return }
+  let o = hand._orph
+  if (cand) {
+    const trig = cand.hold ? clickHoldPoseTriggers[cand.id] : clickPoseTriggers[cand.id]
+    if (!trig) { hand._orph = null; return }
+    const inRet = cand.st.phase === 'retransition'
+    o = hand._orph = { owner: B, fn: cand.id, trig, isTw: cand.hold && (inRet ? !!cand.st.retransitionIsTween : isSequenceOrChainMode(cand.id)), easeOn: !!cfg[`${cand.id}RetransitionEasingCurveEnabled`], r: inRet ? (cand.st.retProg ?? 0) : 0, elapsed: inRet ? (cand.st.retElapsed ?? 0) : 0, last: nowVirtual(), cats, start: null, e0: 0 }
+  } else if (o) {
+    o.owner = B // a later function takes over with no new function to borrow from: the running one carries on for the groups this one leaves alone
+    o.cats = cats
+  } else return
+  o.start = orphSnapshot(hand, cats)
+  o.e0 = orphEase(o, o.r)
+}
+function orphWrite(hand, o, f) {
+  const s = o.start, c = o.cats
+  if (c.includes('offset') && s.offset) {
+    const a = hand._customOffsetAccum || (hand._customOffsetAccum = { x: 0, y: 0, z: 0 })
+    a.x = s.offset.x * f; a.y = s.offset.y * f; a.z = s.offset.z * f
+  }
+  if (c.includes('rot')) {
+    if (hand._customRotationAccum && s.rot) hand._customRotationAccum.identity().slerp(s.rot, f)
+    if (hand._customBaseRotAccum && s.base) hand._customBaseRotAccum.identity().slerp(s.base, f)
+    if (hand._customCursorRigid && s.cursor) { hand._customCursorRigid.q.identity().slerp(s.cursor.q, f); hand._customCursorRigid.t.copy(s.cursor.t).multiplyScalar(f) }
+  }
+  if (c.includes('wrist') && s.wrist) {
+    const acc = hand._wristAccum || (hand._wristAccum = { splay: 0, bend: 0, rot: 0 })
+    acc.splay = s.wrist.splay * f; acc.bend = s.wrist.bend * f; acc.rot = s.wrist.rot * f
+    const out = wristOut(hand)
+    out.splay = acc.splay; out.bend = acc.bend; out.rot = acc.rot
+    hand._wristDeltaFrame = idleReposeFrameCounter
+  }
+}
+// Once per hand per frame, BEFORE the functions apply (they read the accumulators when they apply).
+function updateUntouchedRetransition(hand, now) {
+  const o = hand._orph
+  if (!o) return
+  const st = (hand._cp && hand._cp[o.owner]) || (hand._chp && hand._chp[o.owner])
+  if (!st || st.phase === 'idle' || st.phase === 'retransition') { hand._orph = null; return } // the owner is done, or its own retransition now snapshots and unwinds what is left
+  const dt = Math.max(now - o.last, 0)
+  o.last = now
+  o.elapsed += dt
+  const rt = retTimingFor(hand, o.fn, o.trig, o.isTw)
+  const eff = Math.min(dt, o.elapsed - rt.delay)
+  if (eff > 0) o.r = Math.min(o.r + eff / (rt.speedMs / retransitionScalerMul(hand, o.fn)), 1)
+  const u = orphEase(o, o.r)
+  const f = (o.r >= 1 || o.e0 >= 0.9999) ? 0 : Math.min(Math.max((1 - u) / (1 - o.e0), 0), 1)
+  orphWrite(hand, o, f)
+  if (f === 0) hand._orph = null
+}
 // Tween group's own preset capture/apply -- ONLY `tweenPoses` (the ordered
 // array of saved-pose NAMES, same shape 'multi-select' always stores),
 // unlike HANDO's equivalent which also bundles camera/lighting ("We dont
@@ -16448,6 +16547,11 @@ function isSequenceOrChainMode(p) {
 // so an in-progress-but-not-yet-visually-committed hold isn't force-
 // released by an unrelated click firing in the meantime.
 function releaseHandFromOtherFunctions(hand, exceptId) {
+  const ctx = { cand: null } // Ignore Untouched Settings (2026-11-03): the interrupted function whose retransition the new function's untouched amounts keep following, see beginUntouchedRetransition()
+  releaseHandFromOtherFunctionsCore(hand, exceptId, ctx)
+  beginUntouchedRetransition(hand, exceptId, ctx.cand)
+}
+function releaseHandFromOtherFunctionsCore(hand, exceptId, ctx) {
   const stageOf = stageParentOf(exceptId) // On Click / On Release: their main function keeps waiting for them
   CLICK_POSE_KEYS.forEach((id) => {
     if (id === exceptId) return
@@ -16461,6 +16565,7 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
       // without this, whatever fraction of `id`'s own Offset/Rotation had
       // already been visually shown vanishes the instant it's forced idle.
       bakeInFlightOffsetRotation(hand, id)
+      if (cp.phase !== 'idle') ctx.cand = pickUntouchedCandidate(ctx.cand, id, cp, false)
       if (id === STARTUP_FN) hand._startupSeqDone = true // interrupted counts as finished for Hide Floor After Hand Offset Sequence
       // Logged BEFORE the phase actually changes, so the entry names the
       // phase this hand was genuinely interrupted OUT OF (2026-09-28,
@@ -16479,6 +16584,7 @@ function releaseHandFromOtherFunctions(hand, exceptId) {
     if (chp && chp.phase === 'awaitingRelease' && exceptId === `${id}Rel`) return // the hold waits in this phase while its own On Release function plays
     if (chp && (chp.phase !== 'idle' || chp.pendingClaimAt)) {
       bakeInFlightOffsetRotation(hand, id)
+      if (chp.phase !== 'idle') ctx.cand = pickUntouchedCandidate(ctx.cand, id, chp, true)
       logHandBehaviourEvent(hands.indexOf(hand), handLogTriggerLabel(exceptId), `interrupted ${handLogTriggerLabel(id)} (was mid-"${chp.phase}")`)
       chp.phase = 'idle'; chp.pendingClaimAt = 0
     }
@@ -20492,7 +20598,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":500,"max":1500}',
   StartTimeCurveEnabled: false, StartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', StartTimeRange: '{"min":0,"max":300}',
   PauseDurationMs: 0,
-  RetransitionEnabled: false, PositionalRetransition: true, RetransitionSpeedMs: 400,
+  RetransitionEnabled: false, PositionalRetransition: true, IgnoreUntouchedSettings: false, RetransitionSpeedMs: 400,
   RetransitionSpeedCurveEnabled: false, RetransitionSpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionSpeedCurveRange: '{"min":50,"max":25000}',
   RetransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionStartTimeRange: '{"min":0,"max":300}'
 }
@@ -21216,7 +21322,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'SpeedCurveVisibleOnly', 'SpeedCurveXOrigin', 'SpeedCurveContinual', 'StartTimeCurveVisibleOnly', 'StartTimeCurveXOrigin', 'StartTimeCurveContinual', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionSpeedCurveXOrigin', 'RetransitionSpeedCurveContinual', 'RetransitionStartTimeCurveVisibleOnly', 'RetransitionStartTimeCurveXOrigin', 'RetransitionStartTimeCurveContinual', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveXOrigin', 'TweenStopStartTimeCurveContinual', 'TweenStopDelayCurveVisibleOnly', 'TweenStopDelayCurveXOrigin', 'TweenStopDelayCurveContinual', 'CameraOffsetVisibleOnly', 'CameraOffsetXOrigin', 'CameraOffsetContinual', 'CursorOffsetVisibleOnly', 'CursorOffsetXOrigin', 'CursorOffsetContinual',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
   'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceXOrigin', 'StartDistanceContinual', 'StartDistanceCurve',
-  'RetransitionEnabled', 'PositionalRetransition', 'RetransitionSpeedMs', 'RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
+  'RetransitionEnabled', 'PositionalRetransition', 'IgnoreUntouchedSettings', 'RetransitionSpeedMs','RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
   'RetransitionDistCurveEnabled', 'RetransitionDistCurve', 'RetransitionDistRange',
   'RetransitionScalerEnabled', 'RetransitionScalerCurve', 'RetransitionScalerMulRange', 'RetransitionScalerDistRange',
   // 2026-10-06 (direct request, "1 - CH"): a hold-kind trigger in Sequence/Chain mode uses its own
@@ -21366,7 +21472,7 @@ async function setupStageGroupsForTrigger(prefix, yielder, seedBase) {
 // reload -- see restoreCustomClickFunctions()'s own matching comment).
 // ---- On Release / On Click groups (2026-10-17 / 2026-10-20): see onReleaseOn() / onClickOn() ----
 // Both are shadow pose-kind functions with their on/off in the group label. Neither has a Retransition, Start Time Curve or Start Distance Curve control: those come from the main function.
-function stageDropsControl(suffix) { return /^(Retransition|PositionalRetransition|TweenRetransition|StartTime|TweenStartTime|StartDistance|PauseDurationMs|SkipIfSamePose)/.test(suffix) }
+function stageDropsControl(suffix) { return /^(Retransition|PositionalRetransition|IgnoreUntouchedSettings|TweenRetransition|StartTime|TweenStartTime|StartDistance|PauseDurationMs|SkipIfSamePose)/.test(suffix) }
 // On Release and Tween Stop replace each other: turning one on turns the other off, live (2026-10-20). Ignored while a saved state is being applied.
 function tweenStopReleaseExclusion(id, from, on) {
   if (!on || isApplyingPanelState()) return
@@ -22259,6 +22365,7 @@ function updateSingleTimingGateVisibility(p) {
   // also switched on, AND only for whichever mode's own pair is currently
   // relevant (hold-kind) or unconditionally (pose-kind, see above).
   setRow('PositionalRetransition', retransitionOn)
+  setRow('IgnoreUntouchedSettings', retransitionOn)
   setRow('RetransitionStartTimeCurveEnabled', retransitionOn)
   const retransitionStartCurveEnabled = cfg[`${p}RetransitionStartTimeCurveEnabled`] !== false
   setRow('RetransitionStartTimeCurve', retransitionCurvesOn && retransitionStartCurveEnabled)
@@ -22642,7 +22749,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   // heading -- RetransitionEnabled itself still governs both regardless
   // of mode, preserving the 2026-09-22 request.
   wrapGatedSubgroup(`${p}RetransitionEnabled`, [
-    `${p}PositionalRetransition`, `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`, `${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurveXOrigin`, `${p}RetransitionSpeedCurveContinual`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurveXOrigin`, `${p}RetransitionStartTimeCurveContinual`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
+    `${p}PositionalRetransition`, `${p}IgnoreUntouchedSettings`, `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`,`${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurveXOrigin`, `${p}RetransitionSpeedCurveContinual`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurveXOrigin`, `${p}RetransitionStartTimeCurveContinual`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
     `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`,
     `${p}RetransitionEasingCurveEnabled`, `${p}RetransitionEasingCurve`,
     `${p}RetransitionDistCurveEnabled`, `${p}RetransitionDistCurve`, `${p}RetransitionDistRange`,
@@ -25559,6 +25666,7 @@ function updateRenderOrder() {
   const __perHand = (hand, i) => {
     if (loadingWarmMode && (hand.everReposed || performance.now() > warmReposeDeadline)) return
     const live = liveDistances[i]
+    if (hand._orph) updateUntouchedRetransition(hand, nowMs) // Ignore Untouched Settings: before any function applies this frame (they read the accumulators)
     // timelines always step; what they write to a hand outside every camera (position, pose) can be throttled to every N-th frame, a different hand each frame (see the controls' comment)
     const __thr = hand._curlSkip === true
     hand._posElig = __posN > 0 && __thr
