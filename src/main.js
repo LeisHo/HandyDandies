@@ -16862,11 +16862,14 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     const running = chp.phase === 'forward' || chp.phase === 'looping'
     if (rcap === null) {
       if (running) { if (!chp.retrigOut) { chp.retrigOut = true; endClickHoldPose(p, hand) } } // once per exit (with Retransition off the hand stays in 'forward' and would otherwise be released again every frame)
-      else if (chp.phase === 'idle' && chp.pendingClaimAt) { chp.pendingClaimAt = 0; chp.armedForHoldStartTime = null } // went out of range while waiting for its start delay: never starts
+      if (chp.pendingClaimAt) { chp.pendingClaimAt = 0; chp.armedForHoldStartTime = null } // went out of range while waiting for its start delay (or for a restart): it never starts
     } else {
       chp.retrigOut = false
       if (running && chp.releasePending) chp.releasePending = false // back in range before the end of the pass it was due to stop at
-      if (chp.phase === 'idle' && !chp.pendingClaimAt && !chp.awaitClk) chp.armedForHoldStartTime = null
+      // Back in range while still stopping / retransitioning from an earlier exit (direct request 2026-11-04): it starts animating again straight away. The re-arm schedules a normal claim (the function's Start Time delay still
+      // applies, and the wind-down carries on meanwhile); the commit then restarts the sequence from the hand's CURRENT pose, exactly as when the same function is triggered again mid-transition.
+      const windingDown = chp.phase === 'stopping' || chp.phase === 'retransition'
+      if ((chp.phase === 'idle' || windingDown) && !chp.pendingClaimAt && !chp.awaitClk) chp.armedForHoldStartTime = null
     }
   }
   if (trig.active && chp.armedForHoldStartTime !== trig.holdStartTime && now - trig.holdStartTime >= holdCommitFloorMs) {
