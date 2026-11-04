@@ -22753,7 +22753,7 @@
       "custom40Trig1OffsetProgressionCurveEnabled": false,
       "custom40Trig1OffsetProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom40Trig1CameraOffsetProgressionCurveEnabled": true,
-      "custom40Trig1CameraOffsetProgressionCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2978992226969101,\"y\":0}},{\"x\":0.2825241353199879,\"y\":1,\"h2\":{\"x\":-0.1652506686245827,\"y\":0},\"h1\":{\"x\":0.4017064064237944,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2317798710204062,\"y\":0}}]",
+      "custom40Trig1CameraOffsetProgressionCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2978992226969101,\"y\":0}},{\"x\":0.4584317140148969,\"y\":1,\"h2\":{\"x\":-0.1652506686245827,\"y\":0},\"h1\":{\"x\":0.23292691038832514,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4943668211657991,\"y\":0}}]",
       "custom40Trig1RotationProgressionCurveEnabled": false,
       "custom40Trig1RotationProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom40Trig1WristEnabled": false,
@@ -50599,7 +50599,7 @@
       "custom40Trig1OffsetProgressionCurveEnabled": false,
       "custom40Trig1OffsetProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom40Trig1CameraOffsetProgressionCurveEnabled": true,
-      "custom40Trig1CameraOffsetProgressionCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2978992226969101,\"y\":0}},{\"x\":0.2825241353199879,\"y\":1,\"h2\":{\"x\":-0.1652506686245827,\"y\":0},\"h1\":{\"x\":0.4017064064237944,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2317798710204062,\"y\":0}}]",
+      "custom40Trig1CameraOffsetProgressionCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2978992226969101,\"y\":0}},{\"x\":0.4584317140148969,\"y\":1,\"h2\":{\"x\":-0.1652506686245827,\"y\":0},\"h1\":{\"x\":0.23292691038832514,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4943668211657991,\"y\":0}}]",
       "custom40Trig1RotationProgressionCurveEnabled": false,
       "custom40Trig1RotationProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom40Trig1WristEnabled": false,
@@ -78445,7 +78445,7 @@
       "custom40Trig1OffsetProgressionCurveEnabled": false,
       "custom40Trig1OffsetProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom40Trig1CameraOffsetProgressionCurveEnabled": true,
-      "custom40Trig1CameraOffsetProgressionCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2978992226969101,\"y\":0}},{\"x\":0.2825241353199879,\"y\":1,\"h2\":{\"x\":-0.1652506686245827,\"y\":0},\"h1\":{\"x\":0.4017064064237944,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.2317798710204062,\"y\":0}}]",
+      "custom40Trig1CameraOffsetProgressionCurve": "[{\"x\":0,\"y\":0,\"h1\":{\"x\":0.2978992226969101,\"y\":0}},{\"x\":0.4584317140148969,\"y\":1,\"h2\":{\"x\":-0.1652506686245827,\"y\":0},\"h1\":{\"x\":0.23292691038832514,\"y\":0}},{\"x\":1,\"y\":0,\"h2\":{\"x\":-0.4943668211657991,\"y\":0}}]",
       "custom40Trig1RotationProgressionCurveEnabled": false,
       "custom40Trig1RotationProgressionCurve": "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1}]",
       "custom40Trig1WristEnabled": false,
@@ -93937,9 +93937,9 @@
     },
     "mobile": {
       "left": 20,
-      "top": 270.327392578125,
-      "width": 354.4285888671875,
-      "height": 517.7142944335938,
+      "top": 267.28570556640625,
+      "width": 357.8571472167969,
+      "height": 519.232177734375,
       "collapsed": false
     }
   }
