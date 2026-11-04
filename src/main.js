@@ -9428,6 +9428,8 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       // Positional Retransition (2026-10-19, direct request): On (default) = this function retransitions fully back to its starting state. Off = only the hand POSE retransitions with this function's Retransition settings; the hand's
       // click-function offset and rotation unwind instead at the Retransition Speed of the last triggered click function that has Positional Retransition on - and do not unwind at all while no such function has been triggered.
       { key: `${p}PositionalRetransition`, label: 'Positional Retransition', type: 'checkbox', def: true },
+      // Use Closest Path (2026-11-04, direct request): On (default) = the retransition takes the shortest way back for every rotation angle of the hand (a 360 deg turn unwinds by 0, a 300 by 60). Off = the old straight-line unwind through the full angle. See lerpPoseValuesClosest().
+      { key: `${p}RetransitionClosestPath`, label: 'Use Closest Path', type: 'checkbox', def: true },
       // Ignore Untouched Settings (2026-11-03, direct request): see beginUntouchedRetransition(). On = when this function takes a hand over from another one, the Offset / Rotation / Wrist amounts the previous function left on the hand that THIS function does not
       // use keep unwinding to zero with the previous function's retransition (its speed, start time, easing, scaler) while this function runs, instead of staying frozen until this function's own retransition.
       { key: `${p}IgnoreUntouchedSettings`, label: 'Ignore Untouched Settings', type: 'checkbox', def: false },
@@ -9785,6 +9787,8 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       // Positional Retransition (2026-10-19, direct request): On (default) = this function retransitions fully back to its starting state. Off = only the hand POSE retransitions with this function's Retransition settings; the hand's
       // click-function offset and rotation unwind instead at the Retransition Speed of the last triggered click function that has Positional Retransition on - and do not unwind at all while no such function has been triggered.
       { key: `${p}PositionalRetransition`, label: 'Positional Retransition', type: 'checkbox', def: true },
+      // Use Closest Path (2026-11-04, direct request): On (default) = the retransition takes the shortest way back for every rotation angle of the hand (a 360 deg turn unwinds by 0, a 300 by 60). Off = the old straight-line unwind through the full angle. See lerpPoseValuesClosest().
+      { key: `${p}RetransitionClosestPath`, label: 'Use Closest Path', type: 'checkbox', def: true },
       // Ignore Untouched Settings (2026-11-03, direct request): see beginUntouchedRetransition(). On = when this function takes a hand over from another one, the Offset / Rotation / Wrist amounts the previous function left on the hand that THIS function does not
       // use keep unwinding to zero with the previous function's retransition (its speed, start time, easing, scaler) while this function runs, instead of staying frozen until this function's own retransition.
       { key: `${p}IgnoreUntouchedSettings`, label: 'Ignore Untouched Settings', type: 'checkbox', def: false },
@@ -14676,6 +14680,24 @@ function lerpPoseValues(a, b, t) {
   result.hideModel = am + (bm - am) * t
   return result
 }
+// Use Closest Path (2026-11-04, direct request): "for all properties of each model, the retransition will take the shortest path to its target pose. If my click function triggers a 360 rotation in 1 axis, during
+// retransition the model won't rotate -360 degrees; if it triggers 300, it rotates 60". Only the pose keys that are a full rotation about an axis can be re-expressed as an equivalent angle (a finger curl or a limited
+// joint bend is not the same thing at +360). For each of them the START angle is re-based by whole turns to the one nearest the target, then the usual lerp runs, so at t = 0 the hand looks exactly as before, at t = 1 it
+// is exactly the target (no snap when idle takes over), and in between it travels at most half a turn. The Rotation group's own accumulators are quaternions, which already unwind by the short way.
+const CLOSEST_PATH_KEYS = ['wristRotation', 'modelRotX', 'modelRotY', 'modelRotZ', 'baseRotationX', 'baseRotationY', 'baseRotationZ']
+function lerpPoseValuesClosest(a, b, t) {
+  const result = lerpPoseValues(a, b, t)
+  for (let i = 0; i < CLOSEST_PATH_KEYS.length; i++) {
+    const k = CLOSEST_PATH_KEYS[i]
+    let av = a[k]; let bv = b[k]
+    if (av === undefined) av = POSE_KEY_DEFAULTS[k]
+    if (bv === undefined) bv = POSE_KEY_DEFAULTS[k]
+    av -= 360 * Math.round((av - bv) / 360)
+    result[k] = av + (bv - av) * t
+  }
+  return result
+}
+function closestPathOn(p) { return cfg[`${p}RetransitionClosestPath`] !== false }
 const _poseBaseQuatEuler = new THREE.Euler()
 const _poseBaseQuat = new THREE.Quaternion()
 // Same formula as updateCloneBaseQuat() (alignQuat * Euler(modelRotX/Y/Z
@@ -15360,11 +15382,13 @@ function bakeWristIntoAccum(hand, p, f) {
   hand._wristDeltaFrame = idleReposeFrameCounter
 }
 // Called by applyOffsetRotationRetransition(): the accumulator seen when the retransition began, unwound by the positional progress.
-function unwindWristAccum(hand, start, progress) {
+function unwindWristAccum(hand, start, progress, closest) {
   if (!start && !hand._wristAccum) return
   const rem = 1 - Math.min(Math.max(progress, 0), 1)
   const acc = hand._wristAccum || (hand._wristAccum = { splay: 0, bend: 0, rot: 0 })
-  acc.splay = start ? start.splay * rem : 0; acc.bend = start ? start.bend * rem : 0; acc.rot = start ? start.rot * rem : 0
+  // Use Closest Path: the accumulated wrist twist (a full rotation about the wrist's Y axis) unwinds from its nearest equivalent angle, so 360 unwinds by 0 and 300 by 60 (bend / splay are limited joint angles, left alone)
+  const startRot = start ? (closest ? start.rot - 360 * Math.round(start.rot / 360) : start.rot) : 0
+  acc.splay = start ? start.splay * rem : 0; acc.bend = start ? start.bend * rem : 0; acc.rot = startRot * rem
   const out = wristOut(hand)
   out.splay = acc.splay; out.bend = acc.bend; out.rot = acc.rot
   hand._wristDeltaFrame = idleReposeFrameCounter
@@ -15654,9 +15678,9 @@ function positionalProgressFor(p, poseProgress, st, hand) {
   // the borrowed function's own Retransition Easing Curve shapes it too
   return cfg[`${q}RetransitionEasingCurveEnabled`] ? easingProfilePAt(getEasingProfile(q, CLICK_HOLD_KEYS.includes(q) && isSequenceOrChainMode(q), qTrig, true), st.posProg) : st.posProg
 }
-function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart, baseAccumStart, cursorAccumStart, wristAccumStart) {
+function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart, baseAccumStart, cursorAccumStart, wristAccumStart, closest = true) {
   if (posThrottleHold(hand)) return // Throttle Positional Transposition: a held frame (the decay is a function of progress, so the next full apply catches up exactly)
-  unwindWristAccum(hand, wristAccumStart, progress) // Wrist group: the accumulated wrist angles unwind with the same positional progress
+  unwindWristAccum(hand, wristAccumStart, progress, closest) // Wrist group: the accumulated wrist angles unwind with the same positional progress
   const remaining = 1 - progress
   const decayedX = offsetAccumStart ? offsetAccumStart.x * remaining : 0
   const decayedY = offsetAccumStart ? offsetAccumStart.y * remaining : 0
@@ -15758,7 +15782,7 @@ function beginUntouchedRetransition(hand, B, cand) {
     const trig = cand.hold ? clickHoldPoseTriggers[cand.id] : clickPoseTriggers[cand.id]
     if (!trig) { hand._orph = null; return }
     const inRet = cand.st.phase === 'retransition'
-    o = hand._orph = { owner: B, fn: cand.id, trig, isTw: cand.hold && (inRet ? !!cand.st.retransitionIsTween : isSequenceOrChainMode(cand.id)), easeOn: !!cfg[`${cand.id}RetransitionEasingCurveEnabled`], r: inRet ? (cand.st.retProg ?? 0) : 0, elapsed: inRet ? (cand.st.retElapsed ?? 0) : 0, last: nowVirtual(), cats, start: null, e0: 0 }
+    o = hand._orph = { owner: B, fn: cand.id, trig, isTw: cand.hold && (inRet ? !!cand.st.retransitionIsTween : isSequenceOrChainMode(cand.id)), easeOn: !!cfg[`${cand.id}RetransitionEasingCurveEnabled`], closest: closestPathOn(cand.id), r: inRet ? (cand.st.retProg ?? 0) : 0, elapsed: inRet ? (cand.st.retElapsed ?? 0) : 0, last: nowVirtual(), cats, start: null, e0: 0 }
   } else if (o) {
     o.owner = B // a later function takes over with no new function to borrow from: the running one carries on for the groups this one leaves alone
     o.cats = cats
@@ -15779,7 +15803,7 @@ function orphWrite(hand, o, f) {
   }
   if (c.includes('wrist') && s.wrist) {
     const acc = hand._wristAccum || (hand._wristAccum = { splay: 0, bend: 0, rot: 0 })
-    acc.splay = s.wrist.splay * f; acc.bend = s.wrist.bend * f; acc.rot = s.wrist.rot * f
+    acc.splay = s.wrist.splay * f; acc.bend = s.wrist.bend * f; acc.rot = (o.closest ? s.wrist.rot - 360 * Math.round(s.wrist.rot / 360) : s.wrist.rot) * f // Use Closest Path of the borrowed function (see unwindWristAccum())
     const out = wristOut(hand)
     out.splay = acc.splay; out.bend = acc.bend; out.rot = acc.rot
     hand._wristDeltaFrame = idleReposeFrameCounter
@@ -17243,7 +17267,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // follow the live tuning instead of the saved default in that case) --
     // `poseDefaultValues` is untouched everywhere else (Loading/Pose/Tween
     // Preview, dcHold's own "always starts from default" exception).
-    const values = lerpPoseValues(chp.retransitionStart, cfg, easedProgress)
+    const values = (closestPathOn(p) ? lerpPoseValuesClosest : lerpPoseValues)(chp.retransitionStart, cfg, easedProgress)
     // CORRECTED 2026-09-27 -- see snapshotOffsetRotationAccumForRetransition()'s
     // own comment. Blends from wherever splay actually was the instant
     // retransition began (`chp.retransitionFromSplayDeg`) toward the LIVE
@@ -17259,7 +17283,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // back to zero, not just this function's own last increment -- and
     // clears the real accumulator once progress reaches 1.
     const posProgressH = positionalProgressFor(p, easedProgress, chp, hand)
-    applyOffsetRotationRetransition(hand, posProgressH, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart, chp.retransitionBaseAccumStart, chp.retransitionCursorAccumStart, chp.retransitionWristAccumStart)
+    applyOffsetRotationRetransition(hand, posProgressH, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart, chp.retransitionBaseAccumStart, chp.retransitionCursorAccumStart, chp.retransitionWristAccumStart, closestPathOn(p))
     if (progress >= 1 && (positionalRetransitionOn(p) || chp.posProg >= 1)) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
 }
@@ -18243,7 +18267,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     const easedProgress = cfg[`${p}RetransitionEasingCurveEnabled`] ? easingProfilePAt(getEasingProfile(p, isSequenceOrChainMode(p), clickPoseTriggers[p], true), progress) : progress
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching 'retransition'-phase comment for the full reasoning.
-    const values = lerpPoseValues(cp.retransitionStart, cfg, easedProgress)
+    const values = (closestPathOn(p) ? lerpPoseValuesClosest : lerpPoseValues)(cp.retransitionStart, cfg, easedProgress)
     // CORRECTED 2026-09-27 -- see updateClickHoldPoseForHand()'s own
     // matching 'retransition'-phase comment for the full reasoning.
     const liveSplayTarget = splayDegForHand(hand, live, minLiveDist, liveDistRange)
@@ -18254,7 +18278,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // this function's own last increment -- and clears the real
     // accumulator once progress reaches 1, a genuinely fresh start.
     const posProgressC = positionalProgressFor(p, easedProgress, cp, hand)
-    applyOffsetRotationRetransition(hand, posProgressC, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart, cp.retransitionBaseAccumStart, cp.retransitionCursorAccumStart, cp.retransitionWristAccumStart)
+    applyOffsetRotationRetransition(hand, posProgressC, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart, cp.retransitionBaseAccumStart, cp.retransitionCursorAccumStart, cp.retransitionWristAccumStart, closestPathOn(p))
     if (progress >= 1 && (positionalRetransitionOn(p) || cp.posProg >= 1)) cp.phase = 'idle'
   }
 }
@@ -20598,7 +20622,7 @@ const NEW_CUSTOM_FUNCTION_TEMPLATE = {
   SpeedCurveEnabled: false, SpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', SpeedCurveRange: '{"min":500,"max":1500}',
   StartTimeCurveEnabled: false, StartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', StartTimeRange: '{"min":0,"max":300}',
   PauseDurationMs: 0,
-  RetransitionEnabled: false, PositionalRetransition: true, IgnoreUntouchedSettings: false, RetransitionSpeedMs: 400,
+  RetransitionEnabled: false, PositionalRetransition: true, RetransitionClosestPath: true, IgnoreUntouchedSettings: false, RetransitionSpeedMs: 400,
   RetransitionSpeedCurveEnabled: false, RetransitionSpeedCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionSpeedCurveRange: '{"min":50,"max":25000}',
   RetransitionStartTimeCurve: '[{"x":0,"y":0},{"x":1,"y":1}]', RetransitionStartTimeRange: '{"min":0,"max":300}'
 }
@@ -21322,7 +21346,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'SpeedCurveVisibleOnly', 'SpeedCurveXOrigin', 'SpeedCurveContinual', 'StartTimeCurveVisibleOnly', 'StartTimeCurveXOrigin', 'StartTimeCurveContinual', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionSpeedCurveXOrigin', 'RetransitionSpeedCurveContinual', 'RetransitionStartTimeCurveVisibleOnly', 'RetransitionStartTimeCurveXOrigin', 'RetransitionStartTimeCurveContinual', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveXOrigin', 'TweenStopStartTimeCurveContinual', 'TweenStopDelayCurveVisibleOnly', 'TweenStopDelayCurveXOrigin', 'TweenStopDelayCurveContinual', 'CameraOffsetVisibleOnly', 'CameraOffsetXOrigin', 'CameraOffsetContinual', 'CursorOffsetVisibleOnly', 'CursorOffsetXOrigin', 'CursorOffsetContinual',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
   'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceXOrigin', 'StartDistanceContinual', 'StartDistanceCurve',
-  'RetransitionEnabled', 'PositionalRetransition', 'IgnoreUntouchedSettings', 'RetransitionSpeedMs','RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
+  'RetransitionEnabled', 'PositionalRetransition', 'RetransitionClosestPath', 'IgnoreUntouchedSettings', 'RetransitionSpeedMs','RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
   'RetransitionDistCurveEnabled', 'RetransitionDistCurve', 'RetransitionDistRange',
   'RetransitionScalerEnabled', 'RetransitionScalerCurve', 'RetransitionScalerMulRange', 'RetransitionScalerDistRange',
   // 2026-10-06 (direct request, "1 - CH"): a hold-kind trigger in Sequence/Chain mode uses its own
@@ -22365,6 +22389,7 @@ function updateSingleTimingGateVisibility(p) {
   // also switched on, AND only for whichever mode's own pair is currently
   // relevant (hold-kind) or unconditionally (pose-kind, see above).
   setRow('PositionalRetransition', retransitionOn)
+  setRow('RetransitionClosestPath', retransitionOn)
   setRow('IgnoreUntouchedSettings', retransitionOn)
   setRow('RetransitionStartTimeCurveEnabled', retransitionOn)
   const retransitionStartCurveEnabled = cfg[`${p}RetransitionStartTimeCurveEnabled`] !== false
@@ -22749,7 +22774,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   // heading -- RetransitionEnabled itself still governs both regardless
   // of mode, preserving the 2026-09-22 request.
   wrapGatedSubgroup(`${p}RetransitionEnabled`, [
-    `${p}PositionalRetransition`, `${p}IgnoreUntouchedSettings`, `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`,`${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurveXOrigin`, `${p}RetransitionSpeedCurveContinual`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurveXOrigin`, `${p}RetransitionStartTimeCurveContinual`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
+    `${p}PositionalRetransition`, `${p}RetransitionClosestPath`, `${p}IgnoreUntouchedSettings`, `${p}RetransitionSpeedMs`, `${p}RetransitionSpeedCurveEnabled`,`${p}RetransitionSpeedCurveVisibleOnly`, `${p}RetransitionSpeedCurveXOrigin`, `${p}RetransitionSpeedCurveContinual`, `${p}RetransitionSpeedCurve`, `${p}RetransitionSpeedCurveRange`, `${p}RetransitionStartTimeCurveEnabled`, `${p}RetransitionStartTimeCurveVisibleOnly`, `${p}RetransitionStartTimeCurveXOrigin`, `${p}RetransitionStartTimeCurveContinual`, `${p}RetransitionStartTimeCurve`, `${p}RetransitionStartTimeRange`,
     `${p}TweenRetransitionSpeedMs`, `${p}TweenRetransitionSpeedCurve`, `${p}TweenRetransitionSpeedCurveRange`, `${p}TweenRetransitionStartTimeCurve`, `${p}TweenRetransitionStartTimeRange`,
     `${p}RetransitionEasingCurveEnabled`, `${p}RetransitionEasingCurve`,
     `${p}RetransitionDistCurveEnabled`, `${p}RetransitionDistCurve`, `${p}RetransitionDistRange`,
