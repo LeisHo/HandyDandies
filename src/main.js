@@ -9413,6 +9413,8 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartDistanceMax`, label: 'Start Distance Max (World Units)', type: 'slider', min: 0, max: 200, step: 1, def: 100 },
       { key: `${p}StartDistanceXOrigin`, label: 'Start Distance Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}StartDistanceContinual`, label: 'Start Distance Curve: Continually Recomputes', type: 'checkbox', def: false },
+      // Retriggers New Hands (2026-11-04, direct request): see updateClickHoldPoseForHand() -- while held, hands entering the range start, hands leaving it stop with the Tween Stop settings, and the fraction follows the cursor.
+      { key: `${p}StartDistanceRetrigger`, label: 'Retriggers New Hands', type: 'checkbox', def: false },
       { key: `${p}StartDistanceCurve`, label: 'Start Distance Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
       // Ease Sequence Threshold (2026-11-04, direct request): past Start Distance Max, an extra band of Ease Distance in which the hands still run a PART of the sequence instead of none. X = 0 at Max, 1 at Max + Ease Distance; Y = fraction of the sequence run (0-1). See computeTweenFractionCap().
       { key: `${p}StartDistanceEaseEnabled`, label: 'Ease Sequence Threshold On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
@@ -16222,8 +16224,9 @@ function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curve
 const EASE_CURVE_DEFAULT = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
 // Ease Sequence Threshold helpers (2026-11-04). A hand "runs a partial sequence" when its tween-fraction cap is below 1 and the function has Start Distance Curve AND Ease Sequence Threshold on.
 function easeSp(p) { return stageParentOf(p) || p }
-function easePartial(p, cap) { const sp = easeSp(p); return cap < 1 && !!cfg[`${sp}StartDistanceCurveEnabled`] && !!cfg[`${sp}StartDistanceEaseEnabled`] }
-function easeScaleDurationOn(p) { return cfg[`${easeSp(p)}StartDistanceEaseScaleDuration`] !== false }
+// 2026-11-04 (direct request): partial loops now apply to every function with Start Distance Curve on, not only with Ease Sequence Threshold on. Scale Sequence Duration (inside the ease subgroup) only counts while the ease toggle is on; otherwise a partial hand keeps the full duration, as Start Distance always did.
+function easePartial(p, cap) { const sp = easeSp(p); return cap < 1 && !!cfg[`${sp}StartDistanceCurveEnabled`] }
+function easeScaleDurationOn(p) { const sp = easeSp(p); return !cfg[`${sp}StartDistanceEaseEnabled`] || cfg[`${sp}StartDistanceEaseScaleDuration`] !== false }
 // Scale Sequence Duration OFF: a partial hand plays at the full sequence's per-pose speed, so its forward pass / oscillate lap takes `cap` x the full time (never below 2%). On (default): 1, the full duration of a full run.
 function easeDurFactor(p, cap) { return (easePartial(p, cap) && !easeScaleDurationOn(p)) ? Math.max(cap, 0.02) : 1 }
 function poseSegmentsOf(poses) { const out = []; for (let i = 0; i < poses.length - 1; i++) out.push({ poseA: poses[i], poseB: poses[i + 1], weight: 1 }); return out }
@@ -16774,7 +16777,7 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
   if (rotationCurvesOn(p) && (contOn(p, 'RotationCurve') || st.rotationNormStamp !== contStamp(st, kind))) { st.rotationNorm = captureRotationNorm(hand, p); st.rotationNormStamp = contStamp(st, kind) } // off: captured once per commit
   const sdp = stageParentOf(p) || p // On Click / On Release inherit the main function's Start Distance Curve
   const sdt = sdp === p ? trig : (triggerStateOf(sdp) || trig)
-  if (cfg[`${sdp}StartDistanceCurveEnabled`] && contOn(sdp, 'StartDistance')) {
+  if (cfg[`${sdp}StartDistanceCurveEnabled`] && (contOn(sdp, 'StartDistance') || cfg[`${sdp}StartDistanceRetrigger`])) { // (Retriggers New Hands keeps the fraction following the hand's distance)
     const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${sdp}StartDistanceMin`], cfg[`${sdp}StartDistanceMax`], sdt.startDistanceCurveParsed, nearestFor(hand, p), `${sdp}StartDistanceXOrigin`, sdp, sdt)
     if (cap !== null) st.frozenTweenFractionCap = cap // out of range keeps the last cap rather than snapping
   }
@@ -16851,6 +16854,21 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
   // completely different mechanism (see its own pointerdown listener's
   // comment), so it has no equivalent race to begin with.
   const holdCommitFloorMs = Math.max(cfg.holdConfirmMs ?? 0, cfg.multiClickWindowMs ?? 0)
+  // Retriggers New Hands (2026-11-04, direct request): while the button is held, a hand that moves INTO the Start Distance range (as the cursor moves) starts the sequence the same way a hand in range at the press did, and a hand
+  // that moves OUT of it is released with this function's own Tween Stop / Retransition settings (not a hard stop). The sequence fraction of a hand in range keeps following its distance (refreshLiveDistanceState() treats this as
+  // "Continually Recomputes"). An idle hand is re-armed through the normal arm block just below, by clearing its armed marker; a hand still stopping / retransitioning from an earlier exit is re-armed once it is idle again.
+  if (trig.active && cfg[`${p}StartDistanceRetrigger`] && cfg[`${p}StartDistanceCurveEnabled`] && !handStartupLocked(hand)) {
+    const rcap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, nearestFor(hand, p), `${p}StartDistanceXOrigin`, p, trig)
+    const running = chp.phase === 'forward' || chp.phase === 'looping'
+    if (rcap === null) {
+      if (running) { if (!chp.retrigOut) { chp.retrigOut = true; endClickHoldPose(p, hand) } } // once per exit (with Retransition off the hand stays in 'forward' and would otherwise be released again every frame)
+      else if (chp.phase === 'idle' && chp.pendingClaimAt) { chp.pendingClaimAt = 0; chp.armedForHoldStartTime = null } // went out of range while waiting for its start delay: never starts
+    } else {
+      chp.retrigOut = false
+      if (running && chp.releasePending) chp.releasePending = false // back in range before the end of the pass it was due to stop at
+      if (chp.phase === 'idle' && !chp.pendingClaimAt && !chp.awaitClk) chp.armedForHoldStartTime = null
+    }
+  }
   if (trig.active && chp.armedForHoldStartTime !== trig.holdStartTime && now - trig.holdStartTime >= holdCommitFloorMs) {
     chp.armedForHoldStartTime = trig.holdStartTime // dedupe -- arm exactly once per hold-start, not every frame spent waiting
     // Start Distance Curve (direct spec, 2026-09-27) -- "beyond those
@@ -17488,10 +17506,11 @@ function holdStopParams(p, trig, dist, retransitionOff) {
   const retSpeed = cfg[`${p}RetransitionSpeedCurveEnabled`] ? curveByDomain(p, 'RetransitionSpeedCurveVisibleOnly', dist, trig.tweenRetransitionSpeedCurveParsed, trig.tweenRetransitionSpeedRangeParsed) : 0
   return { startDelay, delayMs, retDelay, retSpeed }
 }
-function endClickHoldPose(p) {
+// `onlyHand` (Retriggers New Hands, 2026-11-04): release just that one hand with this function's own Tween Stop / Retransition settings while the button stays held - the press itself is not ended.
+function endClickHoldPose(p, onlyHand) {
   const trig = clickHoldPoseTriggers[p]
-  if (!trig.active) return // guard against a stray release with no matching press
-  trig.active = false
+  if (!onlyHand && !trig.active) return // guard against a stray release with no matching press
+  if (!onlyHand) trig.active = false
   // Only restore panning once NONE of CLICK_HOLD_KEYS' own triggers are
   // still holding -- e.g. releasing the right button while the left is
   // still held shouldn't re-enable panning mid-hold. `dcHold` added
@@ -17505,10 +17524,11 @@ function endClickHoldPose(p) {
   // check (a real gap otherwise: releasing chp while a still-active
   // quadClickHold hold was ongoing would have incorrectly re-enabled
   // panning out from under it, since neither new key was ever checked).
-  if (CLICK_HOLD_KEYS.every((key) => !clickHoldPoseTriggers[key].active)) applyCameraLockState()
+  if (!onlyHand && CLICK_HOLD_KEYS.every((key) => !clickHoldPoseTriggers[key].active)) applyCameraLockState()
   const now = nowVirtual() // virtual clock -- feeds chp.retransitionStartTime below, an animation-timing field
   let minD = Infinity, maxD = -Infinity
-  const dists = hands.map((hand) => {
+  const oneIdx = onlyHand ? hands.indexOf(onlyHand) : -1
+  const dists = onlyHand ? [] : hands.map((hand) => {
     const d = cursorDistXY(handPoint(hand)) // screen-space XY from the tracking point
     if (hand._onScr !== false) { // domain = on-screen hands only (2026-10-11)
       if (d < minD) minD = d
@@ -17516,8 +17536,10 @@ function endClickHoldPose(p) {
     }
     return d
   })
+  if (onlyHand) dists[oneIdx] = cursorDistXY(handPoint(onlyHand))
   const range = Math.max(maxD - minD, 0.001)
-  hands.forEach((hand, i) => {
+  ;(onlyHand ? [onlyHand] : hands).forEach((hand, i0) => {
+    const i = onlyHand ? oneIdx : i0
     const chp = getOrInitHandCHP(hand)[p]
     // A hand still 'idle' here never actually left it -- HoldConfirmMs
     // (see makeClickHoldPoseGroup()'s own control comment) never let it
@@ -21456,7 +21478,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'SpeedCurveVisibleOnly', 'SpeedCurveXOrigin', 'SpeedCurveContinual', 'StartTimeCurveVisibleOnly', 'StartTimeCurveXOrigin', 'StartTimeCurveContinual', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionSpeedCurveXOrigin', 'RetransitionSpeedCurveContinual', 'RetransitionStartTimeCurveVisibleOnly', 'RetransitionStartTimeCurveXOrigin', 'RetransitionStartTimeCurveContinual', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveXOrigin', 'TweenStopStartTimeCurveContinual', 'TweenStopDelayCurveVisibleOnly', 'TweenStopDelayCurveXOrigin', 'TweenStopDelayCurveContinual', 'CameraOffsetVisibleOnly', 'CameraOffsetXOrigin', 'CameraOffsetContinual', 'CursorOffsetVisibleOnly', 'CursorOffsetXOrigin', 'CursorOffsetContinual',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
-  'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceXOrigin', 'StartDistanceContinual', 'StartDistanceCurve', 'StartDistanceEaseEnabled', 'StartDistanceEaseDist', 'StartDistanceEaseCurve', 'StartDistanceEaseFromMainEnd', 'StartDistanceEaseScaleDuration', 'StartDistanceEaseScaleOffsets',
+  'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceXOrigin', 'StartDistanceContinual', 'StartDistanceRetrigger', 'StartDistanceCurve', 'StartDistanceEaseEnabled', 'StartDistanceEaseDist', 'StartDistanceEaseCurve', 'StartDistanceEaseFromMainEnd', 'StartDistanceEaseScaleDuration', 'StartDistanceEaseScaleOffsets',
   'RetransitionEnabled', 'PositionalRetransition', 'RetransitionClosestPath', 'IgnoreUntouchedSettings', 'RetransitionSpeedMs','RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
   'RetransitionDistCurveEnabled', 'RetransitionDistCurve', 'RetransitionDistRange',
   'RetransitionScalerEnabled', 'RetransitionScalerCurve', 'RetransitionScalerMulRange', 'RetransitionScalerDistRange',
@@ -22440,6 +22462,7 @@ function updateSingleTimingGateVisibility(p) {
   setRow('StartDistanceMax', startDistanceOn)
   setRow('StartDistanceXOrigin', startDistanceOn)
   setRow('StartDistanceContinual', startDistanceOn)
+  setRow('StartDistanceRetrigger', startDistanceOn)
   setRow('StartDistanceCurve', startDistanceOn)
   // Ease Sequence Threshold (2026-11-04): a toggle subgroup inside the Start Distance Curve group. Once wrapped, its checkbox lives in the subgroup header and is never hidden itself (same lesson as the Progression Curve
   // gate); the subgroup shows while Start Distance Curve is on, its slider + curve while the toggle is on too. Not wrapped yet (first pass): the bare row follows Start Distance Curve.
@@ -22885,7 +22908,7 @@ function wrapClickFunctionGatedSubgroups(p) {
   // subgroup for both Single Pose and Tween mode (this curve isn't
   // Mode-gated at all -- see updateSingleTimingGateVisibility()'s own
   // comment).
-  wrapGatedSubgroup(`${p}StartDistanceCurveEnabled`, [`${p}StartDistanceMin`, `${p}StartDistanceMax`, `${p}StartDistanceXOrigin`, `${p}StartDistanceContinual`, `${p}StartDistanceCurve`, `${p}StartDistanceEaseEnabled`, `${p}StartDistanceEaseDist`, `${p}StartDistanceEaseCurve`, `${p}StartDistanceEaseFromMainEnd`, `${p}StartDistanceEaseScaleDuration`, `${p}StartDistanceEaseScaleOffsets`], 'Start Distance Curve')
+  wrapGatedSubgroup(`${p}StartDistanceCurveEnabled`, [`${p}StartDistanceMin`, `${p}StartDistanceMax`, `${p}StartDistanceXOrigin`, `${p}StartDistanceContinual`, `${p}StartDistanceRetrigger`, `${p}StartDistanceCurve`, `${p}StartDistanceEaseEnabled`, `${p}StartDistanceEaseDist`, `${p}StartDistanceEaseCurve`, `${p}StartDistanceEaseFromMainEnd`, `${p}StartDistanceEaseScaleDuration`, `${p}StartDistanceEaseScaleOffsets`], 'Start Distance Curve')
   const easeSubgroup = wrapGatedSubgroup(`${p}StartDistanceEaseEnabled`, [`${p}StartDistanceEaseDist`, `${p}StartDistanceEaseCurve`, `${p}StartDistanceEaseFromMainEnd`, `${p}StartDistanceEaseScaleDuration`, `${p}StartDistanceEaseScaleOffsets`], 'Ease Sequence Threshold') // nested inside the Start Distance Curve group just wrapped
   if (easeSubgroup) easeSubgroup.style.display = cfg[`${p}StartDistanceCurveEnabled`] ? '' : 'none' // the visibility pass ran before this wrap, so set the subgroup's own state here
   // CORRECTED 2026-09-24 (item 7, "duplicate Retransition settings"): the
