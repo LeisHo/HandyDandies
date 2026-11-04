@@ -5296,7 +5296,7 @@ function startupFnControls() {
 // The sphere sequence's borrowed click-function controls: Animation Speed Curve, Easing, Start Time Curve and Start Distance Curve (the pose-kind factory's own rows, so they match the click functions exactly). The Start
 // Time Curve starts OFF here (the spec: with nothing turned on, every sphere just pops in at the click).
 function sphereFnControls() {
-  const keep = /^(SpeedCurveEnabled|SpeedCurveVisibleOnly|SpeedCurveXOrigin|SpeedCurve|SpeedCurveRange|EasingCurveEnabled|EasingCurve|StartTimeCurveEnabled|StartTimeCurveVisibleOnly|StartTimeCurveXOrigin|StartTimeCurve|StartTimeRange|StartDistanceCurveEnabled|StartDistanceMin|StartDistanceMax|StartDistanceXOrigin|StartDistanceCurve|StartDistanceEaseEnabled|StartDistanceEaseDist|StartDistanceEaseCurve)$/
+  const keep = /^(SpeedCurveEnabled|SpeedCurveVisibleOnly|SpeedCurveXOrigin|SpeedCurve|SpeedCurveRange|EasingCurveEnabled|EasingCurve|StartTimeCurveEnabled|StartTimeCurveVisibleOnly|StartTimeCurveXOrigin|StartTimeCurve|StartTimeRange|StartDistanceCurveEnabled|StartDistanceMin|StartDistanceMax|StartDistanceXOrigin|StartDistanceCurve|StartDistanceEaseEnabled|StartDistanceEaseDist|StartDistanceEaseCurve|StartDistanceEaseFromMainEnd|StartDistanceEaseScaleDuration|StartDistanceEaseScaleOffsets)$/
   return makeClickPoseGroup(SPHERE_FN, 'Field Grid Sphere Sequence', {}).controls
     .filter((c) => keep.test(c.key.slice(SPHERE_FN.length)))
     .map((c) => (c.key === SPHERE_FN + 'StartTimeCurveEnabled' ? { ...c, def: false } : c))
@@ -9418,6 +9418,10 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartDistanceEaseEnabled`, label: 'Ease Sequence Threshold On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}StartDistanceEaseDist`, label: 'Ease Distance (World Units, After Start Distance Max)', type: 'slider', min: 0, max: 200, step: 1, def: 50 },
       { key: `${p}StartDistanceEaseCurve`, label: 'Ease Sequence Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]', onChange: () => parseClickHoldConfig(p) },
+      // Follow-ups (2026-11-04, direct request): the ease curve can start where the main curve ends (no jump at Max); a partial-sequence hand keeps the full duration of a full one (On) or plays at the full sequence's per-segment speed so it finishes sooner (Off); the Offset / Rotation / Wrist amounts follow the sequence fraction.
+      { key: `${p}StartDistanceEaseFromMainEnd`, label: 'Start From Main Curve End Value', type: 'checkbox', def: false },
+      { key: `${p}StartDistanceEaseScaleDuration`, label: 'Scale Sequence Duration', type: 'checkbox', def: true },
+      { key: `${p}StartDistanceEaseScaleOffsets`, label: 'Scale Offset / Rotation / Wrist By Sequence Amount', type: 'checkbox', def: true },
       // Retransition on/off -- direct spec item ("Retransition on/off
       // [NEW behavioral gate]"). Off = the hand stays at its end pose
       // FOREVER, never retransitions back to default -- see
@@ -9790,6 +9794,9 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartDistanceEaseEnabled`, label: 'Ease Sequence Threshold On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
       { key: `${p}StartDistanceEaseDist`, label: 'Ease Distance (World Units, After Start Distance Max)', type: 'slider', min: 0, max: 200, step: 1, def: 50 },
       { key: `${p}StartDistanceEaseCurve`, label: 'Ease Sequence Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]', onChange: () => parseClickPoseConfig(p) },
+      { key: `${p}StartDistanceEaseFromMainEnd`, label: 'Start From Main Curve End Value', type: 'checkbox', def: false },
+      { key: `${p}StartDistanceEaseScaleDuration`, label: 'Scale Sequence Duration', type: 'checkbox', def: true },
+      { key: `${p}StartDistanceEaseScaleOffsets`, label: 'Scale Offset / Rotation / Wrist By Sequence Amount', type: 'checkbox', def: true },
       { key: `${p}PauseDurationMs`, label: 'Pause Duration At Tween End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: defaults.pauseDurationMs ?? 500 },
       { key: `${p}RetransitionEnabled`, label: 'Retransition On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       // Positional Retransition (2026-10-19, direct request): On (default) = this function retransitions fully back to its starting state. Off = only the hand POSE retransitions with this function's Retransition settings; the hand's
@@ -15335,7 +15342,22 @@ function normOffsetProgress(v) { return typeof v === 'number' ? { o: v, c: v, r:
 // Progression Curve (2026-10-21, direct request): with a group's Progression Curve on, the fraction of that group's amount that is applied follows the curve (X = progress through the ramp / lap, 0..1; Y = amount applied)
 // instead of the straight rise. Applied to what is SHOWN (applyOffsetRotationToHand) and to what is BAKED when a ramp / lap ends or is cut short (bakeOffsetRotationIntoAccum), so the end of the curve - not always 1 - is what stays,
 // and a release mid-ramp keeps exactly the shaped amount that was on screen. The sign (Oscillate's inverse laps) is kept; the raw progress is what is recorded and compared, only the amount is shaped.
-function shapeOffsetProgress(p, pr) {
+// Ease Sequence Threshold -> Scale Offset / Rotation / Wrist By Sequence Amount: a hand running only a fraction of the sequence gets that same fraction of the function's Offset / Offset To Camera / Rotation / Wrist amounts.
+function offsetCapScale(hand, p) {
+  if (!hand) return 1
+  const sp = stageParentOf(p) || p
+  if (!cfg[`${sp}StartDistanceCurveEnabled`] || !cfg[`${sp}StartDistanceEaseEnabled`] || cfg[`${sp}StartDistanceEaseScaleOffsets`] === false) return 1
+  const st = (hand._cp && hand._cp[p]) || (hand._chp && hand._chp[p])
+  const k = st && st.frozenTweenFractionCap
+  return (k >= 0 && k < 1) ? k : 1
+}
+function shapeOffsetProgress(p, pr, hand) {
+  const s = shapeOffsetProgressRaw(p, pr)
+  const k = offsetCapScale(hand, p)
+  if (k === 1) return s
+  return { ...s, o: s.o * k, c: s.c * k, r: s.r * k, w: (s.w !== undefined ? s.w : s.o) * k }
+}
+function shapeOffsetProgressRaw(p, pr) {
   const offOn = cfg[`${p}OffsetProgressionCurveEnabled`], camOn = cfg[`${p}CameraOffsetProgressionCurveEnabled`], rotOn = cfg[`${p}RotationProgressionCurveEnabled`], wriOn = cfg[`${p}WristProgressionCurveEnabled`]
   if (!offOn && !camOn && !rotOn && !wriOn) return pr
   const t = triggerStateOf(p), pc = t && t.progCurve
@@ -15434,7 +15456,7 @@ function applyOffsetRotationToHand(hand, p, progressIn) {
   // own comment for the full account of the bug this closes).
   if (!hand._lastOffsetRotationProgress) hand._lastOffsetRotationProgress = {}
   hand._lastOffsetRotationProgress[p] = pr
-  const ps = shapeOffsetProgress(p, pr) // Progression Curves: the amounts actually applied below (pr stays the raw progress for the startup curves and the in-flight record)
+  const ps = shapeOffsetProgress(p, pr, hand) // Progression Curves: the amounts actually applied below (pr stays the raw progress for the startup curves and the in-flight record)
   refreshWristDeltaLive(hand, p, ps) // Wrist group: accumulator + live part, used by the next pose apply
   if (p === STARTUP_FN && startupHandScaleActive(hand) && !hand._poseThrApplied) hand.clone.scale.multiplyScalar(startupHandScale(progress)) // Hand Scale Curve (applyPoseValuesToHand() has just set the plain scale this frame)
   _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
@@ -15602,7 +15624,7 @@ function isIdentityQuat(q) { return q.x === 0 && q.y === 0 && q.z === 0 && q.w =
 // machine, at the instant a ramp/lap's own progress crosses 1. See
 // applyOffsetRotationToHand()'s own comment for the full model.
 function bakeOffsetRotationIntoAccum(hand, p, fracIn = 1) {
-  const f = shapeOffsetProgress(p, normOffsetProgress(fracIn)) // the full amount by default; a loop's end value (0, or +/-1 for Oscillate) when Retransition Between Loops is on; shaped by the group's Progression Curve
+  const f = shapeOffsetProgress(p, normOffsetProgress(fracIn), hand) // the full amount by default; a loop's end value (0, or +/-1 for Oscillate) when Retransition Between Loops is on; shaped by the group's Progression Curve
   if (!hand._customOffsetAccum) hand._customOffsetAccum = { x: 0, y: 0, z: 0 }
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   if (!hand._customBaseRotAccum) hand._customBaseRotAccum = new THREE.Quaternion()
@@ -16153,15 +16175,18 @@ function loopSegmentMsFor(p, chp, trig) {
 // the lap end: Loop keeps wrapping round the cycle and Oscillate bounces off
 // each end, so a decelerating hand keeps travelling through the sequence.
 function loopPoseValuesBeyondLap(p, chp, trig, elapsedSegments) {
+  const capF = chp.frozenTweenFractionCap ?? 1
   if (cfg[`${p}LoopMode`] === 'Oscillate') {
     const segments = trig.loopFwdW || (trig.loopPoses.length - 1)
-    const m = ((elapsedSegments / segments) % 2 + 2) % 2
+    const m = ((elapsedSegments / (segments * easeDurFactor(p, capF))) % 2 + 2) % 2
     const lapT = m <= 1 ? m : 2 - m // triangle wave: out, then back
     const position = chp.loopDirection === 1 ? segments * lapT : segments * (1 - lapT)
     return trig.loopFwd ? lerpTweenSegments(trig.loopFwd, (position / segments) * chp.frozenTweenFractionCap) : lerpTweenSequence(trig.loopPoses, (position / segments) * chp.frozenTweenFractionCap)
   }
   const segments = trig.loopRingW || trig.loopPoses.length
   const wrapOffset = trig.loopWrapK || 1 // the lap starts where the closing segment starts
+  const pRing = easePartial(p, capF) ? partialRingFor(chp, trig.loopFwd || poseSegmentsOf(trig.loopPoses), capF, wrapOffset) : null // Ease Sequence Threshold: keep decelerating along the partial ring the hand was looping
+  if (pRing) return lerpLoopSegments(pRing.ring, (pRing.W - wrapOffset) + elapsedSegments * (pRing.W / (easeScaleDurationOn(p) ? segments : pRing.W)))
   return trig.loopRing ? lerpLoopSegments(trig.loopRing, (segments - wrapOffset) + elapsedSegments) : lerpLoopSequence(trig.loopPoses, (segments - 1) + elapsedSegments)
 }
 // Same as computeStartDelayMs(), but the nearest-to-farthest domain is chosen by this function's own "Visible Hands Only" checkbox (`${p}${flag}`, default on):
@@ -16195,13 +16220,53 @@ function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curve
 // Ease Sequence Threshold (2026-11-04): when `easeP` (the function's prefix) has it on, a hand past distMax but within distMax + Ease Distance is NOT dropped: it gets the Ease Sequence Curve's value at (distance - distMax) / Ease Distance
 // (X 0 = at Max, 1 = at Max + Ease Distance). Below distMin and beyond the ease band it is still null (not triggered). The result feeds the same tween-fraction cap as the main range, so every mode (forward, loops, laps, holds) scales alike.
 const EASE_CURVE_DEFAULT = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
+// Ease Sequence Threshold helpers (2026-11-04). A hand "runs a partial sequence" when its tween-fraction cap is below 1 and the function has Start Distance Curve AND Ease Sequence Threshold on.
+function easeSp(p) { return stageParentOf(p) || p }
+function easePartial(p, cap) { const sp = easeSp(p); return cap < 1 && !!cfg[`${sp}StartDistanceCurveEnabled`] && !!cfg[`${sp}StartDistanceEaseEnabled`] }
+function easeScaleDurationOn(p) { return cfg[`${easeSp(p)}StartDistanceEaseScaleDuration`] !== false }
+// Scale Sequence Duration OFF: a partial hand plays at the full sequence's per-pose speed, so its forward pass / oscillate lap takes `cap` x the full time (never below 2%). On (default): 1, the full duration of a full run.
+function easeDurFactor(p, cap) { return (easePartial(p, cap) && !easeScaleDurationOn(p)) ? Math.max(cap, 0.02) : 1 }
+function poseSegmentsOf(poses) { const out = []; for (let i = 0; i < poses.length - 1; i++) out.push({ poseA: poses[i], poseB: poses[i + 1], weight: 1 }); return out }
+// The loop of a PARTIAL sequence (Loop mode with a wrap-back): the forward segments cut off at `cap` of their total weight, ending on `endPose` (the pose the hand's own forward pass really ended on, when known), then a closing
+// segment back to the first pose of weight `closeW`. Returns { ring, W } (W = total weight), or null when there is nothing to build.
+function buildPartialRing(fwd, cap, closeW, endPose) {
+  if (!fwd || fwd.length === 0) return null
+  const total = fwd.reduce((s, g) => s + g.weight, 0)
+  const target = Math.max(cap, 0) * total
+  const out = []
+  let acc = 0
+  for (let i = 0; i < fwd.length; i++) {
+    const g = fwd[i]
+    if (acc + g.weight <= target + 1e-9) { out.push(g); acc += g.weight; continue }
+    const rem = target - acc
+    if (rem > 1e-6 && g.weight > 0) out.push({ poseA: g.poseA, poseB: lerpPoseValues(g.poseA, g.poseB, rem / g.weight), weight: rem })
+    break
+  }
+  if (out.length === 0) out.push({ poseA: fwd[0].poseA, poseB: fwd[0].poseA, weight: 0.001 })
+  if (endPose) out[out.length - 1] = { ...out[out.length - 1], poseB: endPose }
+  const last = out[out.length - 1]
+  const ring = out.concat([{ poseA: last.poseB, poseB: fwd[0].poseA, weight: closeW }])
+  return { ring, W: ring.reduce((s, g) => s + g.weight, 0) }
+}
+// Cached on the per-hand state (rebuilt only when the cap, the segment list or the forward timeline changes).
+function partialRingFor(st, fwd, cap, closeW) {
+  if (!st._pr || st._prCap !== cap || st._prFwd !== fwd || st._prSeg !== st.tweenSegments || st._prClose !== closeW) {
+    const endPose = (st.tweenSegments && st.tweenSegments.length > 0) ? lerpTweenSegments(st.tweenSegments, cap) : null
+    st._pr = buildPartialRing(fwd, cap, closeW, endPose)
+    st._prCap = cap; st._prFwd = fwd; st._prSeg = st.tweenSegments; st._prClose = closeW
+  }
+  return st._pr
+}
 function computeTweenFractionCap(distanceToCursor, distMin, distMax, curveParsed, nearestDist = 0, originKey, easeP, easeTrig) {
   if (originModeFor(originKey) === 1) distanceToCursor = Math.max(distanceToCursor - nearestDist, 0) // Closest Hand: Min / Max then bound the distance measured from the closest hand
   if (distanceToCursor > distMax && distanceToCursor >= distMin && easeP && cfg[`${easeP}StartDistanceEaseEnabled`]) {
     const ease = cfg[`${easeP}StartDistanceEaseDist`]
     if (ease > 0 && distanceToCursor <= distMax + ease) {
       const curve = (easeTrig && easeTrig.startDistanceEaseCurveParsed) || EASE_CURVE_DEFAULT
-      return THREE.MathUtils.clamp(evaluateArmLengthCurve(curve, (distanceToCursor - distMax) / ease), 0, 1)
+      let v = THREE.MathUtils.clamp(evaluateArmLengthCurve(curve, (distanceToCursor - distMax) / ease), 0, 1)
+      // Start From Main Curve End Value: the ease curve is scaled so it begins at the value the main curve ends on at Max (no jump between the two ranges)
+      if (cfg[`${easeP}StartDistanceEaseFromMainEnd`]) v *= THREE.MathUtils.clamp(evaluateArmLengthCurve(curveParsed, 1), 0, 1)
+      return v > 0.0005 ? v : null // a hand that would run none of the sequence is simply not triggered (it would otherwise take the hand over, and a Multi Trigger step, for nothing)
     }
   }
   if (distanceToCursor < distMin || distanceToCursor > distMax) return null
@@ -16950,7 +17015,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // real elapsed time, and only the pose/splay position is reshaped.
     const easingProfile = cfg[`${p}EasingCurveEnabled`] ? getEasingProfile(p, isTween, trig) : null
     if (easingProfile) speedMs = Math.max(easingProfile.T, 1)
-    speedMs = Math.max(speedMs * (chp.glideTimeFactor || 1), 1) // First Transition Time Scale
+    speedMs = Math.max(speedMs * (chp.glideTimeFactor || 1) * easeDurFactor(p, chp.frozenTweenFractionCap ?? 1), 1) // First Transition Time Scale; Scale Sequence Duration (off = a partial hand finishes sooner)
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
     const easedProgress = easingProfile ? easingProfilePAt(easingProfile, progress) : progress
     // Start Distance Curve (2026-09-27) -- see updateClickPoseForHand()'s
@@ -17073,7 +17138,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       const segments = trig.loopFwdW || (trig.loopPoses.length - 1) // lap length in weight units (a Hold counts), = poses - 1 without Holds
       const startPos = chp.loopDirection === 1 ? 0 : segments
       const endPos = chp.loopDirection === 1 ? segments : 0
-      lapT = THREE.MathUtils.clamp(elapsedSegments / segments, 0, 1)
+      lapT = THREE.MathUtils.clamp(elapsedSegments / (segments * easeDurFactor(p, chp.frozenTweenFractionCap ?? 1)), 0, 1) // (the factor is 1 unless Scale Sequence Duration is off for a partial hand)
       const position = startPos + (endPos - startPos) * lapT
       // Start Distance Curve (2026-09-27) -- capped the same way the
       // initial forward pass is; see this function's own top comment.
@@ -17097,9 +17162,18 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // scoping limitation as updateClickPoseForHand()'s own matching
       // wrap-back branch.
       const segments = trig.loopRingW || trig.loopPoses.length // lap length in weight units (a Hold counts), = number of poses without Holds
-      lapT = elapsedSegments / segments
-      const tCyclic = (segments - (trig.loopWrapK || 1)) + Math.min(elapsedSegments, segments)
-      values = trig.loopRing ? lerpLoopSegments(trig.loopRing, tCyclic) : lerpLoopSequence(trig.loopPoses, tCyclic)
+      const capF = chp.frozenTweenFractionCap ?? 1
+      // Ease Sequence Threshold: a partial hand loops a PARTIAL ring (the sequence up to its fraction, then back to the first pose). Scale Sequence Duration on = that lap lasts as long as a full hand's lap; off = it runs at the
+      // full ring's per-pose speed, so the lap is shorter.
+      const pRing = easePartial(p, capF) ? partialRingFor(chp, trig.loopFwd || poseSegmentsOf(trig.loopPoses), capF, trig.loopWrapK || 1) : null
+      if (pRing) {
+        lapT = elapsedSegments / (easeScaleDurationOn(p) ? segments : pRing.W)
+        values = lerpLoopSegments(pRing.ring, (pRing.W - (trig.loopWrapK || 1)) + Math.min(lapT, 1) * pRing.W)
+      } else {
+        lapT = elapsedSegments / segments
+        const tCyclic = (segments - (trig.loopWrapK || 1)) + Math.min(elapsedSegments, segments)
+        values = trig.loopRing ? lerpLoopSegments(trig.loopRing, tCyclic) : lerpLoopSequence(trig.loopPoses, tCyclic)
+      }
     }
     chp.lastAppliedValues = values
     applyPoseValuesToHand(hand, values, chp.frozenSplayDeg)
@@ -17178,7 +17252,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       // mapping) or the pose would snap at the handoff.
       const stopEasing = cfg[`${p}EasingCurveEnabled`] ? getEasingProfile(p, true, trig) : null
       if (stopEasing) speedMs = Math.max(stopEasing.T, 1)
-      speedMs = Math.max(speedMs * (chp.glideTimeFactor || 1), 1) // First Transition Time Scale
+      speedMs = Math.max(speedMs * (chp.glideTimeFactor || 1) * easeDurFactor(p, chp.frozenTweenFractionCap ?? 1), 1) // First Transition Time Scale; Scale Sequence Duration (off = a partial hand finishes sooner)
       chp.stoppingVirtualElapsedMs += dt * decayFactor * (chp.liveTempo || 1)
       const progressRaw = THREE.MathUtils.clamp((chp.stoppingBaseElapsedMs + chp.stoppingVirtualElapsedMs) / speedMs, 0, 1)
       const progress = stopEasing ? easingProfilePAt(stopEasing, progressRaw) : progressRaw
@@ -18054,7 +18128,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // getEasingProfile() and updateClickHoldPoseForHand()'s matching comment.
     const easingProfile = cfg[`${p}EasingCurveEnabled`] ? getEasingProfile(p, isTween, clickPoseTriggers[p]) : null
     if (easingProfile) speedMs = Math.max(easingProfile.T, 1)
-    speedMs = Math.max(speedMs * (cp.glideTimeFactor || 1), 1) // First Transition Time Scale
+    speedMs = Math.max(speedMs * (cp.glideTimeFactor || 1) * easeDurFactor(p, cp.frozenTweenFractionCap ?? 1), 1) // First Transition Time Scale; Scale Sequence Duration (off = a partial hand finishes sooner)
     const progress = THREE.MathUtils.clamp(elapsed / speedMs, 0, 1)
     const easedProgress = easingProfile ? easingProfilePAt(easingProfile, progress) : progress
     if (p === STARTUP_FN) cp.dbgProg = progress // read by logStartupProgressProbe()
@@ -18156,9 +18230,22 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       const baseW = cp.lapSegments.reduce((sum, sg) => sum + sg.weight, 0)
       speedMs = speedMs * (baseW + wrapK) / (baseW + 1)
     }
+    // Ease Sequence Threshold: a partial hand's lap. Loop with a wrap-back plays a PARTIAL ring (sequence up to its fraction, then back to the first pose); Scale Sequence Duration off shortens the lap (ring: by its
+    // weight vs the full ring's, otherwise by the fraction).
+    const capF = cp.frozenTweenFractionCap ?? 1
+    let pRing = null
+    if (easePartial(p, capF) && lapStyle !== 'Oscillate' && cfg[`${p}SequenceLoopTransition`] !== false) {
+      pRing = partialRingFor(cp, cp.lapSegments || poseSegmentsOf(cp.tweenPoses), capF, cp.lapSegments ? wrapK : 1)
+      if (pRing && !easeScaleDurationOn(p)) {
+        const fullW = cp.lapSegments ? cp.lapSegments.reduce((sum, sg) => sum + sg.weight, 0) + wrapK : cp.tweenPoses.length
+        speedMs = speedMs * pRing.W / fullW
+      }
+    } else if (easePartial(p, capF)) speedMs = speedMs * easeDurFactor(p, capF)
     const lapT = THREE.MathUtils.clamp((cp.lapNom ?? (now - cp.sequenceLapStartTime)) / speedMs, 0, 1)
     let values
-    if (lapStyle === 'Oscillate') {
+    if (pRing) {
+      values = lerpLoopSegments(pRing.ring, (cp.sequenceLapIndex - 1 + lapT) * pRing.W)
+    } else if (lapStyle === 'Oscillate') {
       // Start Distance Curve (2026-09-27) -- capped the same way the
       // initial forward pass is (see this phase's own top comment).
       const t = (cp.sequenceDirection === 1 ? lapT : 1 - lapT) * cp.frozenTweenFractionCap
@@ -21369,7 +21456,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'SpeedCurveVisibleOnly', 'SpeedCurveXOrigin', 'SpeedCurveContinual', 'StartTimeCurveVisibleOnly', 'StartTimeCurveXOrigin', 'StartTimeCurveContinual', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionSpeedCurveXOrigin', 'RetransitionSpeedCurveContinual', 'RetransitionStartTimeCurveVisibleOnly', 'RetransitionStartTimeCurveXOrigin', 'RetransitionStartTimeCurveContinual', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveXOrigin', 'TweenStopStartTimeCurveContinual', 'TweenStopDelayCurveVisibleOnly', 'TweenStopDelayCurveXOrigin', 'TweenStopDelayCurveContinual', 'CameraOffsetVisibleOnly', 'CameraOffsetXOrigin', 'CameraOffsetContinual', 'CursorOffsetVisibleOnly', 'CursorOffsetXOrigin', 'CursorOffsetContinual',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
-  'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceXOrigin', 'StartDistanceContinual', 'StartDistanceCurve', 'StartDistanceEaseEnabled', 'StartDistanceEaseDist', 'StartDistanceEaseCurve',
+  'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceXOrigin', 'StartDistanceContinual', 'StartDistanceCurve', 'StartDistanceEaseEnabled', 'StartDistanceEaseDist', 'StartDistanceEaseCurve', 'StartDistanceEaseFromMainEnd', 'StartDistanceEaseScaleDuration', 'StartDistanceEaseScaleOffsets',
   'RetransitionEnabled', 'PositionalRetransition', 'RetransitionClosestPath', 'IgnoreUntouchedSettings', 'RetransitionSpeedMs','RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
   'RetransitionDistCurveEnabled', 'RetransitionDistCurve', 'RetransitionDistRange',
   'RetransitionScalerEnabled', 'RetransitionScalerCurve', 'RetransitionScalerMulRange', 'RetransitionScalerDistRange',
@@ -22365,6 +22452,9 @@ function updateSingleTimingGateVisibility(p) {
   const easeOn = startDistanceOn && !!cfg[`${p}StartDistanceEaseEnabled`]
   setRow('StartDistanceEaseDist', easeOn)
   setRow('StartDistanceEaseCurve', easeOn)
+  setRow('StartDistanceEaseFromMainEnd', easeOn)
+  setRow('StartDistanceEaseScaleDuration', easeOn)
+  setRow('StartDistanceEaseScaleOffsets', easeOn)
   // Easing Curve (2026-10-02) -- also NOT Mode-gated, same reasoning as
   // Start Distance Curve directly above: it reshapes the forward
   // transition's own progress, which exists identically in Single Pose
@@ -22795,8 +22885,8 @@ function wrapClickFunctionGatedSubgroups(p) {
   // subgroup for both Single Pose and Tween mode (this curve isn't
   // Mode-gated at all -- see updateSingleTimingGateVisibility()'s own
   // comment).
-  wrapGatedSubgroup(`${p}StartDistanceCurveEnabled`, [`${p}StartDistanceMin`, `${p}StartDistanceMax`, `${p}StartDistanceXOrigin`, `${p}StartDistanceContinual`, `${p}StartDistanceCurve`, `${p}StartDistanceEaseEnabled`, `${p}StartDistanceEaseDist`, `${p}StartDistanceEaseCurve`], 'Start Distance Curve')
-  const easeSubgroup = wrapGatedSubgroup(`${p}StartDistanceEaseEnabled`, [`${p}StartDistanceEaseDist`, `${p}StartDistanceEaseCurve`], 'Ease Sequence Threshold') // nested inside the Start Distance Curve group just wrapped
+  wrapGatedSubgroup(`${p}StartDistanceCurveEnabled`, [`${p}StartDistanceMin`, `${p}StartDistanceMax`, `${p}StartDistanceXOrigin`, `${p}StartDistanceContinual`, `${p}StartDistanceCurve`, `${p}StartDistanceEaseEnabled`, `${p}StartDistanceEaseDist`, `${p}StartDistanceEaseCurve`, `${p}StartDistanceEaseFromMainEnd`, `${p}StartDistanceEaseScaleDuration`, `${p}StartDistanceEaseScaleOffsets`], 'Start Distance Curve')
+  const easeSubgroup = wrapGatedSubgroup(`${p}StartDistanceEaseEnabled`, [`${p}StartDistanceEaseDist`, `${p}StartDistanceEaseCurve`, `${p}StartDistanceEaseFromMainEnd`, `${p}StartDistanceEaseScaleDuration`, `${p}StartDistanceEaseScaleOffsets`], 'Ease Sequence Threshold') // nested inside the Start Distance Curve group just wrapped
   if (easeSubgroup) easeSubgroup.style.display = cfg[`${p}StartDistanceCurveEnabled`] ? '' : 'none' // the visibility pass ran before this wrap, so set the subgroup's own state here
   // CORRECTED 2026-09-24 (item 7, "duplicate Retransition settings"): the
   // Tween-mode retransition trio (hold-kind only -- a no-op/silently
