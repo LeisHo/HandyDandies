@@ -5296,7 +5296,7 @@ function startupFnControls() {
 // The sphere sequence's borrowed click-function controls: Animation Speed Curve, Easing, Start Time Curve and Start Distance Curve (the pose-kind factory's own rows, so they match the click functions exactly). The Start
 // Time Curve starts OFF here (the spec: with nothing turned on, every sphere just pops in at the click).
 function sphereFnControls() {
-  const keep = /^(SpeedCurveEnabled|SpeedCurveVisibleOnly|SpeedCurveXOrigin|SpeedCurve|SpeedCurveRange|EasingCurveEnabled|EasingCurve|StartTimeCurveEnabled|StartTimeCurveVisibleOnly|StartTimeCurveXOrigin|StartTimeCurve|StartTimeRange|StartDistanceCurveEnabled|StartDistanceMin|StartDistanceMax|StartDistanceXOrigin|StartDistanceCurve)$/
+  const keep = /^(SpeedCurveEnabled|SpeedCurveVisibleOnly|SpeedCurveXOrigin|SpeedCurve|SpeedCurveRange|EasingCurveEnabled|EasingCurve|StartTimeCurveEnabled|StartTimeCurveVisibleOnly|StartTimeCurveXOrigin|StartTimeCurve|StartTimeRange|StartDistanceCurveEnabled|StartDistanceMin|StartDistanceMax|StartDistanceXOrigin|StartDistanceCurve|StartDistanceEaseEnabled|StartDistanceEaseDist|StartDistanceEaseCurve)$/
   return makeClickPoseGroup(SPHERE_FN, 'Field Grid Sphere Sequence', {}).controls
     .filter((c) => keep.test(c.key.slice(SPHERE_FN.length)))
     .map((c) => (c.key === SPHERE_FN + 'StartTimeCurveEnabled' ? { ...c, def: false } : c))
@@ -5365,7 +5365,7 @@ function startSphereSequence(retrigger, ignoreStartDistance) {
     if (!isOnScreen(hands[i].basePosition)) continue // only visible sphere points take part
     let cap = 1
     if (cfg[SPHERE_FN + 'StartDistanceCurveEnabled'] && !ignoreStartDistance) {
-      const c = computeTweenFractionCap(dist[i], cfg[SPHERE_FN + 'StartDistanceMin'], cfg[SPHERE_FN + 'StartDistanceMax'], trig.startDistanceCurveParsed, vMin, SPHERE_FN + 'StartDistanceXOrigin')
+      const c = computeTweenFractionCap(dist[i], cfg[SPHERE_FN + 'StartDistanceMin'], cfg[SPHERE_FN + 'StartDistanceMax'], trig.startDistanceCurveParsed, vMin, SPHERE_FN + 'StartDistanceXOrigin', SPHERE_FN, trig)
       if (c === null) continue // outside the eligible range: this sphere never spawns
       cap = c
     }
@@ -9414,6 +9414,10 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartDistanceXOrigin`, label: 'Start Distance Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}StartDistanceContinual`, label: 'Start Distance Curve: Continually Recomputes', type: 'checkbox', def: false },
       { key: `${p}StartDistanceCurve`, label: 'Start Distance Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseClickHoldConfig(p) },
+      // Ease Sequence Threshold (2026-11-04, direct request): past Start Distance Max, an extra band of Ease Distance in which the hands still run a PART of the sequence instead of none. X = 0 at Max, 1 at Max + Ease Distance; Y = fraction of the sequence run (0-1). See computeTweenFractionCap().
+      { key: `${p}StartDistanceEaseEnabled`, label: 'Ease Sequence Threshold On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}StartDistanceEaseDist`, label: 'Ease Distance (World Units, After Start Distance Max)', type: 'slider', min: 0, max: 200, step: 1, def: 50 },
+      { key: `${p}StartDistanceEaseCurve`, label: 'Ease Sequence Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]', onChange: () => parseClickHoldConfig(p) },
       // Retransition on/off -- direct spec item ("Retransition on/off
       // [NEW behavioral gate]"). Off = the hand stays at its end pose
       // FOREVER, never retransitions back to default -- see
@@ -9782,6 +9786,10 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}StartDistanceXOrigin`, label: 'Start Distance Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
       { key: `${p}StartDistanceContinual`, label: 'Start Distance Curve: Continually Recomputes', type: 'checkbox', def: false },
       { key: `${p}StartDistanceCurve`, label: 'Start Distance Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":1}]', onChange: () => parseClickPoseConfig(p) },
+      // Ease Sequence Threshold: see the hold-kind factory's comment.
+      { key: `${p}StartDistanceEaseEnabled`, label: 'Ease Sequence Threshold On/Off', type: 'checkbox', def: false, onChange: () => updateSingleTimingGateVisibility(p) },
+      { key: `${p}StartDistanceEaseDist`, label: 'Ease Distance (World Units, After Start Distance Max)', type: 'slider', min: 0, max: 200, step: 1, def: 50 },
+      { key: `${p}StartDistanceEaseCurve`, label: 'Ease Sequence Curve (Distance -> Tween Amount)', type: 'text', def: '[{"x":0,"y":1},{"x":1,"y":0}]', onChange: () => parseClickPoseConfig(p) },
       { key: `${p}PauseDurationMs`, label: 'Pause Duration At Tween End (Ms)', type: 'slider', min: 0, max: 5000, step: 10, def: defaults.pauseDurationMs ?? 500 },
       { key: `${p}RetransitionEnabled`, label: 'Retransition On/Off', type: 'checkbox', def: true, onChange: () => updateSingleTimingGateVisibility(p) },
       // Positional Retransition (2026-10-19, direct request): On (default) = this function retransitions fully back to its starting state. Off = only the hand POSE retransitions with this function's Retransition settings; the hand's
@@ -14551,6 +14559,7 @@ function parseClickHoldConfig(p) {
   // Start Distance Curve (2026-09-27) -- see parseClickPoseConfig()'s own
   // matching comment.
   try { t.startDistanceCurveParsed = JSON.parse(cfg[`${p}StartDistanceCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.startDistanceEaseCurveParsed = JSON.parse(cfg[`${p}StartDistanceEaseCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value (or the built-in 1 -> 0 line) */ }
   // Easing Curve (2026-10-02) -- see makeClickHoldPoseGroup()'s own
   // matching control comment.
   try { t.easingCurveParsed = JSON.parse(cfg[`${p}EasingCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
@@ -16183,8 +16192,18 @@ function computeStartDelayMs(distanceToCursor, minLiveDist, liveDistRange, curve
 // the curve's own raw 0-1 Y value directly as the tween-amount fraction
 // (no separate range-rescale needed here, unlike computeStartDelayMs()
 // above -- Y already IS the final fraction).
-function computeTweenFractionCap(distanceToCursor, distMin, distMax, curveParsed, nearestDist = 0, originKey) {
+// Ease Sequence Threshold (2026-11-04): when `easeP` (the function's prefix) has it on, a hand past distMax but within distMax + Ease Distance is NOT dropped: it gets the Ease Sequence Curve's value at (distance - distMax) / Ease Distance
+// (X 0 = at Max, 1 = at Max + Ease Distance). Below distMin and beyond the ease band it is still null (not triggered). The result feeds the same tween-fraction cap as the main range, so every mode (forward, loops, laps, holds) scales alike.
+const EASE_CURVE_DEFAULT = [{ x: 0, y: 1 }, { x: 1, y: 0 }]
+function computeTweenFractionCap(distanceToCursor, distMin, distMax, curveParsed, nearestDist = 0, originKey, easeP, easeTrig) {
   if (originModeFor(originKey) === 1) distanceToCursor = Math.max(distanceToCursor - nearestDist, 0) // Closest Hand: Min / Max then bound the distance measured from the closest hand
+  if (distanceToCursor > distMax && distanceToCursor >= distMin && easeP && cfg[`${easeP}StartDistanceEaseEnabled`]) {
+    const ease = cfg[`${easeP}StartDistanceEaseDist`]
+    if (ease > 0 && distanceToCursor <= distMax + ease) {
+      const curve = (easeTrig && easeTrig.startDistanceEaseCurveParsed) || EASE_CURVE_DEFAULT
+      return THREE.MathUtils.clamp(evaluateArmLengthCurve(curve, (distanceToCursor - distMax) / ease), 0, 1)
+    }
+  }
   if (distanceToCursor < distMin || distanceToCursor > distMax) return null
   const range = Math.max(distMax - distMin, 0.001)
   const normDist = THREE.MathUtils.clamp((distanceToCursor - distMin) / range, 0, 1)
@@ -16691,7 +16710,7 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
   const sdp = stageParentOf(p) || p // On Click / On Release inherit the main function's Start Distance Curve
   const sdt = sdp === p ? trig : (triggerStateOf(sdp) || trig)
   if (cfg[`${sdp}StartDistanceCurveEnabled`] && contOn(sdp, 'StartDistance')) {
-    const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${sdp}StartDistanceMin`], cfg[`${sdp}StartDistanceMax`], sdt.startDistanceCurveParsed, nearestFor(hand, p), `${sdp}StartDistanceXOrigin`)
+    const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${sdp}StartDistanceMin`], cfg[`${sdp}StartDistanceMax`], sdt.startDistanceCurveParsed, nearestFor(hand, p), `${sdp}StartDistanceXOrigin`, sdp, sdt)
     if (cap !== null) st.frozenTweenFractionCap = cap // out of range keeps the last cap rather than snapping
   }
   // Rates. Animation Speed Curve -> tempo of the forward / loop / lap clocks (nominal speed = the value at commit).
@@ -16783,7 +16802,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     let tweenFractionCap = 1
     let eligible = true
     if (cfg[`${p}StartDistanceCurveEnabled`]) {
-      const cap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, nearestFor(hand, p), `${p}StartDistanceXOrigin`)
+      const cap = computeTweenFractionCap(handXYDist(hand), cfg[`${p}StartDistanceMin`], cfg[`${p}StartDistanceMax`], trig.startDistanceCurveParsed, nearestFor(hand, p), `${p}StartDistanceXOrigin`, p, trig)
       if (cap === null) eligible = false
       else tweenFractionCap = cap
     }
@@ -17888,6 +17907,7 @@ function parseClickPoseConfig(p) {
   // unit via a paired Min/Max range) -- see computeTweenFractionCap()'s
   // own comment.
   try { t.startDistanceCurveParsed = JSON.parse(cfg[`${p}StartDistanceCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.startDistanceEaseCurveParsed = JSON.parse(cfg[`${p}StartDistanceEaseCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value (or the built-in 1 -> 0 line) */ }
   // Easing Curve (2026-10-02) -- see makeClickPoseGroup()'s own matching
   // control comment.
   try { t.easingCurveParsed = JSON.parse(cfg[`${p}EasingCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
@@ -18412,7 +18432,7 @@ function triggerClickPose(p, onlyHands = null) {
     // curve here.
     let tweenFractionCap = 1
     if (cfg[`${sp0}StartDistanceCurveEnabled`] && !(p === STARTUP_FN && startupIgnoreStartDistance)) {
-      const cap = computeTweenFractionCap(dists[i], cfg[`${sp0}StartDistanceMin`], cfg[`${sp0}StartDistanceMax`], sTrig.startDistanceCurveParsed, minD, `${sp0}StartDistanceXOrigin`)
+      const cap = computeTweenFractionCap(dists[i], cfg[`${sp0}StartDistanceMin`], cfg[`${sp0}StartDistanceMax`], sTrig.startDistanceCurveParsed, minD, `${sp0}StartDistanceXOrigin`, sp0, sTrig)
       if (cap === null) return // outside the eligible range -- this hand never triggers
       tweenFractionCap = cap
     }
@@ -19367,6 +19387,8 @@ function buildClickHoldPoseWidgets(p) {
   // matching comment.
   const startDistanceCurveRow = document.querySelector(`.dp-row[data-key="${p}StartDistanceCurve"]`)
   if (startDistanceCurveRow) buildGenericCurveWidget(startDistanceCurveRow, { caption: 'X: Distance From Cursor (Start Distance Min→Max)  ·  Y: Tween Amount Executed (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  const startDistanceEaseCurveRow = document.querySelector(`.dp-row[data-key="${p}StartDistanceEaseCurve"]`)
+  if (startDistanceEaseCurveRow) buildGenericCurveWidget(startDistanceEaseCurveRow, { caption: 'X: Distance Past Start Distance Max (0 = Max, 1 = Max + Ease Distance)  ·  Y: Tween Amount Executed (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 0 }] })
   // Easing Curve (2026-10-02) -- X is this hand's own transition
   // progress (0-100%), Y is the eased output fed into the pose/tween
   // interpolation. No separate range widget -- Y is already the final
@@ -19449,6 +19471,8 @@ function buildClickPoseWidgets(p) {
   // Min/Max range slider).
   const startDistanceCurveRow = document.querySelector(`.dp-row[data-key="${p}StartDistanceCurve"]`)
   if (startDistanceCurveRow) buildGenericCurveWidget(startDistanceCurveRow, { caption: 'X: Distance From Cursor (Start Distance Min→Max)  ·  Y: Tween Amount Executed (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 1 }] })
+  const startDistanceEaseCurveRow = document.querySelector(`.dp-row[data-key="${p}StartDistanceEaseCurve"]`)
+  if (startDistanceEaseCurveRow) buildGenericCurveWidget(startDistanceEaseCurveRow, { caption: 'X: Distance Past Start Distance Max (0 = Max, 1 = Max + Ease Distance)  ·  Y: Tween Amount Executed (0=None, 1=Full)', defaultPoints: [{ x: 0, y: 1 }, { x: 1, y: 0 }] })
   // Easing Curve (2026-10-02) -- see buildClickHoldPoseWidgets()'s own
   // matching comment.
   buildOffsetAxisWidgets(p)
@@ -21345,7 +21369,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
   'SpeedCurveVisibleOnly', 'SpeedCurveXOrigin', 'SpeedCurveContinual', 'StartTimeCurveVisibleOnly', 'StartTimeCurveXOrigin', 'StartTimeCurveContinual', 'RetransitionSpeedCurveVisibleOnly', 'RetransitionSpeedCurveXOrigin', 'RetransitionSpeedCurveContinual', 'RetransitionStartTimeCurveVisibleOnly', 'RetransitionStartTimeCurveXOrigin', 'RetransitionStartTimeCurveContinual', 'TweenStopStartTimeCurveVisibleOnly', 'TweenStopStartTimeCurveXOrigin', 'TweenStopStartTimeCurveContinual', 'TweenStopDelayCurveVisibleOnly', 'TweenStopDelayCurveXOrigin', 'TweenStopDelayCurveContinual', 'CameraOffsetVisibleOnly', 'CameraOffsetXOrigin', 'CameraOffsetContinual', 'CursorOffsetVisibleOnly', 'CursorOffsetXOrigin', 'CursorOffsetContinual',
   'StartTimeCurveEnabled', 'StartTimeCurve', 'StartTimeRange', 'TweenStartTimeCurve', 'TweenStartTimeRange',
-  'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceXOrigin', 'StartDistanceContinual', 'StartDistanceCurve',
+  'StartDistanceCurveEnabled', 'StartDistanceMin', 'StartDistanceMax', 'StartDistanceXOrigin', 'StartDistanceContinual', 'StartDistanceCurve', 'StartDistanceEaseEnabled', 'StartDistanceEaseDist', 'StartDistanceEaseCurve',
   'RetransitionEnabled', 'PositionalRetransition', 'RetransitionClosestPath', 'IgnoreUntouchedSettings', 'RetransitionSpeedMs','RetransitionSpeedCurveEnabled', 'RetransitionSpeedCurve', 'RetransitionSpeedCurveRange', 'RetransitionStartTimeCurveEnabled', 'RetransitionStartTimeCurve', 'RetransitionStartTimeRange',
   'RetransitionDistCurveEnabled', 'RetransitionDistCurve', 'RetransitionDistRange',
   'RetransitionScalerEnabled', 'RetransitionScalerCurve', 'RetransitionScalerMulRange', 'RetransitionScalerDistRange',
@@ -22330,6 +22354,17 @@ function updateSingleTimingGateVisibility(p) {
   setRow('StartDistanceXOrigin', startDistanceOn)
   setRow('StartDistanceContinual', startDistanceOn)
   setRow('StartDistanceCurve', startDistanceOn)
+  // Ease Sequence Threshold (2026-11-04): a toggle subgroup inside the Start Distance Curve group. Once wrapped, its checkbox lives in the subgroup header and is never hidden itself (same lesson as the Progression Curve
+  // gate); the subgroup shows while Start Distance Curve is on, its slider + curve while the toggle is on too. Not wrapped yet (first pass): the bare row follows Start Distance Curve.
+  const easeGateRow = document.querySelector(`.dp-row[data-key="${p}StartDistanceEaseEnabled"]`)
+  if (easeGateRow) {
+    const easeGrp = easeGateRow.classList.contains('dp-group-gate-row') ? easeGateRow.closest('.dp-group') : null
+    if (easeGrp) { easeGateRow.style.display = ''; easeGrp.style.display = startDistanceOn ? '' : 'none' }
+    else easeGateRow.style.display = '' // not wrapped yet: never hide the bare row (an inline 'none' would stay on it once it moves into the header); the next pass after wrapping hides the subgroup
+  }
+  const easeOn = startDistanceOn && !!cfg[`${p}StartDistanceEaseEnabled`]
+  setRow('StartDistanceEaseDist', easeOn)
+  setRow('StartDistanceEaseCurve', easeOn)
   // Easing Curve (2026-10-02) -- also NOT Mode-gated, same reasoning as
   // Start Distance Curve directly above: it reshapes the forward
   // transition's own progress, which exists identically in Single Pose
@@ -22760,7 +22795,9 @@ function wrapClickFunctionGatedSubgroups(p) {
   // subgroup for both Single Pose and Tween mode (this curve isn't
   // Mode-gated at all -- see updateSingleTimingGateVisibility()'s own
   // comment).
-  wrapGatedSubgroup(`${p}StartDistanceCurveEnabled`, [`${p}StartDistanceMin`, `${p}StartDistanceMax`, `${p}StartDistanceXOrigin`, `${p}StartDistanceContinual`, `${p}StartDistanceCurve`], 'Start Distance Curve')
+  wrapGatedSubgroup(`${p}StartDistanceCurveEnabled`, [`${p}StartDistanceMin`, `${p}StartDistanceMax`, `${p}StartDistanceXOrigin`, `${p}StartDistanceContinual`, `${p}StartDistanceCurve`, `${p}StartDistanceEaseEnabled`, `${p}StartDistanceEaseDist`, `${p}StartDistanceEaseCurve`], 'Start Distance Curve')
+  const easeSubgroup = wrapGatedSubgroup(`${p}StartDistanceEaseEnabled`, [`${p}StartDistanceEaseDist`, `${p}StartDistanceEaseCurve`], 'Ease Sequence Threshold') // nested inside the Start Distance Curve group just wrapped
+  if (easeSubgroup) easeSubgroup.style.display = cfg[`${p}StartDistanceCurveEnabled`] ? '' : 'none' // the visibility pass ran before this wrap, so set the subgroup's own state here
   // CORRECTED 2026-09-24 (item 7, "duplicate Retransition settings"): the
   // Tween-mode retransition trio (hold-kind only -- a no-op/silently
   // skipped for a pose-kind `p`, whose own rows with these suffixes don't
