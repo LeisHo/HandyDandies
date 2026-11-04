@@ -22592,7 +22592,7 @@ function updateOffsetRotationVisibility(p) {
     const en = document.querySelector(`.dp-row[data-key="${p}${pre}ProgressionCurveEnabled"]`)
     if (en) {
       const gEl = en.classList.contains('dp-group-gate-row') ? en.closest('.dp-group') : null // wrapped into its own group yet?
-      if (gEl) gEl.style.display = on ? '' : 'none'
+      if (gEl) { gEl.style.display = on ? '' : 'none'; en.style.display = '' } // the gate checkbox lives in the group's header: never hidden itself (the first pass runs BEFORE the rows are wrapped, and an inline "none" set then stayed on it, so a group that was off at load - e.g. Offset To Camera - showed an empty Progression Curve with no checkbox after being turned on, 2026-11-03)
       else en.style.display = on ? '' : 'none'
     }
     const cv = document.querySelector(`.dp-row[data-key="${p}${pre}ProgressionCurve"]`)
