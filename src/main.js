@@ -7178,10 +7178,21 @@ function clearPoseJumpLog() {
   if (poseJumpLogEl) poseJumpLogEl.textContent = ''
 }
 // Which click functions/phases are active on a hand right now, e.g. "Click - Offset Test:forward".
+// A function with a Start Distance Curve also shows its tween fraction last frame > this frame, the distance behind it and the forward clock,
+// e.g. "Click - Offset Test:forward cap 0.412>0.655 dist 3.21 fwd 840ms" (added 2026-11-05 to find out whether a jump is the fraction stepping).
+function poseJumpStateText(p, st) {
+  let s = `${handLogTriggerLabel(p)}:${st.phase}`
+  if (st.dbgCapDist !== undefined) {
+    const f = (v) => (typeof v === 'number' ? v.toFixed(3) : '-')
+    s += ` cap ${f(st.dbgCapPrev)}>${f(st.frozenTweenFractionCap)} dist ${st.dbgCapDist.toFixed(2)}`
+    if (st.phase === 'forward' && st.fwdNom !== undefined) s += ` fwd ${Math.round(st.fwdNom)}ms`
+  }
+  return s
+}
 function activeFunctionPhases(hand) {
   const out = []
-  CLICK_POSE_KEYS.forEach((p) => { const st = hand._cp && hand._cp[p]; if (st && st.phase !== 'idle') out.push(`${handLogTriggerLabel(p)}:${st.phase}`) })
-  CLICK_HOLD_KEYS.forEach((p) => { const st = hand._chp && hand._chp[p]; if (st && st.phase !== 'idle') out.push(`${handLogTriggerLabel(p)}:${st.phase}`) })
+  CLICK_POSE_KEYS.forEach((p) => { const st = hand._cp && hand._cp[p]; if (st && st.phase !== 'idle') out.push(poseJumpStateText(p, st)) })
+  CLICK_HOLD_KEYS.forEach((p) => { const st = hand._chp && hand._chp[p]; if (st && st.phase !== 'idle') out.push(poseJumpStateText(p, st)) })
   return out.length ? out.join(' + ') : 'idle'
 }
 // Called once per frame (after updateRenderOrder()) while Log Pose Jumps is on. Compares every
@@ -16778,7 +16789,9 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
   const sdp = stageParentOf(p) || p // On Click / On Release inherit the main function's Start Distance Curve
   const sdt = sdp === p ? trig : (triggerStateOf(sdp) || trig)
   if (cfg[`${sdp}StartDistanceCurveEnabled`] && (contOn(sdp, 'StartDistance') || cfg[`${sdp}StartDistanceRetrigger`])) { // (Retriggers New Hands keeps the fraction following the hand's distance)
-    const cap = computeTweenFractionCap(handDistFor(hand, p), cfg[`${sdp}StartDistanceMin`], cfg[`${sdp}StartDistanceMax`], sdt.startDistanceCurveParsed, nearestFor(hand, p), `${sdp}StartDistanceXOrigin`, sdp, sdt)
+    const capDist = handDistFor(hand, p)
+    const cap = computeTweenFractionCap(capDist, cfg[`${sdp}StartDistanceMin`], cfg[`${sdp}StartDistanceMax`], sdt.startDistanceCurveParsed, nearestFor(hand, p), `${sdp}StartDistanceXOrigin`, sdp, sdt)
+    st.dbgCapPrev = st.frozenTweenFractionCap; st.dbgCapDist = capDist // read by the Pose Jump Log (activeFunctionPhases): the fraction last frame and the distance that produced this frame's
     if (cap !== null) st.frozenTweenFractionCap = cap // out of range keeps the last cap rather than snapping
   }
   // Rates. Animation Speed Curve -> tempo of the forward / loop / lap clocks (nominal speed = the value at commit).
