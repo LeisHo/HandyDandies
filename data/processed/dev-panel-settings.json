@@ -20808,7 +20808,7 @@
       "showFrameRate": false,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": true,
+      "exportLogsUiButton": false,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -48888,7 +48888,7 @@
       "showFrameRate": false,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": true,
+      "exportLogsUiButton": false,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -76968,7 +76968,7 @@
       "showFrameRate": false,
       "frameRateTextColor": "#ffebeb",
       "frameRateRefreshMs": 5,
-      "exportLogsUiButton": true,
+      "exportLogsUiButton": false,
       "snapshotCursor": true,
       "snapshotMouse": true,
       "snapshotHandBehaviour": true,
@@ -84574,7 +84574,7 @@
     },
     {
       "key": "Debug",
-      "collapsed": true,
+      "collapsed": false,
       "locked": true,
       "items": [
         {
