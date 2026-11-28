@@ -9110,6 +9110,25 @@ function wristControls(p, parseFn) {
   rows.push({ key: `${p}WristProgressionCurve`, label: 'Wrist Progression Curve (Sequence Progression -> Amount Applied)', type: 'text', def: linear, onChange: () => parseFn(p) })
   return rows
 }
+// Wrist Crop group of the click functions (2026-11-28, direct request), shared by both factories: On/Off, the crop value to SET (percent, same scale as the Wrist Cropping readout: 0 = full arm), an optional distance Curve (Min / Max range) that
+// replaces the plain value, a Progression Curve, and Retransition Between Loops / Visible Hands Only / Continually Recomputes / X Axis Origin like the Wrist and Rotation groups. See clickCropApplied(). The default value 50 is an arbitrary start.
+function wristCropControls(p, parseFn) {
+  const linear = '[{"x":0,"y":0},{"x":1,"y":1}]'
+  const vis = () => updateOffsetRotationVisibility(p)
+  return [
+    { key: `${p}WristCropEnabled`, label: 'Wrist Crop On/Off', type: 'checkbox', def: false, onChange: vis },
+    { key: `${p}WristCropLoopRetransition`, label: 'Wrist Crop: Retransition Between Loops', type: 'checkbox', def: false },
+    { key: `${p}WristCropCurveVisibleOnly`, label: 'Wrist Crop Curve: Visible Hands Only', type: 'checkbox', def: true },
+    { key: `${p}WristCropCurveContinual`, label: 'Wrist Crop Curve: Continually Recomputes', type: 'checkbox', def: true },
+    { key: `${p}WristCropCurveXOrigin`, label: 'Wrist Crop Curve: X Axis Origin', type: 'select', def: 'Global Setting', options: () => ['Global Setting', 'Closest Hand', 'True Zero'] },
+    { key: `${p}WristCropAmount`, label: 'Wrist Crop (%)', type: 'slider', min: 0, max: 100, step: 1, def: 50 },
+    { key: `${p}WristCropCurveEnabled`, label: 'Wrist Crop Curve On/Off', type: 'checkbox', def: false, onChange: vis },
+    { key: `${p}WristCropCurveRange`, label: 'Wrist Crop Min / Max (%)', type: 'text', def: '{"min":0,"max":100}', onChange: () => parseFn(p) },
+    { key: `${p}WristCropCurve`, label: 'Wrist Crop Curve (Distance From Cursor -> Crop)', type: 'text', def: linear, onChange: () => parseFn(p) },
+    { key: `${p}WristCropProgressionCurveEnabled`, label: 'Wrist Crop Progression Curve On/Off', type: 'checkbox', def: false, onChange: vis },
+    { key: `${p}WristCropProgressionCurve`, label: 'Wrist Crop Progression Curve (Sequence Progression -> Amount Applied)', type: 'text', def: linear, onChange: () => parseFn(p) }
+  ]
+}
 function offsetExtraControls(p, parseFn) {
   const linear = '[{"x":0,"y":0},{"x":1,"y":1}]'
   const rows = []
@@ -9231,6 +9250,7 @@ function makeClickHoldPoseGroup(p, title, defaults = {}) {
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickHoldConfig(p) },
       ...offsetExtraControls(p, parseClickHoldConfig),
       ...wristControls(p, parseClickHoldConfig),
+      ...wristCropControls(p, parseClickHoldConfig),
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}RotationX`, label: 'Rotation X (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
@@ -9671,6 +9691,7 @@ function makeClickPoseGroup(p, title, defaults = {}) {
       { key: `${p}CursorOffsetDistanceCurveRange`, label: 'Cursor Offset Min / Max Distance (World Units)', type: 'text', def: '{"min":-50,"max":50}', onChange: () => parseClickPoseConfig(p) },
       ...offsetExtraControls(p, parseClickPoseConfig),
       ...wristControls(p, parseClickPoseConfig),
+      ...wristCropControls(p, parseClickPoseConfig),
       { key: `${p}RotationEnabled`, label: 'Rotation On/Off', type: 'checkbox', def: false, onChange: () => updateOffsetRotationVisibility(p) },
       { key: `${p}RotationX`, label: 'Rotation X (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
       { key: `${p}RotationY`, label: 'Rotation Y (Deg, Axes Follow Rotation Mode)', type: 'slider', min: -360, max: 360, step: 1, def: 0 },
@@ -14552,13 +14573,17 @@ function parseOffsetAxisCurves(t, p) {
     try { slot.range = JSON.parse(cfg[`${p}Rotation${ax}CurveRange`]) } catch (e) { /* keep last-good value */ }
   })
   if (!t.progCurve) t.progCurve = { o: OFFSET_LINEAR_CURVE, c: OFFSET_LINEAR_CURVE, r: OFFSET_LINEAR_CURVE, w: OFFSET_LINEAR_CURVE } // Progression Curves (see shapeOffsetProgress())
+  if (!t.progCurve.cr) t.progCurve.cr = OFFSET_LINEAR_CURVE
+  if (!t.wristCrop) t.wristCrop = { curve: OFFSET_LINEAR_CURVE, range: { min: 0, max: 100 } }
+  try { t.wristCrop.curve = JSON.parse(cfg[`${p}WristCropCurve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
+  try { t.wristCrop.range = JSON.parse(cfg[`${p}WristCropCurveRange`]) } catch (e) { /* keep last-good value */ }
   if (!t.wristAxis) t.wristAxis = {}
   ;['Splay', 'Bend', 'Rotation'].forEach((k) => {
     const slot = t.wristAxis[k] || (t.wristAxis[k] = { curve: OFFSET_LINEAR_CURVE, range: { min: 0, max: 30 } })
     try { slot.curve = JSON.parse(cfg[`${p}Wrist${k}Curve`]).sort((a, b) => a.x - b.x) } catch (e) { /* keep last-good value */ }
     try { slot.range = JSON.parse(cfg[`${p}Wrist${k}CurveRange`]) } catch (e) { /* keep last-good value */ }
   })
-  ;[['o', 'Offset'], ['c', 'CameraOffset'], ['r', 'Rotation'], ['w', 'Wrist']].forEach(([k, pre]) => {
+  ;[['o', 'Offset'], ['c', 'CameraOffset'], ['r', 'Rotation'], ['w', 'Wrist'], ['cr', 'WristCrop']].forEach(([k, pre]) => {
     try { const pts = JSON.parse(cfg[`${p}${pre}ProgressionCurve`]).sort((a, b) => a.x - b.x); if (Array.isArray(pts) && pts.length >= 2) t.progCurve[k] = pts } catch (e) { /* keep last-good value */ }
   })
 }
@@ -15351,7 +15376,7 @@ function mulWrapperRot(hand, q) {
 }
 // `progressIn` is a plain number (every group follows it) or { o, c, r, b } = Offset / Offset To Camera / Rotation / Rotation at Base, so each group can follow its own
 // Retransition Between Loops shape (see loopLapProgress()). A negative value is the inverse (Oscillate, every other loop).
-function normOffsetProgress(v) { return typeof v === 'number' ? { o: v, c: v, r: v, w: v } : v }
+function normOffsetProgress(v) { return typeof v === 'number' ? { o: v, c: v, r: v, w: v, cr: v } : v }
 // Progression Curve (2026-10-21, direct request): with a group's Progression Curve on, the fraction of that group's amount that is applied follows the curve (X = progress through the ramp / lap, 0..1; Y = amount applied)
 // instead of the straight rise. Applied to what is SHOWN (applyOffsetRotationToHand) and to what is BAKED when a ramp / lap ends or is cut short (bakeOffsetRotationIntoAccum), so the end of the curve - not always 1 - is what stays,
 // and a release mid-ramp keeps exactly the shaped amount that was on screen. The sign (Oscillate's inverse laps) is kept; the raw progress is what is recorded and compared, only the amount is shaped.
@@ -15368,11 +15393,12 @@ function shapeOffsetProgress(p, pr, hand) {
   const s = shapeOffsetProgressRaw(p, pr)
   const k = offsetCapScale(hand, p)
   if (k === 1) return s
-  return { ...s, o: s.o * k, c: s.c * k, r: s.r * k, w: (s.w !== undefined ? s.w : s.o) * k }
+  return { ...s, o: s.o * k, c: s.c * k, r: s.r * k, w: (s.w !== undefined ? s.w : s.o) * k, cr: (s.cr !== undefined ? s.cr : s.o) * k }
 }
 function shapeOffsetProgressRaw(p, pr) {
   const offOn = cfg[`${p}OffsetProgressionCurveEnabled`], camOn = cfg[`${p}CameraOffsetProgressionCurveEnabled`], rotOn = cfg[`${p}RotationProgressionCurveEnabled`], wriOn = cfg[`${p}WristProgressionCurveEnabled`]
-  if (!offOn && !camOn && !rotOn && !wriOn) return pr
+  const cropOn = cfg[`${p}WristCropProgressionCurveEnabled`]
+  if (!offOn && !camOn && !rotOn && !wriOn && !cropOn) return pr
   const t = triggerStateOf(p), pc = t && t.progCurve
   if (!pc) return pr
   const sh = (on, curve, v) => {
@@ -15380,7 +15406,7 @@ function shapeOffsetProgressRaw(p, pr) {
     const y = evaluateArmLengthCurve(curve, Math.min(Math.abs(v), 1))
     return Number.isFinite(y) ? (v < 0 ? -y : y) : v
   }
-  return { ...pr, o: sh(offOn, pc.o, pr.o), c: sh(camOn, pc.c, pr.c), r: sh(rotOn, pc.r, pr.r), w: sh(wriOn, pc.w, pr.w !== undefined ? pr.w : pr.o) }
+  return { ...pr, o: sh(offOn, pc.o, pr.o), c: sh(camOn, pc.c, pr.c), r: sh(rotOn, pc.r, pr.r), w: sh(wriOn, pc.w, pr.w !== undefined ? pr.w : pr.o), cr: sh(cropOn, pc.cr, pr.cr !== undefined ? pr.cr : pr.o) }
 }
 // ---- Wrist group of the click functions (2026-10-21, direct request) ----
 // A function's Wrist group adds degrees to the hand's wrist Splay / Bend / Rotation (on top of the pose and of the Responsive Wrist Splay etc.; Hand Min Max Wrist limits clamp the total). It follows the same model as Offset / Rotation: the live amount ramps in with the function's
@@ -15438,6 +15464,59 @@ function unwindWristAccum(hand, start, progress, closest) {
   hand._wristDeltaFrame = idleReposeFrameCounter
 }
 function wristAccumSnapshot(hand) { const a = hand._wristAccum; return a ? { splay: a.splay, bend: a.bend, rot: a.rot } : null }
+// ---- Wrist Crop group of the click functions (2026-11-28) ----
+// Unlike Wrist (degrees ADDED on top), Wrist Crop SETS the crop: a state { v, k } means "shown crop = the hand's own crop blended k of the way to v" (v and k are 0..1). hand._cfCropBase is what finished ramps / laps have baked in (so a function that is
+// interrupted, or a later function, starts from there), hand._cfCrop is what is shown. A function moves the state toward its own value with its (Progression-Curve shaped) progress; a negative progress (Oscillate inverse) moves back toward the hand's own
+// crop; the retransition fades k to 0. The blend happens in updateRenderOrder() on top of the damped own crop (clickCropApplied()), so the hand's own Wrist Cropping stays live underneath. "Crop Wrist (Master On/Off)" off still means a full arm.
+function cropCompose(a, v, w) {
+  const base = a || { v: 0, k: 0 }
+  const f = Math.min(Math.max(w, -1), 1)
+  if (f > 0) { const k = 1 - (1 - base.k) * (1 - f); return { v: k > 0 ? (base.v * base.k * (1 - f) + v * f) / k : v, k } }
+  if (f < 0) return { v: base.v, k: base.k * (1 + f) }
+  return { v: base.v, k: base.k }
+}
+function wristCropCurveOn(p) { return !!cfg[`${p}WristCropEnabled`] && !!cfg[`${p}WristCropCurveEnabled`] }
+function captureWristCropNorm(hand, p) {
+  const vis = cfg[`${p}WristCropCurveVisibleOnly`] !== false
+  return normFieldDist(handXYDist(hand), vis ? xyFieldMinDist : xyAllMinDist, vis ? xyFieldDistRange : xyAllDistRange, `${p}WristCropCurveXOrigin`)
+}
+function wristCropTarget(hand, p) {
+  let pct = cfg[`${p}WristCropAmount`]
+  if (cfg[`${p}WristCropCurveEnabled`]) {
+    const trig = triggerStateOf(p), slot = trig && trig.wristCrop
+    if (slot && slot.range) {
+      const st = (hand._cp && hand._cp[p]) || (hand._chp && hand._chp[p])
+      pct = cameraSlotValue(slot, st && st.wristCropNorm !== undefined ? st.wristCropNorm : 0)
+    }
+  }
+  return THREE.MathUtils.clamp((Number.isFinite(pct) ? pct : 0) / 100, 0, 1)
+}
+// Called by applyOffsetRotationToHand() with the SHAPED progress: baked state + this function's live part.
+function refreshCropLive(hand, p, ps) {
+  const base = hand._cfCropBase, on = !!cfg[`${p}WristCropEnabled`]
+  if (!base && !on) return
+  const w = ps.cr !== undefined ? ps.cr : ps.o
+  hand._cfCrop = on && w ? cropCompose(base, wristCropTarget(hand, p), w) : (base ? { v: base.v, k: base.k } : null)
+}
+function bakeCropIntoAccum(hand, p, f) {
+  const w = f.cr !== undefined ? f.cr : f.o
+  if (!cfg[`${p}WristCropEnabled`] || !w) return
+  hand._cfCropBase = cropCompose(hand._cfCropBase, wristCropTarget(hand, p), w)
+  hand._cfCrop = { v: hand._cfCropBase.v, k: hand._cfCropBase.k }
+}
+function cropAccumSnapshot(hand) { const a = hand._cfCropBase; return a ? { v: a.v, k: a.k } : null }
+function unwindCropAccum(hand, start, progress) {
+  if (!start && !hand._cfCropBase) return
+  const rem = 1 - Math.min(Math.max(progress, 0), 1)
+  const next = start && rem > 0 ? { v: start.v, k: start.k * rem } : null
+  hand._cfCropBase = next
+  hand._cfCrop = next ? { v: next.v, k: next.k } : null
+}
+function clickCropApplied(hand, ownT) {
+  const c = hand._cfCrop
+  if (!c || !(c.k > 0) || !cfg.cropWristEnabled) return ownT
+  return ownT + (c.v - ownT) * c.k
+}
 function applyOffsetRotationToHand(hand, p, progressIn) {
   const pr = normOffsetProgress(progressIn)
   const progress = pr.o // plain number for the startup-only curves below
@@ -15471,6 +15550,7 @@ function applyOffsetRotationToHand(hand, p, progressIn) {
   hand._lastOffsetRotationProgress[p] = pr
   const ps = shapeOffsetProgress(p, pr, hand) // Progression Curves: the amounts actually applied below (pr stays the raw progress for the startup curves and the in-flight record)
   refreshWristDeltaLive(hand, p, ps) // Wrist group: accumulator + live part, used by the next pose apply
+  refreshCropLive(hand, p, ps) // Wrist Crop group: used by the next frame's arm-length pass
   if (p === STARTUP_FN && startupHandScaleActive(hand) && !hand._poseThrApplied) hand.clone.scale.multiplyScalar(startupHandScale(progress)) // Hand Scale Curve (applyPoseValuesToHand() has just set the plain scale this frame)
   _offsetRightVec.setFromMatrixColumn(camera.matrixWorld, 0)
   _offsetUpVec.setFromMatrixColumn(camera.matrixWorld, 1)
@@ -15606,7 +15686,7 @@ function rotateHandAboutArmBase(hand, q) {
 //    lap's FIRST 1/n for a hold-kind function (it starts on the wrap, after the forward pass), where the fall starts from the previous lap's end value (loopCarry; 0 on the first lap). Nothing is baked at lap end.
 //  - Oscillate: no shaping; every other lap is the inverse (loop 1 normal, loop 2 inverted, ...), so two laps cancel. dir is +1 / -1.
 // n = poses in the lap (the wrap is 1 of n segments). Groups with their checkbox off keep the old behaviour (linear rise, baked in full).
-const LOOP_RETRANSITION_FLAGS = { o: 'OffsetLoopRetransition', c: 'CameraOffsetLoopRetransition', r: 'RotationLoopRetransition', w: 'WristLoopRetransition' }
+const LOOP_RETRANSITION_FLAGS = { o: 'OffsetLoopRetransition', c: 'CameraOffsetLoopRetransition', r: 'RotationLoopRetransition', w: 'WristLoopRetransition', cr: 'WristCropLoopRetransition' }
 function loopLapProgress(p, kind, lapT, carry, n, oscillate, dir) {
   const t = Math.min(Math.max(lapT, 0), 1)
   const w = Math.min(Math.max(1 / Math.max(n, 2), 0.05), 0.95)
@@ -15642,6 +15722,7 @@ function bakeOffsetRotationIntoAccum(hand, p, fracIn = 1) {
   if (!hand._customRotationAccum) hand._customRotationAccum = new THREE.Quaternion()
   if (!hand._customBaseRotAccum) hand._customBaseRotAccum = new THREE.Quaternion()
   bakeWristIntoAccum(hand, p, f)
+  bakeCropIntoAccum(hand, p, f)
   if ((cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`]) && (f.o || f.c)) {
     const base = computeCombinedOffsetAt(hand, p, f.o, f.c)
     hand._customOffsetAccum.x += base.x
@@ -15693,7 +15774,7 @@ function bakeInFlightOffsetRotation(hand, p) {
   const shown = hand._lastOffsetRotationProgress && hand._lastOffsetRotationProgress[p]
   if (!shown) return
   const f = normOffsetProgress(shown) // each group's own fraction, possibly negative (Oscillate inverse) or shaped (Retransition Between Loops)
-  if (!f.o && !f.c && !f.r && !f.w) return
+  if (!f.o && !f.c && !f.r && !f.w && !f.cr) return
   bakeOffsetRotationIntoAccum(hand, p, f)
   hand._lastOffsetRotationProgress[p] = 0
 }
@@ -15722,9 +15803,10 @@ function positionalProgressFor(p, poseProgress, st, hand) {
   // the borrowed function's own Retransition Easing Curve shapes it too
   return cfg[`${q}RetransitionEasingCurveEnabled`] ? easingProfilePAt(getEasingProfile(q, CLICK_HOLD_KEYS.includes(q) && isSequenceOrChainMode(q), qTrig, true), st.posProg) : st.posProg
 }
-function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart, baseAccumStart, cursorAccumStart, wristAccumStart, closest = true) {
+function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotationAccumStart, baseAccumStart, cursorAccumStart, wristAccumStart, closest = true, cropAccumStart = null) {
   if (posThrottleHold(hand)) return // Throttle Positional Transposition: a held frame (the decay is a function of progress, so the next full apply catches up exactly)
   unwindWristAccum(hand, wristAccumStart, progress, closest) // Wrist group: the accumulated wrist angles unwind with the same positional progress
+  unwindCropAccum(hand, cropAccumStart, progress) // Wrist Crop group: fades back to the hand's own crop with the same progress
   const remaining = 1 - progress
   const decayedX = offsetAccumStart ? offsetAccumStart.x * remaining : 0
   const decayedY = offsetAccumStart ? offsetAccumStart.y * remaining : 0
@@ -15786,15 +15868,17 @@ function applyOffsetRotationRetransition(hand, progress, offsetAccumStart, rotat
 // retransitioning) is run on those untouched accumulators from where they are now, down to zero, by updateUntouchedRetransition() before the functions apply. It stops when this function enters its own retransition (that one
 // snapshots whatever is left and unwinds it) or goes idle. "Touches" = the group's On/Off switch is on (an enabled group with all amounts 0 still counts as touched; a rotation Mode other than the old one is not told apart,
 // all three rotation accumulators are one group). Not followed: the interrupted function's Positional Retransition being off (its own borrowed timing), and a pose (a function always sets the whole pose).
-const ORPH_CATS = ['offset', 'rot', 'wrist']
+const ORPH_CATS = ['offset', 'rot', 'wrist', 'crop']
 function orphTouches(p, cat) {
   if (cat === 'offset') return !!(cfg[`${p}OffsetEnabled`] || cfg[`${p}CameraOffsetEnabled`])
   if (cat === 'rot') return !!cfg[`${p}RotationEnabled`]
+  if (cat === 'crop') return !!cfg[`${p}WristCropEnabled`]
   return !!cfg[`${p}WristEnabled`]
 }
 function orphHasAmount(hand, cat) {
   if (cat === 'offset') { const a = hand._customOffsetAccum; return !!a && (a.x !== 0 || a.y !== 0 || a.z !== 0) }
   if (cat === 'rot') return !!((hand._customRotationAccum && !isIdentityQuat(hand._customRotationAccum)) || (hand._customBaseRotAccum && !isIdentityQuat(hand._customBaseRotAccum)) || (hand._customCursorRigid && !isIdentityQuat(hand._customCursorRigid.q)))
+  if (cat === 'crop') return !!hand._cfCropBase && hand._cfCropBase.k > 0
   const w = hand._wristAccum
   return !!w && (w.splay !== 0 || w.bend !== 0 || w.rot !== 0)
 }
@@ -15814,6 +15898,7 @@ function orphSnapshot(hand, cats) {
     s.cursor = hand._customCursorRigid ? { q: hand._customCursorRigid.q.clone(), t: hand._customCursorRigid.t.clone() } : null
   }
   if (cats.includes('wrist')) s.wrist = hand._wristAccum ? { splay: hand._wristAccum.splay, bend: hand._wristAccum.bend, rot: hand._wristAccum.rot } : null
+  if (cats.includes('crop')) s.crop = cropAccumSnapshot(hand)
   return s
 }
 // Called where a function (B) takes a hand over, after the others were released. cand = the interrupted function to borrow the retransition from (or null).
@@ -15844,6 +15929,10 @@ function orphWrite(hand, o, f) {
     if (hand._customRotationAccum && s.rot) hand._customRotationAccum.identity().slerp(s.rot, f)
     if (hand._customBaseRotAccum && s.base) hand._customBaseRotAccum.identity().slerp(s.base, f)
     if (hand._customCursorRigid && s.cursor) { hand._customCursorRigid.q.identity().slerp(s.cursor.q, f); hand._customCursorRigid.t.copy(s.cursor.t).multiplyScalar(f) }
+  }
+  if (c.includes('crop') && s.crop) {
+    hand._cfCropBase = { v: s.crop.v, k: s.crop.k * f }
+    hand._cfCrop = { v: hand._cfCropBase.v, k: hand._cfCropBase.k }
   }
   if (c.includes('wrist') && s.wrist) {
     const acc = hand._wristAccum || (hand._wristAccum = { splay: 0, bend: 0, rot: 0 })
@@ -16467,6 +16556,7 @@ function animSpeedMs(p, isTween, frozenSpeedMs) {
 // increment.
 function snapshotOffsetRotationAccumForRetransition(hand, chp) {
   chp.retransitionWristAccumStart = wristAccumSnapshot(hand)
+  chp.retransitionCropAccumStart = cropAccumSnapshot(hand)
   chp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0, z: 0 }
   chp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
   chp.retransitionBaseAccumStart = hand._customBaseRotAccum ? hand._customBaseRotAccum.clone() : new THREE.Quaternion()
@@ -16725,7 +16815,7 @@ function releaseHandFromOtherFunctionsCore(hand, exceptId, ctx) {
 // "Continually Recomputes" (2026-10-21, direct request), one checkbox per distance-from-cursor curve of a click function. On = the value follows the hand's CURRENT distance from the cursor every frame (the live behaviour of 2026-10-11); off = the value
 // the hand had when the function was triggered (press / commit / release, depending on the curve) is used for the whole run and nothing is re-evaluated. Animation Speed, Start Time, Retransition Speed / Start Time, Tween Stop and Start Distance default to off;
 // Offset To Camera, Offset and Rotation default to on. A key that was never created (an old Multi Trigger) falls back to its default.
-const CONT_DEFAULTS = { WristCurve: true, SpeedCurve: false, StartTimeCurve: false, RetransitionSpeedCurve: false, RetransitionStartTimeCurve: false, TweenStopStartTimeCurve: false, TweenStopDelayCurve: false, StartDistance: false, CameraOffset: true, CursorOffset: true, RotationCurve: true }
+const CONT_DEFAULTS = { WristCropCurve: true, WristCurve: true, SpeedCurve: false, StartTimeCurve: false, RetransitionSpeedCurve: false, RetransitionStartTimeCurve: false, TweenStopStartTimeCurve: false, TweenStopDelayCurve: false, StartDistance: false, CameraOffset: true, CursorOffset: true, RotationCurve: true }
 function contOn(p, name) { const v = cfg[`${p}${name}Continual`]; return v === undefined ? CONT_DEFAULTS[name] : v !== false }
 function contStamp(st, kind) { return kind === 'hold' ? st.forwardStartTime : st.triggerTime } // changes at every commit of the function on this hand
 function liveCurveValue(hand, curveParsed, rangeParsed, p, flag) {
@@ -16785,6 +16875,7 @@ function refreshLiveDistanceState(st, hand, p, trig, now, kind) {
   // Values that are plain functions of distance (no rate): Offset To Camera amount, Start Distance tween amount.
   if (cfg[`${p}CameraOffsetEnabled`] && contOn(p, 'CameraOffset')) st.frozenOffsetNorm = captureCameraOffsetNorm(hand, p)
   if (wristCurvesOn(p) && (contOn(p, 'WristCurve') || st.wristNormStamp !== contStamp(st, kind))) { st.wristNorm = captureWristNorm(hand, p); st.wristNormStamp = contStamp(st, kind) } // Wrist curves: same distance as the Rotation curves
+  if (wristCropCurveOn(p) && (contOn(p, 'WristCropCurve') || st.wristCropNormStamp !== contStamp(st, kind))) { st.wristCropNorm = captureWristCropNorm(hand, p); st.wristCropNormStamp = contStamp(st, kind) }
   if (rotationCurvesOn(p) && (contOn(p, 'RotationCurve') || st.rotationNormStamp !== contStamp(st, kind))) { st.rotationNorm = captureRotationNorm(hand, p); st.rotationNormStamp = contStamp(st, kind) } // off: captured once per commit
   const sdp = stageParentOf(p) || p // On Click / On Release inherit the main function's Start Distance Curve
   const sdt = sdp === p ? trig : (triggerStateOf(sdp) || trig)
@@ -17275,7 +17366,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
         const lapSeg = Math.max(stopOsc ? (trig.loopFwdW || trig.loopPoses.length - 1) : (trig.loopRingW || trig.loopPoses.length), 1e-6)
         const lapNow = normOffsetProgress(loopLapProgress(p, 'hold', loopSegNow / lapSeg, chp.loopCarry || 0, trig.loopPoses.length, stopOsc, chp.loopDirection))
         const lapThen = normOffsetProgress(loopLapProgress(p, 'hold', chp.stoppingLoopBaseSegments / lapSeg, chp.loopCarry || 0, trig.loopPoses.length, stopOsc, chp.loopDirection))
-        stopRamp = { o: lapNow.o - lapThen.o, c: lapNow.c - lapThen.c, r: lapNow.r - lapThen.r }
+        stopRamp = { o: lapNow.o - lapThen.o, c: lapNow.c - lapThen.c, r: lapNow.r - lapThen.r, cr: lapThen.cr < 1 ? (lapNow.cr - lapThen.cr) / (1 - lapThen.cr) : 0 }
       } else {
         values = chp.lastAppliedValues
       }
@@ -17292,7 +17383,9 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
       const progress = stopEasing ? easingProfilePAt(stopEasing, progressRaw) : progressRaw
       if (chp.lateSplayFrom != null) stopSplay = THREE.MathUtils.lerp(chp.lateSplayFrom, chp.frozenSplayDeg, progress)
       const progressAtRelease = THREE.MathUtils.clamp(chp.stoppingBaseElapsedMs / speedMs, 0, 1)
-      stopRamp = Math.max(progress - (stopEasing ? easingProfilePAt(stopEasing, progressAtRelease) : progressAtRelease), 0) // the (eased) forward ramp minus the part already baked at release
+      const bakedAtRelease = stopEasing ? easingProfilePAt(stopEasing, progressAtRelease) : progressAtRelease
+      const addedRamp = Math.max(progress - bakedAtRelease, 0) // the (eased) forward ramp minus the part already baked at release
+      stopRamp = { o: addedRamp, c: addedRamp, r: addedRamp, w: addedRamp, cr: bakedAtRelease < 1 ? addedRamp / (1 - bakedAtRelease) : 0 }
       // `* frozenTweenFractionCap` (CORRECTED 2026-09-28) -- the forward
       // phase this continues from applies Start Distance Curve's cap
       // (`cappedT`); without it here too, a capped hand would jump from
@@ -17410,7 +17503,7 @@ function updateClickHoldPoseForHand(hand, p, live, minLiveDist, liveDistRange, n
     // back to zero, not just this function's own last increment -- and
     // clears the real accumulator once progress reaches 1.
     const posProgressH = positionalProgressFor(p, easedProgress, chp, hand)
-    applyOffsetRotationRetransition(hand, posProgressH, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart, chp.retransitionBaseAccumStart, chp.retransitionCursorAccumStart, chp.retransitionWristAccumStart, closestPathOn(p))
+    applyOffsetRotationRetransition(hand, posProgressH, chp.retransitionOffsetAccumStart, chp.retransitionRotationAccumStart, chp.retransitionBaseAccumStart, chp.retransitionCursorAccumStart, chp.retransitionWristAccumStart, closestPathOn(p), chp.retransitionCropAccumStart)
     if (progress >= 1 && (positionalRetransitionOn(p) || chp.posProg >= 1)) chp.phase = 'idle' // fully settled at default -- stop overriding, normal cfg-driven posing (inert here since it only re-applies on slider change, not every frame) silently regains control
   }
 }
@@ -18379,6 +18472,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
       // not just this one) once, right here, so retransition unwinds the
       // real total rather than just this function's own last increment.
       cp.retransitionWristAccumStart = wristAccumSnapshot(hand)
+      cp.retransitionCropAccumStart = cropAccumSnapshot(hand)
       cp.retransitionOffsetAccumStart = hand._customOffsetAccum ? { ...hand._customOffsetAccum } : { x: 0, y: 0, z: 0 }
       cp.retransitionRotationAccumStart = hand._customRotationAccum ? hand._customRotationAccum.clone() : new THREE.Quaternion()
       cp.retransitionBaseAccumStart = hand._customBaseRotAccum ? hand._customBaseRotAccum.clone() : new THREE.Quaternion()
@@ -18423,7 +18517,7 @@ function updateClickPoseForHand(hand, p, live, minLiveDist, liveDistRange, now) 
     // this function's own last increment -- and clears the real
     // accumulator once progress reaches 1, a genuinely fresh start.
     const posProgressC = positionalProgressFor(p, easedProgress, cp, hand)
-    applyOffsetRotationRetransition(hand, posProgressC, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart, cp.retransitionBaseAccumStart, cp.retransitionCursorAccumStart, cp.retransitionWristAccumStart, closestPathOn(p))
+    applyOffsetRotationRetransition(hand, posProgressC, cp.retransitionOffsetAccumStart, cp.retransitionRotationAccumStart, cp.retransitionBaseAccumStart, cp.retransitionCursorAccumStart, cp.retransitionWristAccumStart, closestPathOn(p), cp.retransitionCropAccumStart)
     if (progress >= 1 && (positionalRetransitionOn(p) || cp.posProg >= 1)) cp.phase = 'idle'
   }
 }
@@ -19431,7 +19525,13 @@ function buildOffsetAxisWidgets(p) {
     if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand)  ·  Y: Wrist ' + k + ' (0 = Min, 1 = Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
     if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: -180, trackMax: 180, unit: 'deg', defaultValue: { min: 0, max: 30 } })
   })
-  ;['Offset', 'CameraOffset', 'Rotation', 'Wrist'].forEach((pre) => {
+  {
+    const curveRow = document.querySelector(`.dp-row[data-key="${p}WristCropCurve"]`)
+    const rangeRow = document.querySelector(`.dp-row[data-key="${p}WristCropCurveRange"]`)
+    if (curveRow) buildGenericCurveWidget(curveRow, { caption: 'X: Distance From Cursor (Nearest→Farthest On-Screen Hand)  ·  Y: Wrist Crop (0 = Min, 1 = Max)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
+    if (rangeRow) buildGenericRangeBarWidget(rangeRow, { trackMin: 0, trackMax: 100, unit: '%', defaultValue: { min: 0, max: 100 } })
+  }
+  ;['Offset', 'CameraOffset', 'Rotation', 'Wrist', 'WristCrop'].forEach((pre) => {
     const row = document.querySelector(`.dp-row[data-key="${p}${pre}ProgressionCurve"]`)
     if (row) buildGenericCurveWidget(row, { caption: 'X: Progression Through The Sequence (0 = Start, 100% = End Of The Ramp / Lap)  ·  Y: Amount Applied (1 = The Full Amount, 0 = None)', defaultPoints: [{ x: 0, y: 0 }, { x: 1, y: 1 }] })
   })
@@ -20681,7 +20781,7 @@ const CUSTOM_FUNCTION_POSE_LAYOUT = [
   // Distance Curve, Retransition, Multi Trigger. The 2 groups that were
   // missing from this list ('Offset To Camera', 'Easing') are new since
   // this layout was captured; the flat rows above already matched.
-  { type: 'group', title: 'On Click' }, { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Wrist' }, { type: 'group', title: 'Easing' },
+  { type: 'group', title: 'On Click' }, { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Wrist' }, { type: 'group', title: 'Wrist Crop' }, { type: 'group', title: 'Easing' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' }, { type: 'group', title: 'Retransition' },
   { type: 'group', title: 'Multi Trigger' }
 ]
@@ -20710,7 +20810,7 @@ const CUSTOM_FUNCTION_HOLD_LAYOUT = [
   { type: 'row', suffix: 'LoopMode' }, { type: 'row', suffix: 'LoopHoldMs' }, { type: 'row', suffix: 'LoopWrapScale' },
   // 2026-10-04 -- same group order as CUSTOM_FUNCTION_POSE_LAYOUT (taken
   // from Click Offset Test); Tween Stop stays last, hold-kind only.
-  { type: 'group', title: 'On Click' }, { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Wrist' }, { type: 'group', title: 'Easing' },
+  { type: 'group', title: 'On Click' }, { type: 'group', title: 'Offset' }, { type: 'group', title: 'Offset To Camera' }, { type: 'group', title: 'Rotation' }, { type: 'group', title: 'Wrist' }, { type: 'group', title: 'Wrist Crop' }, { type: 'group', title: 'Easing' },
   { type: 'group', title: 'Animation Speed Curve' }, { type: 'group', title: 'Start Time Curve' }, { type: 'group', title: 'Start Distance Curve' },
   // Multi Trigger last, as in Click Offset Test (2026-10-04, direct request "fix my
   // group setting order"): it was missing from this list, so hold-kind
@@ -21489,6 +21589,7 @@ const MULTI_TRIGGER_ALLOWED_SUFFIXES = [
   'OffsetLoopRetransition', 'CameraOffsetLoopRetransition', 'RotationLoopRetransition', 'RotationMode',
   'OffsetProgressionCurveEnabled', 'OffsetProgressionCurve', 'CameraOffsetProgressionCurveEnabled', 'CameraOffsetProgressionCurve', 'RotationProgressionCurveEnabled', 'RotationProgressionCurve', 'RotationCurveVisibleOnly', 'RotationCurveXOrigin', 'RotationCurveContinual',
   'WristEnabled', 'WristLoopRetransition', 'WristCurveVisibleOnly', 'WristCurveContinual', 'WristProgressionCurveEnabled', 'WristProgressionCurve',
+  'WristCropEnabled', 'WristCropLoopRetransition', 'WristCropCurveVisibleOnly', 'WristCropCurveContinual', 'WristCropCurveXOrigin', 'WristCropAmount', 'WristCropCurveEnabled', 'WristCropCurveRange', 'WristCropCurve', 'WristCropProgressionCurveEnabled', 'WristCropProgressionCurve',
   'WristSplayEnabled', 'WristSplayAmount', 'WristSplayCurveEnabled', 'WristSplayCurveRange', 'WristSplayCurve', 'WristBendEnabled', 'WristBendAmount', 'WristBendCurveEnabled', 'WristBendCurveRange', 'WristBendCurve', 'WristRotationEnabled', 'WristRotationAmount', 'WristRotationCurveEnabled', 'WristRotationCurveRange', 'WristRotationCurve',
   'RotationXCurveEnabled', 'RotationXCurve', 'RotationXCurveRange', 'RotationYCurveEnabled', 'RotationYCurve', 'RotationYCurveRange', 'RotationZCurveEnabled', 'RotationZCurve', 'RotationZCurveRange',
   'SpeedCurveEnabled', 'SpeedCurve', 'SpeedCurveRange',
@@ -22790,7 +22891,24 @@ function updateOffsetRotationVisibility(p) {
   updateWristVisibility(p)
 }
 // Wrist group rows (2026-10-21): the whole group follows its own On/Off, each axis subgroup its own, the plain Amount and the curve subgroup follow the axis, the curve rows follow the curve On/Off, the Progression Curve row follows its box.
+// Wrist Crop group rows: the group follows its On/Off, the curve rows follow the curve On/Off, the progression curve follows its own.
+function updateWristCropVisibility(p) {
+  const show = (key, on, gate) => {
+    const row = document.querySelector(`.dp-row[data-key="${key}"]`)
+    if (!row) return
+    const g = row.classList.contains('dp-group-gate-row') ? row.closest('.dp-group') : null
+    if (gate) { row.style.display = ''; if (g) g.style.display = on ? '' : 'none'; return }
+    ;(g || row).style.display = on ? '' : 'none'
+  }
+  const on = !!cfg[`${p}WristCropEnabled`], curveOn = on && !!cfg[`${p}WristCropCurveEnabled`]
+  ;['WristCropLoopRetransition', 'WristCropAmount'].forEach((k) => show(`${p}${k}`, on))
+  ;['WristCropCurveVisibleOnly', 'WristCropCurveContinual', 'WristCropCurveXOrigin', 'WristCropCurveRange', 'WristCropCurve'].forEach((k) => show(`${p}${k}`, curveOn))
+  show(`${p}WristCropCurveEnabled`, on, true)
+  show(`${p}WristCropProgressionCurveEnabled`, on, true)
+  show(`${p}WristCropProgressionCurve`, on && !!cfg[`${p}WristCropProgressionCurveEnabled`])
+}
 function updateWristVisibility(p) {
+  updateWristCropVisibility(p)
   const show = (key, on, gate) => {
     const row = document.querySelector(`.dp-row[data-key="${key}"]`)
     if (!row) return
@@ -22914,6 +23032,15 @@ function wrapClickFunctionGatedSubgroups(p) {
   if (wristGroup && wristProgGroup) wristGroup.querySelector(':scope > .dp-group-body').appendChild(wristProgGroup)
   if (wristGroup && rotationGroup && rotationGroup.parentElement) rotationGroup.parentElement.insertBefore(wristGroup, rotationGroup.nextSibling)
   updateWristVisibility(p) // the first visibility pass ran before the rows were wrapped into groups: apply it to the groups now
+  // Wrist Crop: a toggleable group right after Wrist (2026-11-28), with its curve subgroup and Progression Curve
+  const cropGroup = wrapGatedSubgroup(`${p}WristCropEnabled`, [`${p}WristCropLoopRetransition`, `${p}WristCropAmount`], 'Wrist Crop')
+  const cropCurveGroup = wrapGatedSubgroup(`${p}WristCropCurveEnabled`, [`${p}WristCropCurveVisibleOnly`, `${p}WristCropCurveContinual`, `${p}WristCropCurveXOrigin`, `${p}WristCropCurveRange`, `${p}WristCropCurve`], 'Wrist Crop Curve')
+  const cropProgGroup = wrapGatedSubgroup(`${p}WristCropProgressionCurveEnabled`, [`${p}WristCropProgressionCurve`], 'Progression Curve')
+  if (cropGroup && cropCurveGroup) cropGroup.querySelector(':scope > .dp-group-body').appendChild(cropCurveGroup)
+  if (cropGroup && cropProgGroup) cropGroup.querySelector(':scope > .dp-group-body').appendChild(cropProgGroup)
+  const cropAfter = wristGroup || rotationGroup
+  if (cropGroup && cropAfter && cropAfter.parentElement) cropAfter.parentElement.insertBefore(cropGroup, cropAfter.nextSibling)
+  updateWristCropVisibility(p)
   wrapGatedSubgroup(`${p}SpeedCurveEnabled`, [`${p}SpeedCurveVisibleOnly`, `${p}SpeedCurveXOrigin`, `${p}SpeedCurveContinual`, `${p}SpeedCurve`, `${p}SpeedCurveRange`], 'Animation Speed Curve')
   // CORRECTED 2026-09-24 (item 7, remainder): Tween mode's own always-on
   // start-time curve (no enable toggle of its own -- see
@@ -25911,9 +26038,12 @@ function updateRenderOrder() {
     const targetArmLengthT = rvCropTarget(hand, targetArmLengthT0) // + Responsive Velocity > Velocity Wrist Crop
     let armLengthDampingAmt = THREE.MathUtils.clamp(cfg.armLengthDamping ?? 1, 0.001, 1)
     if (hand._startupEase > 0) { armLengthDampingAmt = Math.min(armLengthDampingAmt, STARTUP_EASE_DAMPING); hand._startupEase-- } // ease-in after the startup hold is released (see releaseStartupHold())
-    hand.currentArmLengthT = hand.currentArmLengthT !== undefined
-      ? hand.currentArmLengthT + (targetArmLengthT - hand.currentArmLengthT) * armLengthDampingAmt
+    // _armBaseT is the hand's own damped crop; a click function's Wrist Crop is blended on top of it (clickCropApplied()), and currentArmLengthT is what is shown. currentArmLengthT cleared = start fresh.
+    const prevBaseT = hand.currentArmLengthT === undefined ? undefined : (hand._armBaseT ?? hand.currentArmLengthT)
+    hand._armBaseT = prevBaseT !== undefined
+      ? prevBaseT + (targetArmLengthT - prevBaseT) * armLengthDampingAmt
       : targetArmLengthT
+    hand.currentArmLengthT = clickCropApplied(hand, hand._armBaseT)
     if (hand.skinnedMesh) applyHandArmLength(hand, hand.currentArmLengthT)
     }
     if (__hb0) rlog.hbCur.arm = performance.now() - __hb0
