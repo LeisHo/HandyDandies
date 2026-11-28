@@ -152,6 +152,135 @@ function setSliderBoundLocked(ctrlKey, kind, locked) {
   if (locked) lockedSliderBounds.add(key); else lockedSliderBounds.delete(key)
 }
 
+// Slider multi-select (Ctrl/Shift+click a value box) + batch value-set,
+// CLAUDE.md §12x -- ported from HANDO (byte-shared lineage), itself
+// ported from .claude/TEMPLATE_DEV_PANEL.html. Declared here, in this
+// file's own established early module-level state block (NOT next to the
+// functions that use it further down), per this project's own CLAUDE.md
+// gotcha: a variable referenced by code called at top-level setup time
+// throws "Cannot access before initialization" if declared later in the
+// file, even though it would be perfectly safe inside an event listener --
+// same real production outage this project already hit once. A plain
+// slider's `.dp-num` box is an ALWAYS-present, always-editable <input>
+// here (never a click-to-reveal span), so there's no "open an edit box"
+// lifecycle to manage -- Ctrl/Shift-click toggles/range-selects the box
+// itself; a plain click just focuses it natively, same as it always has.
+// `.dp-num-primary` (added at creation, alongside the pre-existing
+// `.dp-num`) distinguishes the TOP-LEVEL slider's own box from every OTHER
+// `.dp-num` in this file (a min/max bound edit box, a multi-select-list
+// row's own per-item box), so this feature never fires on those.
+const dpSliderMultiSelect = new Set() // Set of .dp-num-primary <input> elements
+let dpSliderMultiSelectAnchor = null
+let dpSliderMultiSelectLastRange = null // {anchor, far: index in visibleDpSlidersInOrder()}
+function dpSliderKeyFor(numInput) {
+  const row = numInput.closest('.dp-row')
+  return row ? row.dataset.key : null
+}
+function setDpSliderMultiSelected(numInput, on) {
+  if (on) { dpSliderMultiSelect.add(numInput); numInput.classList.add('dp-multiselected') } else { dpSliderMultiSelect.delete(numInput); numInput.classList.remove('dp-multiselected') }
+}
+function clearDpSliderMultiSelect() {
+  dpSliderMultiSelect.forEach((n) => setDpSliderMultiSelected(n, false))
+  dpSliderMultiSelectAnchor = null
+  dpSliderMultiSelectLastRange = null
+}
+// Every top-level slider box, in real DOM order (#dpGroups is this
+// project's one shared container for every device, confirmed via grep --
+// no per-tab root to scope this to, unlike the template).
+function visibleDpSlidersInOrder() {
+  const groupsEl = document.getElementById('dpGroups')
+  if (!groupsEl) return []
+  return Array.from(groupsEl.querySelectorAll('.dp-num-primary')).filter((n) => n.offsetParent !== null)
+}
+function applyDpSliderShiftRange(fromInput, toInput) {
+  const order = visibleDpSlidersInOrder()
+  const anchorIdx = order.indexOf(fromInput), newIdx = order.indexOf(toInput)
+  if (anchorIdx === -1 || newIdx === -1) { setDpSliderMultiSelected(toInput, true); return }
+  if (dpSliderMultiSelectLastRange && dpSliderMultiSelectLastRange.anchor === fromInput) {
+    const prevFar = dpSliderMultiSelectLastRange.far
+    const spanLo = Math.min(anchorIdx, prevFar), spanHi = Math.max(anchorIdx, prevFar)
+    if (newIdx >= spanLo && newIdx <= spanHi && newIdx !== prevFar) {
+      // Shrink: the new target lies inside the range the last Shift-click
+      // from this SAME anchor created -- deselect from just past the new
+      // target out to the old far edge ("a shift-click in reverse").
+      const deselLo = (prevFar > anchorIdx) ? newIdx + 1 : prevFar
+      const deselHi = (prevFar > anchorIdx) ? prevFar : newIdx - 1
+      if (deselLo <= deselHi) order.slice(deselLo, deselHi + 1).forEach((n) => setDpSliderMultiSelected(n, false))
+      dpSliderMultiSelectLastRange.far = newIdx
+      return
+    }
+  }
+  const lo = Math.min(anchorIdx, newIdx), hi = Math.max(anchorIdx, newIdx)
+  order.slice(lo, hi + 1).forEach((n) => setDpSliderMultiSelected(n, true))
+  dpSliderMultiSelectLastRange = { anchor: fromInput, far: newIdx }
+}
+// Guarantees the batch applies on blur/Enter even when native 'change'
+// wouldn't fire on its own -- the direct-type keyboard path (below) pre-
+// seeds .value before focus, so if the user commits without typing
+// further, the value never actually changes AFTER focus began, and native
+// 'change' silently never fires. Harmless/idempotent if 'change' also
+// fires separately (the normal click-then-retype case).
+function armDpSliderBatchCommit(primaryInput) {
+  function onBlur() {
+    primaryInput.removeEventListener('blur', onBlur)
+    if (dpSliderMultiSelect.size < 2 || !dpSliderMultiSelect.has(primaryInput)) return
+    const val = primaryInput.value
+    dpSliderMultiSelect.forEach((other) => {
+      if (other === primaryInput) return
+      const entry = numEls[dpSliderKeyFor(other)]
+      if (entry && entry.apply) entry.apply(val)
+    })
+  }
+  primaryInput.addEventListener('blur', onBlur)
+}
+function setupDpSliderMultiSelect() {
+  document.addEventListener('mousedown', (e) => {
+    if ((e.ctrlKey || e.metaKey || e.shiftKey) && e.target.closest('.dp-num-primary')) e.preventDefault()
+  })
+  document.addEventListener('click', (e) => {
+    const numInput = e.target.closest('.dp-num-primary')
+    if (!numInput) {
+      if (dpSliderMultiSelect.size) clearDpSliderMultiSelect()
+      return
+    }
+    const alreadySelected = dpSliderMultiSelect.has(numInput)
+    if (e.ctrlKey || e.metaKey) {
+      setDpSliderMultiSelected(numInput, !alreadySelected)
+      dpSliderMultiSelectAnchor = numInput
+      e.preventDefault()
+      return
+    }
+    if (e.shiftKey) {
+      if (dpSliderMultiSelectAnchor && dpSliderMultiSelectAnchor !== numInput) {
+        applyDpSliderShiftRange(dpSliderMultiSelectAnchor, numInput)
+      } else {
+        setDpSliderMultiSelected(numInput, true)
+      }
+      dpSliderMultiSelectAnchor = numInput
+      e.preventDefault()
+      return
+    }
+    if (dpSliderMultiSelect.size && !alreadySelected) clearDpSliderMultiSelect()
+    dpSliderMultiSelectAnchor = numInput
+    armDpSliderBatchCommit(numInput)
+  })
+  document.addEventListener('keydown', (e) => {
+    if (dpSliderMultiSelect.size === 0) return
+    const ae = document.activeElement
+    if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) return
+    if (!/^[0-9.\-]$/.test(e.key)) return
+    let anchor = dpSliderMultiSelectAnchor
+    if (!anchor || !dpSliderMultiSelect.has(anchor)) anchor = Array.from(dpSliderMultiSelect)[0]
+    if (!anchor) return
+    e.preventDefault()
+    anchor.value = e.key
+    armDpSliderBatchCommit(anchor)
+    anchor.focus()
+    const len = String(anchor.value).length
+    try { anchor.setSelectionRange(len, len) } catch (err) { /* not supported on every input type/browser */ }
+  })
+}
+
 function round(v, d) {
   const m = Math.pow(10, d)
   return Math.round(v * m) / m
@@ -647,6 +776,12 @@ function renderListPickerItemRow(entry, item) {
     row.appendChild(tcb)
   }
   row.appendChild(el('span', 'dp-lp-row-label', { textContent: listPickerRowLabel(entry, item, marks) })) // ctrl.itemBadge(item): optional suffix such as "  (in use)"
+  // ctrl.itemMeta(item, sortKey) (2026-11-19, ported from HANDO's Hand Model Selector): a short muted text after the name (file size, triangles ...), looked up on every draw and never stored in the item.
+  if (entry.ctrl.itemMeta) {
+    let metaText = ''
+    try { metaText = entry.ctrl.itemMeta(item, entry.sortKey || '') || '' } catch (err) { metaText = '' }
+    if (metaText) row.appendChild(el('span', 'dp-lp-row-meta', { textContent: metaText }))
+  }
   row.__item = item
   // Direct user report, 2026-09-11: on mobile, tapping a name and hitting
   // "Use" applied a DIFFERENT (adjacent) saved item's data, even though
@@ -948,6 +1083,49 @@ function refreshListPickerToggles(entry) {
 export function refreshListPickerTogglesByKey(key) {
   const entry = numEls[key]
   if (entry && entry.type === 'list-picker') refreshListPickerToggles(entry)
+}
+// Redraws a list-picker from its current items (e.g. after the host learned more about them).
+export function refreshListPicker(key) {
+  const entry = numEls[key]
+  if (entry && entry.type === 'list-picker') renderListPickerRows(entry)
+}
+// Reorders a list-picker's items by one of ctrl.sortOptions (ported from HANDO, see buildListPickerRow). Stable; a missing value (undefined / null / '' / NaN) sorts last in either direction. With opt.sortGroups the items are
+// ordered by their group path first, so groups and subgroups come out in the same order as the items (ungrouped items stay first, as they render); otherwise each group's own items are ordered and the groups follow the first of
+// their (sorted) items.
+function applyListPickerSort(entry, optKey, dir) {
+  const opt = (entry.ctrl.sortOptions || []).find((o) => o.key === optKey)
+  if (!opt) return
+  const sign = dir === 'desc' ? -1 : 1
+  const missing = (v) => v === undefined || v === null || v === '' || (typeof v === 'number' && Number.isNaN(v))
+  const collate = (a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' })
+  const vals = new Map(entry.items.map((it) => { let v; try { v = opt.get(it) } catch (err) { v = null } return [it, v] }))
+  const byValue = (a, b) => {
+    const x = vals.get(a), y = vals.get(b)
+    const xm = missing(x), ym = missing(y)
+    if (xm && ym) return 0
+    if (xm) return 1
+    if (ym) return -1
+    return sign * (typeof x === 'number' && typeof y === 'number' ? x - y : collate(x, y))
+  }
+  const cmp = opt.sortGroups
+    ? (a, b) => {
+      const ga = a.group || '', gb = b.group || ''
+      if (ga !== gb) {
+        if (!ga) return -1
+        if (!gb) return 1
+        return sign * collate(ga, gb)
+      }
+      return byValue(a, b)
+    }
+    : byValue
+  entry.items = entry.items.slice().sort(cmp)
+  entry.groupOrder = [] // renderListPickerRows() follows the first-seen order of the sorted items
+  if (opt.sortGroups) {
+    const tops = Array.from(new Set([...entry.items.map((it) => it.group).filter(Boolean), ...(entry.pendingGroups || [])].map((g) => g.split(LP_GROUP_PATH_SEP)[0])))
+    entry.groupOrder = tops.sort((a, b) => sign * collate(a, b))
+  }
+  commit(entry.ctrl, entry.items)
+  renderListPickerRows(entry)
 }
 function renderListPickerRows(entry) {
   entry.listEl.innerHTML = ''
@@ -1544,7 +1722,11 @@ export function buildRow(ctrl) {
   } else {
     // slider (default type)
     const slider = el('input', null, { type: 'range', min: ctrl.min, max: ctrl.max, step: ctrl.step, value: ctrl.def })
-    const numInput = el('input', 'dp-num', { type: 'text', value: ctrl.def })
+    // 'dp-num-primary' (alongside the pre-existing 'dp-num'), CLAUDE.md
+    // §12x: distinguishes the TOP-LEVEL slider's own value box from every
+    // other '.dp-num' in this file so the Ctrl/Shift multi-select feature
+    // only ever targets this one.
+    const numInput = el('input', 'dp-num dp-num-primary', { type: 'text', value: ctrl.def })
 
     function apply(v) {
       v = parseFloat(v)
@@ -1648,7 +1830,11 @@ export function buildRow(ctrl) {
     row.appendChild(slider)
     row.appendChild(maxLabel)
     row.appendChild(numInput)
-    numEls[ctrl.key] = { slider, numInput }
+    // `apply` exposed here (CLAUDE.md §12x) so the slider multi-select
+    // feature can batch-set another slider's value from outside this
+    // closure, reusing the SAME clamp/auto-expand/lock logic above rather
+    // than a 2nd copy of it.
+    numEls[ctrl.key] = { slider, numInput, apply }
   }
   // §12f-1: dynamicDevice opt-in -- "Show in Mobile/Landscape" (Desktop-
   // only relevance) + "Independent from Desktop" (Mobile/Landscape-only
@@ -1774,6 +1960,20 @@ function buildListPickerRow(ctrl, row) {
     importBtn = el('button', null, { type: 'button', textContent: 'Import' })
     btnRow.appendChild(importBtn)
   }
+  // ctrl.sortOptions = [{ key, label, get(item), defaultDir?, sortGroups? }] (2026-11-19, ported from HANDO's Hand Model Selector): a "Sort by" select plus an up / down button above the list. Picking an option (or flipping the
+  // direction) reorders the items once; the new order is ordinary saved data like a drag-reorder. Items without a value for the key go last.
+  let sortSelect = null
+  let sortDirBtn = null
+  if (ctrl.sortOptions && ctrl.sortOptions.length) {
+    const sortRow = el('div', 'dp-lp-sort-row')
+    sortRow.appendChild(el('span', 'dp-lp-sort-label', { textContent: 'Sort by' }))
+    sortSelect = el('select', 'dp-lp-sort-select')
+    sortSelect.appendChild(el('option', null, { value: '', textContent: '...' }))
+    ctrl.sortOptions.forEach((o) => sortSelect.appendChild(el('option', null, { value: o.key, textContent: o.label })))
+    sortDirBtn = el('button', 'dp-lp-sort-dir', { type: 'button', textContent: '↑', title: 'Ascending (click to flip)' })
+    sortRow.append(sortSelect, sortDirBtn)
+    row.appendChild(sortRow)
+  }
   row.appendChild(listEl)
   row.appendChild(btnRow)
   const entry = {
@@ -1816,6 +2016,22 @@ function buildListPickerRow(ctrl, row) {
     lastInteractedGroupPath: ''
   }
   numEls[ctrl.key] = entry
+  if (sortSelect) {
+    entry.sortDir = 'asc'
+    const applySort = () => { if (sortSelect.value) applyListPickerSort(entry, sortSelect.value, entry.sortDir) }
+    sortSelect.addEventListener('change', () => {
+      entry.sortKey = sortSelect.value // handed to ctrl.itemMeta(item, sortKey) so a row can show the value it is sorted by
+      const opt = ctrl.sortOptions.find((o) => o.key === sortSelect.value)
+      if (opt && opt.defaultDir) { entry.sortDir = opt.defaultDir; sortDirBtn.textContent = entry.sortDir === 'desc' ? '↓' : '↑' }
+      applySort()
+    })
+    sortDirBtn.addEventListener('click', () => {
+      entry.sortDir = entry.sortDir === 'desc' ? 'asc' : 'desc'
+      sortDirBtn.textContent = entry.sortDir === 'desc' ? '↓' : '↑'
+      sortDirBtn.title = entry.sortDir === 'desc' ? 'Descending (click to flip)' : 'Ascending (click to flip)'
+      applySort()
+    })
+  }
   // First press inside this picker ends its startup state (see renderListPickerRows): groups it gets later behave normally.
   row.addEventListener('pointerdown', () => { entry.userTouched = true }, true)
 
@@ -4869,6 +5085,11 @@ export function initDevPanel(groups, opts = {}) {
   panel.addEventListener('click', (e) => {
     if (!e.shiftKey && !devGroupSelectionArmed) return
     if (e.target.closest('.dp-list-picker-row-container')) return
+    // Same exclusion reasoning as the line above, for the slider multi-
+    // select feature's own Shift+click (CLAUDE.md §12x) -- without this,
+    // this capture-phase listener would hijack it before that feature's
+    // own listener ever saw it.
+    if (e.target.closest('.dp-num-primary')) return
     const headerEl = e.target.closest('.dp-group-header')
     const target = headerEl ? headerEl.closest('.dp-group') : e.target.closest('.dp-row')
     if (!target) return
@@ -4885,6 +5106,7 @@ export function initDevPanel(groups, opts = {}) {
     if (devPanelSelectedItems.size) clearDevSelection()
     if (devGroupSelectionArmed) disarmDevGroupSelection()
   }, true)
+  setupDpSliderMultiSelect()
 
   textEditBtn.addEventListener('click', () => {
     commit(findCtrl('dp_textEditMode'), !textEditModeEnabled)

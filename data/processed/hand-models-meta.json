@@ -1,0 +1,206 @@
+{
+  "../data/processed/HAND3D/HandipantsFixedBone.glb": {
+    "bytes": 830228,
+    "tris": 12224,
+    "modified": "2026-10-17T02:33:13.038Z",
+    "uploaded": "2026-09-25T00:52:26-04:00"
+  },
+  "../data/processed/HAND3D/HandipantsOL_Clip.glb": {
+    "bytes": 133928,
+    "tris": 12224,
+    "modified": "2026-10-11T12:05:40.405Z",
+    "uploaded": "2026-10-11T08:13:11-04:00"
+  },
+  "../data/processed/HAND3D/HD-300.glb": {
+    "bytes": 19308,
+    "tris": 366,
+    "modified": "2026-10-17T02:33:13.017Z",
+    "uploaded": "2026-10-15T01:47:22-04:00"
+  },
+  "../data/processed/HAND3D/HD-500.glb": {
+    "bytes": 21416,
+    "tris": 488,
+    "modified": "2026-10-17T02:33:13.022Z",
+    "uploaded": "2026-10-15T01:47:22-04:00"
+  },
+  "../data/processed/HAND3D/HD-1K.glb": {
+    "bytes": 30040,
+    "tris": 1018,
+    "modified": "2026-10-17T02:33:13.015Z",
+    "uploaded": "2026-10-15T01:47:22-04:00"
+  },
+  "../data/processed/HAND3D/HD-2k.glb": {
+    "bytes": 44768,
+    "tris": 2036,
+    "modified": "2026-10-17T02:33:13.016Z",
+    "uploaded": "2026-10-15T01:47:22-04:00"
+  },
+  "../data/processed/HAND3D/HD-3K.glb": {
+    "bytes": 58856,
+    "tris": 3052,
+    "modified": "2026-10-17T02:33:13.018Z",
+    "uploaded": "2026-10-15T01:47:22-04:00"
+  },
+  "../data/processed/HAND3D/HD-4k.glb": {
+    "bytes": 70624,
+    "tris": 4074,
+    "modified": "2026-10-17T02:33:13.020Z",
+    "uploaded": "2026-10-15T01:47:22-04:00"
+  },
+  "../data/processed/HAND3D/HD-5K.glb": {
+    "bytes": 81108,
+    "tris": 5000,
+    "modified": "2026-10-17T02:33:13.024Z",
+    "uploaded": "2026-10-15T01:47:22-04:00"
+  },
+  "../data/processed/HAND3D/HD-6k.glb": {
+    "bytes": 91656,
+    "tris": 6014,
+    "modified": "2026-10-17T02:33:13.025Z",
+    "uploaded": "2026-10-15T01:47:22-04:00"
+  },
+  "../data/processed/HAND3D/HD-8k.glb": {
+    "bytes": 111592,
+    "tris": 8144,
+    "modified": "2026-10-17T02:33:13.028Z",
+    "uploaded": "2026-10-15T01:47:22-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_100.glb": {
+    "bytes": 25748,
+    "tris": 110,
+    "modified": "2026-10-16T06:18:47.284Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_200.glb": {
+    "bytes": 27656,
+    "tris": 194,
+    "modified": "2026-10-16T06:18:14.516Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_300.glb": {
+    "bytes": 39476,
+    "tris": 292,
+    "modified": "2026-10-23T08:48:36.944Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_400.glb": {
+    "bytes": 31436,
+    "tris": 402,
+    "modified": "2026-10-16T06:17:29.826Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_500.glb": {
+    "bytes": 43488,
+    "tris": 510,
+    "modified": "2026-10-23T08:48:36.946Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_800.glb": {
+    "bytes": 38180,
+    "tris": 810,
+    "modified": "2026-10-16T06:19:27.434Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_1k.glb": {
+    "bytes": 50920,
+    "tris": 960,
+    "modified": "2026-10-23T08:48:36.940Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_2k.glb": {
+    "bytes": 56420,
+    "tris": 2062,
+    "modified": "2026-10-16T06:14:33.961Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_4k.glb": {
+    "bytes": 81076,
+    "tris": 4008,
+    "modified": "2026-10-16T06:14:51.034Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_6k.glb": {
+    "bytes": 103476,
+    "tris": 6034,
+    "modified": "2026-10-16T06:16:26.484Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_8k.glb": {
+    "bytes": 60316,
+    "tris": 8018,
+    "modified": "2026-10-16T06:15:11.805Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_10k.glb": {
+    "bytes": 149272,
+    "tris": 9794,
+    "modified": "2026-10-23T08:48:36.932Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_12k.glb": {
+    "bytes": 145316,
+    "tris": 12224,
+    "modified": "2026-10-16T06:15:56.026Z",
+    "uploaded": "2026-10-16T02:25:15-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_5k.glb": {
+    "bytes": 104264,
+    "tris": 4828,
+    "modified": "2026-10-23T08:48:36.951Z",
+    "uploaded": "2026-10-23T03:25:42-04:00"
+  },
+  "../data/processed/HAND3D/HD_IK_10k_T.glb": {
+    "bytes": 137320,
+    "tris": 9794,
+    "modified": "2026-10-23T08:48:36.937Z",
+    "uploaded": "2026-10-23T03:25:42-04:00"
+  },
+  "../data/processed/HAND3D/SKELETON%20HAND.glb": {
+    "bytes": 13225324,
+    "tris": 4987,
+    "modified": "2026-10-23T08:48:37.056Z",
+    "uploaded": "2026-10-23T03:25:42-04:00"
+  },
+  "../data/processed/HAND3D/SKELETON%20HAND_W.glb": {
+    "bytes": 13237656,
+    "tris": 4987,
+    "modified": "2026-10-23T08:48:37.164Z",
+    "uploaded": "2026-10-23T03:25:42-04:00"
+  },
+  "../data/processed/HAND3D/FEMALE%20HAND_8k.glb": {
+    "bytes": 37515584,
+    "tris": 8142,
+    "modified": "2026-10-23T08:48:36.918Z",
+    "uploaded": "2026-09-24T23:12:54-04:00"
+  },
+  "../data/processed/HAND3D/HAND_IK_3K_5mmOL.glb": {
+    "bytes": 70240,
+    "tris": 3114,
+    "modified": "2026-11-03T09:55:39.627Z",
+    "uploaded": "2026-11-03T04:57:06-05:00"
+  },
+  "../data/processed/HAND3D/HAND_IK_6K_5mmOL.glb": {
+    "bytes": 102560,
+    "tris": 6034,
+    "modified": "2026-11-03T09:55:39.765Z",
+    "uploaded": "2026-11-03T04:57:06-05:00"
+  },
+  "../data/processed/HAND3D/HAND_IK_8K_5mmOL.glb": {
+    "bytes": 120968,
+    "tris": 8058,
+    "modified": "2026-11-03T09:55:39.887Z",
+    "uploaded": "2026-11-03T04:57:06-05:00"
+  },
+  "../data/processed/HAND3D/HAND_IK_10K_5mmOL.glb": {
+    "bytes": 133000,
+    "tris": 10042,
+    "modified": "2026-11-03T09:55:39.995Z",
+    "uploaded": "2026-11-03T04:57:06-05:00"
+  },
+  "../data/processed/HAND3D/HAND_IK_12K_5mmOL.glb": {
+    "bytes": 144252,
+    "tris": 12224,
+    "modified": "2026-11-03T09:55:40.089Z",
+    "uploaded": "2026-11-03T04:57:06-05:00"
+  }
+}

@@ -12,7 +12,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
 import { createUIElement, replaceLayoutNode, registerStorageBackend, loadLayoutConfig, captureAllLayoutConfigs, setActiveContextOverride, getElement as getEngineElement } from '../lib/ui-engine/registry.mjs'
 import { mountInspector, refreshInspector } from '../lib/ui-engine/inspector.mjs'
 import { resolveLengthValue } from '../lib/ui-engine/engine.mjs'
-import { nestImportedGroups, DEV_MODE, initDevPanel, setDevPanelBuilding, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, makeLogBoxCollapsible, mergeImportedItem } from './devpanel/devPanel.js?v=110'
+import { nestImportedGroups, DEV_MODE, initDevPanel, setDevPanelBuilding, syncValue, setControlValue, copyControlState, isApplyingPanelState, onPanelStateApplied, peekRestoredValue, forgetControlsWithPrefix, seedControlValue, refreshListPickerTogglesByKey, organizeGroupSubgroups, refreshSelectOptions, refreshMultiSelectOptions, saveCurrentSettings, renderDynamicGroup, createGroupElement, realDeviceClass, getEditingDevice, getDeviceValue, setDeviceValue, applyTextOverrides, setDevTextOverride, isDevRowVisible, setDevVisibility, forEachDynamicDeviceDescendant, refreshRowDisplaysForEditingTab, beginDynamicBatch, endDynamicBatch, refreshListPickerMarksByKey, refreshListPicker, makeLogBoxCollapsible, mergeImportedItem } from './devpanel/devPanel.js?v=112'
 
 // Toon Shading colour gradient (2026-10-12): MeshToonMaterial's getGradientIrradiance() only reads the RED channel of
 // its gradientMap (a grey ramp). Reading RGB instead is identical for every grey ramp (all channels equal) and lets
@@ -134,6 +134,84 @@ const handModelIdbGet = (id) => handModelIdbRun('readonly', (st) => st.get(id))
 const handModelIdbPut = (id, rec) => handModelIdbRun('readwrite', (st) => st.put(rec, id))
 const handModelIdbDelete = (id) => handModelIdbRun('readwrite', (st) => st.delete(id))
 const handModelIdbKeys = () => handModelIdbRun('readonly', (st) => st.getAllKeys())
+// MODEL SELECTORS: size / triangles / dates (2026-11-19, ported from HANDO's Hand Model Selector). A built-in model's numbers come from data/processed/hand-models-meta.json (written by scripts/active/build-hand-model-meta.js, keyed by
+// the model's url; it arrives after boot and the selectors are redrawn); an imported ("local") model carries its own { bytes, tris, uploaded, modified } as `info` on its Hand Models list item. A model with no numbers shows nothing for
+// them and sorts last. Nothing here is stored for built-ins, so the saved lists only hold names / groups / order.
+const HAND_MODEL_META_URL = '../data/processed/hand-models-meta.json'
+let handModelMeta = {}
+function handModelInfoById(id) {
+  const b = HAND_MODEL_BUILTINS.find((m) => m.id === id)
+  if (b) return handModelMeta[b.url] || null
+  const list = typeof cfg === 'object' && cfg && Array.isArray(cfg.handModels) ? cfg.handModels : []
+  const it = list.find((x) => x && x.id === id)
+  return (it && it.info) || null
+}
+function fmtBytes(n) {
+  if (typeof n !== 'number' || !isFinite(n)) return ''
+  if (n < 1024) return n + ' B'
+  if (n < 1024 * 1024) return (n / 1024).toFixed(n < 10 * 1024 ? 1 : 0) + ' KB'
+  return (n / 1024 / 1024).toFixed(n < 10 * 1024 * 1024 ? 2 : 1) + ' MB'
+}
+function fmtTris(n) {
+  if (typeof n !== 'number' || !isFinite(n)) return ''
+  if (n < 1000) return n + ' tris'
+  if (n < 1000000) return (n / 1000).toFixed(n < 10000 ? 2 : 1) + 'k tris'
+  return (n / 1000000).toFixed(2) + 'M tris'
+}
+function fmtDay(iso) {
+  const t = Date.parse(iso)
+  if (!isFinite(t)) return ''
+  const d = new Date(t)
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
+}
+// Size, triangles and dates of a .glb (an ArrayBuffer): triangles = sum of index counts / 3 over the skinned meshes (no decoding, so Draco files work), without a primitive whose material is called OUTLINE (the baked
+// outline shell repeats the hand's triangles) -- the number the built-in names already quote. `lastModified` / `uploadedMs` are milliseconds or null.
+function glbInfoFromBuffer(buf, lastModified, uploadedMs) {
+  const info = { bytes: buf.byteLength, tris: null, modified: lastModified ? new Date(lastModified).toISOString() : null, uploaded: new Date(uploadedMs || Date.now()).toISOString() }
+  try {
+    const jsonLen = new DataView(buf, 0, 20).getUint32(12, true)
+    const j = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 20, jsonLen)))
+    let only = new Set((j.nodes || []).filter((n) => n.mesh !== undefined && n.skin !== undefined).map((n) => n.mesh))
+    if (!only.size) only = new Set((j.meshes || []).map((_, i) => i))
+    let t = 0
+    ;(j.meshes || []).forEach((m, mi) => {
+      if (!only.has(mi)) return
+      for (const p of m.primitives || []) {
+        const mat = p.material !== undefined && j.materials ? j.materials[p.material] : null
+        if (mat && /outline/i.test(mat.name || '')) continue
+        const mode = p.mode === undefined ? 4 : p.mode
+        const n = (p.indices !== undefined ? j.accessors[p.indices] : j.accessors[p.attributes.POSITION]).count
+        if (mode === 4) t += Math.floor(n / 3)
+        else if (mode === 5 || mode === 6) t += Math.max(0, n - 2)
+      }
+    })
+    info.tris = t
+  } catch (e) { /* triangle count stays unknown */ }
+  return info
+}
+// An imported model's id is 'local:' + the import time in base 36 (+ x's for a same-millisecond clash): that is its upload date when nothing better was recorded.
+function localHandModelUploadedMs(id) {
+  const n = parseInt(String(id).replace(/^local:/, '').replace(/x+$/, ''), 36)
+  return isFinite(n) && n > 1.5e12 && n < 4e12 ? n : null
+}
+function handModelDate(item, key) { const info = handModelInfoById(item && item.id); return info ? Date.parse(info[key]) : NaN }
+function handModelItemMeta(item, sortKey) {
+  if (!item || !item.id) return ''
+  const info = handModelInfoById(item.id)
+  if (!info) return ''
+  const parts = [fmtBytes(info.bytes), fmtTris(info.tris)].filter(Boolean)
+  if (sortKey === 'uploaded' || sortKey === 'modified') { const d = fmtDay(info[sortKey]); if (d) parts.push(d) }
+  return parts.join(' · ')
+}
+const HAND_MODEL_SORT_OPTIONS = [
+  { key: 'name', label: 'Name', get: (item) => item.name, defaultDir: 'asc', sortGroups: true },
+  { key: 'uploaded', label: 'Date Uploaded', get: (item) => handModelDate(item, 'uploaded'), defaultDir: 'desc' },
+  { key: 'modified', label: 'Date Modified', get: (item) => handModelDate(item, 'modified'), defaultDir: 'desc' }
+]
+fetch(HAND_MODEL_META_URL, { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : {})).then((j) => {
+  handModelMeta = j && typeof j === 'object' ? j : {}
+  ;['handModels', 'loadingPreviewModelList', 'skelFrontModelList'].forEach((k) => { try { refreshListPicker(k) } catch (e) { /* panel not built yet: its first draw reads handModelMeta anyway */ } })
+}).catch(() => { /* no meta file: sizes and triangles are simply not shown */ })
 async function resolveHandModelUrl() {
   let id = null
   try { id = localStorage.getItem(HAND_MODEL_LS_KEY) } catch (e) { /* storage blocked */ }
@@ -2812,16 +2890,21 @@ const DEV_GROUPS = [
         type: 'list-picker',
         def: [],
         hostManaged: true,
-        buttons: ['use', 'delete', 'import'],
+        buttons: ['use', 'rename', 'delete', 'group', 'import'],
         itemLabel: 'Hand Model',
         itemBadge: (item) => (item.id === activeHandModelId ? '  (in use)' : (item.source === 'local' && localHandModelPresent[item.id] === false ? '  (not on this device)' : '')),
+        // 2026-11-19 (direct request, ported from HANDO): rename, groups, sort by name / date uploaded / date modified, and each model's file size + triangles on its row. Rename changes only the display name (item.name): the id is what
+        // every setting points at, and an imported model keeps its file name in item.title for the same-name overwrite check.
+        itemMeta: handModelItemMeta,
+        sortOptions: HAND_MODEL_SORT_OPTIONS,
+        onRename: (item, name) => renameHandModelItem('handModels', item, name),
         onUse: (item) => useHandModel(item),
         onBeforeDelete: (item, btn) => {
           if (item.source !== 'local') { flashModelButton(btn, 'Built-in'); return false }
           if (item.id === activeHandModelId) { flashModelButton(btn, 'In use'); return false }
           return true
         },
-        onDeleted: (item) => { if (item.source === 'local') handModelIdbDelete(item.id).catch(() => {}) },
+        onDeleted: (item) => { if (item.source === 'local') handModelIdbDelete(item.id).catch(() => {}); try { syncModelSelectorLists() } catch (e) { /* panel not built */ } },
         onImportClick: (btn) => importHandModelFile(btn)
       },
       // Small Scale Models (2026-10-15): swap a hand's mesh for a lower-resolution model of the same rig once its world Z reaches a level's Z. The levels are a JSON list edited by the widget (buildSmallScaleModelWidget()).
@@ -3059,6 +3142,17 @@ const DEV_GROUPS = [
       // tween (the "wrist crop curve"). Applies to both hands and to the on-screen loading animation; after the loading screen (the live preview) the progress loops 0 -> 100% so it can be watched.
       { key: 'loadingPreviewRealTimeLoading', label: 'Real Time Loading', type: 'checkbox', def: false, placeAfter: 'loadingPreviewModelId' },
       { key: 'loadingPreviewModelId', label: 'Loading Preview Model', type: 'select', def: '', placeAfter: 'loadingPreviewEnabled', options: () => loadingPreviewModelOptions(), onChange: () => onLoadingPreviewModelChanged() },
+      // The Loading Preview Model Selector (2026-11-19, direct request: every model selector an item selector). The select above stays as the hidden backing control (the saved choice, the restore and every other reader are unchanged);
+      // this list is what is shown. Its items are the Hand Models list (built-ins + imported) plus "Same As Hand Model", kept in step by syncModelSelectorLists(); it has its own names / groups / order. Use sets the select's value.
+      {
+        key: 'loadingPreviewModelList', label: 'Loading Preview Model Selector', type: 'list-picker', def: [], hostManaged: true, buttons: ['use', 'rename', 'group'], itemLabel: 'Model', placeAfter: 'loadingPreviewModelId',
+        isInUse: (item) => (item.id || '') === (cfg.loadingPreviewModelId || ''),
+        itemBadge: (item) => (item.source === 'local' && localHandModelPresent[item.id] === false ? '  (not on this device)' : ''),
+        itemMeta: handModelItemMeta,
+        sortOptions: HAND_MODEL_SORT_OPTIONS,
+        onRename: (item, name) => renameHandModelItem('loadingPreviewModelList', item, name),
+        onUse: (item) => { if (!item.virtual && item.source === 'local' && localHandModelPresent[item.id] === false) { alert('"' + item.name + '" was imported on another device - import the file here to use it.'); return } setControlValue('loadingPreviewModelId', item.id || ''); refreshListPickerMarksByKey('loadingPreviewModelList') }
+      },
       // Direct request, following up on the Offset X/Y sliders below
       // ("so i can position the loading hand preview" implies actually
       // being able to SEE it while tuning, not just during the real
@@ -4493,6 +4587,16 @@ const SAVE_SETTINGS_ENDPOINT = '/api/save-settings'
   const SK = (k) => 'skel' + k.charAt(0).toUpperCase() + k.slice(1)
   fieldControls.push({ key: 'renderSkeletonFront', label: 'Render Skeleton In Front On/Off', type: 'checkbox', def: false, onChange: () => { try { skelFrontEnsure() } catch (err) { /* early boot: the first frame picks it up */ } } })
   fieldControls.push({ key: 'skelFrontModel', label: 'Skeleton Model', type: 'select', def: 'repo:SKELETON HAND', options: () => skelFrontModelOptions(), onChange: () => { try { skelFrontReload() } catch (err) { /* early boot */ } } })
+  // The Skeleton Model Selector (2026-11-19, direct request: every model selector an item selector): same arrangement as the Loading Preview Model Selector -- the select above is the hidden backing control, this list is shown.
+  fieldControls.push({
+    key: 'skelFrontModelList', label: 'Skeleton Model Selector', type: 'list-picker', def: [], hostManaged: true, buttons: ['use', 'rename', 'group'], itemLabel: 'Model',
+    isInUse: (item) => (item.id || '') === skelFrontModelId(),
+    itemBadge: (item) => (item.source === 'local' && localHandModelPresent[item.id] === false ? '  (not on this device)' : ''),
+    itemMeta: handModelItemMeta,
+    sortOptions: HAND_MODEL_SORT_OPTIONS,
+    onRename: (item, name) => renameHandModelItem('skelFrontModelList', item, name),
+    onUse: (item) => { if (item.source === 'local' && localHandModelPresent[item.id] === false) { alert('"' + item.name + '" was imported on another device - import the file here to use it.'); return } setControlValue('skelFrontModel', item.id); refreshListPickerMarksByKey('skelFrontModelList') }
+  })
   const effect = {
     toonSteps: () => rebuildSkelGradientMap(), toonStepThreshold: () => rebuildSkelGradientMap(), toonShadowFloor: () => rebuildSkelGradientMap(), toonLightCeiling: () => rebuildSkelGradientMap(), toonGradient: () => rebuildSkelGradientMap(),
     toonBaseTint: (v) => forEachSkelToonMaterial((m) => m.color.set(v)),
@@ -21125,18 +21229,61 @@ function refreshHandModelList() {
   const keep = new Map() // lower-case name -> the last local entry of that name
   saved.forEach((it) => {
     if (!(it && it.source === 'local' && it.id)) return
-    const b = builtinHandModelFor(it.name)
+    const nm = it.title || it.name // the file name the import was made from, not a display name the user may have changed since
+    const b = builtinHandModelFor(nm)
     if (b) { remap[it.id] = b.id; return }
-    const k = String(it.name || '').toLowerCase()
+    const k = String(nm || '').toLowerCase()
     if (keep.has(k)) remap[keep.get(k).id] = it.id // an earlier import of the same name: this one replaces it
     keep.set(k, it)
   })
-  const locals = saved.filter((it) => it && it.source === 'local' && it.id && keep.get(String(it.name || '').toLowerCase()) === it)
+  const keptLocals = new Set(Array.from(keep.values()))
   ;['handModelId', 'loadingPreviewModelId'].forEach((k) => { if (remap[cfg[k]]) { cfg[k] = remap[cfg[k]]; try { syncValue(k, cfg[k]) } catch (e) { /* no panel */ } } })
-  const items = HAND_MODEL_BUILTINS.map((m) => ({ name: m.name, id: m.id, source: 'repo' })).concat(locals)
+  // 2026-11-19: the list now keeps what the user did to it (display names, groups, order -- Rename / + Group / drag), so it is merged instead of rebuilt: an item stays where it is, a replaced / duplicate local is dropped,
+  // a built-in model that is not in the list yet is added at the end (a new model in a later version).
+  const builtinIds = new Set(HAND_MODEL_BUILTINS.map((m) => m.id))
+  const seenIds = new Set()
+  const items = []
+  saved.forEach((it) => {
+    if (!(it && it.id) || seenIds.has(it.id)) return
+    if (builtinIds.has(it.id)) { seenIds.add(it.id); items.push({ ...it, source: 'repo', name: it.name || HAND_MODEL_BUILTINS.find((m) => m.id === it.id).name }); return }
+    if (it.source === 'local' && keptLocals.has(it)) { seenIds.add(it.id); items.push(it) }
+  })
+  HAND_MODEL_BUILTINS.forEach((m) => { if (!seenIds.has(m.id)) items.push({ name: m.name, id: m.id, source: 'repo' }) })
   if (JSON.stringify(items) === JSON.stringify(saved)) return
   cfg.handModels = items
   syncValue('handModels', items)
+}
+// Rename on a model selector (2026-11-19): only the DISPLAY name changes (the id is what every setting points at). Names stay unique inside one list; an imported model remembers the file name it came from in item.title.
+function renameHandModelItem(listKey, item, name) {
+  name = String(name || '').trim()
+  if (!name || !item || name === item.name) return
+  const list = Array.isArray(cfg[listKey]) ? cfg[listKey] : []
+  if (list.some((it) => it && it.id !== item.id && it.name === name)) { alert('"' + name + '" already exists - pick a different name.'); return }
+  setControlValue(listKey, list.map((it) => (it && it.id === item.id ? { ...it, name, ...(it.source === 'local' && !it.title ? { title: it.name } : {}) } : it)))
+}
+// The Loading Preview Model Selector and the Skeleton Model Selector list the same models as Hand Models (built-ins + imported on this account) -- plus "Same As Hand Model" for the preview. Each keeps its own display names, groups and
+// order (Rename / + Group / drag); this only adds a model the list does not have yet and drops one that no longer exists (a deleted import). Nothing is deleted from these two by hand, so nothing needs to stay deleted.
+function syncModelSelectorLists() {
+  const models = (Array.isArray(cfg.handModels) ? cfg.handModels : []).filter((m) => m && m.id)
+  if (!models.length) return // the Hand Models list is not restored yet
+  const byId = new Map(models.map((m) => [m.id, m]))
+  const build = (key, withSame) => {
+    const cur = Array.isArray(cfg[key]) ? cfg[key] : []
+    const seen = new Set()
+    const items = []
+    cur.forEach((it) => {
+      if (!it) return
+      if (it.virtual) { if (withSame && !seen.has('')) { seen.add(''); items.push(it) } return }
+      if (!it.id || !byId.has(it.id) || seen.has(it.id)) return
+      seen.add(it.id)
+      items.push({ ...it, source: byId.get(it.id).source })
+    })
+    if (withSame && !seen.has('')) items.unshift({ name: 'Same As Hand Model', id: '', source: 'repo', virtual: true })
+    models.forEach((m) => { if (!seen.has(m.id)) items.push({ name: m.name, id: m.id, source: m.source }) })
+    if (JSON.stringify(items) !== JSON.stringify(cur)) { cfg[key] = items; syncValue(key, items) }
+  }
+  build('loadingPreviewModelList', true)
+  build('skelFrontModelList', false)
 }
 function useHandModel(item) {
   if (!item || item.id === activeHandModelId) return
@@ -21177,7 +21324,7 @@ function importHandModelFile(btn) {
       const list = Array.isArray(cfg.handModels) ? cfg.handModels : []
       const builtinSame = builtinHandModelFor(title)
       if (builtinSame) { flashModelButton(btn, 'Built-in name'); alert('"' + title + '" is a built-in model (' + builtinSame.name + '). Built-in models are files in the project and cannot be overwritten from here, so nothing was imported - rename the file to import it as its own model.'); results.push(false); continue }
-      const existing = list.find((it) => it && it.source === 'local' && sameName(it.name))
+      const existing = list.find((it) => it && it.source === 'local' && sameName(it.title || it.name))
       let id
       if (existing) {
         if (!confirm('A model called "' + title + '" is already in the Hand Models list. Overwrite it with this file?')) { flashModelButton(btn, 'Cancelled'); results.push(false); continue }
@@ -21189,11 +21336,13 @@ function importHandModelFile(btn) {
       }
       await handModelIdbPut(id, { name: file.name, title, blob: new Blob([buf], { type: 'model/gltf-binary' }) })
       localHandModelPresent[id] = true
-      if (!existing) {
-        const items = list.concat([{ name: title, id, source: 'local' }])
-        cfg.handModels = items
-        syncValue('handModels', items)
-      }
+      const info = glbInfoFromBuffer(buf, file.lastModified, Date.now()) // size / triangles / dates for the model selectors
+      const items = existing
+        ? list.map((it) => (it && it.id === id ? { ...it, title: it.title || title, info } : it))
+        : list.concat([{ name: title, title, id, source: 'local', info }])
+      cfg.handModels = items
+      syncValue('handModels', items)
+      syncModelSelectorLists()
       flashModelButton(btn, existing ? 'Overwritten' : 'Imported')
       results.push(true)
       if (existing && id === activeHandModelId) reloadFor = title // (the model is measured once at load)
@@ -21226,8 +21375,23 @@ async function syncHandModelWithSettings() {
       localHandModelPresent[id] = true
     }
   } catch (e) { /* ignore */ }
+  // 2026-11-19: imported models that were imported before the selectors showed size / triangles: read them from this browser's own copy (a model whose file is not here keeps showing nothing).
+  try {
+    const list = Array.isArray(cfg.handModels) ? cfg.handModels : []
+    let changed = false
+    const out = []
+    for (const it of list) {
+      if (it && it.source === 'local' && !it.info && localHandModelPresent[it.id]) {
+        const rec = await handModelIdbGet(it.id)
+        if (rec && rec.blob) { out.push({ ...it, title: it.title || it.name, info: glbInfoFromBuffer(await rec.blob.arrayBuffer(), null, localHandModelUploadedMs(it.id)) }); changed = true; continue }
+      }
+      out.push(it)
+    }
+    if (changed) cfg.handModels = out
+  } catch (e) { /* ignore */ }
   refreshHandModelList()
   syncValue('handModels', cfg.handModels) // the list above may have been healed directly in cfg; make the panel show it
+  syncModelSelectorLists()
   refreshListPickerTogglesByKey('handModels')
   let pending = null
   try { pending = localStorage.getItem(HAND_MODEL_PENDING_KEY) } catch (e) { /* ignore */ }
@@ -23925,7 +24089,7 @@ function setupLoadingPreviewToonGroup() {
   buildToonGradientWidget('lpToonGradient')
 }
 function setupRenderSkeletonGroup() { // the toggleable "Render Skeleton In Front" subgroup of Field Layout (on/off checkbox in its label); the Toon Shading copy sits in it like the Toon Shading group
-  const keys = ['skelFrontModel']
+  const keys = ['skelFrontModel', 'skelFrontModelList']
   ;['toonSteps', 'toonStepThreshold', 'toonStepThresholdPick', 'toonShadowFloor', 'toonShadowFloorPick', 'toonLightCeiling', 'toonLightCeilingPick', 'toonGradient', 'toonBaseTint', 'textureInfluence', 'toonTint', 'rimIntensity', 'rimPower', 'rimColor'].forEach((k) => keys.push(skelToonKey(k)))
   keys.push('skelSavedToon')
   wrapGatedSubgroup('renderSkeletonFront', keys, 'Render Skeleton In Front')

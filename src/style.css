@@ -485,6 +485,11 @@ body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:n
   background: #0f0f18; color: var(--dp-value-text-color, var(--dp-text-color, #e8e8f0)); border: 1px solid #3a3a4a; border-radius: 4px;
   padding: 2px 4px;
 }
+/* Slider multi-select (Ctrl/Shift+click a value box), CLAUDE.md §12x --
+   ported from HANDO/.claude/TEMPLATE_DEV_PANEL.html; magenta dashed
+   outline, distinct from .dp-selected's own solid outline (a different
+   feature, the top-level fold-into-group selection). */
+.dp-num.dp-multiselected { outline: 2px dashed #f0f; outline-offset: 1px; }
 .dp-row input[type=color] { width: 40px; height: 22px; border: 1px solid #3a3a4a; border-radius: 4px; background: none; padding: 0; }
 .dp-text-input {
   flex: 1 1 auto; min-width: 0; text-align: left; font-size: var(--dp-body-font-size, 11px);
@@ -521,6 +526,13 @@ body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:n
    selected row looking identically selected. */
 .dp-list-picker-row-multi-selected { outline: 1px solid var(--dp-accent-color, #7d8cff); outline-offset: -1px; }
 .dp-lp-row-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Model selectors (2026-11-19, ported from HANDO): muted per-row info (size, triangles ...) and the sort control. */
+.dp-lp-row-meta { flex: 0 0 auto; margin-left: auto; padding-left: 8px; font-size: calc(var(--dp-body-font-size, 11px) - 1px); opacity: 0.6; white-space: nowrap; }
+.dp-lp-sort-row { display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+.dp-lp-sort-label { flex: 0 0 auto; font-size: var(--dp-body-font-size, 11px); opacity: 0.75; }
+.dp-lp-sort-select { flex: 1 1 auto; min-width: 0; background: #0f0f18; color: var(--dp-text-color, #e8e8f0); border: 1px solid #3a3a4a; border-radius: 4px; padding: 2px 4px; font-size: var(--dp-body-font-size, 11px); }
+.dp-lp-sort-dir { flex: 0 0 auto; background: #3a3a4a; color: var(--dp-text-color, #e8e8f0); border: none; border-radius: 4px; padding: 2px 8px; font-size: var(--dp-body-font-size, 11px); cursor: pointer; }
+.dp-lp-sort-dir:active { background: #4a4a5e; }
 .dp-lp-export-checkbox { flex: 0 0 auto; width: 13px; height: 13px; margin: 0; }
 .dp-list-picker-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 .dp-list-picker-actions button {
@@ -717,3 +729,5 @@ body:not(.hd-revealed) #pauseButton, body:not(.hd-revealed) #resetButton, body:n
 .dp-ui-inspector .ui-inspector-tab-active { opacity: 1; box-shadow: 0 0 0 2px #fff inset; }
 .dp-ui-inspector .ui-inspector-group-label { opacity: 0.7; font-size: 10px; font-style: italic; }
 .dp-ui-inspector .ui-inspector-add-override-picker { border: 1px dashed var(--dp-accent, #7d8cff); padding: 6px; margin-top: 6px; border-radius: 4px; }
+/* 2026-11-19: the Loading Preview Model and Skeleton Model selects stay as the backing controls of their item selectors (list-pickers); only the item selectors are shown. */
+.dp-row[data-key="loadingPreviewModelId"], .dp-row[data-key="skelFrontModel"] { display: none !important; }
