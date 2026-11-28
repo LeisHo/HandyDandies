@@ -18,7 +18,9 @@ work seamlessly from there.
 
 ## Currently working on
 
-**2026-11-28: click functions have a Wrist Crop group (9651f249, main.js?v=618).** Sets the crop value with a distance curve, progression curve and loop retransition. Checked by node only, not in the app. Still uncommitted in this working tree, from other sessions: model item selectors (2026-11-19) and slider multi-select (2026-11-27).
+**2026-11-28: click functions have a Wrist Crop group (9651f249, main.js?v=618).** Sets the crop value with a distance curve, progression curve and loop retransition. Checked by node only, not in the app. The model item selectors (2026-11-19) and slider multi-select (2026-11-27) were committed and pushed afterwards (e23c0e56, main.js?v=619), also not checked on screen.
+
+**2026-11-19: model selectors are item selectors (Hands group, Loading Preview, Render Skeleton In Front).** Hand Models gained Rename / + Group / Sort by (name, date uploaded, date modified) and a size + triangles text on every row; the Loading Preview Model and Skeleton Model dropdowns are now item selectors of their own (the old selects are hidden backing controls). Numbers for built-ins come from data/processed/hand-models-meta.json (re-run scripts/active/build-hand-model-meta.js after adding or re-exporting a model). Small Scale Models' per-level dropdowns and Crop Geometry are still dropdowns. Checked in the Browser pane by DOM only (the local startup is too slow to see the panel), not committed. See CHANGELOG 2026-11-19.
 
 **2026-10-15: Small Scale Models shipped (Hands group > "Small Scale Models", default off).** 9 lower-res models (HD-300 ... HD-8k, 366 ... 8,144 tris, same rig) are in data/processed/HAND3D/; the subgroup has an on/off checkbox, + Add Level, and per level a Z slider + model dropdown + delete; a hand uses the deepest level whose Z >= its world Z. Verified through the real controls in the page; NOT yet checked on the user's real saved layout (HANDS group restore), imported local models as levels, or real frame time. See CHANGELOG.txt / CLAUDE.md 2026-10-15.
 
